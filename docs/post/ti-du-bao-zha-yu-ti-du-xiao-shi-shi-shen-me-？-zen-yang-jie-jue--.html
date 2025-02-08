@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="![Image](https://github.com/user-attachments/assets/976e4783-a6c3-4db2-b8fd-03c333010bef)
+
+在深度学习中，[梯度消失](https://so.csdn.net/so/search?q=%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1&spm=1001.2101.3001.7020)和梯度爆炸是训练深层神经网络时常见的两大问题，它们会严重影响网络的训练过程和性能。">
+<meta property="og:title" content="梯度爆炸与梯度消失是什么？怎样解决?">
+<meta property="og:description" content="![Image](https://github.com/user-attachments/assets/976e4783-a6c3-4db2-b8fd-03c333010bef)
+
+在深度学习中，[梯度消失](https://so.csdn.net/so/search?q=%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1&spm=1001.2101.3001.7020)和梯度爆炸是训练深层神经网络时常见的两大问题，它们会严重影响网络的训练过程和性能。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/ti-du-bao-zha-yu-ti-du-xiao-shi-shi-shen-me-%EF%BC%9F-zen-yang-jie-jue--.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>梯度爆炸与梯度消失是什么？怎样解决?</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">梯度爆炸与梯度消失是什么？怎样解决?</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/10" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/976e4783-a6c3-4db2-b8fd-03c333010bef"><img src="https://github.com/user-attachments/assets/976e4783-a6c3-4db2-b8fd-03c333010bef" alt="Image" style="max-width: 100%;"></a></p>
+<p>在深度学习中，<a href="https://so.csdn.net/so/search?q=%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1&amp;spm=1001.2101.3001.7020" rel="nofollow">梯度消失</a>和梯度爆炸是训练深层神经网络时常见的两大问题，它们会严重影响网络的训练过程和性能。梯度消失，梯度趋零难更新；梯度爆炸，梯度过大不稳定。</p>
+<h3>什么是梯度爆炸（Exploding Gradient）？</h3>
+<blockquote>
+<p>误差梯度是神经网络训练过程中计算的方向和数量，用于以正确的方向和合适的量更新网络权重。 在深层网络或循环神经网络中，误差梯度可在更新中累积，变成非常大的梯度，然后导致网络权重的大幅更新，并因此使网络变得不稳定。在极端情况下，权重的值变得非常大，以至于溢出，导致 NaN 值。 网络层之间的梯度（值大于 1.0）重复相乘导致的指数级增长会产生梯度爆炸。 梯度爆炸引发的问题 在深度多层感知机网络中，梯度爆炸会引起网络不稳定，最好的结果是无法从训练数据中学习，而最坏的结果是出现无法再更新的 NaN 权重值。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/996c3ddb-b52d-46db-8bee-8095702e231f"><img src="https://github.com/user-attachments/assets/996c3ddb-b52d-46db-8bee-8095702e231f" alt="Image" style="max-width: 100%;"></a></p>
+<h4>梯度爆炸的原因是什么？</h4>
+<p>梯度爆炸的原因主要包括权重初始化过大、网络层数过多以及学习率设置过高等。</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/35cb1855-22c6-4392-95c3-0d997fefbaeb"><img src="https://github.com/user-attachments/assets/35cb1855-22c6-4392-95c3-0d997fefbaeb" alt="Image" style="max-width: 100%;"></a></p>
+<ul>
+<li><strong>权重初始化过大</strong>：在神经网络中，如果权重的初始值设置得过大，那么在<em><strong>反向传播</strong></em>过程中，梯度值可能会因为权重的累积效应而迅速增大，导致梯度爆炸。</li>
+<li><strong>网络层数过多</strong>：在深层神经网络中，由于<em><strong>链式法则</strong></em>的应用，梯度需要通过多层进行反向传播。如果每一层的梯度都稍微增大一点，那么经过多层传播后，梯度值就会变得非常大，导致梯度爆炸。</li>
+<li><strong>学习率设置过高</strong>：学习率决定了模型参数更新的步长。如果学习率设置得过高，那么模型参数在更新时可能会因为步长过大而跳出最优解的范围，同时过高的学习率会使模型在<em><strong>更新参数时过于激进，从而加剧梯度的波动</strong></em>。</li>
+</ul>
+<h3>什么是梯度消失（Vanishing Gradient）？</h3>
+<blockquote>
+<p>In machine learning, the vanishing gradient problem is a difficulty found in training artificial neural networks with gradient-based learning methods and backpropagation. In such methods, each of the neural network’s weights receive an update proportional to the partial derivative of the error function with respect to the current weight in each iteration of training. The problem is that in some cases, the gradient will be vanishingly small, effectively preventing the weight from changing its value. In the worst case, this may completely stop the neural network from further training. As one example of the problem cause, traditional activation functions such as the hyperbolic tangent function have gradients in the range (0, 1), and backpropagation computes gradients by the chain rule. This has the effect of multiplying n of these small numbers to compute gradients of the “front” layers in an n-layer network, meaning that the gradient (error signal) decreases exponentially with n while the front layers train very slowly.</p>
+</blockquote>
+<p>说人话就是：在某些情况下，梯度会变得非常小，有效地阻止了权重值的变化。在最坏的情况下，这可能会完全停止神经网络的进一步训练。例如，传统的激活函数(如双曲正切函数)具有范围(0,1)内的梯度，反向传播通过链式法则计算梯度。这样做的效果是，用这些小数字的n乘以n来计算n层网络中“前端”层的梯度，这意味着梯度(误差信号)随n呈指数递减，而前端层的训练非常缓慢。<br>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/aba9230a-fc3a-401a-92ab-b3d13ba349f9"><img src="https://github.com/user-attachments/assets/aba9230a-fc3a-401a-92ab-b3d13ba349f9" alt="Image" style="max-width: 100%;"></a></p>
+<h4>梯度消失的原因</h4>
+<p>梯度消失的主要原因包括激活函数的选择、链式法则的应用、权重初始化不当以及网络层数过多等。<br>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/bd775b3a-e3b3-476f-b374-62973d3e1b0d"><img src="https://github.com/user-attachments/assets/bd775b3a-e3b3-476f-b374-62973d3e1b0d" alt="Image" style="max-width: 100%;"></a></p>
+<ul>
+<li>激活函数的选择：在使用某些激活函数***（如Sigmoid和Tanh）***时，当输入值非常大或非常小的时候，这些函数的导数（或梯度）会趋近于零。</li>
+<li>链式法则的应用：在深度神经网络中，梯度是通过链式法则从输出层逐层反向传播到输入层的。每一层的梯度都是前一层梯度与该层激活函数导数的乘积。如果每一层的梯度都稍微减小一点，那么经过多层传播后，梯度值就会变得非常小，几乎为零。</li>
+<li>权重初始化不当：如果网络权重的初始值设置得太小，那么在前向传播过程中，输入信号可能会迅速衰减，导致激活函数的输入值非常小，进而使得梯度在反向传播过程中也迅速减小。</li>
+<li>网络层数过多：随着网络层数的增加，梯度需要通过更多的层进行反向传播。每一层都可能对梯度进行一定的衰减，因此层数越多，梯度消失的风险就越大。</li>
+</ul>
+<h3>解决方法</h3>
+<h4>方案1-预训练加微调</h4>
+<p>此方法来自Hinton在2006年发表的一篇论文，Hinton为了解决梯度的问题，提出采取无监督逐层训练方法，其基本思想是每次训练一层隐节点，训练时将上一层隐节点的输出作为输入，而本层隐节点的输出作为下一层隐节点的输入，此过程就是逐层“预训练”（pre-training）；在预训练完成后，再对整个网络进行“微调”（fine-tunning）。Hinton在训练深度信念网络（Deep Belief Networks中，使用了这个方法，在各层预训练完成后，再利用BP算法对整个网络进行训练。此思想相当于是先寻找局部最优，然后整合起来寻找全局最优，此方法有一定的好处，但是目前应用的不是很多了。</p>
+<h4>方案2-梯度剪切、正则化</h4>
+<p>梯度剪切这个方案主要是针对梯度爆炸提出的，其思想是设置一个梯度剪切阈值，然后更新梯度的时候，如果梯度超过这个阈值，那么就将其强制限制在这个范围之内。这可以防止梯度爆炸。<br>
+注：在WGAN中也有梯度剪切限制操作，但是和这个是不一样的，WGAN限制梯度更新信息是为了保证lipchitz条件。<br>
+另外一种解决梯度爆炸的手段是采用权重正则化（weithts regularization）比较常见的是l1正则，和l2正则，在各个深度框架中都有相应的API可以使用正则化。</p>
+<h4>方案3-relu、leakrelu、elu等激活函数</h4>
+<p>写过一篇<a href="https://tingdonghu.github.io/post/shen-du-xue-xi-%20-zhong-chang-jian-ji-huo-han-shu.html" rel="nofollow">机器学习中常见的激活函数总结</a><br>
+Relu:思想也很简单，如果激活函数的导数为1，那么就不存在梯度消失爆炸的问题了，每层的网络都可以得到相同的更新速度，relu就这样应运而生。</p>
+<h4>方案4-batchnorm/批规范化</h4>
+<p>Batchnorm是深度学习发展以来提出的最重要的成果之一了，目前已经被广泛的应用到了各大网络中，具有加速网络收敛速度，提升训练稳定性的效果，Batchnorm本质上是解决反向传播过程中的梯度问题。batchnorm全名是batch normalization，简称BN，即批规范化，通过规范化操作将输出信号x规范化到均值为0，方差为1保证网络的稳定性。</p>
+<h4>方案5-残差结构</h4>
+<p>残差结构说起残差的话，不得不提这篇论文了：Deep Residual Learning for Image Recognition，关于这篇论文的解读，可以参考<a href="https://zhuanlan.zhihu.com/p/31852747" rel="nofollow">机器学习算法全栈工程师知乎专栏文章链接</a> 这里只简单介绍残差如何解决梯度的问题。<br>
+事实上，就是残差网络的出现导致了image net比赛的终结，自从残差提出后，几乎所有的深度网络都离不开残差的身影，相比较之前的几层，几十层的深度网络，在残差网络面前都不值一提，残差可以很轻松的构建几百层，一千多层的网络而不用担心梯度消失过快的问题，原因就在于残差的捷径（shortcut）部分，其中残差单元如下图所示：<br>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/7362e774-5cd6-4175-9333-b8c0e38b7927"><img src="https://github.com/user-attachments/assets/7362e774-5cd6-4175-9333-b8c0e38b7927" alt="Image" style="max-width: 100%;"></a></p>
+<h4>方案6-LSTM</h4>
+<p>LSTM全称是长短期记忆网络（long-short term memory networks），是不那么容易发生梯度消失的，主要原因在于LSTM内部复杂的“门”(gates)，如下图，LSTM通过它内部的“门”可以接下来更新的时候“记住”前几次训练的”残留记忆“，因此，经常用于生成文本中。目前也有基于CNN的LSTM，感兴趣的可以尝试一下。<br>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/9f8ad730-135a-4308-b4ea-16d2d86488f7"><img src="https://github.com/user-attachments/assets/9f8ad730-135a-4308-b4ea-16d2d86488f7" alt="Image" style="max-width: 100%;"></a></p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+
+
+</html>
