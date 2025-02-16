@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## OpenPCDet的代码实现
+### PP网络点云数据处理
+注：
+1、在实现的过程中，每个pillar的长宽是0.16米，在pcdet的实现中，我们只会截取前视图的部分，进行训练，因为kitti的标注是根据2号相机进行标注的，所有x轴的负方向（即车的后方）是没有标注数据的，我们会截取掉后面的数据；同时为了保证检测的可靠性，距离太远的点，由于点云过于稀疏，也会被截取。">
+<meta property="og:title" content="OpenPCDet-PointPillar的实现（1）">
+<meta property="og:description" content="## OpenPCDet的代码实现
+### PP网络点云数据处理
+注：
+1、在实现的过程中，每个pillar的长宽是0.16米，在pcdet的实现中，我们只会截取前视图的部分，进行训练，因为kitti的标注是根据2号相机进行标注的，所有x轴的负方向（即车的后方）是没有标注数据的，我们会截取掉后面的数据；同时为了保证检测的可靠性，距离太远的点，由于点云过于稀疏，也会被截取。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/OpenPCDet-PointPillar-de-shi-xian-%EF%BC%881%EF%BC%89.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>OpenPCDet-PointPillar的实现（1）</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">OpenPCDet-PointPillar的实现（1）</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/14" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>OpenPCDet的代码实现</h2>
+<h3>PP网络点云数据处理</h3>
+<p>注：<br>
+1、在实现的过程中，每个pillar的长宽是0.16米，在pcdet的实现中，我们只会截取前视图的部分，进行训练，因为kitti的标注是根据2号相机进行标注的，所有x轴的负方向（即车的后方）是没有标注数据的，我们会截取掉后面的数据；同时为了保证检测的可靠性，距离太远的点，由于点云过于稀疏，也会被截取。所以在pcdet的实现中，点云空间的选取范围xyz的最小值是=[0, -39.68,-3]， xyz选取的最大值是[69.12, 39.68, 1]。<br>
+2、其中每个pillar中的最大点云数量是32，如果一个pillar中的点云数量超过32,那么就会随机采样，选取32个点；如果一个pillar中的点云数量少于32；那么会对这个pillar使用0样本填充。<br>
+在经过映射后，就获得了一个（D，P，N）的张量；接下来这里使用了一个简化版的pointnet网络对点云的数据进行特征提取（即将这些点通过MLP升维，然后跟着BN层和Relu激活层），得到一个（C，P，N）形状的张量，之后再使用maxpool操作提取每个pillar中最能代表该pillar的点。那么输出会变成（C，P，N）-&gt;（C，P）；在经过上述操作编码后的点，需要重新放回到原来对应pillar的x,y位置上生成伪图象数据。<br>
+下面看这部分的代码实现：<br>
+预处理实现代码 pcdet/datasets/processor/data_processor.py</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">def</span> <span class="pl-en">transform_points_to_voxels</span>(<span class="pl-s1">self</span>, <span class="pl-s1">data_dict</span><span class="pl-c1">=</span><span class="pl-c1">None</span>, <span class="pl-s1">config</span><span class="pl-c1">=</span><span class="pl-c1">None</span>):
+        <span class="pl-s">"""</span>
+<span class="pl-s">        将点云转换为pillar,使用spconv的VoxelGeneratorV2</span>
+<span class="pl-s">        因为pillar可是认为是一个z轴上所有voxel的集合，所以在设置的时候，</span>
+<span class="pl-s">        只需要将每个voxel的高度设置成kitti中点云的最大高度即可</span>
+<span class="pl-s">        """</span>
+        
+        <span class="pl-c">#初始化点云转换成pillar需要的参数</span>
+        <span class="pl-k">if</span> <span class="pl-s1">data_dict</span> <span class="pl-c1">is</span> <span class="pl-c1">None</span>:
+            <span class="pl-c"># kitti截取的点云范围是[0, -39.68, -3, 69.12, 39.68, 1]</span>
+            <span class="pl-c"># 得到[69.12, 79.36, 4]/[0.16, 0.16, 4] = [432, 496, 1]</span>
+            <span class="pl-s1">grid_size</span> <span class="pl-c1">=</span> (<span class="pl-s1">self</span>.<span class="pl-c1">point_cloud_range</span>[<span class="pl-c1">3</span>:<span class="pl-c1">6</span>] <span class="pl-c1">-</span> <span class="pl-s1">self</span>.<span class="pl-c1">point_cloud_range</span>[<span class="pl-c1">0</span>:<span class="pl-c1">3</span>]) <span class="pl-c1">/</span> <span class="pl-s1">np</span>.<span class="pl-c1">array</span>(<span class="pl-s1">config</span>.<span class="pl-c1">VOXEL_SIZE</span>)
+            <span class="pl-s1">self</span>.<span class="pl-c1">grid_size</span> <span class="pl-c1">=</span> <span class="pl-s1">np</span>.<span class="pl-c1">round</span>(<span class="pl-s1">grid_size</span>).<span class="pl-c1">astype</span>(<span class="pl-s1">np</span>.<span class="pl-c1">int64</span>)
+            <span class="pl-s1">self</span>.<span class="pl-c1">voxel_size</span> <span class="pl-c1">=</span> <span class="pl-s1">config</span>.<span class="pl-c1">VOXEL_SIZE</span>
+            <span class="pl-c"># just bind the config, we will create the VoxelGeneratorWrapper later,</span>
+            <span class="pl-c"># to avoid pickling issues in multiprocess spawn</span>
+            <span class="pl-k">return</span> <span class="pl-en">partial</span>(<span class="pl-s1">self</span>.<span class="pl-c1">transform_points_to_voxels</span>, <span class="pl-s1">config</span><span class="pl-c1">=</span><span class="pl-s1">config</span>)
+
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_generator</span> <span class="pl-c1">is</span> <span class="pl-c1">None</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">voxel_generator</span> <span class="pl-c1">=</span> <span class="pl-en">VoxelGeneratorWrapper</span>(
+                <span class="pl-c">#给定每个pillar的大小  [0.16, 0.16, 4]</span>
+                <span class="pl-s1">vsize_xyz</span><span class="pl-c1">=</span><span class="pl-s1">config</span>.<span class="pl-c1">VOXEL_SIZE</span>,  
+                <span class="pl-c">#给定点云的范围 [0, -39.68, -3, 69.12, 39.68, 1]</span>
+                <span class="pl-s1">coors_range_xyz</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">point_cloud_range</span>,  
+                <span class="pl-c">#给定每个点云的特征维度，这里是x，y，z，r 其中r是激光雷达反射强度</span>
+                <span class="pl-s1">num_point_features</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">num_point_features</span>,
+                <span class="pl-c">#给定每个pillar中最多能有多少个点 32</span>
+                <span class="pl-s1">max_num_points_per_voxel</span><span class="pl-c1">=</span><span class="pl-s1">config</span>.<span class="pl-c1">MAX_POINTS_PER_VOXEL</span>,  
+                <span class="pl-c">#最多选取多少个pillar，因为生成的pillar中，很多都是没有点在里面的</span>
+                <span class="pl-c"># 可以重上面的可视化图像中查看到，所以这里只需要得到那些非空的pillar就行</span>
+                <span class="pl-s1">max_num_voxels</span><span class="pl-c1">=</span><span class="pl-s1">config</span>.<span class="pl-c1">MAX_NUMBER_OF_VOXELS</span>[<span class="pl-s1">self</span>.<span class="pl-c1">mode</span>],  <span class="pl-c"># 16000</span>
+            )
+        
+        <span class="pl-s1">points</span> <span class="pl-c1">=</span> <span class="pl-s1">data_dict</span>[<span class="pl-s">'points'</span>]
+        <span class="pl-c"># 生成pillar输出</span>
+        <span class="pl-s1">voxel_output</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_generator</span>.<span class="pl-c1">generate</span>(<span class="pl-s1">points</span>)
+        <span class="pl-c"># 假设一份点云数据是N*4，那么经过pillar生成后会得到三份数据</span>
+        <span class="pl-c"># voxels代表了每个生成的pillar数据，维度是[M,32,4]</span>
+        <span class="pl-c"># coordinates代表了每个生成的pillar所在的zyx轴坐标，维度是[M,3],其中z恒为0</span>
+        <span class="pl-c"># num_points代表了每个生成的pillar中有多少个有效的点维度是[m,]，因为不满32会被0填充</span>
+        <span class="pl-s1">voxels</span>, <span class="pl-s1">coordinates</span>, <span class="pl-s1">num_points</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_output</span>
+
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">data_dict</span>[<span class="pl-s">'use_lead_xyz'</span>]:
+            <span class="pl-s1">voxels</span> <span class="pl-c1">=</span> <span class="pl-s1">voxels</span>[..., <span class="pl-c1">3</span>:]  <span class="pl-c"># remove xyz in voxels(N, 3)</span>
+
+        <span class="pl-s1">data_dict</span>[<span class="pl-s">'voxels'</span>] <span class="pl-c1">=</span> <span class="pl-s1">voxels</span>
+        <span class="pl-s1">data_dict</span>[<span class="pl-s">'voxel_coords'</span>] <span class="pl-c1">=</span> <span class="pl-s1">coordinates</span>
+        <span class="pl-s1">data_dict</span>[<span class="pl-s">'voxel_num_points'</span>] <span class="pl-c1">=</span> <span class="pl-s1">num_points</span>
+        <span class="pl-k">return</span> <span class="pl-s1">data_dict</span>
+
+<span class="pl-c">#　下面是使用spconv生成pillar的代码    </span>
+
+<span class="pl-k">class</span> <span class="pl-v">VoxelGeneratorWrapper</span>():
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">vsize_xyz</span>, <span class="pl-s1">coors_range_xyz</span>, <span class="pl-s1">num_point_features</span>, <span class="pl-s1">max_num_points_per_voxel</span>, <span class="pl-s1">max_num_voxels</span>):
+        <span class="pl-k">try</span>:
+            <span class="pl-k">from</span> <span class="pl-s1">spconv</span>.<span class="pl-s1">utils</span> <span class="pl-k">import</span> <span class="pl-v">VoxelGeneratorV2</span> <span class="pl-k">as</span> <span class="pl-v">VoxelGenerator</span>
+            <span class="pl-s1">self</span>.<span class="pl-c1">spconv_ver</span> <span class="pl-c1">=</span> <span class="pl-c1">1</span>
+        <span class="pl-k">except</span>:
+            <span class="pl-k">try</span>:
+                <span class="pl-k">from</span> <span class="pl-s1">spconv</span>.<span class="pl-s1">utils</span> <span class="pl-k">import</span> <span class="pl-v">VoxelGenerator</span>
+                <span class="pl-s1">self</span>.<span class="pl-c1">spconv_ver</span> <span class="pl-c1">=</span> <span class="pl-c1">1</span>
+            <span class="pl-k">except</span>:
+                <span class="pl-k">from</span> <span class="pl-s1">spconv</span>.<span class="pl-s1">utils</span> <span class="pl-k">import</span> <span class="pl-v">Point2VoxelCPU3d</span> <span class="pl-k">as</span> <span class="pl-v">VoxelGenerator</span>
+                <span class="pl-s1">self</span>.<span class="pl-c1">spconv_ver</span> <span class="pl-c1">=</span> <span class="pl-c1">2</span>
+
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">spconv_ver</span> <span class="pl-c1">==</span> <span class="pl-c1">1</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">_voxel_generator</span> <span class="pl-c1">=</span> <span class="pl-en">VoxelGenerator</span>(
+                <span class="pl-s1">voxel_size</span><span class="pl-c1">=</span><span class="pl-s1">vsize_xyz</span>,
+                <span class="pl-s1">point_cloud_range</span><span class="pl-c1">=</span><span class="pl-s1">coors_range_xyz</span>,
+                <span class="pl-s1">max_num_points</span><span class="pl-c1">=</span><span class="pl-s1">max_num_points_per_voxel</span>,
+                <span class="pl-s1">max_voxels</span><span class="pl-c1">=</span><span class="pl-s1">max_num_voxels</span>
+            )
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">_voxel_generator</span> <span class="pl-c1">=</span> <span class="pl-en">VoxelGenerator</span>(
+                <span class="pl-s1">vsize_xyz</span><span class="pl-c1">=</span><span class="pl-s1">vsize_xyz</span>,
+                <span class="pl-s1">coors_range_xyz</span><span class="pl-c1">=</span><span class="pl-s1">coors_range_xyz</span>,
+                <span class="pl-s1">num_point_features</span><span class="pl-c1">=</span><span class="pl-s1">num_point_features</span>,
+                <span class="pl-s1">max_num_points_per_voxel</span><span class="pl-c1">=</span><span class="pl-s1">max_num_points_per_voxel</span>,
+                <span class="pl-s1">max_num_voxels</span><span class="pl-c1">=</span><span class="pl-s1">max_num_voxels</span>
+            )
+
+    <span class="pl-k">def</span> <span class="pl-en">generate</span>(<span class="pl-s1">self</span>, <span class="pl-s1">points</span>):
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">spconv_ver</span> <span class="pl-c1">==</span> <span class="pl-c1">1</span>:
+            <span class="pl-s1">voxel_output</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">_voxel_generator</span>.<span class="pl-c1">generate</span>(<span class="pl-s1">points</span>)
+            <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">voxel_output</span>, <span class="pl-s1">dict</span>):
+                <span class="pl-s1">voxels</span>, <span class="pl-s1">coordinates</span>, <span class="pl-s1">num_points</span> <span class="pl-c1">=</span> \
+                    <span class="pl-s1">voxel_output</span>[<span class="pl-s">'voxels'</span>], <span class="pl-s1">voxel_output</span>[<span class="pl-s">'coordinates'</span>], <span class="pl-s1">voxel_output</span>[<span class="pl-s">'num_points_per_voxel'</span>]
+            <span class="pl-k">else</span>:
+                <span class="pl-s1">voxels</span>, <span class="pl-s1">coordinates</span>, <span class="pl-s1">num_points</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_output</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-k">assert</span> <span class="pl-s1">tv</span> <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>, <span class="pl-s">f"Unexpected error, library: 'cumm' wasn't imported properly."</span>
+            <span class="pl-s1">voxel_output</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">_voxel_generator</span>.<span class="pl-c1">point_to_voxel</span>(<span class="pl-s1">tv</span>.<span class="pl-c1">from_numpy</span>(<span class="pl-s1">points</span>))
+            <span class="pl-s1">tv_voxels</span>, <span class="pl-s1">tv_coordinates</span>, <span class="pl-s1">tv_num_points</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_output</span>
+            <span class="pl-c"># make copy with numpy(), since numpy_view() will disappear as soon as the generator is deleted</span>
+            <span class="pl-s1">voxels</span> <span class="pl-c1">=</span> <span class="pl-s1">tv_voxels</span>.<span class="pl-c1">numpy</span>()
+            <span class="pl-s1">coordinates</span> <span class="pl-c1">=</span> <span class="pl-s1">tv_coordinates</span>.<span class="pl-c1">numpy</span>()
+            <span class="pl-s1">num_points</span> <span class="pl-c1">=</span> <span class="pl-s1">tv_num_points</span>.<span class="pl-c1">numpy</span>()
+        <span class="pl-k">return</span> <span class="pl-s1">voxels</span>, <span class="pl-s1">coordinates</span>, <span class="pl-s1">num_points</span></pre></div>
+<p>在经过上面的预处理之后，就需要使用简化版的pointnet网络对每个pillar中的数据进行特征提取了。<br>
+代码在pcdet/models/backbones_3d/vfe/pillar_vfe.py</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">torch</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span> <span class="pl-k">as</span> <span class="pl-s1">nn</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span>.<span class="pl-s1">functional</span> <span class="pl-k">as</span> <span class="pl-c1">F</span>
+
+<span class="pl-k">from</span> .<span class="pl-s1">vfe_template</span> <span class="pl-k">import</span> <span class="pl-v">VFETemplate</span>
+
+
+<span class="pl-k">class</span> <span class="pl-v">PFNLayer</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Module</span>):
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>,
+                 <span class="pl-s1">in_channels</span>,
+                 <span class="pl-s1">out_channels</span>,
+                 <span class="pl-s1">use_norm</span><span class="pl-c1">=</span><span class="pl-c1">True</span>,
+                 <span class="pl-s1">last_layer</span><span class="pl-c1">=</span><span class="pl-c1">False</span>):
+        <span class="pl-en">super</span>().<span class="pl-c1">__init__</span>()
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">last_vfe</span> <span class="pl-c1">=</span> <span class="pl-s1">last_layer</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">use_norm</span> <span class="pl-c1">=</span> <span class="pl-s1">use_norm</span>
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">self</span>.<span class="pl-c1">last_vfe</span>:
+            <span class="pl-s1">out_channels</span> <span class="pl-c1">=</span> <span class="pl-s1">out_channels</span> <span class="pl-c1">//</span> <span class="pl-c1">2</span>
+
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">use_norm</span>:
+            <span class="pl-c"># 根据论文中，这是是简化版pointnet网络层的初始化</span>
+            <span class="pl-c"># 论文中使用的是 1x1 的卷积层完成这里的升维操作（理论上使用卷积的计算速度会更快）</span>
+            <span class="pl-c"># 输入的通道数是刚刚经过数据增强过后的点云特征，每个点云有10个特征，</span>
+            <span class="pl-c"># 输出的通道数是64</span>
+            <span class="pl-s1">self</span>.<span class="pl-c1">linear</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">Linear</span>(<span class="pl-s1">in_channels</span>, <span class="pl-s1">out_channels</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>)
+            <span class="pl-c"># 一维BN层</span>
+            <span class="pl-s1">self</span>.<span class="pl-c1">norm</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm1d</span>(<span class="pl-s1">out_channels</span>, <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>)
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">linear</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">Linear</span>(<span class="pl-s1">in_channels</span>, <span class="pl-s1">out_channels</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">part</span> <span class="pl-c1">=</span> <span class="pl-c1">50000</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">forward</span>(<span class="pl-s1">self</span>, <span class="pl-s1">inputs</span>):
+        <span class="pl-k">if</span> <span class="pl-s1">inputs</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">0</span>] <span class="pl-c1">&gt;</span> <span class="pl-s1">self</span>.<span class="pl-c1">part</span>:
+            <span class="pl-c"># nn.Linear performs randomly when batch size is too large</span>
+            <span class="pl-s1">num_parts</span> <span class="pl-c1">=</span> <span class="pl-s1">inputs</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">0</span>] <span class="pl-c1">//</span> <span class="pl-s1">self</span>.<span class="pl-c1">part</span>
+            <span class="pl-s1">part_linear_out</span> <span class="pl-c1">=</span> [<span class="pl-s1">self</span>.<span class="pl-c1">linear</span>(<span class="pl-s1">inputs</span>[<span class="pl-s1">num_part</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">part</span>:(<span class="pl-s1">num_part</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>) <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">part</span>])
+                               <span class="pl-k">for</span> <span class="pl-s1">num_part</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_parts</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>)]
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cat</span>(<span class="pl-s1">part_linear_out</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">0</span>)
+        <span class="pl-k">else</span>:
+            <span class="pl-c"># x的维度由（M, 32, 10）升维成了（M, 32, 64）</span>
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">linear</span>(<span class="pl-s1">inputs</span>)
+        <span class="pl-s1">torch</span>.<span class="pl-c1">backends</span>.<span class="pl-c1">cudnn</span>.<span class="pl-c1">enabled</span> <span class="pl-c1">=</span> <span class="pl-c1">False</span>
+        <span class="pl-c"># BatchNorm1d层:(M, 64, 32) --&gt; (M, 32, 64)</span>
+        <span class="pl-c"># （pillars,num_point,channel）-&gt;(pillars,channel,num_points)</span>
+        <span class="pl-c"># 这里之所以变换维度，是因为BatchNorm1d在通道维度上进行,对于图像来说默认模式为[N,C,H*W],通道在第二个维度上</span>
+        <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">norm</span>(<span class="pl-s1">x</span>.<span class="pl-c1">permute</span>(<span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">1</span>)).<span class="pl-c1">permute</span>(<span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">1</span>) <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">use_norm</span> <span class="pl-k">else</span> <span class="pl-s1">x</span>
+        <span class="pl-s1">torch</span>.<span class="pl-c1">backends</span>.<span class="pl-c1">cudnn</span>.<span class="pl-c1">enabled</span> <span class="pl-c1">=</span> <span class="pl-c1">True</span>
+        <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-c1">F</span>.<span class="pl-c1">relu</span>(<span class="pl-s1">x</span>)
+        <span class="pl-c"># 完成pointnet的最大池化操作，找出每个pillar中最能代表该pillar的点</span>
+        <span class="pl-c"># x_max shape ：（M, 1, 64）　</span>
+        <span class="pl-s1">x_max</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">max</span>(<span class="pl-s1">x</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">1</span>, <span class="pl-s1">keepdim</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)[<span class="pl-c1">0</span>]
+
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">last_vfe</span>:
+            <span class="pl-c"># 返回经过简化版pointnet处理pillar的结果</span>
+            <span class="pl-k">return</span> <span class="pl-s1">x_max</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">x_repeat</span> <span class="pl-c1">=</span> <span class="pl-s1">x_max</span>.<span class="pl-c1">repeat</span>(<span class="pl-c1">1</span>, <span class="pl-s1">inputs</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">1</span>], <span class="pl-c1">1</span>)
+            <span class="pl-s1">x_concatenated</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cat</span>([<span class="pl-s1">x</span>, <span class="pl-s1">x_repeat</span>], <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">2</span>)
+            <span class="pl-k">return</span> <span class="pl-s1">x_concatenated</span>
+
+
+<span class="pl-k">class</span> <span class="pl-v">PillarVFE</span>(<span class="pl-v">VFETemplate</span>):
+    <span class="pl-s">"""</span>
+<span class="pl-s">    model_cfg:NAME: PillarVFE</span>
+<span class="pl-s">                    WITH_DISTANCE: False</span>
+<span class="pl-s">                    USE_ABSLOTE_XYZ: True</span>
+<span class="pl-s">                    USE_NORM: True</span>
+<span class="pl-s">                    NUM_FILTERS: [64]</span>
+<span class="pl-s">    num_point_features:4</span>
+<span class="pl-s">    voxel_size:[0.16 0.16 4]</span>
+<span class="pl-s">    POINT_CLOUD_RANGE: [0, -39.68, -3, 69.12, 39.68, 1]</span>
+<span class="pl-s">    """</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">model_cfg</span>, <span class="pl-s1">num_point_features</span>, <span class="pl-s1">voxel_size</span>, <span class="pl-s1">point_cloud_range</span>, <span class="pl-c1">**</span><span class="pl-s1">kwargs</span>):
+        <span class="pl-en">super</span>().<span class="pl-c1">__init__</span>(<span class="pl-s1">model_cfg</span><span class="pl-c1">=</span><span class="pl-s1">model_cfg</span>)
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">use_norm</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">USE_NORM</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">with_distance</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">WITH_DISTANCE</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">use_absolute_xyz</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">USE_ABSLOTE_XYZ</span>
+        <span class="pl-s1">num_point_features</span> <span class="pl-c1">+=</span> <span class="pl-c1">6</span> <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">use_absolute_xyz</span> <span class="pl-k">else</span> <span class="pl-c1">3</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">with_distance</span>:
+            <span class="pl-s1">num_point_features</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_FILTERS</span>
+        <span class="pl-k">assert</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">num_filters</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span>
+        <span class="pl-s1">num_filters</span> <span class="pl-c1">=</span> [<span class="pl-s1">num_point_features</span>] <span class="pl-c1">+</span> <span class="pl-en">list</span>(<span class="pl-s1">self</span>.<span class="pl-c1">num_filters</span>)
+
+        <span class="pl-s1">pfn_layers</span> <span class="pl-c1">=</span> []
+        <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-en">len</span>(<span class="pl-s1">num_filters</span>) <span class="pl-c1">-</span> <span class="pl-c1">1</span>):
+            <span class="pl-s1">in_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">num_filters</span>[<span class="pl-s1">i</span>]
+            <span class="pl-s1">out_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">num_filters</span>[<span class="pl-s1">i</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>]
+            <span class="pl-s1">pfn_layers</span>.<span class="pl-c1">append</span>(
+                <span class="pl-en">PFNLayer</span>(<span class="pl-s1">in_filters</span>, <span class="pl-s1">out_filters</span>, <span class="pl-s1">self</span>.<span class="pl-c1">use_norm</span>, <span class="pl-s1">last_layer</span><span class="pl-c1">=</span>(<span class="pl-s1">i</span> <span class="pl-c1">&gt;=</span> <span class="pl-en">len</span>(<span class="pl-s1">num_filters</span>) <span class="pl-c1">-</span> <span class="pl-c1">2</span>))
+            )
+        <span class="pl-c"># 加入线性层，将10维特征变为64维特征</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">pfn_layers</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">ModuleList</span>(<span class="pl-s1">pfn_layers</span>)
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">voxel_x</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_size</span>[<span class="pl-c1">0</span>]
+        <span class="pl-s1">self</span>.<span class="pl-c1">voxel_y</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_size</span>[<span class="pl-c1">1</span>]
+        <span class="pl-s1">self</span>.<span class="pl-c1">voxel_z</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_size</span>[<span class="pl-c1">2</span>]
+        <span class="pl-s1">self</span>.<span class="pl-c1">x_offset</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_x</span> <span class="pl-c1">/</span> <span class="pl-c1">2</span> <span class="pl-c1">+</span> <span class="pl-s1">point_cloud_range</span>[<span class="pl-c1">0</span>]
+        <span class="pl-s1">self</span>.<span class="pl-c1">y_offset</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_y</span> <span class="pl-c1">/</span> <span class="pl-c1">2</span> <span class="pl-c1">+</span> <span class="pl-s1">point_cloud_range</span>[<span class="pl-c1">1</span>]
+        <span class="pl-s1">self</span>.<span class="pl-c1">z_offset</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_z</span> <span class="pl-c1">/</span> <span class="pl-c1">2</span> <span class="pl-c1">+</span> <span class="pl-s1">point_cloud_range</span>[<span class="pl-c1">2</span>]
+
+    <span class="pl-k">def</span> <span class="pl-en">get_output_feature_dim</span>(<span class="pl-s1">self</span>):
+        <span class="pl-k">return</span> <span class="pl-s1">self</span>.<span class="pl-c1">num_filters</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>]
+
+    <span class="pl-k">def</span> <span class="pl-en">get_paddings_indicator</span>(<span class="pl-s1">self</span>, <span class="pl-s1">actual_num</span>, <span class="pl-s1">max_num</span>, <span class="pl-s1">axis</span><span class="pl-c1">=</span><span class="pl-c1">0</span>):
+        <span class="pl-s">"""</span>
+<span class="pl-s">        计算padding的指示</span>
+<span class="pl-s">        Args:</span>
+<span class="pl-s">            actual_num:每个voxel实际点的数量（M，）</span>
+<span class="pl-s">            max_num:voxel最大点的数量（32，）</span>
+<span class="pl-s">        Returns:</span>
+<span class="pl-s">            paddings_indicator:表明一个pillar中哪些是真实数据，哪些是填充的0数据</span>
+<span class="pl-s">        """</span>
+        <span class="pl-c"># 扩展一个维度，使变为（M，1）</span>
+        <span class="pl-s1">actual_num</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">unsqueeze</span>(<span class="pl-s1">actual_num</span>, <span class="pl-s1">axis</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>)
+        <span class="pl-c"># [1, 1]</span>
+        <span class="pl-s1">max_num_shape</span> <span class="pl-c1">=</span> [<span class="pl-c1">1</span>] <span class="pl-c1">*</span> <span class="pl-en">len</span>(<span class="pl-s1">actual_num</span>.<span class="pl-c1">shape</span>)
+        <span class="pl-c"># [1, -1]</span>
+        <span class="pl-s1">max_num_shape</span>[<span class="pl-s1">axis</span> <span class="pl-c1">+</span> <span class="pl-c1">1</span>] <span class="pl-c1">=</span> <span class="pl-c1">-</span><span class="pl-c1">1</span>
+        <span class="pl-c"># (1,32)</span>
+        <span class="pl-s1">max_num</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">arange</span>(<span class="pl-s1">max_num</span>, <span class="pl-s1">dtype</span><span class="pl-c1">=</span><span class="pl-s1">torch</span>.<span class="pl-c1">int</span>, <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s1">actual_num</span>.<span class="pl-c1">device</span>).<span class="pl-c1">view</span>(<span class="pl-s1">max_num_shape</span>)
+        <span class="pl-c"># (M, 32)</span>
+        <span class="pl-s1">paddings_indicator</span> <span class="pl-c1">=</span> <span class="pl-s1">actual_num</span>.<span class="pl-c1">int</span>() <span class="pl-c1">&gt;</span> <span class="pl-s1">max_num</span>
+        <span class="pl-k">return</span> <span class="pl-s1">paddings_indicator</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">forward</span>(<span class="pl-s1">self</span>, <span class="pl-s1">batch_dict</span>, <span class="pl-c1">**</span><span class="pl-s1">kwargs</span>):
+        <span class="pl-s">"""</span>
+<span class="pl-s">        batch_dict:</span>
+<span class="pl-s">            points:(N,5) --&gt; (batch_index,x,y,z,r) batch_index代表了该点云数据在当前batch中的index</span>
+<span class="pl-s">            frame_id:(4,) --&gt; (003877,001908,006616,005355) 帧ID</span>
+<span class="pl-s">            gt_boxes:(4,40,8)--&gt; (x,y,z,dx,dy,dz,ry,class)</span>
+<span class="pl-s">            use_lead_xyz:(4,) --&gt; (1,1,1,1)</span>
+<span class="pl-s">            voxels:(M,32,4) --&gt; (x,y,z,r)</span>
+<span class="pl-s">            voxel_coords:(M,4) --&gt; (batch_index,z,y,x) batch_index代表了该点云数据在当前batch中的index</span>
+<span class="pl-s">            voxel_num_points:(M,)</span>
+<span class="pl-s">            image_shape:(4,2) 每份点云数据对应的2号相机图片分辨率</span>
+<span class="pl-s">            batch_size:4    batch_size大小</span>
+<span class="pl-s">        """</span>
+        <span class="pl-s1">voxel_features</span>, <span class="pl-s1">voxel_num_points</span>, <span class="pl-s1">coords</span> <span class="pl-c1">=</span> <span class="pl-s1">batch_dict</span>[<span class="pl-s">'voxels'</span>], <span class="pl-s1">batch_dict</span>[<span class="pl-s">'voxel_num_points'</span>], <span class="pl-s1">batch_dict</span>[
+            <span class="pl-s">'voxel_coords'</span>]
+        <span class="pl-c"># 求每个pillar中所有点云的和 (M, 32, 3)-&gt;(M, 1, 3) 设置keepdim=True的，则保留原来的维度信息</span>
+        <span class="pl-c"># 然后在使用求和信息除以每个点云中有多少个点来求每个pillar中所有点云的平均值 points_mean shape：(M, 1, 3)</span>
+        <span class="pl-s1">points_mean</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_features</span>[:, :, :<span class="pl-c1">3</span>].<span class="pl-c1">sum</span>(<span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">1</span>, <span class="pl-s1">keepdim</span><span class="pl-c1">=</span><span class="pl-c1">True</span>) <span class="pl-c1">/</span> <span class="pl-s1">voxel_num_points</span>.<span class="pl-c1">type_as</span>(<span class="pl-s1">voxel_features</span>).<span class="pl-c1">view</span>(
+            <span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>)
+        <span class="pl-c"># 每个点云数据减去该点对应pillar的平均值得到差值 xc,yc,zc</span>
+        <span class="pl-s1">f_cluster</span> <span class="pl-c1">=</span> <span class="pl-s1">voxel_features</span>[:, :, :<span class="pl-c1">3</span>] <span class="pl-c1">-</span> <span class="pl-s1">points_mean</span>
+
+        <span class="pl-c"># 创建每个点云到该pillar的坐标中心点偏移量空数据 xp,yp,zp</span>
+        <span class="pl-s1">f_center</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">zeros_like</span>(<span class="pl-s1">voxel_features</span>[:, :, :<span class="pl-c1">3</span>])
+        <span class="pl-c">#  coords是每个网格点的坐标，即[432, 496, 1]，需要乘以每个pillar的长宽得到点云数据中实际的长宽（单位米）</span>
+        <span class="pl-c">#  同时为了获得每个pillar的中心点坐标，还需要加上每个pillar长宽的一半得到中心点坐标</span>
+        <span class="pl-c">#  每个点的x、y、z减去对应pillar的坐标中心点，得到每个点到该点中心点的偏移量</span>
+        <span class="pl-s1">f_center</span>[:, :, <span class="pl-c1">0</span>] <span class="pl-c1">=</span> <span class="pl-s1">voxel_features</span>[:, :, <span class="pl-c1">0</span>] <span class="pl-c1">-</span> (
+                <span class="pl-s1">coords</span>[:, <span class="pl-c1">3</span>].<span class="pl-c1">to</span>(<span class="pl-s1">voxel_features</span>.<span class="pl-c1">dtype</span>).<span class="pl-c1">unsqueeze</span>(<span class="pl-c1">1</span>) <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_x</span> <span class="pl-c1">+</span> <span class="pl-s1">self</span>.<span class="pl-c1">x_offset</span>)
+        <span class="pl-s1">f_center</span>[:, :, <span class="pl-c1">1</span>] <span class="pl-c1">=</span> <span class="pl-s1">voxel_features</span>[:, :, <span class="pl-c1">1</span>] <span class="pl-c1">-</span> (
+                <span class="pl-s1">coords</span>[:, <span class="pl-c1">2</span>].<span class="pl-c1">to</span>(<span class="pl-s1">voxel_features</span>.<span class="pl-c1">dtype</span>).<span class="pl-c1">unsqueeze</span>(<span class="pl-c1">1</span>) <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_y</span> <span class="pl-c1">+</span> <span class="pl-s1">self</span>.<span class="pl-c1">y_offset</span>)
+        <span class="pl-c"># 此处偏移多了z轴偏移  论文中没有z轴偏移</span>
+        <span class="pl-s1">f_center</span>[:, :, <span class="pl-c1">2</span>] <span class="pl-c1">=</span> <span class="pl-s1">voxel_features</span>[:, :, <span class="pl-c1">2</span>] <span class="pl-c1">-</span> (
+                <span class="pl-s1">coords</span>[:, <span class="pl-c1">1</span>].<span class="pl-c1">to</span>(<span class="pl-s1">voxel_features</span>.<span class="pl-c1">dtype</span>).<span class="pl-c1">unsqueeze</span>(<span class="pl-c1">1</span>) <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">voxel_z</span> <span class="pl-c1">+</span> <span class="pl-s1">self</span>.<span class="pl-c1">z_offset</span>)
+
+        <span class="pl-c"># 如果使用绝对坐标，直接组合</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">use_absolute_xyz</span>:
+            <span class="pl-s1">features</span> <span class="pl-c1">=</span> [<span class="pl-s1">voxel_features</span>, <span class="pl-s1">f_cluster</span>, <span class="pl-s1">f_center</span>]
+        <span class="pl-c"># 否则，取voxel_features的3维之后，在组合</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">features</span> <span class="pl-c1">=</span> [<span class="pl-s1">voxel_features</span>[..., <span class="pl-c1">3</span>:], <span class="pl-s1">f_cluster</span>, <span class="pl-s1">f_center</span>]
+
+        <span class="pl-c"># 如果使用距离信息</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">with_distance</span>:
+            <span class="pl-c"># torch.norm的第一个2指的是求2范数，第二个2是在第三维度求范数</span>
+            <span class="pl-s1">points_dist</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">norm</span>(<span class="pl-s1">voxel_features</span>[:, :, :<span class="pl-c1">3</span>], <span class="pl-c1">2</span>, <span class="pl-c1">2</span>, <span class="pl-s1">keepdim</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+            <span class="pl-s1">features</span>.<span class="pl-c1">append</span>(<span class="pl-s1">points_dist</span>)
+        <span class="pl-c"># 将特征在最后一维度拼接 得到维度为（M，32,10）的张量</span>
+        <span class="pl-s1">features</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cat</span>(<span class="pl-s1">features</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">-</span><span class="pl-c1">1</span>)
+        <span class="pl-c"># 每个pillar中点云的最大数量</span>
+        <span class="pl-s1">voxel_count</span> <span class="pl-c1">=</span> <span class="pl-s1">features</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">1</span>]
+        <span class="pl-s">"""</span>
+<span class="pl-s">        由于在生成每个pillar中，不满足最大32个点的pillar会存在由0填充的数据，</span>
+<span class="pl-s">        而刚才上面的计算中，会导致这些</span>
+<span class="pl-s">        由0填充的数据在计算出现xc,yc,zc和xp,yp,zp出现数值，</span>
+<span class="pl-s">        所以需要将这个被填充的数据的这些数值清0,</span>
+<span class="pl-s">        因此使用get_paddings_indicator计算features中哪些是需要被保留真实数据和需要被置0的填充数据</span>
+<span class="pl-s">        """</span>
+        <span class="pl-c"># 得到mask维度是（M， 32）</span>
+        <span class="pl-c"># mask中指名了每个pillar中哪些是需要被保留的数据</span>
+        <span class="pl-s1">mask</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">get_paddings_indicator</span>(<span class="pl-s1">voxel_num_points</span>, <span class="pl-s1">voxel_count</span>, <span class="pl-s1">axis</span><span class="pl-c1">=</span><span class="pl-c1">0</span>)
+        <span class="pl-c"># （M， 32）-&gt;(M, 32, 1)</span>
+        <span class="pl-s1">mask</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">unsqueeze</span>(<span class="pl-s1">mask</span>, <span class="pl-c1">-</span><span class="pl-c1">1</span>).<span class="pl-c1">type_as</span>(<span class="pl-s1">voxel_features</span>)
+        <span class="pl-c"># 将feature中被填充数据的所有特征置0</span>
+        <span class="pl-s1">features</span> <span class="pl-c1">*=</span> <span class="pl-s1">mask</span>
+
+        <span class="pl-k">for</span> <span class="pl-s1">pfn</span> <span class="pl-c1">in</span> <span class="pl-s1">self</span>.<span class="pl-c1">pfn_layers</span>:
+            <span class="pl-s1">features</span> <span class="pl-c1">=</span> <span class="pl-en">pfn</span>(<span class="pl-s1">features</span>)
+        <span class="pl-c"># (M, 64), 每个pillar抽象出一个64维特征</span>
+        <span class="pl-s1">features</span> <span class="pl-c1">=</span> <span class="pl-s1">features</span>.<span class="pl-c1">squeeze</span>()
+        <span class="pl-s1">batch_dict</span>[<span class="pl-s">'pillar_features'</span>] <span class="pl-c1">=</span> <span class="pl-s1">features</span>
+        <span class="pl-k">return</span> <span class="pl-s1">batch_dict</span></pre></div>
+<p>在经过简化版的pointnet网络提取出每个pillar的特征信息后，就需要将每个的pillar数据重新放回原来的坐标分布中来组成伪图像数据了。<br>
+代码在pcdet/models/backbones_2d/map_to_bev/pointpillar_scatter.py</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">torch</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span> <span class="pl-k">as</span> <span class="pl-s1">nn</span>
+
+
+<span class="pl-k">class</span> <span class="pl-v">PointPillarScatter</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Module</span>):
+    <span class="pl-s">"""</span>
+<span class="pl-s">       对应到论文中就是stacked pillars，将生成的pillar按照坐标索引还原到原空间中</span>
+<span class="pl-s">    """</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">model_cfg</span>, <span class="pl-s1">grid_size</span>, <span class="pl-c1">**</span><span class="pl-s1">kwargs</span>):
+        <span class="pl-en">super</span>().<span class="pl-c1">__init__</span>()
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span> <span class="pl-c1">=</span> <span class="pl-s1">model_cfg</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_bev_features</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_BEV_FEATURES</span>  <span class="pl-c"># 64</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">nx</span>, <span class="pl-s1">self</span>.<span class="pl-c1">ny</span>, <span class="pl-s1">self</span>.<span class="pl-c1">nz</span> <span class="pl-c1">=</span> <span class="pl-s1">grid_size</span>  <span class="pl-c"># [432,496,1]</span>
+        <span class="pl-k">assert</span> <span class="pl-s1">self</span>.<span class="pl-c1">nz</span> <span class="pl-c1">==</span> <span class="pl-c1">1</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">forward</span>(<span class="pl-s1">self</span>, <span class="pl-s1">batch_dict</span>, <span class="pl-c1">**</span><span class="pl-s1">kwargs</span>):
+        <span class="pl-s">"""</span>
+<span class="pl-s">       Args:</span>
+<span class="pl-s">           pillar_features:(M,64)</span>
+<span class="pl-s">           coords:(M, 4) 第一维是batch_index 其余维度为xyz</span>
+<span class="pl-s">       Returns:</span>
+<span class="pl-s">           batch_spatial_features:(batch_size, 64, 496, 432)</span>
+<span class="pl-s">       """</span>
+        <span class="pl-c"># 拿到经过前面pointnet处理过后的pillar数据和每个pillar所在点云中的坐标位置</span>
+        <span class="pl-c"># pillar_features 维度 （M， 64）</span>
+        <span class="pl-c"># coords 维度 （M， 4）</span>
+        <span class="pl-s1">pillar_features</span>, <span class="pl-s1">coords</span> <span class="pl-c1">=</span> <span class="pl-s1">batch_dict</span>[<span class="pl-s">'pillar_features'</span>], <span class="pl-s1">batch_dict</span>[<span class="pl-s">'voxel_coords'</span>]
+
+        <span class="pl-c"># 将转换成为伪图像的数据存在到该列表中</span>
+        <span class="pl-s1">batch_spatial_features</span> <span class="pl-c1">=</span> []
+        <span class="pl-s1">batch_size</span> <span class="pl-c1">=</span> <span class="pl-s1">coords</span>[:, <span class="pl-c1">0</span>].<span class="pl-c1">max</span>().<span class="pl-c1">int</span>().<span class="pl-c1">item</span>() <span class="pl-c1">+</span> <span class="pl-c1">1</span>
+
+        <span class="pl-c"># batch中的每个数据独立处理</span>
+        <span class="pl-k">for</span> <span class="pl-s1">batch_idx</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">batch_size</span>):
+            <span class="pl-c"># 创建一个空间坐标所有用来接受pillar中的数据</span>
+            <span class="pl-c"># self.num_bev_features是64</span>
+            <span class="pl-c"># self.nz * self.nx * self.ny是生成的空间坐标索引 [496, 432, 1]的乘积</span>
+            <span class="pl-c"># spatial_feature 维度 (64,214272)</span>
+            <span class="pl-s1">spatial_feature</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">zeros</span>(
+                <span class="pl-s1">self</span>.<span class="pl-c1">num_bev_features</span>,
+                <span class="pl-s1">self</span>.<span class="pl-c1">nz</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">nx</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">ny</span>,
+                <span class="pl-s1">dtype</span><span class="pl-c1">=</span><span class="pl-s1">pillar_features</span>.<span class="pl-c1">dtype</span>,
+                <span class="pl-s1">device</span><span class="pl-c1">=</span><span class="pl-s1">pillar_features</span>.<span class="pl-c1">device</span>)  <span class="pl-c"># (64,214272)--&gt;1x432x496=214272</span>
+
+            <span class="pl-c"># 从coords[:, 0]取出该batch_idx的数据mask</span>
+            <span class="pl-s1">batch_mask</span> <span class="pl-c1">=</span> <span class="pl-s1">coords</span>[:, <span class="pl-c1">0</span>] <span class="pl-c1">==</span> <span class="pl-s1">batch_idx</span>
+            <span class="pl-c"># 根据mask提取坐标</span>
+            <span class="pl-s1">this_coords</span> <span class="pl-c1">=</span> <span class="pl-s1">coords</span>[<span class="pl-s1">batch_mask</span>, :]
+            <span class="pl-c"># this_coords中存储的坐标是z,y和x的形式,且只有一层，因此计算索引的方式如下</span>
+            <span class="pl-c"># 平铺后需要计算前面有多少个pillar 一直到当前pillar的索引</span>
+            <span class="pl-s">"""</span>
+<span class="pl-s">            因为前面是将所有数据flatten成一维的了，相当于一个图片宽高为[496, 432]的图片</span>
+<span class="pl-s">            被flatten成一维的图片数据了，变成了496*432=214272;</span>
+<span class="pl-s">            而this_coords中存储的是平面（不需要考虑Z轴）中一个点的信息，所以要</span>
+<span class="pl-s">            将这个点的位置放回被flatten的一位数据时，需要计算在该点之前所有行的点总和加上</span>
+<span class="pl-s">            该点所在的列即可</span>
+<span class="pl-s">            """</span>
+            <span class="pl-c"># 这里得到所有非空pillar在伪图像的对应索引位置</span>
+            <span class="pl-s1">indices</span> <span class="pl-c1">=</span> <span class="pl-s1">this_coords</span>[:, <span class="pl-c1">1</span>] <span class="pl-c1">+</span> <span class="pl-s1">this_coords</span>[:, <span class="pl-c1">2</span>] <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">nx</span> <span class="pl-c1">+</span> <span class="pl-s1">this_coords</span>[:, <span class="pl-c1">3</span>]
+            <span class="pl-c"># 转换数据类型</span>
+            <span class="pl-s1">indices</span> <span class="pl-c1">=</span> <span class="pl-s1">indices</span>.<span class="pl-c1">type</span>(<span class="pl-s1">torch</span>.<span class="pl-c1">long</span>)
+            <span class="pl-c"># 根据mask提取pillar_features</span>
+            <span class="pl-s1">pillars</span> <span class="pl-c1">=</span> <span class="pl-s1">pillar_features</span>[<span class="pl-s1">batch_mask</span>, :]
+            <span class="pl-s1">pillars</span> <span class="pl-c1">=</span> <span class="pl-s1">pillars</span>.<span class="pl-c1">t</span>()
+            <span class="pl-c"># 在索引位置填充pillars</span>
+            <span class="pl-s1">spatial_feature</span>[:, <span class="pl-s1">indices</span>] <span class="pl-c1">=</span> <span class="pl-s1">pillars</span>
+            <span class="pl-c"># 将空间特征加入list,每个元素为(64, 214272)</span>
+            <span class="pl-s1">batch_spatial_features</span>.<span class="pl-c1">append</span>(<span class="pl-s1">spatial_feature</span>)
+
+        <span class="pl-c"># 在第0个维度将所有的数据堆叠在一起</span>
+        <span class="pl-s1">batch_spatial_features</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">stack</span>(<span class="pl-s1">batch_spatial_features</span>, <span class="pl-c1">0</span>)
+        <span class="pl-c"># reshape回原空间(伪图像)    （4, 64, 214272）--&gt; (4, 64, 496, 432)</span>
+        <span class="pl-s1">batch_spatial_features</span> <span class="pl-c1">=</span> <span class="pl-s1">batch_spatial_features</span>.<span class="pl-c1">view</span>(<span class="pl-s1">batch_size</span>, <span class="pl-s1">self</span>.<span class="pl-c1">num_bev_features</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">nz</span>, <span class="pl-s1">self</span>.<span class="pl-c1">ny</span>,
+                                                             <span class="pl-s1">self</span>.<span class="pl-c1">nx</span>)
+        <span class="pl-c"># 将结果加入batch_dict</span>
+        <span class="pl-s1">batch_dict</span>[<span class="pl-s">'spatial_features'</span>] <span class="pl-c1">=</span> <span class="pl-s1">batch_spatial_features</span>
+        <span class="pl-k">return</span> <span class="pl-s1">batch_dict</span></pre></div>
+<h3>使用2D BackBone提取特征</h3>
+<p>经过上面的映射操作，将原来的pillar提取最大的数值后放回到相应的坐标后，就可以得到类似于图像的数据了；只有在有pillar非空的坐标处有提取的点云数据，其余地方都是0数据，所以得到的一个（batch_size，64, 432, 496）的张量还是很稀疏的。<br>
+下图是对得到的张量数据使用2D中的特征提取手段进行多尺度的特征提取和拼接融合。<br>
+这没有好解析的就是常规的卷积操作然后进行拼接即可，注意一下维度变换就可以。</p>
+<blockquote>
+<p>最终经过所有上采样层得到的3个尺度的的信息<br>
+每个尺度的 shape 都是 （batch_size, 128, 248, 216）<br>
+在第一个维度上进行拼接得到x  维度是 （batch_size, 384, 248, 216）<br>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/bab9d330-7e54-410e-9be2-10e52ad9f949"><img src="https://github.com/user-attachments/assets/bab9d330-7e54-410e-9be2-10e52ad9f949" alt="Image" style="max-width: 100%;"></a><br>
+代码在pcdet/models/backbones_2d/base_bev_backbone.py</p>
+</blockquote>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">numpy</span> <span class="pl-k">as</span> <span class="pl-s1">np</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span> <span class="pl-k">as</span> <span class="pl-s1">nn</span>
+
+
+<span class="pl-k">class</span> <span class="pl-v">BaseBEVBackbone</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Module</span>):
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">model_cfg</span>, <span class="pl-s1">input_channels</span>):
+        <span class="pl-en">super</span>().<span class="pl-c1">__init__</span>()
+        <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span> <span class="pl-c1">=</span> <span class="pl-s1">model_cfg</span>
+        <span class="pl-c"># 读取下采样层参数</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'LAYER_NUMS'</span>, <span class="pl-c1">None</span>) <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+            <span class="pl-k">assert</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_NUMS</span>) <span class="pl-c1">==</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_STRIDES</span>) <span class="pl-c1">==</span> <span class="pl-en">len</span>(
+                <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_FILTERS</span>)
+            <span class="pl-s1">layer_nums</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_NUMS</span>
+            <span class="pl-s1">layer_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_STRIDES</span>
+            <span class="pl-s1">num_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_FILTERS</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">layer_nums</span> <span class="pl-c1">=</span> <span class="pl-s1">layer_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">num_filters</span> <span class="pl-c1">=</span> []
+        <span class="pl-c"># 读取上采样层参数</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'UPSAMPLE_STRIDES'</span>, <span class="pl-c1">None</span>) <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+            <span class="pl-k">assert</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">UPSAMPLE_STRIDES</span>) <span class="pl-c1">==</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_UPSAMPLE_FILTERS</span>)
+            <span class="pl-s1">num_upsample_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_UPSAMPLE_FILTERS</span>
+            <span class="pl-s1">upsample_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">UPSAMPLE_STRIDES</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">upsample_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">num_upsample_filters</span> <span class="pl-c1">=</span> []
+
+        <span class="pl-s1">num_levels</span> <span class="pl-c1">=</span> <span class="pl-en">len</span>(<span class="pl-s1">layer_nums</span>)  <span class="pl-c"># 2</span>
+        <span class="pl-s1">c_in_list</span> <span class="pl-c1">=</span> [<span class="pl-s1">input_channels</span>, <span class="pl-c1">*</span><span class="pl-s1">num_filters</span>[:<span class="pl-c1">-</span><span class="pl-c1">1</span>]]  <span class="pl-c"># (256, 128) input_channels:256, num_filters[:-1]：64,128</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">blocks</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">ModuleList</span>()
+        <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">ModuleList</span>()
+        <span class="pl-k">for</span> <span class="pl-s1">idx</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_levels</span>):  <span class="pl-c"># (64,64)--&gt;(64,128)--&gt;(128,256) # 这里为cur_layers的第一层且stride=2</span>
+            <span class="pl-s1">cur_layers</span> <span class="pl-c1">=</span> [
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ZeroPad2d</span>(<span class="pl-c1">1</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+                    <span class="pl-s1">c_in_list</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">3</span>,
+                    <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">layer_strides</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">padding</span><span class="pl-c1">=</span><span class="pl-c1">0</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+                ),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+            ]
+            <span class="pl-k">for</span> <span class="pl-s1">k</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">layer_nums</span>[<span class="pl-s1">idx</span>]):  <span class="pl-c"># 根据layer_nums堆叠卷积层</span>
+                <span class="pl-s1">cur_layers</span>.<span class="pl-c1">extend</span>([
+                    <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(<span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">3</span>, <span class="pl-s1">padding</span><span class="pl-c1">=</span><span class="pl-c1">1</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>),
+                    <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                    <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+                ])
+            <span class="pl-c"># 在block中添加该层</span>
+            <span class="pl-c"># *作用是：将列表解开成几个独立的参数，传入函数 # 类似的运算符还有两个星号(**)，是将字典解开成独立的元素作为形参</span>
+            <span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(<span class="pl-c1">*</span><span class="pl-s1">cur_layers</span>))
+            <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">upsample_strides</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span>:  <span class="pl-c"># 构造上采样层  # (1, 2, 4)</span>
+                <span class="pl-s1">stride</span> <span class="pl-c1">=</span> <span class="pl-s1">upsample_strides</span>[<span class="pl-s1">idx</span>]
+                <span class="pl-k">if</span> <span class="pl-s1">stride</span> <span class="pl-c1">&gt;=</span> <span class="pl-c1">1</span>:
+                    <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">ConvTranspose2d</span>(
+                            <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>],
+                            <span class="pl-s1">upsample_strides</span>[<span class="pl-s1">idx</span>],
+                            <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">upsample_strides</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+                        ),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+                    ))
+                <span class="pl-k">else</span>:
+                    <span class="pl-s1">stride</span> <span class="pl-c1">=</span> <span class="pl-s1">np</span>.<span class="pl-c1">round</span>(<span class="pl-c1">1</span> <span class="pl-c1">/</span> <span class="pl-s1">stride</span>).<span class="pl-c1">astype</span>(<span class="pl-s1">np</span>.<span class="pl-c1">int</span>)
+                    <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+                            <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>],
+                            <span class="pl-s1">stride</span>,
+                            <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">stride</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+                        ),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+                    ))
+
+        <span class="pl-s1">c_in</span> <span class="pl-c1">=</span> <span class="pl-en">sum</span>(<span class="pl-s1">num_upsample_filters</span>)  <span class="pl-c"># 512</span>
+        <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">upsample_strides</span>) <span class="pl-c1">&gt;</span> <span class="pl-s1">num_levels</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ConvTranspose2d</span>(<span class="pl-s1">c_in</span>, <span class="pl-s1">c_in</span>, <span class="pl-s1">upsample_strides</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>], <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">upsample_strides</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>], <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">c_in</span>, <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>(),
+            ))
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_bev_features</span> <span class="pl-c1">=</span> <span class="pl-s1">c_in</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">forward</span>(<span class="pl-s1">self</span>, <span class="pl-s1">data_dict</span>):
+        <span class="pl-s">"""</span>
+<span class="pl-s">        Args:</span>
+<span class="pl-s">            data_dict:</span>
+<span class="pl-s">                spatial_features : (4, 64, 496, 432)</span>
+<span class="pl-s">        Returns:</span>
+<span class="pl-s">        """</span>
+        <span class="pl-s1">spatial_features</span> <span class="pl-c1">=</span> <span class="pl-s1">data_dict</span>[<span class="pl-s">'spatial_features'</span>]
+        <span class="pl-s1">ups</span> <span class="pl-c1">=</span> []
+        <span class="pl-s1">ret_dict</span> <span class="pl-c1">=</span> {}
+        <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">spatial_features</span>
+        <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>)):
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>[<span class="pl-s1">i</span>](<span class="pl-s1">x</span>)
+
+            <span class="pl-s1">stride</span> <span class="pl-c1">=</span> <span class="pl-en">int</span>(<span class="pl-s1">spatial_features</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">2</span>] <span class="pl-c1">/</span> <span class="pl-s1">x</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">2</span>])
+            <span class="pl-s1">ret_dict</span>[<span class="pl-s">'spatial_features_%dx'</span> <span class="pl-c1">%</span> <span class="pl-s1">stride</span>] <span class="pl-c1">=</span> <span class="pl-s1">x</span>
+            <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span>:  <span class="pl-c"># (4,64,248,216)--&gt;(4,128,124,108)--&gt;(4,256,62,54)</span>
+                <span class="pl-s1">ups</span>.<span class="pl-c1">append</span>(<span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>[<span class="pl-s1">i</span>](<span class="pl-s1">x</span>))
+            <span class="pl-k">else</span>:
+                <span class="pl-s1">ups</span>.<span class="pl-c1">append</span>(<span class="pl-s1">x</span>)
+
+        <span class="pl-c"># 如果存在上采样层，将上采样结果连接</span>
+        <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">ups</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">1</span>:
+            <span class="pl-s">"""</span>
+<span class="pl-s">            最终经过所有上采样层得到的3个尺度的的信息</span>
+<span class="pl-s">            每个尺度的 shape 都是 （batch_size, 128, 248, 216）</span>
+<span class="pl-s">            在第一个维度上进行拼接得到x  维度是 （batch_size, 384, 248, 216）</span>
+<span class="pl-s">            """</span>
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cat</span>(<span class="pl-s1">ups</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">1</span>)
+        <span class="pl-k">elif</span> <span class="pl-en">len</span>(<span class="pl-s1">ups</span>) <span class="pl-c1">==</span> <span class="pl-c1">1</span>:
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">ups</span>[<span class="pl-c1">0</span>]
+        
+        <span class="pl-c"># Fasle</span>
+        <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>) <span class="pl-c1">&gt;</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>):
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>](<span class="pl-s1">x</span>)
+            
+        <span class="pl-c"># 将结果存储在spatial_features_2d中并返回</span>
+        <span class="pl-s1">data_dict</span>[<span class="pl-s">'spatial_features_2d'</span>] <span class="pl-c1">=</span> <span class="pl-s1">x</span>
+
+        <span class="pl-k">return</span> <span class="pl-s1">data_dict</span></pre></div>
+<h3>检测头的实现</h3>
+<p>PiontPillars中的检测头采用了类似SSD的检测头设置，在openpcdet的实现中，直接使用了一个网络训练车、人、自行车三个类别；没有像原论文中对车、人使用两种不同的网络结构。因此在检测头的先验框设置上，一共有三个类别的先验框，每个先验框都有两个方向分别是BEV视角下的0度和90度，每个类别的先验证只有一种尺度信息；分别是车 [3.9, 1.6, 1.56]、人[0.8, 0.6, 1.73]、自行车[1.76, 0.6, 1.73]（单位：米）。</p>
+<pre class="notranslate"><code class="notranslate">    在anchor匹配GT的过程中，使用的是**2D IOU**匹配方式，直接从生成的特征图也就是BEV视角进行匹配；**不需要考虑高度信息。原因有二：1、因为在kitti数据集中所有的物体都是在三维空间的同一个平面中的，没有车在车上面的一个情况。 2、所有类别物体之间的高度差别不是很大，直接使用SmoothL1回归就可以得到很好的结果。**   其次是每个anchor被设置为正负样本的iou阈值是：7
+</code></pre>
+<ul>
+<li>车匹配iou阈值大于等于0.65为正样本，小于0.45为负样本，中间的不计算损失。</li>
+<li>人匹配iou阈值大于等于0.5为正样本，小于0.35为负样本，中间的不计算损失。</li>
+<li>自行车匹配iou阈值大于等于0.5为正样本，小于0.35为负样本，中间的不计算损失。</li>
+</ul>
+<p><strong>其中每个anchor都需要预测7个参数，分别是 (x, y, z, w, l, h, θ)，其中x, y,  z预测一个anchor的中心坐标在点云中的位置， w，l，h分别预测了一个anchor的长宽高数据，θ预测了box的旋转角度。</strong></p>
+<p>同时，因为在角度预测时候不可以区分两个完全相反的box，<strong>所以PiontPillars的检测头中还添加了对一个anchor的方向预测；这里使用了一个基于softmax的方向分类box的两个朝向信息。</strong><br>
+代码在 pcdet/models/dense_heads/anchor_head_single.py</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">numpy</span> <span class="pl-k">as</span> <span class="pl-s1">np</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span> <span class="pl-k">as</span> <span class="pl-s1">nn</span>
+
+<span class="pl-k">from</span> .<span class="pl-s1">anchor_head_template</span> <span class="pl-k">import</span> <span class="pl-v">AnchorHeadTemplate</span>
+
+
+<span class="pl-k">class</span> <span class="pl-v">AnchorHeadSingle</span>(<span class="pl-v">AnchorHeadTemplate</span>):
+    <span class="pl-s">"""</span>
+<span class="pl-s">    Args:</span>
+<span class="pl-s">        model_cfg: AnchorHeadSingle的配置</span>
+<span class="pl-s">        input_channels: 384 输入通道数</span>
+<span class="pl-s">        num_class: 3</span>
+<span class="pl-s">        class_names: ['Car','Pedestrian','Cyclist']</span>
+<span class="pl-s">        grid_size: (432, 496, 1)</span>
+<span class="pl-s">        point_cloud_range: (0, -39.68, -3, 69.12, 39.68, 1)</span>
+<span class="pl-s">        predict_boxes_when_training: False</span>
+<span class="pl-s">    """</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">model_cfg</span>, <span class="pl-s1">input_channels</span>, <span class="pl-s1">num_class</span>, <span class="pl-s1">class_names</span>, <span class="pl-s1">grid_size</span>, <span class="pl-s1">point_cloud_range</span>,
+                 <span class="pl-s1">predict_boxes_when_training</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-c1">**</span><span class="pl-s1">kwargs</span>):
+        <span class="pl-en">super</span>().<span class="pl-c1">__init__</span>(
+            <span class="pl-s1">model_cfg</span><span class="pl-c1">=</span><span class="pl-s1">model_cfg</span>, <span class="pl-s1">num_class</span><span class="pl-c1">=</span><span class="pl-s1">num_class</span>, <span class="pl-s1">class_names</span><span class="pl-c1">=</span><span class="pl-s1">class_names</span>, <span class="pl-s1">grid_size</span><span class="pl-c1">=</span><span class="pl-s1">grid_size</span>,
+            <span class="pl-s1">point_cloud_range</span><span class="pl-c1">=</span><span class="pl-s1">point_cloud_range</span>,
+            <span class="pl-s1">predict_boxes_when_training</span><span class="pl-c1">=</span><span class="pl-s1">predict_boxes_when_training</span>
+        )
+        <span class="pl-c"># 每个点有3个尺度的个先验框  每个先验框都有两个方向（0度，90度） num_anchors_per_location:[2, 2, 2]</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_anchors_per_location</span> <span class="pl-c1">=</span> <span class="pl-en">sum</span>(<span class="pl-s1">self</span>.<span class="pl-c1">num_anchors_per_location</span>)  <span class="pl-c"># sum([2, 2, 2])</span>
+        <span class="pl-c"># Conv2d(512,18,kernel_size=(1,1),stride=(1,1))</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">conv_cls</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+            <span class="pl-s1">input_channels</span>, <span class="pl-s1">self</span>.<span class="pl-c1">num_anchors_per_location</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">num_class</span>,
+            <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">1</span>
+        )
+        <span class="pl-c"># Conv2d(512,42,kernel_size=(1,1),stride=(1,1))</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">conv_box</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+            <span class="pl-s1">input_channels</span>, <span class="pl-s1">self</span>.<span class="pl-c1">num_anchors_per_location</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">box_coder</span>.<span class="pl-c1">code_size</span>,
+            <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">1</span>
+        )
+        <span class="pl-c"># 如果存在方向损失，则添加方向卷积层Conv2d(512,12,kernel_size=(1,1),stride=(1,1))</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'USE_DIRECTION_CLASSIFIER'</span>, <span class="pl-c1">None</span>) <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">conv_dir_cls</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+                <span class="pl-s1">input_channels</span>,
+                <span class="pl-s1">self</span>.<span class="pl-c1">num_anchors_per_location</span> <span class="pl-c1">*</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_DIR_BINS</span>,
+                <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">1</span>
+            )
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">conv_dir_cls</span> <span class="pl-c1">=</span> <span class="pl-c1">None</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">init_weights</span>()
+
+    <span class="pl-c"># 初始化参数</span>
+    <span class="pl-k">def</span> <span class="pl-en">init_weights</span>(<span class="pl-s1">self</span>):
+        <span class="pl-s1">pi</span> <span class="pl-c1">=</span> <span class="pl-c1">0.01</span>
+        <span class="pl-c"># 初始化分类卷积偏置</span>
+        <span class="pl-s1">nn</span>.<span class="pl-c1">init</span>.<span class="pl-c1">constant_</span>(<span class="pl-s1">self</span>.<span class="pl-c1">conv_cls</span>.<span class="pl-c1">bias</span>, <span class="pl-c1">-</span><span class="pl-s1">np</span>.<span class="pl-c1">log</span>((<span class="pl-c1">1</span> <span class="pl-c1">-</span> <span class="pl-s1">pi</span>) <span class="pl-c1">/</span> <span class="pl-s1">pi</span>))
+        <span class="pl-c"># 初始化分类卷积权重</span>
+        <span class="pl-s1">nn</span>.<span class="pl-c1">init</span>.<span class="pl-c1">normal_</span>(<span class="pl-s1">self</span>.<span class="pl-c1">conv_box</span>.<span class="pl-c1">weight</span>, <span class="pl-s1">mean</span><span class="pl-c1">=</span><span class="pl-c1">0</span>, <span class="pl-s1">std</span><span class="pl-c1">=</span><span class="pl-c1">0.001</span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">forward</span>(<span class="pl-s1">self</span>, <span class="pl-s1">data_dict</span>):
+        <span class="pl-c"># 从字典中取出经过backbone处理过的信息</span>
+        <span class="pl-c"># spatial_features_2d 维度 （batch_size, 384, 248, 216）</span>
+        <span class="pl-s1">spatial_features_2d</span> <span class="pl-c1">=</span> <span class="pl-s1">data_dict</span>[<span class="pl-s">'spatial_features_2d'</span>]
+        <span class="pl-c"># 每个坐标点上面6个先验框的类别预测 --&gt; (batch_size, 18, 200, 176)</span>
+        <span class="pl-s1">cls_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">conv_cls</span>(<span class="pl-s1">spatial_features_2d</span>)
+        <span class="pl-c"># 每个坐标点上面6个先验框的参数预测 --&gt; (batch_size, 42, 200, 176)  其中每个先验框需要预测7个参数，分别是（x, y, z, w, l, h, θ）</span>
+        <span class="pl-s1">box_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">conv_box</span>(<span class="pl-s1">spatial_features_2d</span>)
+        <span class="pl-c"># 维度调整，将类别放置在最后一维度   [N, H, W, C] --&gt; (batch_size, 200, 176, 18)</span>
+        <span class="pl-s1">cls_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">cls_preds</span>.<span class="pl-c1">permute</span>(<span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">1</span>).<span class="pl-c1">contiguous</span>()
+        <span class="pl-c"># 维度调整，将先验框调整参数放置在最后一维度   [N, H, W, C] --&gt; (batch_size ,200, 176, 42)</span>
+        <span class="pl-s1">box_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">box_preds</span>.<span class="pl-c1">permute</span>(<span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">1</span>).<span class="pl-c1">contiguous</span>()
+        <span class="pl-c"># 将类别和先验框调整预测结果放入前向传播字典中</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">forward_ret_dict</span>[<span class="pl-s">'cls_preds'</span>] <span class="pl-c1">=</span> <span class="pl-s1">cls_preds</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">forward_ret_dict</span>[<span class="pl-s">'box_preds'</span>] <span class="pl-c1">=</span> <span class="pl-s1">box_preds</span>
+        <span class="pl-c"># 进行方向分类预测</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">conv_dir_cls</span> <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+            <span class="pl-c"># # 每个先验框都要预测为两个方向中的其中一个方向 --&gt; (batch_size, 12, 200, 176)</span>
+            <span class="pl-s1">dir_cls_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">conv_dir_cls</span>(<span class="pl-s1">spatial_features_2d</span>)
+            <span class="pl-c"># 将类别和先验框方向预测结果放到最后一个维度中   [N, H, W, C] --&gt; (batch_size, 248, 216, 12)</span>
+            <span class="pl-s1">dir_cls_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">dir_cls_preds</span>.<span class="pl-c1">permute</span>(<span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">1</span>).<span class="pl-c1">contiguous</span>()
+            <span class="pl-c"># 将方向预测结果放入前向传播字典中</span>
+            <span class="pl-s1">self</span>.<span class="pl-c1">forward_ret_dict</span>[<span class="pl-s">'dir_cls_preds'</span>] <span class="pl-c1">=</span> <span class="pl-s1">dir_cls_preds</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">dir_cls_preds</span> <span class="pl-c1">=</span> <span class="pl-c1">None</span>
+
+        <span class="pl-s">"""</span>
+<span class="pl-s">        如果是在训练模式的时候，需要对每个先验框分配GT来计算loss</span>
+<span class="pl-s">        """</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">training</span>:
+            <span class="pl-c"># targets_dict = {</span>
+            <span class="pl-c">#     'box_cls_labels': cls_labels, # (4，211200）</span>
+            <span class="pl-c">#     'box_reg_targets': bbox_targets, # (4，211200, 7）</span>
+            <span class="pl-c">#     'reg_weights': reg_weights # (4，211200）</span>
+            <span class="pl-c"># }</span>
+            <span class="pl-s1">targets_dict</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">assign_targets</span>(
+                <span class="pl-s1">gt_boxes</span><span class="pl-c1">=</span><span class="pl-s1">data_dict</span>[<span class="pl-s">'gt_boxes'</span>]  <span class="pl-c"># （4，39，8）</span>
+            )
+            <span class="pl-c"># 将GT分配结果放入前向传播字典中</span>
+            <span class="pl-s1">self</span>.<span class="pl-c1">forward_ret_dict</span>.<span class="pl-c1">update</span>(<span class="pl-s1">targets_dict</span>)
+
+        <span class="pl-c"># 如果不是训练模式，则直接生成进行box的预测</span>
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">self</span>.<span class="pl-c1">training</span> <span class="pl-c1">or</span> <span class="pl-s1">self</span>.<span class="pl-c1">predict_boxes_when_training</span>:
+            <span class="pl-c"># 根据预测结果解码生成最终结果</span>
+            <span class="pl-s1">batch_cls_preds</span>, <span class="pl-s1">batch_box_preds</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">generate_predicted_boxes</span>(
+                <span class="pl-s1">batch_size</span><span class="pl-c1">=</span><span class="pl-s1">data_dict</span>[<span class="pl-s">'batch_size'</span>],
+                <span class="pl-s1">cls_preds</span><span class="pl-c1">=</span><span class="pl-s1">cls_preds</span>, <span class="pl-s1">box_preds</span><span class="pl-c1">=</span><span class="pl-s1">box_preds</span>, <span class="pl-s1">dir_cls_preds</span><span class="pl-c1">=</span><span class="pl-s1">dir_cls_preds</span>
+            )
+            <span class="pl-s1">data_dict</span>[<span class="pl-s">'batch_cls_preds'</span>] <span class="pl-c1">=</span> <span class="pl-s1">batch_cls_preds</span>  <span class="pl-c"># (1, 211200, 3) 70400*3=211200</span>
+            <span class="pl-s1">data_dict</span>[<span class="pl-s">'batch_box_preds'</span>] <span class="pl-c1">=</span> <span class="pl-s1">batch_box_preds</span>  <span class="pl-c"># (1, 211200, 7)</span>
+            <span class="pl-s1">data_dict</span>[<span class="pl-s">'cls_preds_normalized'</span>] <span class="pl-c1">=</span> <span class="pl-c1">False</span>
+
+        <span class="pl-k">return</span> <span class="pl-s1">data_dict</span></pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
