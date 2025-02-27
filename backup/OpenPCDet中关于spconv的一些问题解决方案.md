@@ -14,6 +14,12 @@ AttributeError: module 'spconv' has no attribute '__version__'
 ``` python
 pip uninstall spconv-cu113
 pip uninstall spconv
+pip install spconv-cu113
+```
+测试版本：
+```python
+import spconv
+print(spconv.__version__)
 ```
 
 问题2：
