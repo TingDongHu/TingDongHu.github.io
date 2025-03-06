@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 作用域
+在Java中，我们经常看到`public`、`protected`、`private`这些修饰符。">
+<meta property="og:title" content="JAVA语法笔记（四）面向对象(二)">
+<meta property="og:description" content="## 作用域
+在Java中，我们经常看到`public`、`protected`、`private`这些修饰符。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-si-%EF%BC%89-mian-xiang-dui-xiang-%28-er-%29.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记（四）面向对象(二)</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style><style>.markdown-alert.markdown-alert-warning {border-left-color:var(--borderColor-attention-emphasis, var(--color-attention-emphasis));background-color:var(--color-attention-subtle);}.markdown-alert.markdown-alert-warning .markdown-alert-title {color: var(--fgColor-attention,var(--color-attention-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记（四）面向对象(二)</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/22" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>作用域</h2>
+<p>在Java中，我们经常看到<code class="notranslate">public</code>、<code class="notranslate">protected</code>、<code class="notranslate">private</code>这些修饰符。在Java中，这些修饰符可以用来限定访问作用域。<br>
+定义为<code class="notranslate">public</code>的<code class="notranslate">class</code>、<code class="notranslate">interface</code>可以被其他任何类访问.<br>
+定义为<code class="notranslate">private</code>的<code class="notranslate">field</code>、<code class="notranslate">method</code>无法被其他类访问.<br>
+由于Java支持嵌套类，如果一个类内部还定义了嵌套类，那么，嵌套类拥有访问private的权限：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// private</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Inner</span> <span class="pl-s1">i</span> = <span class="pl-k">new</span> <span class="pl-smi">Inner</span>();
+        <span class="pl-s1">i</span>.<span class="pl-en">hi</span>();
+    }
+
+    <span class="pl-c">// private方法:</span>
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">hello</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"private hello!"</span>);
+    }
+
+    <span class="pl-c">// 静态内部类:</span>
+    <span class="pl-k">static</span> <span class="pl-k">class</span> <span class="pl-smi">Inner</span> {
+        <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">hi</span>() {
+            <span class="pl-smi">Main</span>.<span class="pl-en">hello</span>();
+        }
+    }
+}</pre></div>
+<p>定义在一个<code class="notranslate">class</code>内部的<code class="notranslate">class</code>称为嵌套类（<code class="notranslate">nested class</code>），Java支持好几种嵌套类。<br>
+<code class="notranslate">protected</code>作用于继承关系。定义为<code class="notranslate">protected</code>的字段和方法可以被子类访问，以及子类的子类。</p>
+<h3>package</h3>
+<p>包作用域是指一个类允许访问同一个<code class="notranslate">package</code>的没有<code class="notranslate">public</code>、<code class="notranslate">private</code>修饰的<code class="notranslate">class</code>，以及没有<code class="notranslate">public</code>、<code class="notranslate">protected</code>、<code class="notranslate">private</code>修饰的字段和方法。<br>
+只要在同一个包，就可以访问<code class="notranslate">package</code>权限的<code class="notranslate">class</code>、field和<code class="notranslate">method</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">package</span> <span class="pl-s1">abc</span>;
+
+<span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-smi">void</span> <span class="pl-en">foo</span>() {
+        <span class="pl-c">// 可以访问package权限的类:</span>
+        <span class="pl-smi">Hello</span> <span class="pl-s1">h</span> = <span class="pl-k">new</span> <span class="pl-smi">Hello</span>();
+        <span class="pl-c">// 可以调用package权限的方法:</span>
+        <span class="pl-s1">h</span>.<span class="pl-en">hi</span>();
+    }
+}</pre></div>
+<h2>内部类</h2>
+<p>有一种类，它被定义在另一个类的内部，所以称为内部类（Nested Class）。Java的内部类分为好几种，通常情况用得不多，但也需要了解它们是如何使用的。<br>
+Java的内部类可分为Inner Class、Anonymous Class和Static Nested Class三种；<br>
+Inner Class和Anonymous Class本质上是相同的，都必须依附于Outer Class的实例，即隐含地持有Outer.this实例，并拥有Outer Class的<code class="notranslate">private</code>访问权限；<br>
+Static Nested Class是独立类，但拥有Outer Class的<code class="notranslate">private</code>访问权限。</p>
+<h2>Inner Class</h2>
+<p>如果一个类定义在另一个类的内部，这个类就是Inner Class：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">class</span> <span class="pl-smi">Outer</span> {
+    <span class="pl-k">class</span> <span class="pl-smi">Inner</span> {
+        <span class="pl-c">// 定义了一个Inner Class</span>
+    }
+}</pre></div>
+<p>上述定义的<code class="notranslate">Outer</code>是一个普通类，而<code class="notranslate">Inner</code>是一个Inner Class，它与普通类有个最大的不同，就是Inner Class的实例不能单独存在，必须依附于一个Outer Class的实例。示例代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// inner class</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Outer</span> <span class="pl-s1">outer</span> = <span class="pl-k">new</span> <span class="pl-smi">Outer</span>(<span class="pl-s">"Nested"</span>); <span class="pl-c">// 实例化一个Outer</span>
+        <span class="pl-smi">Outer</span>.<span class="pl-smi">Inner</span> <span class="pl-s1">inner</span> = <span class="pl-s1">outer</span>.<span class="pl-k">new</span> <span class="pl-smi">Inner</span>(); <span class="pl-c">// 实例化一个Inner</span>
+        <span class="pl-s1">inner</span>.<span class="pl-en">hello</span>();
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Outer</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+
+    <span class="pl-smi">Outer</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+    }
+
+    <span class="pl-k">class</span> <span class="pl-smi">Inner</span> {
+        <span class="pl-smi">void</span> <span class="pl-en">hello</span>() {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Hello, "</span> + <span class="pl-smi">Outer</span>.<span class="pl-smi">this</span>.<span class="pl-s1">name</span>);
+        }
+    }
+}</pre></div>
+<p>要实例化一个<code class="notranslate">Inner</code>，我们必须首先创建一个<code class="notranslate">Outer</code>的实例，然后，调用<code class="notranslate">Outer</code>实例的<code class="notranslate">new</code>来创建<code class="notranslate">Inner</code>实例<br>
+这是因为<code class="notranslate">Inner Class</code>除了有一个<code class="notranslate">this</code>指向它自己，还隐含地持有一个<code class="notranslate">Outer Class</code>实例，可以用<code class="notranslate">Outer.this</code>访问这个实例。所以，实例化一个<code class="notranslate">Inner Class</code>不能脱离<code class="notranslate">Outer</code>实例。<br>
+<code class="notranslate">Inner Class</code>和普通Class相比，除了能引用<code class="notranslate">Outer</code>实例外，还有一个额外的“特权”，就是可以修改Outer Class的<code class="notranslate">private</code>字段，因为Inner Class的作用域在Outer Class内部，所以能访问Outer Class的<code class="notranslate">private</code>字段和方法。</p>
+<p>观察Java编译器编译后的<code class="notranslate">.class</code>文件可以发现，Outer类被编译为<code class="notranslate">Outer.class</code>，而Inner类被编译为<code class="notranslate">Outer$Inner.class</code>。</p>
+<h3>Anonymous Class</h3>
+<p>还有一种定义Inner Class的方法，它不需要在Outer Class中明确地定义这个Class，而是在方法内部，通过匿名类（Anonymous Class）来定义。示例代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Anonymous Class</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Outer</span> <span class="pl-s1">outer</span> = <span class="pl-k">new</span> <span class="pl-smi">Outer</span>(<span class="pl-s">"Nested"</span>);
+        <span class="pl-s1">outer</span>.<span class="pl-en">asyncHello</span>();
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Outer</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+
+    <span class="pl-smi">Outer</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+    }
+
+    <span class="pl-smi">void</span> <span class="pl-en">asyncHello</span>() {
+        <span class="pl-smi">Runnable</span> <span class="pl-s1">r</span> = <span class="pl-k">new</span> <span class="pl-smi">Runnable</span>() {
+            <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+            <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">run</span>() {
+                <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Hello, "</span> + <span class="pl-smi">Outer</span>.<span class="pl-smi">this</span>.<span class="pl-s1">name</span>);
+            }
+        };
+        <span class="pl-k">new</span> <span class="pl-smi">Thread</span>(<span class="pl-s1">r</span>).<span class="pl-en">start</span>();
+    }
+}</pre></div>
+<p>观察<code class="notranslate">asyncHello()</code>方法，我们在方法内部实例化了一个<code class="notranslate">Runnable</code>。<code class="notranslate">Runnable</code>本身是接口，接口是不能实例化的，所以这里实际上是定义了一个实现了<code class="notranslate">Runnable</code>接口的匿名类，并且通过<code class="notranslate">new</code>实例化该匿名类，然后转型为<code class="notranslate">Runnable</code>。在定义匿名类的时候就必须实例化它，定义匿名类的写法如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Runnable</span> <span class="pl-s1">r</span> = <span class="pl-k">new</span> <span class="pl-smi">Runnable</span>() {
+    <span class="pl-c">// 实现必要的抽象方法...</span>
+};</pre></div>
+<p>匿名类和Inner Class一样，可以访问Outer Class的<code class="notranslate">private</code>字段和方法。之所以我们要定义匿名类，是因为在这里我们通常不关心类名，比直接定义Inner Class可以少写很多代码。<br>
+观察Java编译器编译后的<code class="notranslate">.class</code>文件可以发现，Outer类被编译为<code class="notranslate">Outer.class</code>，而匿名类被编译为<code class="notranslate">Outer$1.class</code>。如果有多个匿名类，Java编译器会将每个匿名类依次命名为<code class="notranslate">Outer$1</code>、<code class="notranslate">Outer$2</code>、<code class="notranslate">Outer$3</code>……</p>
+<h3>Static Nested Class</h3>
+<p>最后一种内部类和Inner Class类似，但是使用<code class="notranslate">static</code>修饰，称为静态内部类（Static Nested Class）：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Static Nested Class</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Outer</span>.<span class="pl-smi">StaticNested</span> <span class="pl-s1">sn</span> = <span class="pl-k">new</span> <span class="pl-smi">Outer</span>.<span class="pl-smi">StaticNested</span>();
+        <span class="pl-s1">sn</span>.<span class="pl-en">hello</span>();
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Outer</span> {
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-smi">String</span> <span class="pl-c1">NAME</span> = <span class="pl-s">"OUTER"</span>;
+
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+
+    <span class="pl-smi">Outer</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+    }
+
+    <span class="pl-k">static</span> <span class="pl-k">class</span> <span class="pl-smi">StaticNested</span> {
+        <span class="pl-smi">void</span> <span class="pl-en">hello</span>() {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Hello, "</span> + <span class="pl-smi">Outer</span>.<span class="pl-c1">NAME</span>);
+        }
+    }
+}</pre></div>
+<p>用static修饰的内部类和Inner Class有很大的不同，它不再依附于Outer的实例，而是一个完全独立的类，因此无法引用<code class="notranslate">Outer.this</code>，但它可以访问Outer的<code class="notranslate">private</code>静态字段和静态方法。如果把StaticNested移到Outer之外，就失去了访问<code class="notranslate">private</code>的权限。</p>
+<h1>classpath和jar包</h1>
+<p>JVM通过环境变量<code class="notranslate">classpath</code>决定搜索<code class="notranslate">class</code>的路径和顺序；<br>
+强烈建议不要设置系统环境变量<code class="notranslate">classpath</code>，建议始终通过<code class="notranslate">-cp</code>命令传入；<br>
+jar包本质上是<code class="notranslate">zip</code>格式，相当于目录，可以包含很多<code class="notranslate">.class</code>文件，方便下载和使用；<br>
+<code class="notranslate">MANIFEST.MF</code>文件可以提供jar包的信息，如<code class="notranslate">Main-Class</code>，这样可以直接运行jar包。</p>
+<h2>classpath</h2>
+<p><code class="notranslate">classpath</code>是JVM用到的一个环境变量，它用来指示JVM如何搜索<code class="notranslate">class</code>。<br>
+因为Java是编译型语言，源码文件是<code class="notranslate">.java</code>，而编译后的<code class="notranslate">.class</code>文件才是真正可以被JVM执行的字节码。因此，JVM需要知道，如果要加载一个<code class="notranslate">abc.xyz.Hello</code>的类，应该去哪搜索对应的<code class="notranslate">Hello.class</code>文件。<br>
+所以，<code class="notranslate">classpath</code>就是一组目录的集合，它设置的搜索路径与操作系统相关。例如，在Windows系统上，用<code class="notranslate">;</code>分隔，带空格的目录用<code class="notranslate">""</code>括起来，可能长这样：</p>
+<blockquote>
+<p>C:\work\project1\bin;C:\shared;"D:\My Documents\project1\bin"</p>
+</blockquote>
+<p>在Linux系统上，用<code class="notranslate">:</code>分隔，可能长这样：</p>
+<blockquote>
+<p>/usr/shared:/usr/local/bin:/home/liaoxuefeng/bin</p>
+</blockquote>
+<p>现在我们假设<code class="notranslate">classpath</code>是<code class="notranslate">.;C:\work\project1\bin;C:\shared</code>，当JVM在加载<code class="notranslate">abc.xyz.Hello</code>这个类时，会依次查找：</p>
+<ul>
+<li>&lt;当前目录&gt;\abc\xyz\Hello.class</li>
+<li>C:\work\project1\bin\abc\xyz\Hello.class</li>
+<li>C:\shared\abc\xyz\Hello.class<br>
+注意到<code class="notranslate">.</code>代表当前目录。如果JVM在某个路径下找到了对应的<code class="notranslate">class</code>文件，就不再往后继续搜索。如果所有路径下都没有找到，就报错。<br>
+<code class="notranslate">classpath</code>的设定方法有两种：<br>
+在系统环境变量中设置<code class="notranslate">classpath</code>环境变量，不推荐；<br>
+在启动JVM时设置<code class="notranslate">classpath</code>变量，推荐。<br>
+我们强烈<strong>不推荐</strong>在系统环境变量中设置<code class="notranslate">classpath</code>，那样会污染整个系统环境。在启动JVM时设置<code class="notranslate">classpath</code>才是推荐的做法。实际上就是给java命令传入<code class="notranslate">-classpath</code>参数：</li>
+</ul>
+<blockquote>
+<p>java -classpath .;C:\work\project1\bin;C:\shared abc.xyz.Hello</p>
+</blockquote>
+<p>或者使用<code class="notranslate">-cp</code>的简写：</p>
+<blockquote>
+<p>java -cp .;C:\work\project1\bin;C:\shared abc.xyz.Hello</p>
+</blockquote>
+<p>没有设置系统环境变量，也没有传入<code class="notranslate">-cp</code>参数，那么JVM默认的<code class="notranslate">classpath</code>为<code class="notranslate">.</code>，即当前目录：</p>
+<blockquote>
+<p>java abc.xyz.Hello</p>
+</blockquote>
+<p>上述命令告诉JVM只在当前目录搜索<code class="notranslate">Hello.class</code>。<br>
+在IDE中运行Java程序，IDE自动传入的<code class="notranslate">-cp</code>参数是当前工程的<code class="notranslate">bin</code>目录和引入的jar包。<br>
+通常，我们在自己编写的<code class="notranslate">class</code>中，会引用Java核心库的<code class="notranslate">class</code>，例如，<code class="notranslate">String</code>、<code class="notranslate">ArrayList</code>等。这些class应该上哪去找？<br>
+有很多“如何设置classpath”的文章会告诉你把JVM自带的<code class="notranslate">rt.jar</code>放入<code class="notranslate">classpath</code>，但事实上，根本不需要告诉JVM如何去Java核心库查找class，JVM怎么可能笨到连自己的核心库在哪都不知道！</p>
+<div class="markdown-alert markdown-alert-warning"><p class="markdown-alert-title"><svg class="octicon octicon-alert mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p><p>不要把任何Java核心库添加到classpath中！JVM根本不依赖classpath加载核心库！</p>
+</div>
+<p>更好的做法是，不要设置<code class="notranslate">classpath</code>.默认的当前目录<code class="notranslate">.</code>对于绝大多数情况都够用了。<br>
+假设我们有一个编译后的<code class="notranslate">Hello.class</code>，它的包名是<code class="notranslate">com.example</code>，当前目录是<code class="notranslate">C:\work</code>，那么，目录结构必须如下：<br>
+C:\work<br>
+└─ com<br>
+└─ example<br>
+└─ Hello.class<br>
+运行这个<code class="notranslate">Hello.class</code>必须在当前目录下使用如下命令：</p>
+<blockquote>
+<p>C:\work&gt; java -cp . com.example.Hello</p>
+</blockquote>
+<p>JVM根据<code class="notranslate">classpath</code>设置的<code class="notranslate">.</code>在当前目录下查找<code class="notranslate">com.example.Hello</code>，即实际搜索文件必须位于<code class="notranslate">com/example/Hello.class</code>。如果指定的<code class="notranslate">.class</code>文件不存在，或者目录结构和包名对不上，均会报错。</p>
+<h2>jar包</h2>
+<p>如果有很多<code class="notranslate">.class</code>文件，散落在各层目录中，肯定不便于管理。如果能把目录打一个包，变成一个文件，就方便多了。<br>
+jar包就是用来干这个事的，它可以把<code class="notranslate">package</code>组织的目录层级，以及各个目录下的所有文件（包括<code class="notranslate">.class</code>文件和其他文件）都打成一个jar文件，这样一来，无论是备份，还是发给客户，就简单多了。<br>
+**jar包实际上就是一个zip格式的压缩文件，而jar包相当于目录。**如果我们要执行一个jar包的<code class="notranslate">class</code>，就可以把jar包放到<code class="notranslate">classpath</code>中：</p>
+<blockquote>
+<p>java -cp ./hello.jar abc.xyz.Hello</p>
+</blockquote>
+<p>这样JVM会自动在<code class="notranslate">hello.jar</code>文件里去搜索某个类。<br>
+那么问题来了：如何创建jar包？</p>
+<p>因为jar就是zip包，所以，直接在资源管理器中，找到正确的目录，点击右键，在弹出的快捷菜单中选择“发送到”，“压缩(zipped)文件夹”，就制作了一个zip文件。然后，把后缀从<code class="notranslate">.zip</code>改为<code class="notranslate">.jar</code>，一个jar包就创建成功。<br>
+假设编译输出的目录结构是这样：</p>
+<p>package_sample<br>
+└─ bin<br>
+├─ hong<br>
+│  └─ Person.class<br>
+│  ming<br>
+│  └─ Person.class<br>
+└─ mr<br>
+└─ jun<br>
+└─ Arrays.class<br>
+这里需要特别注意的是，jar包里的第一层目录，不能是<code class="notranslate">bin</code>，而应该是<code class="notranslate">hong</code>、<code class="notranslate">ming</code>、<code class="notranslate">mr</code>。如果在Windows的资源管理器中看，应该长这样：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/b94c1ade-54d2-4997-88de-59661bba557f"><img src="https://github.com/user-attachments/assets/b94c1ade-54d2-4997-88de-59661bba557f" alt="Image" style="max-width: 100%;"></a><br>
+如果长这样：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/56c13b85-1d3a-4cc9-a1f6-fa3634f02e9f"><img src="https://github.com/user-attachments/assets/56c13b85-1d3a-4cc9-a1f6-fa3634f02e9f" alt="Image" style="max-width: 100%;"></a><br>
+上面的<code class="notranslate">hello.zip</code>包含有<code class="notranslate">bin</code>目录，说明打包打得有问题，JVM仍然无法从jar包中查找正确的<code class="notranslate">class</code>，原因是<code class="notranslate">hong.Person</code>必须按<code class="notranslate">hong/Person.class</code>存放，而不是<code class="notranslate">bin/hong/Person.class</code>。<br>
+jar包还可以包含一个特殊的<code class="notranslate">/META-INF/MANIFEST.MF</code>文件，<code class="notranslate">MANIFEST.MF</code>是纯文本，可以指定<code class="notranslate">Main-Class</code>和其它信息。JVM会自动读取这个<code class="notranslate">MANIFEST.MF</code>文件，如果存在<code class="notranslate">Main-Class</code>，我们就不必在命令行指定启动的类名，而是用更方便的命令：</p>
+<blockquote>
+<p>java -jar hello.jar</p>
+</blockquote>
+<p>在大型项目中，不可能手动编写<code class="notranslate">MANIFEST.MF</code>文件，再手动创建jar包。Java社区提供了大量的开源构建工具，例如<a href="https://liaoxuefeng.com/books/java/maven/index.html" rel="nofollow"><strong>Maven</strong></a>，可以非常方便地创建jar包。</p>
+<h1>class版本</h1>
+<p>在Java开发中，许多童鞋经常被各种版本的JDK搞得晕头转向，本节我们就来详细讲解Java程序编译后的class文件版本问题。<br>
+高版本的JDK可编译输出低版本兼容的class文件，但需注意，低版本的JDK可能不存在高版本JDK添加的类和方法，导致运行时报错。<br>
+运行时使用哪个JDK版本，编译时就尽量使用同一版本的JDK编译源码。<br>
+我们通常说的Java 8，Java 11，Java 17，是指JDK的版本，也就是JVM的版本，更确切地说，就是<code class="notranslate">java.exe</code>这个程序的版本：</p>
+<blockquote>
+<p>$ java -version<br>
+java version "17" 2021-09-14 LTS</p>
+</blockquote>
+<p>而每个版本的JVM，它能执行的class文件版本也不同。例如，Java 11对应的class文件版本是55，而Java 17对应的class文件版本是61。</p>
+<p>如果用Java 11编译一个Java程序，输出的class文件版本默认就是55，这个class既可以在Java 11上运行，也可以在Java 17上运行，因为Java 17支持的class文件版本是61，表示“最多支持到版本61”。<br>
+如果用Java 17编译一个Java程序，输出的class文件版本默认就是61，它可以在Java 17、Java 18上运行，但不可能在Java 11上运行，因为Java 11支持的class版本最多到55。如果使用低于Java 17的JVM运行，会得到一个<code class="notranslate">UnsupportedClassVersionError</code>，错误信息类似：</p>
+<blockquote>
+<p>java.lang.UnsupportedClassVersionError: Xxx has been compiled by a more recent version of the Java Runtime...</p>
+</blockquote>
+<p>只要看到<code class="notranslate">UnsupportedClassVersionError</code>就表示当前要加载的class文件版本超过了JVM的能力，必须使用更高版本的JVM才能运行。<br>
+打个比方，用Word 2013保存一个Word文件，这个文件也可以在Word 2016上打开。但反过来，用Word 2016保存一个Word文件，就无法使用Word 2013打开。<br>
+但是，且慢，用Word 2016也可以保存一个格式为Word 2013的文件，这样保存的Word文件就可以用低版本的Word 2013打开，但前提是保存时必须明确指定文件格式兼容Word 2013。<br>
+类似的，对应到JVM的class文件，我们也可以用Java 17编译一个Java程序，指定输出的class版本要兼容Java 11（即class版本55），这样编译生成的class文件就可以在Java &gt;=11的环境中运行。<br>
+指定编译输出有两种方式，一种是在<code class="notranslate">javac</code>命令行中用参数<code class="notranslate">--release</code>设置：</p>
+<blockquote>
+<p>$ javac --release 11 Main.java</p>
+</blockquote>
+<p>参数<code class="notranslate">--release 11</code>表示源码兼容Java 11，编译的class输出版本为Java 11兼容，即class版本55。<br>
+第二种方式是用参数<code class="notranslate">--source</code>指定源码版本，用参数<code class="notranslate">--target</code>指定输出class版本：</p>
+<blockquote>
+<p>$ javac --source 9 --target 11 Main.java</p>
+</blockquote>
+<p>上述命令如果使用Java 17的JDK编译，它会把源码视为Java 9兼容版本，并输出class为Java 11兼容版本。注意<code class="notranslate">--release</code>参数和<code class="notranslate">--source --target</code>参数只能二选一，不能同时设置。<br>
+然而，指定版本如果低于当前的JDK版本，会有一些潜在的问题。例如，我们用Java 17编译<code class="notranslate">Hello.java</code>，参数设置<code class="notranslate">--source 9</code>和<code class="notranslate">--target 11</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Hello</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">hello</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"hello"</span>.<span class="pl-en">indent</span>(<span class="pl-c1">4</span>));
+    }
+}</pre></div>
+<p>用低于Java 11的JVM运行<code class="notranslate">Hello</code>会得到一个<code class="notranslate">LinkageError</code>，因为无法加载<code class="notranslate">Hello.class</code>文件，而用Java 11运行<code class="notranslate">Hello</code>会得到一个<code class="notranslate">NoSuchMethodError</code>，因为<code class="notranslate">String.indent()</code>方法是从Java 12才添加进来的，Java 11的<code class="notranslate">String</code>版本根本没有<code class="notranslate">indent()</code>方法。</p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>如果使用--release 11则会在编译时检查该方法是否在Java 11中存在。</p>
+</div>
+<p>因此，如果运行时的JVM版本是Java 11，则编译时也最好使用Java 11，而不是用高版本的JDK编译输出低版本的class。<br>
+如果使用<code class="notranslate">javac</code>编译时不指定任何版本参数，那么相当于使用<code class="notranslate">--release</code> 当前版本编译，即源码版本和输出版本均为当前版本。<br>
+在开发阶段，多个版本的JDK可以同时安装，当前使用的JDK版本可由<code class="notranslate">JAVA_HOME</code>环境变量切换。</p>
+<h3>源码版本</h3>
+<p>在编写源代码的时候，我们通常会预设一个源码的版本。在编译的时候，如果用<code class="notranslate">--source</code>或<code class="notranslate">--release</code>指定源码版本，则使用指定的源码版本检查语法。<br>
+例如，使用了<code class="notranslate">lambda</code>表达式的源码版本至少要为8才能编译，使用了<code class="notranslate">var</code>关键字的源码版本至少要为10才能编译，使用<code class="notranslate">switch</code>表达式的源码版本至少要为12才能编译，且12和13版本需要启用<code class="notranslate">--enable-preview</code>参数。</p>
+<h1>模块</h1>
+<p>从Java 9开始，JDK又引入了模块（Module）。<br>
+什么是模块？这要从Java 9之前的版本说起。<br>
+我们知道，<code class="notranslate">.class</code>文件是JVM看到的最小可执行文件，而一个大型程序需要编写很多Class，并生成一堆<code class="notranslate">.class</code>文件，很不便于管理，所以，jar文件就是class文件的容器。<br>
+在Java 9之前，一个大型Java程序会生成自己的jar文件，同时引用依赖的第三方jar文件，而JVM自带的Java标准库，实际上也是以jar文件形式存放的，这个文件叫<code class="notranslate">rt.jar</code>，一共有60多M。<br>
+如果是自己开发的程序，除了一个自己的<code class="notranslate">app.jar</code>以外，还需要一堆第三方的jar包，运行一个Java程序，一般来说，命令行写这样：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">java -cp app.jar:a.jar:b.jar:c.jar com.liaoxuefeng.sample.Main</pre></div>
+<p>如果漏写了某个运行时需要用到的jar，那么在运行期极有可能抛出<code class="notranslate">ClassNotFoundException</code>。<br>
+所以，jar只是用于存放class的容器，它并不关心class之间的依赖。<br>
+从Java 9开始引入的模块，主要是为了解决“依赖”这个问题。如果<code class="notranslate">a.jar</code>必须依赖另一个<code class="notranslate">b.jar</code>才能运行，那我们应该给<code class="notranslate">a.jar</code>加点说明啥的，让程序在编译和运行的时候能自动定位到<code class="notranslate">b.jar</code>，这种自带“依赖关系”的class容器就是模块。<br>
+为了表明Java模块化的决心，从Java 9开始，原有的Java标准库已经由一个单一巨大的<code class="notranslate">rt.jar</code>分拆成了几十个模块，这些模块以<code class="notranslate">.jmod</code>扩展名标识，可以在<code class="notranslate">$JAVA_HOME/jmods</code>目录下找到它们：</p>
+<ul>
+<li><strong>java.base.jmod</strong></li>
+<li><strong>java.compiler.jmod</strong></li>
+<li><strong>java.datatransfer.jmod</strong></li>
+<li><strong>java.desktop.jmod</strong></li>
+<li><strong>...</strong></li>
+</ul>
+<p>这些<code class="notranslate">.jmod</code>文件每一个都是一个模块，模块名就是文件名。例如：模块<code class="notranslate">java.base</code>对应的文件就是<code class="notranslate">java.base.jmod</code>。模块之间的依赖关系已经被写入到模块内的<code class="notranslate">module-info.class</code>文件了。所有的模块都直接或间接地依赖<code class="notranslate">java.base</code>模块，只有<code class="notranslate">java.base</code>模块不依赖任何模块，它可以被看作是“根模块”，好比所有的类都是从<code class="notranslate">Object</code>直接或间接继承而来。</p>
+<p>把一堆class封装为jar仅仅是一个打包的过程，而把一堆class封装为模块则不但需要打包，还需要写入依赖关系，并且还可以包含二进制代码（通常是JNI扩展）。此外，模块支持多版本，即在同一个模块中可以为不同的JVM提供不同的版本。</p>
+<h3>编写模块</h3>
+<p>那么，我们应该如何编写模块呢？还是以具体的例子来说。首先，创建模块和原有的创建Java项目是完全一样的，以<code class="notranslate">oop-module</code>工程为例，它的目录结构如下：<br>
+oop-module<br>
+├── bin<br>
+├── build.sh<br>
+└── src<br>
+├── com<br>
+│   └── itranswarp<br>
+│       └── sample<br>
+│           ├── Greeting.java<br>
+│           └── Main.java<br>
+└── module-info.java</p>
+<p>其中，<code class="notranslate">bin</code>目录存放编译后的class文件，<code class="notranslate">src</code>目录存放源码，按包名的目录结构存放，仅仅在src目录下多了一个<code class="notranslate">module-info.java</code>这个文件，这就是模块的描述文件。在这个模块中，它长这样：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">module</span> <span class="pl-s1">hello</span>.<span class="pl-s1">world</span> {
+	<span class="pl-k">requires</span> <span class="pl-s1">java</span>.<span class="pl-s1">base</span>; <span class="pl-c">// 可不写，任何模块都会自动引入java.base</span>
+	<span class="pl-k">requires</span> <span class="pl-s1">java</span>.<span class="pl-s1">xml</span>;
+}</pre></div>
+<p>其中，<code class="notranslate">module</code>是关键字，后面的<code class="notranslate">hello.world</code>是模块的名称，它的命名规范与包一致。花括号的<code class="notranslate">requires xxx</code>;表示这个模块需要引用的其他模块名。除了<code class="notranslate">java.base</code>可以被自动引入外，这里我们引入了一个<code class="notranslate">java.xml</code>的模块。<br>
+当我们使用模块声明了依赖关系后，才能使用引入的模块。例如，<code class="notranslate">Main.java</code>代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">package</span> <span class="pl-s1">com</span>.<span class="pl-s1">itranswarp</span>.<span class="pl-s1">sample</span>;
+
+<span class="pl-c">// 必须引入java.xml模块后才能使用其中的类:</span>
+<span class="pl-k">import</span> <span class="pl-s1">javax</span>.<span class="pl-s1">xml</span>.<span class="pl-s1">XMLConstants</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+	<span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+		<span class="pl-smi">Greeting</span> <span class="pl-s1">g</span> = <span class="pl-k">new</span> <span class="pl-smi">Greeting</span>();
+		<span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">g</span>.<span class="pl-en">hello</span>(<span class="pl-smi">XMLConstants</span>.<span class="pl-c1">XML_NS_PREFIX</span>));
+	}
+}</pre></div>
+<p>如果把<code class="notranslate">requires java.xml;</code>从<code class="notranslate">module-info.java</code>中去掉，编译将报错。可见，模块的重要作用就是声明依赖关系。<br>
+下面，我们用JDK提供的命令行工具来编译并创建模块。</p>
+<p>首先，我们把工作目录切换到<code class="notranslate">oop-module</code>，在当前目录下编译所有的<code class="notranslate">.java</code>文件，并存放到<code class="notranslate">bin</code>目录下，命令如下：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ javac -d bin src/module-info.java src/com/itranswarp/sample/<span class="pl-k">*</span>.java</pre></div>
+<p>如果编译成功，现在项目结构如下：<br>
+oop-module<br>
+├── bin<br>
+│   ├── com<br>
+│   │   └── itranswarp<br>
+│   │       └── sample<br>
+│   │           ├── Greeting.class<br>
+│   │           └── Main.class<br>
+│   └── module-info.class<br>
+└── src<br>
+├── com<br>
+│   └── itranswarp<br>
+│       └── sample<br>
+│           ├── Greeting.java<br>
+│           └── Main.java<br>
+└── module-info.java<br>
+注意到<code class="notranslate">src</code>目录下的<code class="notranslate">module-info.java</code>被编译到<code class="notranslate">bin</code>目录下的<code class="notranslate">module-info.class</code>。</p>
+<p>下一步，我们需要把bin目录下的所有class文件先打包成jar，在打包的时候，注意传入<code class="notranslate">--main-class</code>参数，让这个jar包能自己定位<code class="notranslate">main</code>方法所在的类：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ jar --create --file hello.jar --main-class com.itranswarp.sample.Main -C bin <span class="pl-c1">.</span></pre></div>
+<p>现在我们就在当前目录下得到了<code class="notranslate">hello.jar</code>这个jar包，它和普通jar包并无区别，可以直接使用命令<code class="notranslate">java -jar hello.jar</code>来运行它。但是我们的目标是创建模块，所以，继续使用JDK自带的<code class="notranslate">jmod</code>命令把一个jar包转换成模块：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ jmod create --class-path hello.jar hello.jmod</pre></div>
+<p>于是，在当前目录下我们又得到了<code class="notranslate">hello.jmod</code>这个模块文件，这就是最后打包出来的传说中的模块！</p>
+<h3>运行模块</h3>
+<p>要运行一个jar，我们使用<code class="notranslate">java -jar xxx.jar</code>命令。要运行一个模块，我们只需要指定模块名。试试：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ java --module-path hello.jmod --module hello.world</pre></div>
+<p>结果是一个错误：</p>
+<blockquote>
+<p>Error occurred during initialization of boot layer<br>
+java.lang.module.FindException: JMOD format not supported at execution time: hello.jmod</p>
+</blockquote>
+<p>原因是<code class="notranslate">.jmod</code>不能被放入<code class="notranslate">--module-path</code>中。换成<code class="notranslate">.jar</code>就没问题了：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ java --module-path hello.jar --module hello.world
+Hello, xml<span class="pl-k">!</span></pre></div>
+<p>那我们辛辛苦苦创建的<code class="notranslate">hello.jmod</code>有什么用？答案是我们可以用它来打包JRE。</p>
+<h3>打包JRE</h3>
+<p>前面讲了，为了支持模块化，Java 9首先带头把自己的一个巨大无比的<code class="notranslate">rt.jar</code>拆成了几十个<code class="notranslate">.jmod</code>模块，原因就是，运行Java程序的时候，实际上我们用到的JDK模块，并没有那么多。不需要的模块，完全可以删除。<br>
+过去发布一个Java应用程序，要运行它，必须下载一个完整的JRE，再运行jar包。而完整的JRE块头很大，有100多M。怎么给JRE瘦身呢？<br>
+现在，JRE自身的标准库已经分拆成了模块，只需要带上程序用到的模块，其他的模块就可以被裁剪掉。怎么裁剪JRE呢？并不是说把系统安装的JRE给删掉部分模块，而是“复制”一份JRE，但只带上用到的模块。为此，JDK提供了<code class="notranslate">jlink</code>命令来干这件事。命令如下：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ jlink --module-path hello.jmod --add-modules java.base,java.xml,hello.world --output jre/</pre></div>
+<p>我们在<code class="notranslate">--module-path</code>参数指定了我们自己的模块<code class="notranslate">hello.jmod</code>，然后，在<code class="notranslate">--add-modules</code>参数中指定了我们用到的3个模块<code class="notranslate">java.base</code>、<code class="notranslate">java.xml</code>和<code class="notranslate">hello.world</code>，用,分隔。最后，在<code class="notranslate">--output</code>参数指定输出目录。</p>
+<p>现在，在当前目录下，我们可以找到jre目录，这是一个完整的并且带有我们自己<code class="notranslate">hello.jmod</code>模块的JRE。试试直接运行这个JRE：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">$ jre/bin/java --module hello.world
+Hello, xml<span class="pl-k">!</span></pre></div>
+<p>要分发我们自己的Java应用程序，只需要把这个<code class="notranslate">jre</code>目录打个包给对方发过去，对方直接运行上述命令即可，既不用下载安装JDK，也不用知道如何配置我们自己的模块，极大地方便了分发和部署。</p>
+<h3>访问权限</h3>
+<p>前面我们讲过，Java的class访问权限分为<code class="notranslate">public</code>、<code class="notranslate">protected</code>、<code class="notranslate">private</code>和默认的包访问权限。引入模块后，这些访问权限的规则就要稍微做些调整。<br>
+确切地说，class的这些访问权限只在一个模块内有效，模块和模块之间，例如，a模块要访问b模块的某个class，必要条件是b模块明确地导出了可以访问的包。<br>
+举个例子：我们编写的模块<code class="notranslate">hello.world</code>用到了模块<code class="notranslate">java.xml</code>的一个类<code class="notranslate">javax.xml.XMLConstants</code>，我们之所以能直接使用这个类，是因为模块<code class="notranslate">java.xml</code>的<code class="notranslate">module-info.java</code>中声明了若干导出：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">module</span> <span class="pl-s1">java</span>.<span class="pl-s1">xml</span> {
+    <span class="pl-k">exports</span> <span class="pl-s1">java</span>.<span class="pl-s1">xml</span>;
+    <span class="pl-k">exports</span> <span class="pl-s1">javax</span>.<span class="pl-s1">xml</span>.<span class="pl-s1">catalog</span>;
+    <span class="pl-k">exports</span> <span class="pl-s1">javax</span>.<span class="pl-s1">xml</span>.<span class="pl-s1">datatype</span>;
+    ...
+}</pre></div>
+<p>只有它声明的导出的包，外部代码才被允许访问。换句话说，如果外部代码想要访问我们的<code class="notranslate">hello.world</code>模块中的<code class="notranslate">com.itranswarp.sample.Greeting</code>类，我们必须将其导出：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">module</span> <span class="pl-s1">hello</span>.<span class="pl-s1">world</span> {
+    <span class="pl-k">exports</span> <span class="pl-s1">com</span>.<span class="pl-s1">itranswarp</span>.<span class="pl-s1">sample</span>;
+
+    <span class="pl-k">requires</span> <span class="pl-s1">java</span>.<span class="pl-s1">base</span>;
+	<span class="pl-k">requires</span> <span class="pl-s1">java</span>.<span class="pl-s1">xml</span>;
+}</pre></div>
+<p>因此，模块进一步隔离了代码的访问权限。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
