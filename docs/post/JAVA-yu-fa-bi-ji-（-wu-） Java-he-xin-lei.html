@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 字符串和编码
+`Java`字符串`String`是不可变对象；
+字符串操作不改变原字符串内容，而是返回新字符串；
+常用的字符串操作：提取子串、查找、替换、大小写转换等；
+`Java`使用`Unicode`编码表示`String`和`char`；
+转换编码就是将`String`和`byte[]`转换，需要指定编码；
+转换为`byte[]`时，始终优先考虑`UTF-8`编码。">
+<meta property="og:title" content="JAVA语法笔记（五） Java核心类">
+<meta property="og:description" content="## 字符串和编码
+`Java`字符串`String`是不可变对象；
+字符串操作不改变原字符串内容，而是返回新字符串；
+常用的字符串操作：提取子串、查找、替换、大小写转换等；
+`Java`使用`Unicode`编码表示`String`和`char`；
+转换编码就是将`String`和`byte[]`转换，需要指定编码；
+转换为`byte[]`时，始终优先考虑`UTF-8`编码。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-wu-%EF%BC%89%20Java-he-xin-lei.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记（五） Java核心类</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style><style>.markdown-alert.markdown-alert-caution {border-left-color:var(--borderColor-danger-emphasis, var(--color-danger-emphasis));background-color:var(--color-danger-subtle);}.markdown-alert.markdown-alert-caution .markdown-alert-title {color: var(--fgColor-danger,var(--color-danger-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记（五） Java核心类</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/23" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>字符串和编码</h2>
+<p><code class="notranslate">Java</code>字符串<code class="notranslate">String</code>是不可变对象；<br>
+字符串操作不改变原字符串内容，而是返回新字符串；<br>
+常用的字符串操作：提取子串、查找、替换、大小写转换等；<br>
+<code class="notranslate">Java</code>使用<code class="notranslate">Unicode</code>编码表示<code class="notranslate">String</code>和<code class="notranslate">char</code>；<br>
+转换编码就是将<code class="notranslate">String</code>和<code class="notranslate">byte[]</code>转换，需要指定编码；<br>
+转换为<code class="notranslate">byte[]</code>时，始终优先考虑<code class="notranslate">UTF-8</code>编码。</p>
+<h3>String</h3>
+<p>在Java中，<code class="notranslate">String</code>是一个引用类型，它本身也是一个<code class="notranslate">class</code>。但是，Java编译器对<code class="notranslate">String</code>有特殊处理，即可以直接用<code class="notranslate">"..."</code>来表示一个字符串<br>
+实际上字符串在<code class="notranslate">String</code>内部是通过一个<code class="notranslate">char[]</code>数组表示的，因此，按下面的写法也是可以的：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">String</span> <span class="pl-s1">s1</span> = <span class="pl-s">"Hello!"</span>;
+<span class="pl-smi">String</span> <span class="pl-s1">s2</span> = <span class="pl-k">new</span> <span class="pl-smi">String</span>(<span class="pl-k">new</span> <span class="pl-smi">char</span>[] {<span class="pl-s">'H'</span>, <span class="pl-s">'e'</span>, <span class="pl-s">'l'</span>, <span class="pl-s">'l'</span>, <span class="pl-s">'o'</span>, <span class="pl-s">'!'</span>});</pre></div>
+<p>因为<code class="notranslate">String</code>太常用了，所以Java提供了<code class="notranslate">"..."</code>这种字符串字面量表示方法。<br>
+Java字符串的一个重要特点就是字符串<strong>不可变</strong>。这种不可变性是通过内部的<code class="notranslate">private final char[]</code>字段，以及没有任何修改<code class="notranslate">char[]</code>的方法实现的。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// String</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s">"Hello"</span>;
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+        <span class="pl-s1">s</span> = <span class="pl-s1">s</span>.<span class="pl-en">toUpperCase</span>();
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+    }
+}</pre></div>
+<p>运行结果：</p>
+<blockquote>
+<p>Hello<br>
+HELLO<br>
+Process finished with exit code 0</p>
+</blockquote>
+<h3>字符串比较</h3>
+<p>当我们想要比较两个字符串是否相同时，要特别注意，我们实际上是想比较字符串的内容是否相同。必须使用<code class="notranslate">equals()</code>方法而不能用<code class="notranslate">==</code>。<br>
+我们看下面的例子：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// String</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span> <span class="pl-s1">s1</span> = <span class="pl-s">"hello"</span>;
+        <span class="pl-smi">String</span> <span class="pl-s1">s2</span> = <span class="pl-s">"hello"</span>;
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s1</span> == <span class="pl-s1">s2</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s1</span>.<span class="pl-en">equals</span>(<span class="pl-s1">s2</span>));
+    }
+}</pre></div>
+<p>从表面上看，两个字符串用<code class="notranslate">==</code>和<code class="notranslate">equals()</code>比较都为<code class="notranslate">true</code>，但实际上那只是<strong>Java编译器在编译期，会自动把所有相同的字符串当作一个对象放入常量池，自然<code class="notranslate">s1</code>和<code class="notranslate">s2</code>的引用就是相同的。</strong></p>
+<p>所以，这种<code class="notranslate">==</code>比较返回<code class="notranslate">true</code>纯属巧合。换一种写法，<code class="notranslate">==</code>比较就会失败：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// String</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span> <span class="pl-s1">s1</span> = <span class="pl-s">"hello"</span>;
+        <span class="pl-smi">String</span> <span class="pl-s1">s2</span> = <span class="pl-s">"HELLO"</span>.<span class="pl-en">toLowerCase</span>();
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s1</span> == <span class="pl-s1">s2</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s1</span>.<span class="pl-en">equals</span>(<span class="pl-s1">s2</span>));
+    }
+}</pre></div>
+<p>结论：两个字符串比较，必须总是使用<code class="notranslate">equals()</code>方法。<br>
+要忽略大小写比较，使用<code class="notranslate">equalsIgnoreCase()</code>方法。<br>
+<code class="notranslate">String</code>类还提供了多种方法来搜索子串、提取子串。常用的方法有：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 是否包含子串:</span>
+<span class="pl-s">"Hello"</span>.<span class="pl-en">contains</span>(<span class="pl-s">"ll"</span>); <span class="pl-c">// true</span></pre></div>
+<p>注意到<code class="notranslate">contains()</code>方法的参数是<code class="notranslate">CharSequence</code>而不是<code class="notranslate">String</code>，因为<code class="notranslate">CharSequence</code>是<code class="notranslate">String</code>实现的一个接口。</p>
+<p>搜索子串的更多的例子：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s">"Hello"</span>.<span class="pl-en">indexOf</span>(<span class="pl-s">"l"</span>); <span class="pl-c">// 2</span>
+<span class="pl-s">"Hello"</span>.<span class="pl-en">lastIndexOf</span>(<span class="pl-s">"l"</span>); <span class="pl-c">// 3</span>
+<span class="pl-s">"Hello"</span>.<span class="pl-en">startsWith</span>(<span class="pl-s">"He"</span>); <span class="pl-c">// true</span>
+<span class="pl-s">"Hello"</span>.<span class="pl-en">endsWith</span>(<span class="pl-s">"lo"</span>); <span class="pl-c">// true</span></pre></div>
+<p>提取子串的例子：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s">"Hello"</span>.<span class="pl-en">substring</span>(<span class="pl-c1">2</span>); <span class="pl-c">// "llo"</span>
+<span class="pl-s">"Hello"</span>.<span class="pl-en">substring</span>(<span class="pl-c1">2</span>, <span class="pl-c1">4</span>); <span class="pl-s">"ll"</span></pre></div>
+<p>注意<strong>索引号是从<code class="notranslate">0</code>开始的</strong>。</p>
+<h3>去除首尾空白字符</h3>
+<p>使用<code class="notranslate">trim()</code>方法可以移除字符串首尾空白字符。空白字符包括空格，<code class="notranslate">\t</code>，<code class="notranslate">\r</code>，<code class="notranslate">\n</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s">"  <span class="pl-cce">\t</span>Hello<span class="pl-cce">\r</span><span class="pl-cce">\n</span> "</span>.<span class="pl-en">trim</span>(); <span class="pl-c">// "Hello"</span></pre></div>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>注意：<code class="notranslate">trim()</code>并没有改变字符串的内容，而是返回了一个新字符串。</p>
+</div>
+<p>另一个<code class="notranslate">strip()</code>方法也可以移除字符串首尾空白字符。它和<code class="notranslate">trim()</code>不同的是，类似中文的空格字符<code class="notranslate">\u3000</code>也会被移除：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s">"<span class="pl-cce">\u3000</span>Hello<span class="pl-cce">\u3000</span>"</span>.<span class="pl-en">strip</span>(); <span class="pl-c">// "Hello"</span>
+<span class="pl-s">" Hello "</span>.<span class="pl-en">stripLeading</span>(); <span class="pl-c">// "Hello "</span>
+<span class="pl-s">" Hello "</span>.<span class="pl-en">stripTrailing</span>(); <span class="pl-c">// " Hello"</span></pre></div>
+<p>String还提供了<code class="notranslate">isEmpty()</code>和<code class="notranslate">isBlank()</code>来判断字符串是否为空和空白字符串：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s">""</span>.<span class="pl-en">isEmpty</span>(); <span class="pl-c">// true，因为字符串长度为0</span>
+<span class="pl-s">"  "</span>.<span class="pl-en">isEmpty</span>(); <span class="pl-c">// false，因为字符串长度不为0</span>
+<span class="pl-s">"  <span class="pl-cce">\n</span>"</span>.<span class="pl-en">isBlank</span>(); <span class="pl-c">// true，因为只包含空白字符</span>
+<span class="pl-s">" Hello "</span>.<span class="pl-en">isBlank</span>(); <span class="pl-c">// false，因为包含非空白字符</span></pre></div>
+<h3>格式化字符串</h3>
+<p>字符串提供了<code class="notranslate">formatted()</code>方法和<code class="notranslate">format()</code>静态方法，可以传入其他参数，替换占位符，然后生成新的字符串：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// String</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s">"Hi %s, your score is %d!"</span>;
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>.<span class="pl-en">formatted</span>(<span class="pl-s">"Alice"</span>, <span class="pl-c1">80</span>));
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">String</span>.<span class="pl-en">format</span>(<span class="pl-s">"Hi %s, your score is %.2f!"</span>, <span class="pl-s">"Bob"</span>, <span class="pl-c1">59.5</span>));
+    }
+}</pre></div>
+<h3>类型转换</h3>
+<p>要把任意基本类型或引用类型转换为字符串，可以使用静态方法<code class="notranslate">valueOf()</code>。这是一个重载方法，编译器会根据参数自动选择合适的方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">String</span>.<span class="pl-en">valueOf</span>(<span class="pl-c1">123</span>); <span class="pl-c">// "123"</span>
+<span class="pl-smi">String</span>.<span class="pl-en">valueOf</span>(<span class="pl-c1">45.67</span>); <span class="pl-c">// "45.67"</span>
+<span class="pl-smi">String</span>.<span class="pl-en">valueOf</span>(<span class="pl-c1">true</span>); <span class="pl-c">// "true"</span>
+<span class="pl-smi">String</span>.<span class="pl-en">valueOf</span>(<span class="pl-k">new</span> <span class="pl-smi">Object</span>()); <span class="pl-c">// 类似java.lang.Object@636be97c</span></pre></div>
+<p>要把字符串转换为其他类型，就需要根据情况。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-s1">n1</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">parseInt</span>(<span class="pl-s">"123"</span>); <span class="pl-c">// 123</span>
+<span class="pl-smi">int</span> <span class="pl-s1">n2</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">parseInt</span>(<span class="pl-s">"ff"</span>, <span class="pl-c1">16</span>); <span class="pl-c">// 按十六进制转换，255</span>
+<span class="pl-smi">boolean</span> <span class="pl-s1">b1</span> = <span class="pl-smi">Boolean</span>.<span class="pl-en">parseBoolean</span>(<span class="pl-s">"true"</span>); <span class="pl-c">// true</span>
+<span class="pl-smi">boolean</span> <span class="pl-s1">b2</span> = <span class="pl-smi">Boolean</span>.<span class="pl-en">parseBoolean</span>(<span class="pl-s">"FALSE"</span>); <span class="pl-c">// false</span></pre></div>
+<div class="markdown-alert markdown-alert-caution"><p class="markdown-alert-title"><svg class="octicon octicon-stop mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p><p>要特别注意，<code class="notranslate">Integer</code>有个<code class="notranslate">getInteger(String)</code>方法，它不是将字符串转换为<code class="notranslate">int</code>，而是把该字符串对应的系统变量转换为<code class="notranslate">Integer</code>：</p>
+</div>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Integer</span>.<span class="pl-en">getInteger</span>(<span class="pl-s">"java.version"</span>); <span class="pl-c">// 版本号，11</span></pre></div>
+<h3>转换为char[]</h3>
+<p><code class="notranslate">String</code>和<code class="notranslate">char[]</code>类型可以互相转换，方法是：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">char</span>[] <span class="pl-s1">cs</span> = <span class="pl-s">"Hello"</span>.<span class="pl-en">toCharArray</span>(); <span class="pl-c">// String -&gt; char[]</span>
+<span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-k">new</span> <span class="pl-smi">String</span>(<span class="pl-s1">cs</span>); <span class="pl-c">// char[] -&gt; String</span></pre></div>
+<p>如果修改了<code class="notranslate">char[]</code>数组，<code class="notranslate">String</code>并不会改变：<br>
+这是因为通过<code class="notranslate">new String(char[])</code>创建新的<code class="notranslate">String</code>实例时，它并不会直接引用传入的<code class="notranslate">char[]</code>数组，而是会复制一份，所以，修改外部的<code class="notranslate">char[]</code>数组不会影响<code class="notranslate">String</code>实例内部的<code class="notranslate">char[]</code>数组，因为这是两个不同的数组。<br>
+从<code class="notranslate">String</code>的不变性设计可以看出，如果传入的对象有可能改变，我们需要复制而不是直接引用。</p>
+<h2>StringBuilder</h2>
+<p><code class="notranslate">StringBuilder</code>是可变对象，用来高效拼接字符串；<br>
+<code class="notranslate">StringBuilder</code>可以支持链式操作，实现链式操作的关键是返回实例本身；<br>
+<code class="notranslate">StringBuffer</code>是<code class="notranslate">StringBuilder</code>的线程安全版本，现在很少使用。<br>
+<code class="notranslate">Java</code>编译器对<code class="notranslate">String</code>做了特殊处理，使得我们可以直接用<code class="notranslate">+</code>拼接字符串。<br>
+考察下面的循环代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s">""</span>;
+<span class="pl-k">for</span> (<span class="pl-smi">int</span> <span class="pl-s1">i</span> = <span class="pl-c1">0</span>; <span class="pl-s1">i</span> &lt; <span class="pl-c1">1000</span>; <span class="pl-s1">i</span>++) {
+    <span class="pl-s1">s</span> = <span class="pl-s1">s</span> + <span class="pl-s">","</span> + <span class="pl-s1">i</span>;
+}</pre></div>
+<p>虽然可以直接拼接字符串，但是，在循环中，每次循环都会创建新的字符串对象，然后扔掉旧的字符串。这样，绝大部分字符串都是临时对象，不但浪费内存，还会影响GC效率。<br>
+为了能高效拼接字符串，Java标准库提供了<code class="notranslate">StringBuilder</code>，它是一个可变对象，可以预分配缓冲区，这样，往<code class="notranslate">StringBuilder</code>中新增字符时，不会创建新的临时对象：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">StringBuilder</span> <span class="pl-s1">sb</span> = <span class="pl-k">new</span> <span class="pl-smi">StringBuilder</span>(<span class="pl-c1">1024</span>);
+<span class="pl-k">for</span> (<span class="pl-smi">int</span> <span class="pl-s1">i</span> = <span class="pl-c1">0</span>; <span class="pl-s1">i</span> &lt; <span class="pl-c1">1000</span>; <span class="pl-s1">i</span>++) {
+    <span class="pl-s1">sb</span>.<span class="pl-en">append</span>(<span class="pl-s">','</span>);
+    <span class="pl-s1">sb</span>.<span class="pl-en">append</span>(<span class="pl-s1">i</span>);
+}
+<span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s1">sb</span>.<span class="pl-en">toString</span>();</pre></div>
+<p><code class="notranslate">StringBuilder</code>还可以进行链式操作：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 链式操作</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">var</span> <span class="pl-s1">sb</span> = <span class="pl-k">new</span> <span class="pl-smi">StringBuilder</span>(<span class="pl-c1">1024</span>);
+        <span class="pl-s1">sb</span>.<span class="pl-en">append</span>(<span class="pl-s">"Mr "</span>)
+          .<span class="pl-en">append</span>(<span class="pl-s">"Bob"</span>)
+          .<span class="pl-en">append</span>(<span class="pl-s">"!"</span>)
+          .<span class="pl-en">insert</span>(<span class="pl-c1">0</span>, <span class="pl-s">"Hello, "</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">sb</span>.<span class="pl-en">toString</span>());
+    }
+}</pre></div>
+<p>如果我们查看<code class="notranslate">StringBuilder</code>的源码，可以发现，进行链式操作的关键是，定义的<code class="notranslate">append()</code>方法会返回<code class="notranslate">this</code>，这样，就可以不断调用自身的其他方法。<br>
+仿照<code class="notranslate">StringBuilder</code>，我们也可以设计支持链式操作的类。例如，一个可以不断增加的计数器：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 链式操作</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Adder</span> <span class="pl-s1">adder</span> = <span class="pl-k">new</span> <span class="pl-smi">Adder</span>();
+        <span class="pl-s1">adder</span>.<span class="pl-en">add</span>(<span class="pl-c1">3</span>)
+             .<span class="pl-en">add</span>(<span class="pl-c1">5</span>)
+             .<span class="pl-en">inc</span>()
+             .<span class="pl-en">add</span>(<span class="pl-c1">10</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">adder</span>.<span class="pl-en">value</span>());
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Adder</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">sum</span> = <span class="pl-c1">0</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Adder</span> <span class="pl-en">add</span>(<span class="pl-smi">int</span> <span class="pl-s1">n</span>) {
+        <span class="pl-s1">sum</span> += <span class="pl-s1">n</span>;
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">Adder</span> <span class="pl-en">inc</span>() {
+        <span class="pl-s1">sum</span> ++;
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">value</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">sum</span>;
+    }
+}</pre></div>
+<div class="markdown-alert markdown-alert-caution"><p class="markdown-alert-title"><svg class="octicon octicon-stop mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p><p>注意：对于普通的字符串+操作，并不需要我们将其改写为<code class="notranslate">StringBuilder</code>，因为Java编译器在编译时就自动把多个连续的+操作编码为<code class="notranslate">StringConcatFactory</code>的操作。在运行期，<code class="notranslate">StringConcatFactory</code>会自动把字符串连接操作优化为数组复制或者<code class="notranslate">StringBuilder</code>操作。</p>
+</div>
+<p>你可能还听说过<code class="notranslate">StringBuffer</code>，这是Java早期的一个<code class="notranslate">StringBuilder</code>的线程安全版本，它通过同步来保证多个线程操作<code class="notranslate">StringBuffer</code>也是安全的，但是同步会带来执行速度的下降。<br>
+<code class="notranslate">StringBuilder</code>和<code class="notranslate">StringBuffer</code>接口完全相同，现在完全没有必要使用StringBuffer。</p>
+<h2>包装类型</h2>
+<p>Java核心库提供的包装类型可以把基本类型包装为<code class="notranslate">class；</code><br>
+自动装箱和自动拆箱都是在编译期完成的（JDK&gt;=1.5）；<br>
+装箱和拆箱会影响执行效率，且拆箱时可能发生<code class="notranslate">NullPointerException；</code><br>
+包装类型的比较必须使用<code class="notranslate">equals()；</code><br>
+整数和浮点数的包装类型都继承自<code class="notranslate">Number；</code><br>
+包装类型提供了大量实用方法。</p>
+<p>我们已经知道，Java的数据类型分两种：<br>
+基本类型：<code class="notranslate">byte</code>，<code class="notranslate">short</code>，<code class="notranslate">int</code>，<code class="notranslate">long</code>，<code class="notranslate">boolean</code>，<code class="notranslate">float</code>，<code class="notranslate">double</code>，<code class="notranslate">char</code>；<br>
+引用类型：所有<code class="notranslate">class</code>和<code class="notranslate">interface</code>类型。<br>
+引用类型可以赋值为<code class="notranslate">null</code>，表示空，但基本类型不能赋值为<code class="notranslate">null</code>：<br>
+那么，如何把一个基本类型视为对象（引用类型）？<br>
+比如，想要把<code class="notranslate">int</code>基本类型变成一个引用类型，我们可以定义一个<code class="notranslate">Integer</code>类，它只包含一个实例字段<code class="notranslate">int</code>，这样，<code class="notranslate">Integer</code>类就可以视为<code class="notranslate">int</code>的包装类（Wrapper Class）：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Integer</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">value</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Integer</span>(<span class="pl-smi">int</span> <span class="pl-s1">value</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">value</span> = <span class="pl-s1">value</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">intValue</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">value</span>;
+    }
+}</pre></div>
+<p>定义好了<code class="notranslate">Integer</code>类，我们就可以把<code class="notranslate">int</code>和<code class="notranslate">Integer</code>互相转换：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-c1">null</span>;
+<span class="pl-smi">Integer</span> <span class="pl-s1">n2</span> = <span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-c1">99</span>);
+<span class="pl-smi">int</span> <span class="pl-s1">n3</span> = <span class="pl-s1">n2</span>.<span class="pl-en">intValue</span>();</pre></div>
+<p>实际上，因为包装类型非常有用，Java核心库为每种基本类型都提供了对应的包装类型：</p>
+
+<p>我们可以直接使用，并不需要自己去定义：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Integer:</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">int</span> <span class="pl-s1">i</span> = <span class="pl-c1">100</span>;
+        <span class="pl-c">// 通过new操作符创建Integer实例(不推荐使用,会有编译警告):</span>
+        <span class="pl-smi">Integer</span> <span class="pl-s1">n1</span> = <span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-s1">i</span>);
+        <span class="pl-c">// 通过静态方法valueOf(int)创建Integer实例:</span>
+        <span class="pl-smi">Integer</span> <span class="pl-s1">n2</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">valueOf</span>(<span class="pl-s1">i</span>);
+        <span class="pl-c">// 通过静态方法valueOf(String)创建Integer实例:</span>
+        <span class="pl-smi">Integer</span> <span class="pl-s1">n3</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">valueOf</span>(<span class="pl-s">"100"</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n3</span>.<span class="pl-en">intValue</span>());
+    }
+}</pre></div>
+<h3>Auto Boxing</h3>
+<p>因为<code class="notranslate">int</code>和<code class="notranslate">Integer</code>可以互相转换：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-s1">i</span> = <span class="pl-c1">100</span>;
+<span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">valueOf</span>(<span class="pl-s1">i</span>);
+<span class="pl-smi">int</span> <span class="pl-s1">x</span> = <span class="pl-s1">n</span>.<span class="pl-en">intValue</span>();</pre></div>
+<p>所以，Java编译器可以帮助我们自动在<code class="notranslate">int</code>和<code class="notranslate">Integer</code>之间转型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-c1">100</span>; <span class="pl-c">// 编译器自动使用Integer.valueOf(int)</span>
+<span class="pl-smi">int</span> <span class="pl-s1">x</span> = <span class="pl-s1">n</span>; <span class="pl-c">// 编译器自动使用Integer.intValue()</span></pre></div>
+<p>这种直接把<code class="notranslate">int</code>变为<code class="notranslate">Integer</code>的赋值写法，称为自动装箱（Auto Boxing），反过来，把<code class="notranslate">Integer</code>变为<code class="notranslate">int</code>的赋值写法，称为自动拆箱（Auto Unboxing）。</p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>自动装箱和自动拆箱只发生在编译阶段，目的是为了少写代码。</p>
+</div>
+<h3>不变类</h3>
+<p>所有的包装类型都是不变类。我们查看<code class="notranslate">Integer</code>的源码可知，它的核心代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-smi">Integer</span> {
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-s1">value</span>;
+}</pre></div>
+<p>因此，一旦创建了<code class="notranslate">Integer</code>对象，该对象就是不变的。</p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>对两个<code class="notranslate">Integer</code>实例进行比较要特别注意：绝对不能用<code class="notranslate">==</code>比较，因为<code class="notranslate">Integer</code>是引用类型，必须使用<code class="notranslate">equals()</code>比较</p>
+</div>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// == or equals?</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Integer</span> <span class="pl-s1">x</span> = <span class="pl-c1">127</span>;
+        <span class="pl-smi">Integer</span> <span class="pl-s1">y</span> = <span class="pl-c1">127</span>;
+        <span class="pl-smi">Integer</span> <span class="pl-s1">m</span> = <span class="pl-c1">99999</span>;
+        <span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-c1">99999</span>;
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"x == y: "</span> + (<span class="pl-s1">x</span>==<span class="pl-s1">y</span>)); <span class="pl-c">// true</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"m == n: "</span> + (<span class="pl-s1">m</span>==<span class="pl-s1">n</span>)); <span class="pl-c">// false</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"x.equals(y): "</span> + <span class="pl-s1">x</span>.<span class="pl-en">equals</span>(<span class="pl-s1">y</span>)); <span class="pl-c">// true</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"m.equals(n): "</span> + <span class="pl-s1">m</span>.<span class="pl-en">equals</span>(<span class="pl-s1">n</span>)); <span class="pl-c">// true</span>
+    }
+}</pre></div>
+<p>仔细观察结果的童鞋可以发现，<code class="notranslate">==</code>比较，较小的两个相同的<code class="notranslate">Integer</code>返回<code class="notranslate">true</code>，较大的两个相同的<code class="notranslate">Integer</code>返回<code class="notranslate">false</code>，这是因为<code class="notranslate">Integer</code>是不变类，编译器把<code class="notranslate">Integer x = 127;</code>自动变为<code class="notranslate">Integer x = Integer.valueOf(127);</code>，为了节省内存，<code class="notranslate">Integer.valueOf()</code>对于较小的数，始终返回相同的实例，因此，<code class="notranslate">==</code>比较“恰好”为<code class="notranslate">true</code>，但我们绝不能因为Java标准库的<code class="notranslate">Integer</code>内部有缓存优化就用<code class="notranslate">==</code>比较，必须用<code class="notranslate">equals()</code>方法比较两个<code class="notranslate">Integer</code>。<br>
+因为<code class="notranslate">Integer.valueOf()</code>可能始终返回同一个<code class="notranslate">Integer</code>实例，因此，在我们自己创建<code class="notranslate">Integer</code>的时候，以下两种方法：</p>
+<ul>
+<li>方法1：<code class="notranslate">Integer n = new Integer(100);</code></li>
+<li>方法2：<code class="notranslate">Integer n = Integer.valueOf(100);</code></li>
+</ul>
+<p>方法2更好，因为方法1总是创建新的<code class="notranslate">Integer</code>实例，方法2把内部优化留给<code class="notranslate">Integer</code>的实现者去做，即使在当前版本没有优化，也有可能在下一个版本进行优化。<br>
+我们把能创建“新”对象的静态方法称为静态工厂方法。<code class="notranslate">Integer.valueOf()</code>就是静态工厂方法，它尽可能地返回缓存的实例以节省内存。</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>创建新对象时，优先选用静态工厂方法而不是new操作符。</p>
+</div>
+<p>如果我们考察<code class="notranslate">Byte.valueOf()</code>方法的源码，可以看到，标准库返回的<code class="notranslate">Byte</code>实例全部是缓存实例，但调用者并不关心静态工厂方法以何种方式创建新实例还是直接返回缓存的实例。</p>
+<h3>进制转换</h3>
+<p><code class="notranslate">Integer</code>类本身还提供了大量方法，例如，最常用的静态方法<code class="notranslate">parseInt()</code>可以把字符串解析成一个整数：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-s1">x1</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">parseInt</span>(<span class="pl-s">"100"</span>); <span class="pl-c">// 100</span>
+<span class="pl-smi">int</span> <span class="pl-s1">x2</span> = <span class="pl-smi">Integer</span>.<span class="pl-en">parseInt</span>(<span class="pl-s">"100"</span>, <span class="pl-c1">16</span>); <span class="pl-c">// 256,因为按16进制解析</span></pre></div>
+<p><code class="notranslate">Integer</code>还可以把整数格式化为指定进制的字符串：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Integer:</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Integer</span>.<span class="pl-en">toString</span>(<span class="pl-c1">100</span>)); <span class="pl-c">// "100",表示为10进制</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Integer</span>.<span class="pl-en">toString</span>(<span class="pl-c1">100</span>, <span class="pl-c1">36</span>)); <span class="pl-c">// "2s",表示为36进制</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Integer</span>.<span class="pl-en">toHexString</span>(<span class="pl-c1">100</span>)); <span class="pl-c">// "64",表示为16进制</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Integer</span>.<span class="pl-en">toOctalString</span>(<span class="pl-c1">100</span>)); <span class="pl-c">// "144",表示为8进制</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Integer</span>.<span class="pl-en">toBinaryString</span>(<span class="pl-c1">100</span>)); <span class="pl-c">// "1100100",表示为2进制</span>
+    }
+}</pre></div>
+<p>注意：上述方法的输出都是<code class="notranslate">String</code>，在计算机内存中，只用二进制表示，不存在十进制或十六进制的表示方法。<code class="notranslate">int n = 100</code>在内存中总是以4字节的二进制表示：<br>
+┌──────┬──────┬──────┬──────┐<br>
+│ 00000000│00000000│00000000│01100100│<br>
+└──────┴──────┴──────┴──────┘</p>
+<p>我们经常使用的<code class="notranslate">System.out.println(n);</code>是依靠核心库自动把整数格式化为10进制输出并显示在屏幕上，使用<code class="notranslate">Integer.toHexString(n)</code>则通过核心库自动把整数格式化为16进制。<br>
+这里我们注意到程序设计的一个重要原则：数据的存储和显示要分离。<br>
+Java的包装类型还定义了一些有用的静态变量</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// boolean只有两个值true/false，其包装类型只需要引用Boolean提供的静态字段:</span>
+<span class="pl-smi">Boolean</span> <span class="pl-s1">t</span> = <span class="pl-smi">Boolean</span>.<span class="pl-c1">TRUE</span>;
+<span class="pl-smi">Boolean</span> <span class="pl-s1">f</span> = <span class="pl-smi">Boolean</span>.<span class="pl-c1">FALSE</span>;
+<span class="pl-c">// int可表示的最大/最小值:</span>
+<span class="pl-smi">int</span> <span class="pl-s1">max</span> = <span class="pl-smi">Integer</span>.<span class="pl-c1">MAX_VALUE</span>; <span class="pl-c">// 2147483647</span>
+<span class="pl-smi">int</span> <span class="pl-s1">min</span> = <span class="pl-smi">Integer</span>.<span class="pl-c1">MIN_VALUE</span>; <span class="pl-c">// -2147483648</span>
+<span class="pl-c">// long类型占用的bit和byte数量:</span>
+<span class="pl-smi">int</span> <span class="pl-s1">sizeOfLong</span> = <span class="pl-smi">Long</span>.<span class="pl-c1">SIZE</span>; <span class="pl-c">// 64 (bits)</span>
+<span class="pl-smi">int</span> <span class="pl-s1">bytesOfLong</span> = <span class="pl-smi">Long</span>.<span class="pl-c1">BYTES</span>; <span class="pl-c">// 8 (bytes)</span></pre></div>
+<p>最后，所有的整数和浮点数的包装类型都继承自<code class="notranslate">Number</code>，因此，可以非常方便地直接通过包装类型获取各种基本类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 向上转型为Number:</span>
+<span class="pl-smi">Number</span> <span class="pl-s1">num</span> = <span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-c1">999</span>);
+<span class="pl-c">// 获取byte, int, long, float, double:</span>
+<span class="pl-smi">byte</span> <span class="pl-s1">b</span> = <span class="pl-s1">num</span>.<span class="pl-en">byteValue</span>();
+<span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">num</span>.<span class="pl-en">intValue</span>();
+<span class="pl-smi">long</span> <span class="pl-s1">ln</span> = <span class="pl-s1">num</span>.<span class="pl-en">longValue</span>();
+<span class="pl-smi">float</span> <span class="pl-s1">f</span> = <span class="pl-s1">num</span>.<span class="pl-en">floatValue</span>();
+<span class="pl-smi">double</span> <span class="pl-s1">d</span> = <span class="pl-s1">num</span>.<span class="pl-en">doubleValue</span>();</pre></div>
+<h3>处理无符号整型</h3>
+<p>在Java中，并没有无符号整型（Unsigned）的基本数据类型。<code class="notranslate">byte</code>、<code class="notranslate">short</code>、<code class="notranslate">int</code>和<code class="notranslate">long</code>都是带符号整型，最高位是符号位。而C语言则提供了CPU支持的全部数据类型，包括无符号整型。无符号整型和有符号整型的转换在Java中就需要借助包装类型的静态方法完成。<br>
+例如，byte是有符号整型，范围是<code class="notranslate">-128</code>~<code class="notranslate">+127</code>，但如果把byte看作无符号整型，它的范围就是<code class="notranslate">0~255</code>。我们把一个负的byte按无符号整型转换为<code class="notranslate">int</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Byte</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">byte</span> <span class="pl-s1">x</span> = -<span class="pl-c1">1</span>;
+        <span class="pl-smi">byte</span> <span class="pl-s1">y</span> = <span class="pl-c1">127</span>;
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Byte</span>.<span class="pl-en">toUnsignedInt</span>(<span class="pl-s1">x</span>)); <span class="pl-c">// 255</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Byte</span>.<span class="pl-en">toUnsignedInt</span>(<span class="pl-s1">y</span>)); <span class="pl-c">// 127</span>
+    }
+}
+<span class="pl-smi">因为</span>`byte`<span class="pl-s1">的</span>`-<span class="pl-c1">1</span>`<span class="pl-s1">的二进制表示是</span>`<span class="pl-c1">11111111</span>`，<span class="pl-s1">以无符号整型转换后的</span>`int`<span class="pl-s1">就是</span>`<span class="pl-c1">255</span>`。
+<span class="pl-s1">类似的</span>，<span class="pl-s1">可以把一个</span>`short`<span class="pl-s1">按</span>`<span class="pl-s1">unsigned</span>`<span class="pl-s1">转换为</span>`int`，<span class="pl-s1">把一个</span>`int`<span class="pl-s1">按</span>`<span class="pl-s1">unsigned</span>`<span class="pl-s1">转换为</span>`long`。
+
+## <span class="pl-s1">JavaBean</span>
+<span class="pl-s1">JavaBean是一种符合命名规范的</span>`<span class="pl-k">class</span>`，<span class="pl-s1">它通过</span>`<span class="pl-s1">getter</span>`<span class="pl-s1">和</span>`<span class="pl-s1">setter</span>`<span class="pl-s1">来定义属性</span>；
+<span class="pl-s1">属性是一种通用的叫法</span>，<span class="pl-s1">并非Java语法规定</span>；
+<span class="pl-s1">可以利用IDE快速生成</span>`<span class="pl-s1">getter</span>`<span class="pl-s1">和</span>`<span class="pl-s1">setter</span>`；
+<span class="pl-s1">使用</span>`<span class="pl-s1">Introspector</span>.<span class="pl-s1">getBeanInfo</span>()`<span class="pl-s1">可以获取属性列表</span>。
+
+## <span class="pl-s1">枚举</span>
+&gt;<span class="pl-s1">Java使用enum定义枚举类型</span>，<span class="pl-s1">它被编译器编译为final</span> <span class="pl-k">class</span> <span class="pl-smi">Xxx</span> <span class="pl-k">extends</span> <span class="pl-smi">Enum</span> { … }；
+<span class="pl-en">通过name</span>()<span class="pl-s1">获取常量定义的字符串</span>，<span class="pl-en">注意不要使用toString</span>()；
+<span class="pl-en">通过ordinal</span>()<span class="pl-s1">返回常量定义的顺序</span>（<span class="pl-smi">无实质意义</span>）；
+<span class="pl-s1">可以为enum编写构造方法</span>、<span class="pl-s1">字段和方法</span>
+<span class="pl-s1">enum的构造方法要声明为private</span>，<span class="pl-s1">字段强烈建议声明为final</span>；
+<span class="pl-s1">enum适合用在switch语句中</span>。
+
+
+**<span class="pl-s1">通过enum定义的枚举类</span>，<span class="pl-s1">和其他的class有什么区别</span>？**
+<span class="pl-s1">答案是没有任何区别</span>。`<span class="pl-k">enum</span>`<span class="pl-s1">定义的类型就是</span>`<span class="pl-k">class</span>`，<span class="pl-s1">只不过它有以下几个特点</span>：
+- <span class="pl-s1">定义的</span>`<span class="pl-k">enum</span>`<span class="pl-s1">类型总是继承自</span>`<span class="pl-s1">java</span>.<span class="pl-s1">lang</span>.<span class="pl-s1">Enum</span>`，<span class="pl-s1">且无法被继承</span>；
+- <span class="pl-s1">只能定义出</span>`<span class="pl-k">enum</span>`<span class="pl-s1">的实例</span>，<span class="pl-s1">而无法通过</span>`<span class="pl-k">new</span>`<span class="pl-s1">操作符创建</span>`<span class="pl-k">enum</span>`<span class="pl-s1">的实例</span>；
+- <span class="pl-s1">定义的每个实例都是引用类型的唯一实例</span>；
+- <span class="pl-s1">可以将</span>`<span class="pl-k">enum</span>`<span class="pl-s1">类型用于</span>`<span class="pl-k">switch</span>`<span class="pl-s1">语句</span>。
+
+<span class="pl-s1">例如</span>，<span class="pl-s1">我们定义的Color枚举类</span>：
+```<span class="pl-s1">java</span>
+<span class="pl-k">public</span> <span class="pl-k">enum</span> <span class="pl-smi">Color</span> {
+    <span class="pl-c1">RED</span>, <span class="pl-c1">GREEN</span>, <span class="pl-c1">BLUE</span>;
+}</pre></div>
+<p>编译器编译出的class大概就像这样：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-smi">Color</span> <span class="pl-k">extends</span> <span class="pl-smi">Enum</span> { <span class="pl-c">// 继承自Enum，标记为final class</span>
+    <span class="pl-c">// 每个实例均为全局唯一:</span>
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Color</span> <span class="pl-c1">RED</span> = <span class="pl-k">new</span> <span class="pl-smi">Color</span>();
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Color</span> <span class="pl-c1">GREEN</span> = <span class="pl-k">new</span> <span class="pl-smi">Color</span>();
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Color</span> <span class="pl-c1">BLUE</span> = <span class="pl-k">new</span> <span class="pl-smi">Color</span>();
+    <span class="pl-c">// private构造方法，确保外部无法调用new操作符:</span>
+    <span class="pl-k">private</span> <span class="pl-smi">Color</span>() {}
+}</pre></div>
+<p><strong>name()</strong><br>
+返回常量名，例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-smi">Weekday</span>.<span class="pl-c1">SUN</span>.<span class="pl-en">name</span>(); <span class="pl-c">// "SUN"</span></pre></div>
+<p><strong>ordinal()</strong><br>
+返回定义的常量的顺序，从0开始计数，例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-smi">Weekday</span>.<span class="pl-c1">MON</span>.<span class="pl-en">ordinal</span>(); <span class="pl-c">// 1</span></pre></div>
+<p>改变枚举常量定义的顺序就会导致<code class="notranslate">ordinal()</code>返回值发生变化。</p>
+<h2>record类</h2>
+<p>从Java 14开始，引入了新的Record类。我们定义Record类时，使用关键字record。把上述Point类改写为Record类，代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Record</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Point</span> <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Point</span>(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p</span>.<span class="pl-en">x</span>());
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p</span>.<span class="pl-en">y</span>());
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p</span>);
+    }
+}
+
+<span class="pl-k">record</span> <span class="pl-s1">Point</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {}</pre></div>
+<p>仔细观察<code class="notranslate">Point</code>的定义：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">record</span> <span class="pl-s1">Point</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {}</pre></div>
+<p>把上述定义改写为class，相当于以下代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-smi">Point</span> <span class="pl-k">extends</span> <span class="pl-smi">Record</span> {
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-s1">x</span>;
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-s1">y</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Point</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">x</span> = <span class="pl-s1">x</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">y</span> = <span class="pl-s1">y</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">x</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">x</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">y</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">y</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">String</span>.<span class="pl-en">format</span>(<span class="pl-s">"Point[x=%s, y=%s]"</span>, <span class="pl-s1">x</span>, <span class="pl-s1">y</span>);
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">equals</span>(<span class="pl-smi">Object</span> <span class="pl-s1">o</span>) {
+        ...
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">hashCode</span>() {
+        ...
+    }
+}</pre></div>
+<p>除了用<code class="notranslate">final</code>修饰<code class="notranslate">class</code>以及每个字段外，编译器还自动为我们创建了构造方法，和字段名同名的方法，以及覆写<code class="notranslate">toString()</code>、<code class="notranslate">equals()</code>和<code class="notranslate">hashCode()</code>方法。<br>
+换句话说，使用<code class="notranslate">record</code>关键字，可以一行写出一个不变类。</p>
+<div class="markdown-alert markdown-alert-caution"><p class="markdown-alert-title"><svg class="octicon octicon-stop mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p><p>和<code class="notranslate">enum</code>类似，我们自己不能直接从<code class="notranslate">Record</code>派生，只能通过<code class="notranslate">record</code>关键字由编译器实现继承。</p>
+</div>
+<h3>构造方法</h3>
+<p>编译器默认按照<code class="notranslate">record</code>声明的变量顺序自动创建一个构造方法，并在方法内给字段赋值。那么问题来了，如果我们要检查参数，应该怎么办？<br>
+假设<code class="notranslate">Point</code>类的<code class="notranslate">x</code>、<code class="notranslate">y</code>不允许负数，我们就得给<code class="notranslate">Point</code>的构造方法加上检查逻辑：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">record</span> <span class="pl-s1">Point</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {
+    <span class="pl-k">public</span> <span class="pl-s1">Point</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">x</span> &lt; <span class="pl-c1">0</span> || <span class="pl-s1">y</span> &lt; <span class="pl-c1">0</span>) {
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">IllegalArgumentException</span>();
+        }
+    }
+}</pre></div>
+<p>注意到方法<code class="notranslate">public Point {...}</code>被称为<code class="notranslate">Compact Constructor</code>，它的目的是让我们编写检查逻辑，编译器最终生成的构造方法如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-smi">Point</span> <span class="pl-k">extends</span> <span class="pl-smi">Record</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">Point</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {
+        <span class="pl-c">// 这是我们编写的Compact Constructor:</span>
+        <span class="pl-k">if</span> (<span class="pl-s1">x</span> &lt; <span class="pl-c1">0</span> || <span class="pl-s1">y</span> &lt; <span class="pl-c1">0</span>) {
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">IllegalArgumentException</span>();
+        }
+        <span class="pl-c">// 这是编译器继续生成的赋值代码:</span>
+        <span class="pl-smi">this</span>.<span class="pl-s1">x</span> = <span class="pl-s1">x</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">y</span> = <span class="pl-s1">y</span>;
+    }
+    ...
+}</pre></div>
+<p>作为<code class="notranslate">record</code>的<code class="notranslate">Point</code>仍然可以添加静态方法。一种常用的静态方法是<code class="notranslate">of()</code>方法，用来创建<code class="notranslate">Point</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">record</span> <span class="pl-s1">Point</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">Point</span> <span class="pl-en">of</span>() {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">Point</span>(<span class="pl-c1">0</span>, <span class="pl-c1">0</span>);
+    }
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">Point</span> <span class="pl-en">of</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">Point</span>(<span class="pl-s1">x</span>, <span class="pl-s1">y</span>);
+    }
+}</pre></div>
+<p>这样我们可以写出更简洁的代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">var</span> <span class="pl-s1">z</span> = <span class="pl-smi">Point</span>.<span class="pl-en">of</span>();
+<span class="pl-smi">var</span> <span class="pl-s1">p</span> = <span class="pl-smi">Point</span>.<span class="pl-en">of</span>(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);</pre></div>
+<h2>BigInteger</h2>
+<p><code class="notranslate">BigInteger</code>用于表示任意大小的整数；<br>
+<code class="notranslate">BigInteger</code>是不变类，并且继承自<code class="notranslate">Number</code>；<br>
+将<code class="notranslate">BigInteger</code>转换成基本类型时可使用<code class="notranslate">longValueExact()</code>等方法保证结果准确。<br>
+如果我们使用的整数范围超过了<code class="notranslate">long</code>型怎么办？这个时候，就只能用软件来模拟一个大整数。<code class="notranslate">java.math.BigInteger</code>就是用来表示任意大小的整数。<code class="notranslate">BigInteger</code>内部用一个<code class="notranslate">int[]</code>数组来模拟一个非常大的整数：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">BigInteger</span> <span class="pl-s1">bi</span> = <span class="pl-k">new</span> <span class="pl-smi">BigInteger</span>(<span class="pl-s">"1234567890"</span>);
+<span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">bi</span>.<span class="pl-en">pow</span>(<span class="pl-c1">5</span>)); <span class="pl-c">// 2867971860299718107233761438093672048294900000</span></pre></div>
+<p>对<code class="notranslate">BigInteger</code>做运算的时候，只能使用实例方法，例如，加法运算：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">BigInteger</span> <span class="pl-s1">i1</span> = <span class="pl-k">new</span> <span class="pl-smi">BigInteger</span>(<span class="pl-s">"1234567890"</span>);
+<span class="pl-smi">BigInteger</span> <span class="pl-s1">i2</span> = <span class="pl-k">new</span> <span class="pl-smi">BigInteger</span>(<span class="pl-s">"12345678901234567890"</span>);
+<span class="pl-smi">BigInteger</span> <span class="pl-s1">sum</span> = <span class="pl-s1">i1</span>.<span class="pl-en">add</span>(<span class="pl-s1">i2</span>); <span class="pl-c">// 12345678902469135780</span></pre></div>
+<p>和<code class="notranslate">long</code>型整数运算比，<code class="notranslate">BigInteger</code>不会有范围限制，但缺点是速度比较慢。</p>
+<p>也可以把<code class="notranslate">BigInteger</code>转换成<code class="notranslate">long</code>型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">BigInteger</span> <span class="pl-s1">i</span> = <span class="pl-k">new</span> <span class="pl-smi">BigInteger</span>(<span class="pl-s">"123456789000"</span>);
+<span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">i</span>.<span class="pl-en">longValue</span>()); <span class="pl-c">// 123456789000</span>
+<span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">i</span>.<span class="pl-en">multiply</span>(<span class="pl-s1">i</span>).<span class="pl-en">longValueExact</span>()); <span class="pl-c">// java.lang.ArithmeticException: BigInteger out of long range</span></pre></div>
+<h3>BigDecimal</h3>
+<p>和<code class="notranslate">BigInteger</code>类似，<code class="notranslate">BigDecimal</code>可以表示一个任意大小且精度完全准确的浮点数。<br>
+<code class="notranslate">BigDecimal</code>用于表示精确的小数，常用于财务计算；<br>
+比较<code class="notranslate">BigDecimal</code>的值是否相等，必须使用<code class="notranslate">compareTo()</code>而不能使用<code class="notranslate">equals()</code>。</p>
+<h2>常用工具类</h2>
+<p>SecureRandom<br>
+有伪随机数，就有真随机数。实际上真正的真随机数只能通过量子力学原理来获取，而我们想要的是一个不可预测的安全的随机数，<code class="notranslate">SecureRandom</code>就是用来创建安全的随机数的：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">SecureRandom</span> <span class="pl-s1">sr</span> = <span class="pl-k">new</span> <span class="pl-smi">SecureRandom</span>();
+<span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">sr</span>.<span class="pl-en">nextInt</span>(<span class="pl-c1">100</span>));</pre></div>
+<p><code class="notranslate">SecureRandom</code>无法指定种子，它使用RNG（<code class="notranslate">random number generator</code>）算法。JDK的<code class="notranslate">SecureRandom</code>实际上有多种不同的底层实现，有的使用安全随机种子加上伪随机数算法来产生安全的随机数，有的使用真正的随机数生成器。实际使用的时候，可以优先获取高强度的安全随机数生成器，如果没有提供，再使用普通等级的安全随机数生成器：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Arrays</span>;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">security</span>.<span class="pl-s1">SecureRandom</span>;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">security</span>.<span class="pl-s1">NoSuchAlgorithmException</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">SecureRandom</span> <span class="pl-s1">sr</span> = <span class="pl-c1">null</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-s1">sr</span> = <span class="pl-smi">SecureRandom</span>.<span class="pl-en">getInstanceStrong</span>(); <span class="pl-c">// 获取高强度安全随机数生成器</span>
+        } <span class="pl-k">catch</span> (<span class="pl-smi">NoSuchAlgorithmException</span> <span class="pl-s1">e</span>) {
+            <span class="pl-s1">sr</span> = <span class="pl-k">new</span> <span class="pl-smi">SecureRandom</span>(); <span class="pl-c">// 获取普通的安全随机数生成器</span>
+        }
+        <span class="pl-smi">byte</span>[] <span class="pl-s1">buffer</span> = <span class="pl-k">new</span> <span class="pl-smi">byte</span>[<span class="pl-c1">16</span>];
+        <span class="pl-s1">sr</span>.<span class="pl-en">nextBytes</span>(<span class="pl-s1">buffer</span>); <span class="pl-c">// 用安全随机数填充buffer</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Arrays</span>.<span class="pl-en">toString</span>(<span class="pl-s1">buffer</span>));
+    }
+}</pre></div>
+<p><code class="notranslate">SecureRandom</code>的安全性是通过操作系统提供的安全的随机种子来生成随机数。这个种子是通过CPU的热噪声、读写磁盘的字节、网络流量等各种随机事件产生的“熵”。<br>
+在密码学中，安全的随机数非常重要。如果使用不安全的伪随机数，所有加密体系都将被攻破。因此，时刻牢记必须使用<code class="notranslate">SecureRandom</code>来产生安全的随机数。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
