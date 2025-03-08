@@ -1,5 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>古月月仔的编程学习博客</title><link>https://TingDongHu.github.io</link><description>我是古月月仔，计算机在校生&amp;游戏程序员</description><copyright>古月月仔的编程学习博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/147360624?v=4</url><title>avatar</title><link>https://TingDongHu.github.io</link></image><lastBuildDate>Sat, 08 Mar 2025 13:24:52 +0000</lastBuildDate><managingEditor>古月月仔的编程学习博客</managingEditor><ttl>60</ttl><webMaster>古月月仔的编程学习博客</webMaster><item><title>JAVA语法笔记（七）反射</title><link>https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-qi-%EF%BC%89-fan-she.html</link><description>**什么是反射？**
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>古月月仔的编程学习博客</title><link>https://TingDongHu.github.io</link><description>我是古月月仔，计算机在校生&amp;游戏程序员</description><copyright>古月月仔的编程学习博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/147360624?v=4</url><title>avatar</title><link>https://TingDongHu.github.io</link></image><lastBuildDate>Sat, 08 Mar 2025 15:12:17 +0000</lastBuildDate><managingEditor>古月月仔的编程学习博客</managingEditor><ttl>60</ttl><webMaster>古月月仔的编程学习博客</webMaster><item><title>JAVA语法笔记（八）注解</title><link>https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-ba-%EF%BC%89-zhu-jie.html</link><description>**什么是注解（Annotation）？**注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”：
+```java
+// this is a component:
+@Resource('hello')
+public class Hello {
+    @Inject
+    int n;
+
+    @PostConstruct
+    public void hello(@Param String name) {
+        System.out.println(name);
+    }
+
+    @Override
+    public String toString() {
+        return 'Hello';
+    }
+}
+```
+注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。</description><guid isPermaLink="true">https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-ba-%EF%BC%89-zhu-jie.html</guid><pubDate>Sat, 08 Mar 2025 15:11:54 +0000</pubDate></item><item><title>JAVA语法笔记（七）反射</title><link>https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-qi-%EF%BC%89-fan-she.html</link><description>**什么是反射？**
 反射就是Reflection，Java的反射是指程序在运行期可以拿到一个对象的所有信息。</description><guid isPermaLink="true">https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-qi-%EF%BC%89-fan-she.html</guid><pubDate>Sat, 08 Mar 2025 13:24:27 +0000</pubDate></item><item><title>JAVA语法笔记（六）异常处理</title><link>https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-liu-%EF%BC%89-yi-chang-chu-li.html</link><description>Java内置了一套异常处理机制，总是使用异常来表示错误。</description><guid isPermaLink="true">https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-liu-%EF%BC%89-yi-chang-chu-li.html</guid><pubDate>Sat, 08 Mar 2025 09:20:40 +0000</pubDate></item><item><title>JAVA语法笔记（五） Java核心类</title><link>https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-wu-%EF%BC%89%20Java-he-xin-lei.html</link><description>## 字符串和编码
 `Java`字符串`String`是不可变对象；
 字符串操作不改变原字符串内容，而是返回新字符串；

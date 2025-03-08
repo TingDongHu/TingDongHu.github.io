@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="**什么是注解（Annotation）？**注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”：
+```java
+// this is a component:
+@Resource('hello')
+public class Hello {
+    @Inject
+    int n;
+
+    @PostConstruct
+    public void hello(@Param String name) {
+        System.out.println(name);
+    }
+
+    @Override
+    public String toString() {
+        return 'Hello';
+    }
+}
+```
+注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。">
+<meta property="og:title" content="JAVA语法笔记（八）注解">
+<meta property="og:description" content="**什么是注解（Annotation）？**注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”：
+```java
+// this is a component:
+@Resource('hello')
+public class Hello {
+    @Inject
+    int n;
+
+    @PostConstruct
+    public void hello(@Param String name) {
+        System.out.println(name);
+    }
+
+    @Override
+    public String toString() {
+        return 'Hello';
+    }
+}
+```
+注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-ba-%EF%BC%89-zhu-jie.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记（八）注解</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记（八）注解</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/26" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>**什么是注解（Annotation）？**注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// this is a component:</span>
+<span class="pl-c1">@</span><span class="pl-c1">Resource</span>(<span class="pl-s">"hello"</span>)
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Hello</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Inject</span>
+    <span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">PostConstruct</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">hello</span>(<span class="pl-c1">@</span><span class="pl-c1">Param</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">name</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-s">"Hello"</span>;
+    }
+}</pre></div>
+<p>注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。<br>
+从JVM的角度看，注解本身对代码逻辑没有任何影响，如何使用注解完全由工具决定。</p>
+<p>Java的注解可以分为三类：<br>
+第一类是由编译器使用的注解，例如：</p>
+<ul>
+<li><code class="notranslate">@Override</code>：让编译器检查该方法是否正确地实现了覆写；</li>
+<li><code class="notranslate">@SuppressWarnings</code>：告诉编译器忽略此处代码产生的警告。</li>
+</ul>
+<p>这类注解不会被编译进入<code class="notranslate">.class</code>文件，它们在编译后就被编译器扔掉了。</p>
+<p>第二类是由工具处理<code class="notranslate">.class</code>文件使用的注解，比如有些工具会在加载<code class="notranslate">class</code>的时候，对<code class="notranslate">class</code>做动态修改，实现一些特殊的功能。这类注解会被编译进入<code class="notranslate">.class</code>文件，但加载结束后并不会存在于内存中。这类注解只被一些底层库使用，一般我们不必自己处理。</p>
+<p>第三类是在程序运行期能够读取的注解，它们在加载后一直存在于JVM中，这也是最常用的注解。例如，一个配置了<code class="notranslate">@PostConstruct</code>的方法会在调用构造方法后自动被调用（这是Java代码读取该注解实现的功能，JVM并不会识别该注解）。</p>
+<p>定义一个注解时，还可以定义配置参数。配置参数可以包括：</p>
+<ul>
+<li>所有基本类型；</li>
+<li>String；</li>
+<li>枚举类型；</li>
+<li>基本类型、String、Class以及枚举的数组。</li>
+</ul>
+<p>因为配置参数必须是常量，所以，上述限制保证了注解在定义时就已经确定了每个参数的值。<br>
+注解的配置参数可以有默认值，缺少某个配置参数时将使用默认值。<br>
+此外，大部分注解会有一个名为<code class="notranslate">value</code>的配置参数，对此参数赋值，可以只写常量，相当于省略了<code class="notranslate">value</code>参数。<br>
+如果只写注解，相当于全部使用默认值。</p>
+<p>举个栗子，对以下代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Hello</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Check</span>(<span class="pl-s1">min</span>=<span class="pl-c1">0</span>, <span class="pl-s1">max</span>=<span class="pl-c1">100</span>, <span class="pl-s1">value</span>=<span class="pl-c1">55</span>)
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">Check</span>(<span class="pl-s1">value</span>=<span class="pl-c1">99</span>)
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-s1">p</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">Check</span>(<span class="pl-c1">99</span>) <span class="pl-c">// @Check(value=99)</span>
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-s1">x</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">Check</span>
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-s1">y</span>;
+}</pre></div>
+<p><code class="notranslate">@Check</code>就是一个注解。第一个<code class="notranslate">@Check(min=0, max=100, value=55)</code>明确定义了三个参数，第二个<code class="notranslate">@Check(value=99)</code>只定义了一个<code class="notranslate">value</code>参数，它实际上和<code class="notranslate">@Check(99)</code>是完全一样的。最后一个<code class="notranslate">@Check</code>表示所有参数都使用默认值。</p>
+<h2>定义注解</h2>
+<p>Java语言使用<code class="notranslate">@interface</code>语法来定义注解（<code class="notranslate">Annotation</code>），它的格式如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}</pre></div>
+<p>注解的参数类似无参数方法，可以用<code class="notranslate">default</code>设定一个默认值（强烈推荐）。最常用的参数应当命名为<code class="notranslate">value</code>。</p>
+<h3>元注解</h3>
+<p>有一些注解可以修饰其他注解，这些注解就称为元注解（meta annotation）。Java标准库已经定义了一些元注解，我们只需要使用元注解，通常不需要自己去编写元注解。</p>
+<p>最常用的元注解是<code class="notranslate">@Target</code>。使用<code class="notranslate">@Target</code>可以定义<code class="notranslate">Annotation</code>能够被应用于源码的哪些位置：</p>
+<ul>
+<li>类或接口：<code class="notranslate">ElementType.TYPE</code>；</li>
+<li>字段：<code class="notranslate">ElementType.FIELD</code>；</li>
+<li>方法：<code class="notranslate">ElementType.METHOD</code>；</li>
+<li>构造方法：<code class="notranslate">ElementType.CONSTRUCTOR</code>；</li>
+<li>方法参数：<code class="notranslate">ElementType.PARAMETER</code>。</li>
+</ul>
+<p>例如，定义注解<code class="notranslate">@Report</code>可用在方法上，我们必须添加一个<code class="notranslate">@Target(ElementType.METHOD)</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Target</span>(<span class="pl-smi">ElementType</span>.<span class="pl-c1">METHOD</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}</pre></div>
+<p>定义注解<code class="notranslate">@Report</code>可用在方法或字段上，可以把<code class="notranslate">@Target</code>注解参数变为数组<code class="notranslate">{ ElementType.METHOD, ElementType.FIELD }</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Target</span>({
+    <span class="pl-smi">ElementType</span>.<span class="pl-c1">METHOD</span>,
+    <span class="pl-smi">ElementType</span>.<span class="pl-c1">FIELD</span>
+})
+<span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    ...
+}</pre></div>
+<p>实际上<code class="notranslate">@Target</code>定义的<code class="notranslate">value</code>是<code class="notranslate">ElementType[]</code>数组，只有一个元素时，可以省略数组的写法。<br>
+另一个重要的元注解<code class="notranslate">@Retention</code>定义了<code class="notranslate">Annotation</code>的生命周期：</p>
+<ul>
+<li>仅编译期：RetentionPolicy.SOURCE；</li>
+<li>仅class文件：RetentionPolicy.CLASS；</li>
+<li>运行期：RetentionPolicy.RUNTIME。<br>
+如果<code class="notranslate">@Retention</code>不存在，则该<code class="notranslate">Annotation</code>默认为<code class="notranslate">CLASS</code>。因为通常我们自定义的<code class="notranslate">Annotation</code>都是<code class="notranslate">RUNTIME</code>，所以，务必要加上<code class="notranslate">@Retention(RetentionPolicy.RUNTIME)</code>这个元注解：</li>
+</ul>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Retention</span>(<span class="pl-smi">RetentionPolicy</span>.<span class="pl-c1">RUNTIME</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}</pre></div>
+<p>使用<code class="notranslate">@Repeatable</code>这个元注解可以定义<code class="notranslate">Annotation</code>是否可重复。这个注解应用不是特别广泛。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Repeatable</span>(<span class="pl-smi">Reports</span>.<span class="pl-k">class</span>)
+<span class="pl-c1">@</span><span class="pl-c1">Target</span>(<span class="pl-smi">ElementType</span>.<span class="pl-c1">TYPE</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}
+
+<span class="pl-c1">@</span><span class="pl-c1">Target</span>(<span class="pl-smi">ElementType</span>.<span class="pl-c1">TYPE</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Reports</span> {
+    <span class="pl-smi">Report</span>[] <span class="pl-s1">value</span>();
+}</pre></div>
+<p>经过<code class="notranslate">@Repeatable</code>修饰后，在某个类型声明处，就可以添加多个<code class="notranslate">@Report</code>注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Report</span>(<span class="pl-s1">type</span>=<span class="pl-c1">1</span>, <span class="pl-s1">level</span>=<span class="pl-s">"debug"</span>)
+<span class="pl-c1">@</span><span class="pl-c1">Report</span>(<span class="pl-s1">type</span>=<span class="pl-c1">2</span>, <span class="pl-s1">level</span>=<span class="pl-s">"warning"</span>)
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Hello</span> {
+}</pre></div>
+<p>使用<code class="notranslate">@Inherited</code>定义子类是否可继承父类定义的<code class="notranslate">Annotation</code>。<code class="notranslate">@Inherited</code>仅针对<code class="notranslate">@Target(ElementType.TYPE)</code>类型的<code class="notranslate">annotation</code>有效，并且仅针对<code class="notranslate">class</code>的继承，对<code class="notranslate">interface</code>的继承无效：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Inherited</span>
+<span class="pl-c1">@</span><span class="pl-c1">Target</span>(<span class="pl-smi">ElementType</span>.<span class="pl-c1">TYPE</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}</pre></div>
+<p>在使用的时候，如果一个类用到了<code class="notranslate">@Report</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Report</span>(<span class="pl-s1">type</span>=<span class="pl-c1">1</span>)
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Person</span> {
+}</pre></div>
+<p>则它的子类默认也定义了该注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Student</span> <span class="pl-k">extends</span> <span class="pl-smi">Person</span> {
+}</pre></div>
+<h3>如何定义Annotation</h3>
+<p>我们总结一下定义<code class="notranslate">Annotation</code>的步骤：<br>
+第一步，用<code class="notranslate">@interface</code>定义注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+}</pre></div>
+<p>第二步，添加参数、默认值：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}</pre></div>
+<p>把最常用的参数定义为<code class="notranslate">value()</code>，推荐所有参数都尽量设置默认值。</p>
+<p>第三步，用元注解配置注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Target</span>(<span class="pl-smi">ElementType</span>.<span class="pl-c1">TYPE</span>)
+<span class="pl-c1">@</span><span class="pl-c1">Retention</span>(<span class="pl-smi">RetentionPolicy</span>.<span class="pl-c1">RUNTIME</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Report</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">type</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">level</span>() <span class="pl-k">default</span> <span class="pl-s">"info"</span>;
+    <span class="pl-smi">String</span> <span class="pl-s1">value</span>() <span class="pl-k">default</span> <span class="pl-s">""</span>;
+}</pre></div>
+<p>其中，必须设置<code class="notranslate">@Target</code>和<code class="notranslate">@Retention</code>，<code class="notranslate">@Retention</code>一般设置为<code class="notranslate">RUNTIME</code>，因为我们自定义的注解通常要求在运行期读取。一般情况下，不必写<code class="notranslate">@Inherited</code>和<code class="notranslate">@Repeatable</code>。</p>
+<h2>处理注解</h2>
+<p>Java的注解本身对代码逻辑没有任何影响。根据·<a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/retention/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/retention">@retention</a>·的配置：</p>
+<ul>
+<li><code class="notranslate">SOURCE</code>类型的注解在编译期就被丢掉了；</li>
+<li><code class="notranslate">CLASS</code>类型的注解仅保存在<code class="notranslate">class</code>文件中，它们不会被加载进<code class="notranslate">JVM</code>；</li>
+<li><code class="notranslate">RUNTIME</code>类型的注解会被加载进<code class="notranslate">JVM</code>，并且在运行期可以被程序读取。</li>
+</ul>
+<p>如何使用注解完全由工具决定。<code class="notranslate">SOURCE</code>类型的注解主要由编译器使用，因此我们一般只使用，不编写。<code class="notranslate">CLASS</code>类型的注解主要由底层工具库使用，涉及到<code class="notranslate">class</code>的加载，一般我们很少用到。只有<code class="notranslate">RUNTIME</code>类型的注解不但要使用，还经常需要编写。<br>
+因此，我们只讨论如何读取<code class="notranslate">RUNTIME</code>类型的注解。<br>
+因为注解定义后也是一种<code class="notranslate">class</code>，所有的注解都继承自<code class="notranslate">java.lang.annotation.Annotation</code>，因此，读取注解，需要使用反射API。</p>
+<p>Java提供的使用反射API读取<code class="notranslate">Annotation</code>的方法包括：<br>
+判断某个注解是否存在于<code class="notranslate">Class</code>、<code class="notranslate">Field</code>、<code class="notranslate">Method</code>或<code class="notranslate">Constructor</code>：</p>
+<ul>
+<li>Class.isAnnotationPresent(Class)</li>
+<li>Field.isAnnotationPresent(Class)</li>
+<li>Method.isAnnotationPresent(Class)</li>
+<li>Constructor.isAnnotationPresent(Class)</li>
+</ul>
+<p>例如：</p>
+<pre class="notranslate"><code class="notranslate">// 判断@Report是否存在于Person类:
+Person.class.isAnnotationPresent(Report.class);
+</code></pre>
+<p>使用反射API读取Annotation：</p>
+<ul>
+<li>Class.getAnnotation(Class)</li>
+<li>Field.getAnnotation(Class)</li>
+<li>Method.getAnnotation(Class)</li>
+<li>Constructor.getAnnotation(Class)</li>
+</ul>
+<p>例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 获取Person定义的@Report注解:</span>
+<span class="pl-smi">Report</span> <span class="pl-s1">report</span> = <span class="pl-smi">Person</span>.<span class="pl-k">class</span>.<span class="pl-en">getAnnotation</span>(<span class="pl-smi">Report</span>.<span class="pl-k">class</span>);
+<span class="pl-smi">int</span> <span class="pl-s1">type</span> = <span class="pl-s1">report</span>.<span class="pl-en">type</span>();
+<span class="pl-smi">String</span> <span class="pl-s1">level</span> = <span class="pl-s1">report</span>.<span class="pl-en">level</span>();</pre></div>
+<p>使用反射API读取<code class="notranslate">Annotation</code>有两种方法。方法一是先判断<code class="notranslate">Annotation</code>是否存在，如果存在，就直接读取：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Class</span> <span class="pl-s1">cls</span> = <span class="pl-smi">Person</span>.<span class="pl-k">class</span>;
+<span class="pl-k">if</span> (<span class="pl-s1">cls</span>.<span class="pl-en">isAnnotationPresent</span>(<span class="pl-smi">Report</span>.<span class="pl-k">class</span>)) {
+    <span class="pl-smi">Report</span> <span class="pl-s1">report</span> = <span class="pl-s1">cls</span>.<span class="pl-en">getAnnotation</span>(<span class="pl-smi">Report</span>.<span class="pl-k">class</span>);
+    ...
+}</pre></div>
+<p>第二种方法是直接读取<code class="notranslate">Annotation</code>，如果<code class="notranslate">Annotation</code>不存在，将返回<code class="notranslate">null</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Class</span> <span class="pl-s1">cls</span> = <span class="pl-smi">Person</span>.<span class="pl-k">class</span>;
+<span class="pl-smi">Report</span> <span class="pl-s1">report</span> = <span class="pl-s1">cls</span>.<span class="pl-en">getAnnotation</span>(<span class="pl-smi">Report</span>.<span class="pl-k">class</span>);
+<span class="pl-k">if</span> (<span class="pl-s1">report</span> != <span class="pl-c1">null</span>) {
+   ...
+}</pre></div>
+<p>读取方法、字段和构造方法的<code class="notranslate">Annotation</code>和<code class="notranslate">Class</code>类似。但要读取方法参数的<code class="notranslate">Annotation</code>就比较麻烦一点，因为方法参数本身可以看成一个数组，而每个参数又可以定义多个注解，所以，一次获取方法参数的所有注解就必须用一个二维数组来表示。例如，对于以下方法定义的注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">hello</span>(<span class="pl-c1">@</span><span class="pl-c1">NotNull</span> <span class="pl-c1">@</span><span class="pl-c1">Range</span>(<span class="pl-s1">max</span>=<span class="pl-c1">5</span>) <span class="pl-smi">String</span> <span class="pl-s1">name</span>, <span class="pl-c1">@</span><span class="pl-c1">NotNull</span> <span class="pl-smi">String</span> <span class="pl-s1">prefix</span>) {
+}</pre></div>
+<p>要读取方法参数的注解，我们先用反射获取<code class="notranslate">Method</code>实例，然后读取方法参数的所有注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 获取Method实例:</span>
+<span class="pl-smi">Method</span> <span class="pl-s1">m</span> = ...
+<span class="pl-c">// 获取所有参数的Annotation:</span>
+<span class="pl-smi">Annotation</span>[][] <span class="pl-s1">annos</span> = <span class="pl-s1">m</span>.<span class="pl-en">getParameterAnnotations</span>();
+<span class="pl-c">// 第一个参数（索引为0）的所有Annotation:</span>
+<span class="pl-smi">Annotation</span>[] <span class="pl-s1">annosOfName</span> = <span class="pl-s1">annos</span>[<span class="pl-c1">0</span>];
+<span class="pl-k">for</span> (<span class="pl-smi">Annotation</span> <span class="pl-s1">anno</span> : <span class="pl-s1">annosOfName</span>) {
+    <span class="pl-k">if</span> (<span class="pl-s1">anno</span> <span class="pl-k">instanceof</span> <span class="pl-smi">Range</span> <span class="pl-s1">r</span>) { <span class="pl-c">// @Range注解</span>
+        <span class="pl-s1">r</span>.<span class="pl-en">max</span>();
+    }
+    <span class="pl-k">if</span> (<span class="pl-s1">anno</span> <span class="pl-k">instanceof</span> <span class="pl-smi">NotNull</span> <span class="pl-s1">n</span>) { <span class="pl-c">// @NotNull注解</span>
+        <span class="pl-c">//</span>
+    }
+}</pre></div>
+<h2>使用注解</h2>
+<p>注解如何使用，完全由程序自己决定。例如，<code class="notranslate">JUnit</code>是一个测试框架，它会自动运行所有标记为<code class="notranslate">@Test</code>的方法。<br>
+我们来看一个<code class="notranslate">@Range</code>注解，我们希望用它来定义一个<code class="notranslate">String</code>字段的规则：字段长度满足<code class="notranslate">@Range</code>的参数定义：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Retention</span>(<span class="pl-smi">RetentionPolicy</span>.<span class="pl-c1">RUNTIME</span>)
+<span class="pl-c1">@</span><span class="pl-c1">Target</span>(<span class="pl-smi">ElementType</span>.<span class="pl-c1">FIELD</span>)
+<span class="pl-k">public</span> @interface <span class="pl-s1">Range</span> {
+    <span class="pl-smi">int</span> <span class="pl-s1">min</span>() <span class="pl-k">default</span> <span class="pl-c1">0</span>;
+    <span class="pl-smi">int</span> <span class="pl-s1">max</span>() <span class="pl-k">default</span> <span class="pl-c1">255</span>;
+}</pre></div>
+<p>在某个<code class="notranslate">JavaBean</code>中，我们可以使用该注解：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Person</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Range</span>(<span class="pl-s1">min</span>=<span class="pl-c1">1</span>, <span class="pl-s1">max</span>=<span class="pl-c1">20</span>)
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">Range</span>(<span class="pl-s1">max</span>=<span class="pl-c1">10</span>)
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-s1">city</span>;
+}</pre></div>
+<p>但是，定义了注解，本身对程序逻辑没有任何影响。我们必须自己编写代码来使用注解。这里，我们编写一个<code class="notranslate">Person</code>实例的检查方法，它可以检查<code class="notranslate">Person</code>实例的<code class="notranslate">String</code>字段长度是否满足<code class="notranslate">@Range</code>的定义：</p>
+<pre class="notranslate"><code class="notranslate">void check(Person person) throws IllegalArgumentException, ReflectiveOperationException {
+    // 遍历所有Field:
+    for (Field field : person.getClass().getFields()) {
+        // 获取Field定义的@Range:
+        Range range = field.getAnnotation(Range.class);
+        // 如果@Range存在:
+        if (range != null) {
+            // 获取Field的值:
+            Object value = field.get(person);
+            // 如果值是String:
+            if (value instanceof String s) {
+                // 判断值是否满足@Range的min/max:
+                if (s.length() &lt; range.min() || s.length() &gt; range.max()) {
+                    throw new IllegalArgumentException("Invalid field: " + field.getName());
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>这样一来，我们通过<code class="notranslate">@Range</code>注解，配合<code class="notranslate">check()</code>方法，就可以完成<code class="notranslate">Person</code>实例的检查。注意检查逻辑完全是我们自己编写的，<code class="notranslate">JVM</code>不会自动给注解添加任何额外的逻辑。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
