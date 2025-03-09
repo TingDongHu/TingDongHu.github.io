@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="Java标准库自带的`java.util`包提供了集合类：`Collection`，它是除`Map`外所有其他集合类的根接口。">
+<meta property="og:title" content="JAVA语法笔记（十）集合">
+<meta property="og:description" content="Java标准库自带的`java.util`包提供了集合类：`Collection`，它是除`Map`外所有其他集合类的根接口。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-shi-%EF%BC%89-ji-he.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记（十）集合</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记（十）集合</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/28" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>Java标准库自带的<code class="notranslate">java.util</code>包提供了集合类：<code class="notranslate">Collection</code>，它是除<code class="notranslate">Map</code>外所有其他集合类的根接口。Java的<code class="notranslate">java.util</code>包主要提供了以下三种类型的集合：</p>
+<ul>
+<li><code class="notranslate">List</code>：一种有序列表的集合，例如，按索引排列的<code class="notranslate">Student</code>的<code class="notranslate">List</code>；</li>
+<li><code class="notranslate">Set</code>：一种保证没有重复元素的集合，例如，所有无重复名称的<code class="notranslate">Student</code>的<code class="notranslate">Set</code>；</li>
+<li><code class="notranslate">Map</code>：一种通过键值（key-value）查找的映射表集合，例如，根据<code class="notranslate">Student</code>的<code class="notranslate">name</code>查找对应<code class="notranslate">Student</code>的<code class="notranslate">Map</code>。</li>
+</ul>
+<p>Java集合的设计有几个特点：一是实现了接口和实现类相分离，例如，有序表的接口是<code class="notranslate">List</code>，具体的实现类有<code class="notranslate">ArrayList</code>，<code class="notranslate">LinkedList</code>等，二是支持泛型，我们可以限制在一个集合中只能放入同一种数据类型的元素，例如：</p>
+<pre class="notranslate"><code class="notranslate">List&lt;String&gt; list = new ArrayList&lt;&gt;(); // 只能放入String类型
+</code></pre>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>Java访问集合总是通过统一的方式——迭代器（Iterator）来实现，它最明显的好处在于无需知道集合内部元素是按什么方式存储的。</p>
+</div>
+<p>由于Java的集合设计非常久远，中间经历过大规模改进，我们要注意到有一小部分集合类是遗留类，不应该继续使用：</p>
+<ul>
+<li><code class="notranslate">Hashtable</code>：一种线程安全的<code class="notranslate">Map</code>实现；</li>
+<li><code class="notranslate">Vector</code>：一种线程安全的<code class="notranslate">List</code>实现；</li>
+<li><code class="notranslate">Stack</code>：基于<code class="notranslate">Vector</code>实现的<code class="notranslate">LIFO</code>的栈。</li>
+</ul>
+<p>还有一小部分接口是遗留接口，也不应该继续使用：</p>
+<ul>
+<li><code class="notranslate">Enumeration&lt;E&gt;</code>：已被<code class="notranslate">Iterator&lt;E&gt;</code>取代。</li>
+</ul>
+<h2>List</h2>
+<p><strong>创建List</strong>,除了使用ArrayList和LinkedList,还可以通过List接口提供的of()方法，根据给定元素快速创建List：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">List</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">list</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">5</span>);</pre></div>
+<p><strong>遍历List</strong><br>
+和数组类型类似，我们要遍历一个List，完全可以用for循环根据索引配合get(int)方法遍历：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">List</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">list</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"apple"</span>, <span class="pl-s">"pear"</span>, <span class="pl-s">"banana"</span>);
+        <span class="pl-k">for</span> (<span class="pl-smi">int</span> <span class="pl-s1">i</span>=<span class="pl-c1">0</span>; <span class="pl-s1">i</span>&lt;<span class="pl-s1">list</span>.<span class="pl-en">size</span>(); <span class="pl-s1">i</span>++) {
+            <span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-s1">i</span>);
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+        }
+    }
+}</pre></div>
+<p>但这种方式并不推荐，一是代码复杂，二是因为<code class="notranslate">get(int)</code>方法只有<code class="notranslate">ArrayList</code>的实现是高效的，换成<code class="notranslate">LinkedList</code>后，索引越大，访问速度越慢。</p>
+<p>所以我们要始终坚持使用迭代器<code class="notranslate">Iterator</code>来访问<code class="notranslate">List</code>。<code class="notranslate">Iterator</code>本身也是一个对象，但它是由<code class="notranslate">List</code>的实例调用<code class="notranslate">iterator()</code>方法的时候创建的。<code class="notranslate">Iterator</code>对象知道如何遍历一个<code class="notranslate">List</code>，并且不同的<code class="notranslate">List</code>类型，返回的<code class="notranslate">Iterator</code>对象实现也是不同的，但总是具有最高的访问效率。</p>
+<p><code class="notranslate">Iterator</code>对象有两个方法：<code class="notranslate">boolean hasNext()</code>判断是否有下一个元素，<code class="notranslate">E next()</code>返回下一个元素。因此，使用<code class="notranslate">Iterator</code>遍历<code class="notranslate">List</code>代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Iterator</span>;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">List</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">list</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"apple"</span>, <span class="pl-s">"pear"</span>, <span class="pl-s">"banana"</span>);
+        <span class="pl-k">for</span> (<span class="pl-smi">Iterator</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">it</span> = <span class="pl-s1">list</span>.<span class="pl-en">iterator</span>(); <span class="pl-s1">it</span>.<span class="pl-en">hasNext</span>(); ) {
+            <span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s1">it</span>.<span class="pl-en">next</span>();
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+        }
+    }
+}</pre></div>
+<p>通过Iterator遍历List永远是最高效的方式。并且，由于Iterator遍历是如此常用，所以，Java的for each循环本身就可以帮我们使用Iterator遍历。把上面的代码再改写如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">List</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">list</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"apple"</span>, <span class="pl-s">"pear"</span>, <span class="pl-s">"banana"</span>);
+        <span class="pl-k">for</span> (<span class="pl-smi">String</span> <span class="pl-s1">s</span> : <span class="pl-s1">list</span>) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+        }
+    }
+}</pre></div>
+<p>实际上，只要实现了<code class="notranslate">Iterable</code>接口的集合类都可以直接用<code class="notranslate">for each</code>循环来遍历，Java编译器本身并不知道如何遍历集合对象，但它会自动把<code class="notranslate">for each</code>循环变成<code class="notranslate">Iterator</code>的调用，原因就在于<code class="notranslate">Iterable</code>接口定义了一个<code class="notranslate">Iterator&lt;E&gt; iterator()</code>方法，强迫集合类必须返回一个<code class="notranslate">Iterator</code>实例。</p>
+<h2>Properties</h2>
+<p>在编写应用程序的时候，经常需要读写配置文件。例如，用户的设置：</p>
+<pre class="notranslate"><code class="notranslate"># 上次最后打开的文件:
+last_open_file=/data/hello.txt
+# 自动保存文件的时间间隔:
+auto_save_interval=60
+</code></pre>
+<p>配置文件的特点是，它的<code class="notranslate">Key-Value</code>一般都是<code class="notranslate">String-String</code>类型的，因此我们完全可以用<code class="notranslate">Map&lt;String, String&gt;</code>来表示它。</p>
+<p>因为配置文件非常常用，所以Java集合库提供了一个<code class="notranslate">Properties</code>来表示一组“配置”。由于历史遗留原因，<code class="notranslate">Properties</code>内部本质上是一个<code class="notranslate">Hashtable</code>，但我们只需要用到<code class="notranslate">Properties</code>自身关于读写配置的接口。<br>
+用<code class="notranslate">Properties</code>读取配置文件非常简单。Java默认配置文件以<code class="notranslate">.properties</code>为扩展名，每行以<code class="notranslate">key=value</code>表示，以<code class="notranslate">#</code>开头的是注释。以下是一个典型的配置文件：</p>
+<pre class="notranslate"><code class="notranslate"># setting.properties
+
+last_open_file=/data/hello.txt
+auto_save_interval=60
+</code></pre>
+<p>可以从文件系统读取这个<code class="notranslate">.properties</code>文件：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">String</span> <span class="pl-s1">f</span> = <span class="pl-s">"setting.properties"</span>;
+<span class="pl-smi">Properties</span> <span class="pl-s1">props</span> = <span class="pl-k">new</span> <span class="pl-smi">Properties</span>();
+<span class="pl-s1">props</span>.<span class="pl-en">load</span>(<span class="pl-k">new</span> <span class="pl-smi">java</span>.<span class="pl-smi">io</span>.<span class="pl-smi">FileInputStream</span>(<span class="pl-s1">f</span>));
+
+<span class="pl-smi">String</span> <span class="pl-s1">filepath</span> = <span class="pl-s1">props</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"last_open_file"</span>);
+<span class="pl-smi">String</span> <span class="pl-s1">interval</span> = <span class="pl-s1">props</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"auto_save_interval"</span>, <span class="pl-s">"120"</span>);</pre></div>
+<p>可见，用<code class="notranslate">Properties</code>读取配置文件，一共有三步：</p>
+<ul>
+<li>创建Properties实例；</li>
+<li>调用load()读取文件；</li>
+<li>调用getProperty()获取配置。</li>
+</ul>
+<p>调用<code class="notranslate">getProperty()</code>获取配置时，如果<code class="notranslate">key</code>不存在，将返回<code class="notranslate">null</code>。我们还可以提供一个默认值，这样，当<code class="notranslate">key</code>不存在的时候，就返回默认值。</p>
+<p>也可以从<code class="notranslate">classpath</code>读取<code class="notranslate">.properties</code>文件，因为<code class="notranslate">load(InputStream)</code>方法接收一个<code class="notranslate">InputStream</code>实例，表示一个字节流，它不一定是文件流，也可以是从<code class="notranslate">jar</code>包中读取的资源流：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Properties</span> <span class="pl-s1">props</span> = <span class="pl-k">new</span> <span class="pl-smi">Properties</span>();
+<span class="pl-s1">props</span>.<span class="pl-en">load</span>(<span class="pl-en">getClass</span>().<span class="pl-en">getResourceAsStream</span>(<span class="pl-s">"/common/setting.properties"</span>));</pre></div>
+<p>试试从内存读取一个字节流：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// properties</span>
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">io</span>.*;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Properties</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+        <span class="pl-smi">String</span> <span class="pl-s1">settings</span> = <span class="pl-s">"# test"</span> + <span class="pl-s">"<span class="pl-cce">\n</span>"</span> + <span class="pl-s">"course=Java"</span> + <span class="pl-s">"<span class="pl-cce">\n</span>"</span> + <span class="pl-s">"last_open_date=2019-08-07T12:35:01"</span>;
+        <span class="pl-smi">ByteArrayInputStream</span> <span class="pl-s1">input</span> = <span class="pl-k">new</span> <span class="pl-smi">ByteArrayInputStream</span>(<span class="pl-s1">settings</span>.<span class="pl-en">getBytes</span>(<span class="pl-s">"UTF-8"</span>));
+        <span class="pl-smi">Properties</span> <span class="pl-s1">props</span> = <span class="pl-k">new</span> <span class="pl-smi">Properties</span>();
+        <span class="pl-s1">props</span>.<span class="pl-en">load</span>(<span class="pl-s1">input</span>);
+
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"course: "</span> + <span class="pl-s1">props</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"course"</span>));
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"last_open_date: "</span> + <span class="pl-s1">props</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"last_open_date"</span>));
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"last_open_file: "</span> + <span class="pl-s1">props</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"last_open_file"</span>));
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"auto_save: "</span> + <span class="pl-s1">props</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"auto_save"</span>, <span class="pl-s">"60"</span>));
+    }
+}</pre></div>
+<p>如果有多个<code class="notranslate">.properties</code>文件，可以反复调用<code class="notranslate">load()</code>读取，后读取的<code class="notranslate">key-value</code>会覆盖已读取的<code class="notranslate">key-value</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Properties</span> <span class="pl-s1">props</span> = <span class="pl-k">new</span> <span class="pl-smi">Properties</span>();
+<span class="pl-s1">props</span>.<span class="pl-en">load</span>(<span class="pl-en">getClass</span>().<span class="pl-en">getResourceAsStream</span>(<span class="pl-s">"/common/setting.properties"</span>));
+<span class="pl-s1">props</span>.<span class="pl-en">load</span>(<span class="pl-k">new</span> <span class="pl-smi">FileInputStream</span>(<span class="pl-s">"C:<span class="pl-cce">\\</span>conf<span class="pl-cce">\\</span>setting.properties"</span>));</pre></div>
+<p>上面的代码演示了<code class="notranslate">Properties</code>的一个常用用法：可以把默认配置文件放到<code class="notranslate">classpath</code>中，然后，根据机器的环境编写另一个配置文件，覆盖某些默认的配置。</p>
+<p><code class="notranslate">Properties</code>设计的目的是存储<code class="notranslate">String</code>类型的<code class="notranslate">key－value</code>，但<code class="notranslate">Properties</code>实际上是从<code class="notranslate">Hashtable</code>派生的，它的设计实际上是有问题的，但是为了保持兼容性，现在已经没法修改了。除了<code class="notranslate">getProperty()</code>和<code class="notranslate">setProperty()</code>方法外，还有从<code class="notranslate">Hashtable</code>继承下来的<code class="notranslate">get()</code>和<code class="notranslate">put()</code>方法，这些方法的参数签名是<code class="notranslate">Object</code>，我们在使用<code class="notranslate">Properties</code>的时候，不要去调用这些从<code class="notranslate">Hashtable</code>继承下来的方法。</p>
+<h2>Set</h2>
+<p>我们知道，Map用于存储<code class="notranslate">key-value</code>的映射，对于充当<code class="notranslate">key</code>的对象，是不能重复的，并且，不但需要正确覆写<code class="notranslate">equals()</code>方法，还要正确覆写<code class="notranslate">hashCode()</code>方法。<br>
+如果我们只需要存储不重复的<code class="notranslate">key</code>，并不需要存储映射的<code class="notranslate">value</code>，那么就可以使用<code class="notranslate">Set</code>。<br>
+<code class="notranslate">Set</code>用于存储不重复的元素集合，它主要提供以下几个方法：</p>
+<ul>
+<li>将元素添加进Set：<code class="notranslate">boolean add(E e)</code></li>
+<li>将元素从Set删除：<code class="notranslate">boolean remove(Object e)</code></li>
+<li>判断是否包含元素：<code class="notranslate">boolean contains(Object e)</code></li>
+</ul>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Set</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">set</span> = <span class="pl-k">new</span> <span class="pl-smi">HashSet</span>&lt;&gt;();
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">add</span>(<span class="pl-s">"abc"</span>)); <span class="pl-c">// true</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">add</span>(<span class="pl-s">"xyz"</span>)); <span class="pl-c">// true</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">add</span>(<span class="pl-s">"xyz"</span>)); <span class="pl-c">// false，添加失败，因为元素已存在</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">contains</span>(<span class="pl-s">"xyz"</span>)); <span class="pl-c">// true，元素存在</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">contains</span>(<span class="pl-s">"XYZ"</span>)); <span class="pl-c">// false，元素不存在</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">remove</span>(<span class="pl-s">"hello"</span>)); <span class="pl-c">// false，删除失败，因为元素不存在</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">set</span>.<span class="pl-en">size</span>()); <span class="pl-c">// 2，一共两个元素</span>
+    }
+}</pre></div>
+<p><code class="notranslate">Set</code>实际上相当于只存储<code class="notranslate">key</code>、不存储<code class="notranslate">value</code>的<code class="notranslate">Map</code>。我们经常用<code class="notranslate">Set</code>用于去除重复元素。<br>
+因为放入<code class="notranslate">Set</code>的元素和<code class="notranslate">Map</code>的<code class="notranslate">key</code>类似，都要正确实现<code class="notranslate">equals()</code>和<code class="notranslate">hashCode()</code>方法，否则该元素无法正确地放入<code class="notranslate">Set</code>。<br>
+最常用的<code class="notranslate">Set</code>实现类是<code class="notranslate">HashSet</code>，实际上，<code class="notranslate">HashSet</code>仅仅是对<code class="notranslate">HashMap</code>的一个简单封装，它的核心代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">HashSet</span>&lt;<span class="pl-smi">E</span>&gt; <span class="pl-k">implements</span> <span class="pl-smi">Set</span>&lt;<span class="pl-smi">E</span>&gt; {
+    <span class="pl-c">// 持有一个HashMap:</span>
+    <span class="pl-k">private</span> <span class="pl-smi">HashMap</span>&lt;<span class="pl-smi">E</span>, <span class="pl-smi">Object</span>&gt; <span class="pl-s1">map</span> = <span class="pl-k">new</span> <span class="pl-smi">HashMap</span>&lt;&gt;();
+
+    <span class="pl-c">// 放入HashMap的value:</span>
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Object</span> <span class="pl-c1">PRESENT</span> = <span class="pl-k">new</span> <span class="pl-smi">Object</span>();
+
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">add</span>(<span class="pl-smi">E</span> <span class="pl-s1">e</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">map</span>.<span class="pl-en">put</span>(<span class="pl-s1">e</span>, <span class="pl-c1">PRESENT</span>) == <span class="pl-c1">null</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">contains</span>(<span class="pl-smi">Object</span> <span class="pl-s1">o</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">map</span>.<span class="pl-en">containsKey</span>(<span class="pl-s1">o</span>);
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">remove</span>(<span class="pl-smi">Object</span> <span class="pl-s1">o</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">map</span>.<span class="pl-en">remove</span>(<span class="pl-s1">o</span>) == <span class="pl-c1">PRESENT</span>;
+    }
+}</pre></div>
+<p><code class="notranslate">Set</code>接口并不保证有序，而<code class="notranslate">SortedSet</code>接口则保证元素是有序的：</p>
+<ul>
+<li><code class="notranslate">HashSet</code>是无序的，因为它实现了<code class="notranslate">Set</code>接口，并没有实现<code class="notranslate">SortedSet</code>接口；</li>
+<li><code class="notranslate">TreeSet</code>是有序的，因为它实现了<code class="notranslate">SortedSet</code>接口。</li>
+</ul>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/0f2a7606-eb33-4fb0-a019-6125e3f1215c"><img src="https://github.com/user-attachments/assets/0f2a7606-eb33-4fb0-a019-6125e3f1215c" alt="Image" style="max-width: 100%;"></a></p>
+<h2>Queue</h2>
+<p>队列（Queue）是一种经常使用的集合。<code class="notranslate">Queue</code>实际上是实现了一个先进先出（FIFO：First In First Out）的有序表。它和<code class="notranslate">List</code>的区别在于，<code class="notranslate">List</code>可以在任意位置添加和删除元素，而<code class="notranslate">Queue</code>只有两个操作：</p>
+<ul>
+<li>把元素添加到队列末尾；</li>
+<li>从队列头部取出元素。</li>
+</ul>
+<p>队列Queue实现了一个先进先出（FIFO）的数据结构：</p>
+<ul>
+<li>通过<code class="notranslate">add()</code>/<code class="notranslate">offer()</code>方法将元素添加到队尾；</li>
+<li>通过<code class="notranslate">remove()</code>/<code class="notranslate">poll()</code>从队首获取元素并删除；</li>
+<li>通过<code class="notranslate">element()</code>/<code class="notranslate">peek()</code>从队首获取元素但不删除。</li>
+</ul>
+<h2>PriorityQueue</h2>
+<p>我们知道，<code class="notranslate">Queue</code>是一个先进先出（FIFO）的队列。<br>
+在银行柜台办业务时，我们假设只有一个柜台在办理业务，但是办理业务的人很多，怎么办？<br>
+可以每个人先取一个号，例如：A1、A2、A3……然后，按照号码顺序依次办理，实际上这就是一个<code class="notranslate">Queue</code>。<br>
+如果这时来了一个VIP客户，他的号码是V1，虽然当前排队的是A10、A11、A12……但是柜台下一个呼叫的客户号码却是V1。<br>
+这个时候，我们发现，要实现“VIP插队”的业务，用<code class="notranslate">Queue</code>就不行了，因为<code class="notranslate">Queue</code>会严格按FIFO的原则取出队首元素。我们需要的是优先队列：<code class="notranslate">PriorityQueue</code>。<br>
+<code class="notranslate">PriorityQueue</code>和<code class="notranslate">Queue</code>的区别在于，它的出队顺序与元素的优先级有关，对<code class="notranslate">PriorityQueue</code>调用<code class="notranslate">remove()</code>或<code class="notranslate">poll()</code>方法，返回的总是优先级最高的元素。<br>
+要使用<code class="notranslate">PriorityQueue</code>，我们就必须给每个元素定义“优先级”。我们以实际代码为例，先看看<code class="notranslate">PriorityQueue</code>的行为：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Comparator</span>;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">PriorityQueue</span>;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Queue</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Queue</span>&lt;<span class="pl-smi">User</span>&gt; <span class="pl-s1">q</span> = <span class="pl-k">new</span> <span class="pl-smi">PriorityQueue</span>&lt;&gt;(<span class="pl-k">new</span> <span class="pl-smi">UserComparator</span>());
+        <span class="pl-c">// 添加3个元素到队列:</span>
+        <span class="pl-s1">q</span>.<span class="pl-en">offer</span>(<span class="pl-k">new</span> <span class="pl-smi">User</span>(<span class="pl-s">"Bob"</span>, <span class="pl-s">"A1"</span>));
+        <span class="pl-s1">q</span>.<span class="pl-en">offer</span>(<span class="pl-k">new</span> <span class="pl-smi">User</span>(<span class="pl-s">"Alice"</span>, <span class="pl-s">"A2"</span>));
+        <span class="pl-s1">q</span>.<span class="pl-en">offer</span>(<span class="pl-k">new</span> <span class="pl-smi">User</span>(<span class="pl-s">"Boss"</span>, <span class="pl-s">"V1"</span>));
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">q</span>.<span class="pl-en">poll</span>()); <span class="pl-c">// Boss/V1</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">q</span>.<span class="pl-en">poll</span>()); <span class="pl-c">// Bob/A1</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">q</span>.<span class="pl-en">poll</span>()); <span class="pl-c">// Alice/A2</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">q</span>.<span class="pl-en">poll</span>()); <span class="pl-c">// null,因为队列为空</span>
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">UserComparator</span> <span class="pl-k">implements</span> <span class="pl-smi">Comparator</span>&lt;<span class="pl-smi">User</span>&gt; {
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">compare</span>(<span class="pl-smi">User</span> <span class="pl-s1">u1</span>, <span class="pl-smi">User</span> <span class="pl-s1">u2</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">u1</span>.<span class="pl-s1">number</span>.<span class="pl-en">charAt</span>(<span class="pl-c1">0</span>) == <span class="pl-s1">u2</span>.<span class="pl-s1">number</span>.<span class="pl-en">charAt</span>(<span class="pl-c1">0</span>)) {
+            <span class="pl-c">// 如果两人的号都是A开头或者都是V开头,比较号的大小:</span>
+            <span class="pl-k">return</span> <span class="pl-s1">u1</span>.<span class="pl-s1">number</span>.<span class="pl-en">compareTo</span>(<span class="pl-s1">u2</span>.<span class="pl-s1">number</span>);
+        }
+        <span class="pl-k">if</span> (<span class="pl-s1">u1</span>.<span class="pl-s1">number</span>.<span class="pl-en">charAt</span>(<span class="pl-c1">0</span>) == <span class="pl-s">'V'</span>) {
+            <span class="pl-c">// u1的号码是V开头,优先级高:</span>
+            <span class="pl-k">return</span> -<span class="pl-c1">1</span>;
+        } <span class="pl-k">else</span> {
+            <span class="pl-k">return</span> <span class="pl-c1">1</span>;
+        }
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">User</span> {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-s1">number</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">User</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>, <span class="pl-smi">String</span> <span class="pl-s1">number</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">number</span> = <span class="pl-s1">number</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">name</span> + <span class="pl-s">"/"</span> + <span class="pl-s1">number</span>;
+    }
+}</pre></div>
+<p>实现<code class="notranslate">PriorityQueue</code>的关键在于提供的<code class="notranslate">UserComparator</code>对象，它负责比较两个元素的大小（较小的在前）。<code class="notranslate">UserComparator</code>总是把V开头的号码优先返回，只有在开头相同的时候，才比较号码大小。</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p><code class="notranslate">PriorityQueue</code>实现了一个优先队列：从队首获取元素时，总是获取优先级最高的元素；<br>
+<code class="notranslate">PriorityQueue</code>默认按元素比较的顺序排序（必须实现Comparable接口），也可以通过Comparator自定义排序算法（元素就不必实现Comparable接口）。</p>
+</div>
+<h2>Deque</h2>
+<p>我们知道，<code class="notranslate">Queue</code>是队列，只能一头进，另一头出。<br>
+如果把条件放松一下，允许两头都进，两头都出，这种队列叫双端队列（Double Ended Queue），学名<code class="notranslate">Deque</code>。<br>
+Java集合提供了接口<code class="notranslate">Deque</code>来实现一个双端队列，它的功能是：</p>
+<ul>
+<li>既可以添加到队尾，也可以添加到队首；</li>
+<li>既可以从队首获取，又可以从队尾获取。</li>
+</ul>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/3f2292a6-0b4f-442b-87cf-a08b8bea1145"><img src="https://github.com/user-attachments/assets/3f2292a6-0b4f-442b-87cf-a08b8bea1145" alt="Image" style="max-width: 100%;"></a></p>
+<h2>Iterator</h2>
+<p>Java的集合类都可以使用<code class="notranslate">for each</code>循环，<code class="notranslate">List</code>、<code class="notranslate">Set</code>和<code class="notranslate">Queue</code>会迭代每个元素，<code class="notranslate">Map</code>会迭代每个<code class="notranslate">key</code>。以<code class="notranslate">List</code>为例：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">list</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"Apple"</span>, <span class="pl-s">"Orange"</span>, <span class="pl-s">"Pear"</span>);
+<span class="pl-k">for</span> (<span class="pl-smi">String</span> <span class="pl-s1">s</span> : <span class="pl-s1">list</span>) {
+    <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+}</pre></div>
+<p>实际上，Java编译器并不知道如何遍历<code class="notranslate">List</code>。上述代码能够编译通过，只是因为编译器把<code class="notranslate">for each</code>循环通过<code class="notranslate">Iterator</code>改写为了普通的<code class="notranslate">for</code>循环：</p>
+<pre class="notranslate"><code class="notranslate">for (Iterator&lt;String&gt; it = list.iterator(); it.hasNext(); ) {
+     String s = it.next();
+     System.out.println(s);
+}
+</code></pre>
+<p>我们把这种通过<code class="notranslate">Iterator</code>对象遍历集合的模式称为迭代器。<br>
+使用迭代器的好处在于，调用方总是以统一的方式遍历各种集合类型，而不必关心它们内部的存储结构。<br>
+例如，我们虽然知道<code class="notranslate">ArrayList</code>在内部是以数组形式存储元素，并且，它还提供了<code class="notranslate">get(int)</code>方法。虽然我们可以用<code class="notranslate">for</code>循环遍历：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">for</span> (<span class="pl-smi">int</span> <span class="pl-s1">i</span>=<span class="pl-c1">0</span>; <span class="pl-s1">i</span>&lt;<span class="pl-s1">list</span>.<span class="pl-en">size</span>(); <span class="pl-s1">i</span>++) {
+    <span class="pl-smi">Object</span> <span class="pl-s1">value</span> = <span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-s1">i</span>);
+}</pre></div>
+<p>但是这样一来，调用方就必须知道集合的内部存储结构。并且，如果把<code class="notranslate">ArrayList</code>换成<code class="notranslate">LinkedList</code>，<code class="notranslate">get(int)</code>方法耗时会随着<code class="notranslate">index</code>的增加而增加。如果把<code class="notranslate">ArrayList</code>换成<code class="notranslate">Set</code>，上述代码就无法编译，因为<code class="notranslate">Set</code>内部没有索引。</p>
+<p>用<code class="notranslate">Iterator</code>遍历就没有上述问题，因为<code class="notranslate">Iterator</code>对象是集合对象自己在内部创建的，它自己知道如何高效遍历内部的数据集合，调用方则获得了统一的代码，编译器才能把标准的<code class="notranslate">for each</code>循环自动转换为<code class="notranslate">Iterator</code>遍历。</p>
+<p>如果我们自己编写了一个集合类，想要使用for each循环，只需满足以下条件：</p>
+<ul>
+<li>集合类实现<code class="notranslate">Iterable</code>接口，该接口要求返回一个<code class="notranslate">Iterator</code>对象；</li>
+<li>用<code class="notranslate">Iterator</code>对象迭代集合内部数据。</li>
+</ul>
+<p>这里的关键在于，集合类通过调用<code class="notranslate">iterator()</code>方法，返回一个<code class="notranslate">Iterator</code>对象，这个对象必须自己知道如何遍历该集合。<br>
+一个简单的<code class="notranslate">Iterator</code>示例如下，它总是以倒序遍历集合：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// Iterator</span>
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">ReverseList</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">rlist</span> = <span class="pl-k">new</span> <span class="pl-smi">ReverseList</span>&lt;&gt;();
+        <span class="pl-s1">rlist</span>.<span class="pl-en">add</span>(<span class="pl-s">"Apple"</span>);
+        <span class="pl-s1">rlist</span>.<span class="pl-en">add</span>(<span class="pl-s">"Orange"</span>);
+        <span class="pl-s1">rlist</span>.<span class="pl-en">add</span>(<span class="pl-s">"Pear"</span>);
+        <span class="pl-k">for</span> (<span class="pl-smi">String</span> <span class="pl-s1">s</span> : <span class="pl-s1">rlist</span>) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">s</span>);
+        }
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">ReverseList</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-k">implements</span> <span class="pl-smi">Iterable</span>&lt;<span class="pl-smi">T</span>&gt; {
+
+    <span class="pl-k">private</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-s1">list</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">add</span>(<span class="pl-smi">T</span> <span class="pl-s1">t</span>) {
+        <span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-s1">t</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Iterator</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-en">iterator</span>() {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">ReverseIterator</span>(<span class="pl-s1">list</span>.<span class="pl-en">size</span>());
+    }
+
+    <span class="pl-k">class</span> <span class="pl-smi">ReverseIterator</span> <span class="pl-k">implements</span> <span class="pl-smi">Iterator</span>&lt;<span class="pl-smi">T</span>&gt; {
+        <span class="pl-smi">int</span> <span class="pl-s1">index</span>;
+
+        <span class="pl-smi">ReverseIterator</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {
+            <span class="pl-smi">this</span>.<span class="pl-s1">index</span> = <span class="pl-s1">index</span>;
+        }
+
+        <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+        <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">hasNext</span>() {
+            <span class="pl-k">return</span> <span class="pl-s1">index</span> &gt; <span class="pl-c1">0</span>;
+        }
+
+        <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+        <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">next</span>() {
+            <span class="pl-s1">index</span>--;
+            <span class="pl-k">return</span> <span class="pl-smi">ReverseList</span>.<span class="pl-smi">this</span>.<span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-s1">index</span>);
+        }
+    }
+}</pre></div>
+<p>在编写<code class="notranslate">Iterator</code>的时候，我们通常可以用一个内部类来实现<code class="notranslate">Iterator</code>接口，这个内部类可以直接访问对应的外部类的所有字段和方法。例如，上述代码中，内部类<code class="notranslate">ReverseIterator</code>可以用<code class="notranslate">ReverseList.this</code>获得当前外部类的<code class="notranslate">this</code>引用，然后，通过这个<code class="notranslate">this</code>引用就可以访问<code class="notranslate">ReverseList</code>的所有字段和方法。</p>
+<h2>Collections</h2>
+<p><code class="notranslate">Collections</code>是JDK提供的工具类，同样位于<code class="notranslate">java.util</code>包中。它提供了一系列静态方法，能更方便地操作各种集合。<br>
+我们一般看方法名和参数就可以确认Collections提供的该方法的功能。例如，对于以下静态方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">boolean</span> <span class="pl-en">addAll</span>(<span class="pl-smi">Collection</span>&lt;? <span class="pl-en">super</span> <span class="pl-smi">T</span>&gt; <span class="pl-s1">c</span>, <span class="pl-smi">T</span>... <span class="pl-s1">elements</span>) { ... }</pre></div>
+<p><code class="notranslate">addAll()</code>方法可以给一个<code class="notranslate">Collection</code>类型的集合添加若干元素。因为方法签名是<code class="notranslate">Collection</code>，所以我们可以传入<code class="notranslate">List</code>，<code class="notranslate">Set</code>等各种集合类型。</p>
+<h3>排序</h3>
+<p><code class="notranslate">Collections</code>可以对<code class="notranslate">List</code>进行排序。因为排序会直接修改<code class="notranslate">List</code>元素的位置，因此必须传入可变<code class="notranslate">List</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">list</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+        <span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-s">"apple"</span>);
+        <span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-s">"pear"</span>);
+        <span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-s">"orange"</span>);
+        <span class="pl-c">// 排序前:</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">list</span>);
+        <span class="pl-smi">Collections</span>.<span class="pl-en">sort</span>(<span class="pl-s1">list</span>);
+        <span class="pl-c">// 排序后:</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">list</span>);
+    }
+}</pre></div>
+<h3>洗牌</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Collections</span>.<span class="pl-en">shuffle</span>(<span class="pl-s1">list</span>);</pre></div>
+<h3>不可变集合</h3>
+<p><code class="notranslate">Collections</code>还提供了一组方法把可变集合封装成不可变集合：</p>
+<ul>
+<li>封装成不可变List：List unmodifiableList(List&lt;? extends T&gt; list)</li>
+<li>封装成不可变Set：Set unmodifiableSet(Set&lt;? extends T&gt; set)</li>
+<li>封装成不可变Map：Map&lt;K, V&gt; unmodifiableMap(Map&lt;? extends K, ? extends V&gt; m)</li>
+</ul>
+<p>这种封装实际上是通过创建一个代理对象，拦截掉所有修改方法实现的。<br>
+然而，继续对原始的可变List进行增删是可以的，并且，会直接影响到封装后的“不可变”List：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">mutable</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+        <span class="pl-s1">mutable</span>.<span class="pl-en">add</span>(<span class="pl-s">"apple"</span>);
+        <span class="pl-s1">mutable</span>.<span class="pl-en">add</span>(<span class="pl-s">"pear"</span>);
+        <span class="pl-c">// 变为不可变集合:</span>
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">immutable</span> = <span class="pl-smi">Collections</span>.<span class="pl-en">unmodifiableList</span>(<span class="pl-s1">mutable</span>);
+        <span class="pl-s1">mutable</span>.<span class="pl-en">add</span>(<span class="pl-s">"orange"</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">immutable</span>);
+    }
+}</pre></div>
+<p>把一个可变List封装成不可变List，那么，返回不可变List后，最好立刻扔掉可变List的引用，这样可以保证后续操作不会意外改变原始对象，从而造成“不可变”List变化了：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">mutable</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+        <span class="pl-s1">mutable</span>.<span class="pl-en">add</span>(<span class="pl-s">"apple"</span>);
+        <span class="pl-s1">mutable</span>.<span class="pl-en">add</span>(<span class="pl-s">"pear"</span>);
+        <span class="pl-c">// 变为不可变集合:</span>
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">immutable</span> = <span class="pl-smi">Collections</span>.<span class="pl-en">unmodifiableList</span>(<span class="pl-s1">mutable</span>);
+        <span class="pl-c">// 立刻扔掉mutable的引用:</span>
+        <span class="pl-s1">mutable</span> = <span class="pl-c1">null</span>;
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">immutable</span>);
+    }
+}</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
