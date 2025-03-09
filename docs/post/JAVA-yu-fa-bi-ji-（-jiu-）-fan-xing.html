@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 什么是泛型
+泛型就是编写模板代码来适应任意类型；
+泛型的好处是使用时不必对类型进行强制转换，它通过编译器对类型进行检查；
+注意泛型的继承关系：可以把`ArrayList<Integer>`向上转型为`List<Integer>`（T不能变！），但不能把`ArrayList<Integer>`向上转型为`ArrayList<Number>`（T不能变成父类）。">
+<meta property="og:title" content="JAVA语法笔记（九）范型">
+<meta property="og:description" content="## 什么是泛型
+泛型就是编写模板代码来适应任意类型；
+泛型的好处是使用时不必对类型进行强制转换，它通过编译器对类型进行检查；
+注意泛型的继承关系：可以把`ArrayList<Integer>`向上转型为`List<Integer>`（T不能变！），但不能把`ArrayList<Integer>`向上转型为`ArrayList<Number>`（T不能变成父类）。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%EF%BC%88-jiu-%EF%BC%89-fan-xing.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记（九）范型</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style><style>.markdown-alert.markdown-alert-warning {border-left-color:var(--borderColor-attention-emphasis, var(--color-attention-emphasis));background-color:var(--color-attention-subtle);}.markdown-alert.markdown-alert-warning .markdown-alert-title {color: var(--fgColor-attention,var(--color-attention-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记（九）范型</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/27" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>什么是泛型</h2>
+<p>泛型就是编写模板代码来适应任意类型；<br>
+泛型的好处是使用时不必对类型进行强制转换，它通过编译器对类型进行检查；<br>
+注意泛型的继承关系：可以把<code class="notranslate">ArrayList&lt;Integer&gt;</code>向上转型为<code class="notranslate">List&lt;Integer&gt;</code>（T不能变！），但不能把<code class="notranslate">ArrayList&lt;Integer&gt;</code>向上转型为<code class="notranslate">ArrayList&lt;Number&gt;</code>（T不能变成父类）。</p>
+<p>我们先观察Java标准库提供的<code class="notranslate">ArrayList</code>，它可以看作“可变长度”的数组，因为用起来比数组更方便。<br>
+实际上<code class="notranslate">ArrayList</code>内部就是一个<code class="notranslate">Object[]</code>数组，配合存储一个当前分配的长度，就可以充当“可变数组”：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">ArrayList</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">Object</span>[] <span class="pl-s1">array</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">size</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">add</span>(<span class="pl-smi">Object</span> <span class="pl-s1">e</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">remove</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">get</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+}</pre></div>
+<p>如果用上述<code class="notranslate">ArrayList</code>存储<code class="notranslate">String</code>类型，会有这么几个缺点：</p>
+<ul>
+<li>需要强制转型；</li>
+<li>不方便，易出错。</li>
+</ul>
+<p>例如，代码必须这么写：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">ArrayList</span> <span class="pl-s1">list</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>();
+<span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-s">"Hello"</span>);
+<span class="pl-c">// 获取到Object，必须强制转型为String:</span>
+<span class="pl-smi">String</span> <span class="pl-s1">first</span> = (<span class="pl-smi">String</span>) <span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-c1">0</span>);</pre></div>
+<p>很容易出现<code class="notranslate">ClassCastException</code>，因为容易“误转型”：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-c1">123</span>));
+<span class="pl-c">// ERROR: ClassCastException:</span>
+<span class="pl-smi">String</span> <span class="pl-s1">second</span> = (<span class="pl-smi">String</span>) <span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-c1">1</span>);</pre></div>
+<p>要解决上述问题，我们可以为<code class="notranslate">String</code>单独编写一种ArrayList：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">StringArrayList</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span>[] <span class="pl-s1">array</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">size</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">add</span>(<span class="pl-smi">String</span> <span class="pl-s1">e</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">remove</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">get</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+}</pre></div>
+<p>这样一来，存入的必须是<code class="notranslate">String</code>，取出的也一定是<code class="notranslate">String</code>，不需要强制转型，因为编译器会强制检查放入的类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">StringArrayList</span> <span class="pl-s1">list</span> = <span class="pl-k">new</span> <span class="pl-smi">StringArrayList</span>();
+<span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-s">"Hello"</span>);
+<span class="pl-smi">String</span> <span class="pl-s1">first</span> = <span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-c1">0</span>);
+<span class="pl-c">// 编译错误: 不允许放入非String类型:</span>
+<span class="pl-s1">list</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-c1">123</span>));</pre></div>
+<p>问题暂时解决。</p>
+<p>然而，新的问题是，如果要存储<code class="notranslate">Integer</code>，还需要为<code class="notranslate">Integer</code>单独编写一种<code class="notranslate">ArrayList</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">IntegerArrayList</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">Integer</span>[] <span class="pl-s1">array</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">size</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">add</span>(<span class="pl-smi">Integer</span> <span class="pl-s1">e</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">remove</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">Integer</span> <span class="pl-en">get</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+}</pre></div>
+<p>实际上，还需要为其他所有class单独编写一种ArrayList：</p>
+<ul>
+<li>LongArrayList</li>
+<li>DoubleArrayList</li>
+<li>PersonArrayList</li>
+<li>...</li>
+</ul>
+<p>这是不可能的，JDK的<code class="notranslate">class</code>就有上千个，而且它还不知道其他人编写的class。</p>
+<p>为了解决新的问题，我们必须把<code class="notranslate">ArrayList</code>变成一种模板：<code class="notranslate">ArrayList&lt;T&gt;</code>，代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span>[] <span class="pl-s1">array</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">size</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">add</span>(<span class="pl-smi">T</span> <span class="pl-s1">e</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">remove</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">get</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>) {...}
+}</pre></div>
+<p>T可以是任何class。这样一来，我们就实现了：编写一次模版，可以创建任意类型的<code class="notranslate">ArrayList</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 创建可以存储String的ArrayList:</span>
+<span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">strList</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">String</span>&gt;();
+<span class="pl-c">// 创建可以存储Float的ArrayList:</span>
+<span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Float</span>&gt; <span class="pl-s1">floatList</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Float</span>&gt;();
+<span class="pl-c">// 创建可以存储Person的ArrayList:</span>
+<span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Person</span>&gt; <span class="pl-s1">personList</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Person</span>&gt;();</pre></div>
+<p>因此，泛型就是定义一种模板，例如<code class="notranslate">ArrayList&lt;T&gt;</code>，然后在代码中为用到的类创建对应的<code class="notranslate">ArrayList&lt;类型&gt;</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">strList</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">String</span>&gt;();</pre></div>
+<p>由编译器针对类型作检查：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s1">strList</span>.<span class="pl-en">add</span>(<span class="pl-s">"hello"</span>); <span class="pl-c">// OK</span>
+<span class="pl-smi">String</span> <span class="pl-s1">s</span> = <span class="pl-s1">strList</span>.<span class="pl-en">get</span>(<span class="pl-c1">0</span>); <span class="pl-c">// OK</span>
+<span class="pl-s1">strList</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-c1">123</span>)); <span class="pl-c">// compile error!</span>
+<span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-s1">strList</span>.<span class="pl-en">get</span>(<span class="pl-c1">0</span>); <span class="pl-c">// compile error!</span></pre></div>
+<p>这样一来，既实现了编写一次，万能匹配，又通过编译器保证了类型安全：这就是泛型。</p>
+<h2>向上转型</h2>
+<p>在Java标准库中的<code class="notranslate">ArrayList&lt;T&gt;</code>实现了<code class="notranslate">List&lt;T&gt;</code>接口，它可以向上转型为<code class="notranslate">List&lt;T&gt;</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-k">implements</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">T</span>&gt; {
+    ...
+}
+
+<span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">list</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">String</span>&gt;();</pre></div>
+<p>即类型<code class="notranslate">ArrayList&lt;T&gt;</code>可以向上转型为<code class="notranslate">List&lt;T&gt;</code>。<br>
+要特别注意：不能把<code class="notranslate">ArrayList&lt;Integer&gt;</code>向上转型为<code class="notranslate">ArrayList&lt;Number&gt;</code>或<code class="notranslate">List&lt;Number&gt;</code>。<br>
+这是为什么呢？假设<code class="notranslate">ArrayList&lt;Integer&gt;</code>可以向上转型为<code class="notranslate">ArrayList&lt;Number&gt;</code>，观察一下代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 创建ArrayList&lt;Integer&gt;类型：</span>
+<span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">integerList</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Integer</span>&gt;();
+<span class="pl-c">// 添加一个Integer：</span>
+<span class="pl-s1">integerList</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-c1">123</span>));
+<span class="pl-c">// “向上转型”为ArrayList&lt;Number&gt;：</span>
+<span class="pl-smi">ArrayList</span>&lt;<span class="pl-smi">Number</span>&gt; <span class="pl-s1">numberList</span> = <span class="pl-s1">integerList</span>;
+<span class="pl-c">// 添加一个Float，因为Float也是Number：</span>
+<span class="pl-s1">numberList</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Float</span>(<span class="pl-c1">12.34</span>));
+<span class="pl-c">// 从ArrayList&lt;Integer&gt;获取索引为1的元素（即添加的Float）：</span>
+<span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-s1">integerList</span>.<span class="pl-en">get</span>(<span class="pl-c1">1</span>); <span class="pl-c">// ClassCastException!</span></pre></div>
+<p>我们把一个<code class="notranslate">ArrayList&lt;Integer&gt;</code>转型为<code class="notranslate">ArrayList&lt;Number&gt;</code>类型后，这个<code class="notranslate">ArrayList&lt;Number&gt;</code>就可以接受<code class="notranslate">Float</code>类型，因为<code class="notranslate">Float</code>是<code class="notranslate">Number</code>的子类。但是，<code class="notranslate">ArrayList&lt;Number&gt;</code>实际上和<code class="notranslate">ArrayList&lt;Integer&gt;</code>是同一个对象，也就是<code class="notranslate">ArrayList&lt;Integer&gt;</code>类型，它不可能接受<code class="notranslate">Float</code>类型， 所以在获取<code class="notranslate">Integer</code>的时候将产生<code class="notranslate">ClassCastException</code>。<br>
+实际上，编译器为了避免这种错误，根本就不允许把<code class="notranslate">ArrayList&lt;Integer&gt;</code>转型为<code class="notranslate">ArrayList&lt;Number&gt;</code>。</p>
+<div class="markdown-alert markdown-alert-warning"><p class="markdown-alert-title"><svg class="octicon octicon-alert mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p><p><code class="notranslate">ArrayList&lt;Integer&gt;</code>和<code class="notranslate">ArrayList&lt;Number&gt;</code>两者完全没有继承关系。</p>
+</div>
+<p><strong>用一个图来表示泛型的继承关系，就是<code class="notranslate">T</code>不变时，可以向上转型，<code class="notranslate">T</code>本身不能向上转型：</strong></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/04298741-cda6-4e07-8d30-8e40df8b0ec6"><img src="https://github.com/user-attachments/assets/04298741-cda6-4e07-8d30-8e40df8b0ec6" alt="Image" style="max-width: 100%;"></a></p>
+<h2>泛型接口</h2>
+<p>除了<code class="notranslate">ArrayList&lt;T&gt;</code>使用了泛型，还可以在接口中使用泛型。例如，<code class="notranslate">Arrays.sort(Object[])</code>可以对任意数组进行排序，但待排序的元素必须实现<code class="notranslate">Comparable&lt;T&gt;</code>这个泛型接口：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">Comparable</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * 返回负数: 当前实例比参数o小</span>
+<span class="pl-c">     * 返回0: 当前实例与参数o相等</span>
+<span class="pl-c">     * 返回正数: 当前实例比参数o大</span>
+<span class="pl-c">     */</span>
+    <span class="pl-smi">int</span> <span class="pl-en">compareTo</span>(<span class="pl-smi">T</span> <span class="pl-s1">o</span>);
+}</pre></div>
+<p>可以直接对<code class="notranslate">String</code>数组进行排序：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// sort</span>
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Arrays</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span>[] <span class="pl-s1">ss</span> = <span class="pl-k">new</span> <span class="pl-smi">String</span>[] { <span class="pl-s">"Orange"</span>, <span class="pl-s">"Apple"</span>, <span class="pl-s">"Pear"</span> };
+        <span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">ss</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Arrays</span>.<span class="pl-en">toString</span>(<span class="pl-s1">ss</span>));
+    }
+}</pre></div>
+<p>这是因为<code class="notranslate">String</code>本身已经实现了<code class="notranslate">Comparable&lt;String&gt;</code>接口。如果换成我们自定义的<code class="notranslate">Person</code>类型试试：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// sort</span>
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Arrays</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Person</span>[] <span class="pl-s1">ps</span> = <span class="pl-k">new</span> <span class="pl-smi">Person</span>[] {
+            <span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s">"Bob"</span>, <span class="pl-c1">61</span>),
+            <span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s">"Alice"</span>, <span class="pl-c1">88</span>),
+            <span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s">"Lily"</span>, <span class="pl-c1">75</span>),
+        };
+        <span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">ps</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Arrays</span>.<span class="pl-en">toString</span>(<span class="pl-s1">ps</span>));
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Person</span> {
+    <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+    <span class="pl-smi">int</span> <span class="pl-s1">score</span>;
+    <span class="pl-smi">Person</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>, <span class="pl-smi">int</span> <span class="pl-s1">score</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">score</span> = <span class="pl-s1">score</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">name</span> + <span class="pl-s">","</span> + <span class="pl-smi">this</span>.<span class="pl-s1">score</span>;
+    }
+}</pre></div>
+<p>运行程序，我们会得到<code class="notranslate">ClassCastException</code>，即无法将<code class="notranslate">Person</code>转型为<code class="notranslate">Comparable</code>。我们修改代码，让<code class="notranslate">Person</code>实现<code class="notranslate">Comparable&lt;T&gt;</code>接口：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// sort</span>
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Arrays</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Person</span>[] <span class="pl-s1">ps</span> = <span class="pl-k">new</span> <span class="pl-smi">Person</span>[] {
+            <span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s">"Bob"</span>, <span class="pl-c1">61</span>),
+            <span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s">"Alice"</span>, <span class="pl-c1">88</span>),
+            <span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s">"Lily"</span>, <span class="pl-c1">75</span>),
+        };
+        <span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">ps</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">Arrays</span>.<span class="pl-en">toString</span>(<span class="pl-s1">ps</span>));
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Person</span> <span class="pl-k">implements</span> <span class="pl-smi">Comparable</span>&lt;<span class="pl-smi">Person</span>&gt; {
+    <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+    <span class="pl-smi">int</span> <span class="pl-s1">score</span>;
+    <span class="pl-smi">Person</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>, <span class="pl-smi">int</span> <span class="pl-s1">score</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">score</span> = <span class="pl-s1">score</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">compareTo</span>(<span class="pl-smi">Person</span> <span class="pl-s1">other</span>) {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">name</span>.<span class="pl-en">compareTo</span>(<span class="pl-s1">other</span>.<span class="pl-s1">name</span>);
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">name</span> + <span class="pl-s">","</span> + <span class="pl-smi">this</span>.<span class="pl-s1">score</span>;
+    }
+}</pre></div>
+<p>运行上述代码，可以正确实现按<code class="notranslate">name</code>进行排序。<br>
+也可以修改比较逻辑，例如，按<code class="notranslate">score</code>从高到低排序。请自行修改测试。</p>
+<h2>静态方法</h2>
+<p>编写泛型类时，要特别注意，泛型类型<code class="notranslate">&lt;T&gt;</code>不能用于静态方法。例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() { ... }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() { ... }
+
+    <span class="pl-c">// 对静态方法使用&lt;T&gt;:</span>
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-en">create</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt;(<span class="pl-s1">first</span>, <span class="pl-s1">last</span>);
+    }
+}</pre></div>
+<p>上述代码会导致编译错误，我们无法在静态方法<code class="notranslate">create()</code>的方法参数和返回类型上使用泛型类型<code class="notranslate">T</code>。</p>
+<p>有些同学在网上搜索发现，可以在<code class="notranslate">static</code>修饰符后面加一个<code class="notranslate">&lt;T&gt;</code>，编译就能通过：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() { ... }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() { ... }
+
+    <span class="pl-c">// 可以编译通过:</span>
+    <span class="pl-k">public</span> <span class="pl-k">static</span> &lt;<span class="pl-smi">T</span>&gt; <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-en">create</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt;(<span class="pl-s1">first</span>, <span class="pl-s1">last</span>);
+    }
+}</pre></div>
+<p>但实际上，这个<code class="notranslate">&lt;T&gt;</code>和<code class="notranslate">Pair&lt;T&gt;</code>类型的<code class="notranslate">&lt;T&gt;</code>已经没有任何关系了.<br>
+对于静态方法，我们可以单独改写为“泛型”方法，只需要使用另一个类型即可。对于上面的<code class="notranslate">create()</code>静态方法，我们应该把它改为另一种泛型类型，例如，<code class="notranslate">&lt;K&gt;</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() { ... }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() { ... }
+
+    <span class="pl-c">// 静态泛型方法应该使用其他类型区分:</span>
+    <span class="pl-k">public</span> <span class="pl-k">static</span> &lt;<span class="pl-smi">K</span>&gt; <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">K</span>&gt; <span class="pl-en">create</span>(<span class="pl-smi">K</span> <span class="pl-s1">first</span>, <span class="pl-smi">K</span> <span class="pl-s1">last</span>) {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">K</span>&gt;(<span class="pl-s1">first</span>, <span class="pl-s1">last</span>);
+    }
+}</pre></div>
+<p>这样才能清楚地将静态方法的泛型类型和实例类型的泛型类型区分开。<br>
+泛型还可以定义多种类型。例如，我们希望<code class="notranslate">Pair</code>不总是存储两个类型一样的对象，就可以使用类型<code class="notranslate">&lt;T, K&gt;</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>, <span class="pl-smi">K</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">K</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">K</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() { ... }
+    <span class="pl-k">public</span> <span class="pl-smi">K</span> <span class="pl-en">getLast</span>() { ... }
+}</pre></div>
+<p>使用的时候，需要指出两种类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span>&lt;<span class="pl-smi">String</span>, <span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-s">"test"</span>, <span class="pl-c1">123</span>);</pre></div>
+<h2>擦拭法</h2>
+<p>泛型是一种类似”模板代码“的技术，不同语言的泛型实现方式不一定相同。<br>
+Java语言的泛型实现方式是擦拭法（Type Erasure）。<br>
+所谓擦拭法是指，虚拟机对泛型其实一无所知，所有的工作都是编译器做的。<br>
+例如，我们编写了一个泛型类<code class="notranslate">Pair&lt;T&gt;</code>，这是编译器看到的代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>而虚拟机根本不知道泛型。这是虚拟机执行的代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">Object</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">Object</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">Object</span> <span class="pl-s1">first</span>, <span class="pl-smi">Object</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>因此，Java使用擦拭法实现泛型，导致了：<br>
+编译器把类型<code class="notranslate">&lt;T&gt;</code>视为<code class="notranslate">Object</code>；<br>
+编译器根据<code class="notranslate">&lt;T&gt;</code>实现安全的强制转型。<br>
+使用泛型的时候，我们编写的代码也是编译器看到的代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-s">"Hello"</span>, <span class="pl-s">"world"</span>);
+<span class="pl-smi">String</span> <span class="pl-s1">first</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();
+<span class="pl-smi">String</span> <span class="pl-s1">last</span> = <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>();</pre></div>
+<p>而虚拟机执行的代码并没有泛型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span> <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>(<span class="pl-s">"Hello"</span>, <span class="pl-s">"world"</span>);
+<span class="pl-smi">String</span> <span class="pl-s1">first</span> = (<span class="pl-smi">String</span>) <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();
+<span class="pl-smi">String</span> <span class="pl-s1">last</span> = (<span class="pl-smi">String</span>) <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>();</pre></div>
+<p>所以，Java的泛型是由编译器在编译时实行的，编译器内部永远把所有类型<code class="notranslate">T</code>视为<code class="notranslate">Object</code>处理，但是，在需要转型的时候，编译器会根据<code class="notranslate">T</code>的类型自动为我们实行安全地强制转型。<br>
+了解了Java泛型的实现方式——擦拭法，我们就知道了Java泛型的局限：<br>
+局限一：<code class="notranslate">&lt;T&gt;</code>不能是基本类型，例如<code class="notranslate">int</code>，因为实际类型是<code class="notranslate">Object</code>，<code class="notranslate">Object</code>类型无法持有基本类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span>&lt;<span class="pl-smi">int</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">1</span>, <span class="pl-c1">2</span>); <span class="pl-c">// compile error!</span></pre></div>
+<p>局限二：无法取得带泛型的<code class="notranslate">Class</code>。观察以下代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">p1</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-s">"Hello"</span>, <span class="pl-s">"world"</span>);
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p2</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+        <span class="pl-smi">Class</span> <span class="pl-s1">c1</span> = <span class="pl-s1">p1</span>.<span class="pl-en">getClass</span>();
+        <span class="pl-smi">Class</span> <span class="pl-s1">c2</span> = <span class="pl-s1">p2</span>.<span class="pl-en">getClass</span>();
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">c1</span>==<span class="pl-s1">c2</span>); <span class="pl-c">// true</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">c1</span>==<span class="pl-smi">Pair</span>.<span class="pl-k">class</span>); <span class="pl-c">// true</span>
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>因为<code class="notranslate">T</code>是<code class="notranslate">Object</code>，我们对<code class="notranslate">Pair&lt;String&gt;</code>和<code class="notranslate">Pair&lt;Integer&gt;</code>类型获取<code class="notranslate">Class</code>时，获取到的是同一个<code class="notranslate">Class</code>，也就是<code class="notranslate">Pair</code>类的<code class="notranslate">Class</code>。<br>
+换句话说，所有泛型实例，无论<code class="notranslate">T</code>的类型是什么，<code class="notranslate">getClass()</code>返回同一个Class实例，因为编译后它们全部都是<code class="notranslate">Pair&lt;Object&gt;</code>。<br>
+局限三：无法判断带泛型的类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+<span class="pl-c">// Compile error:</span>
+<span class="pl-k">if</span> (<span class="pl-s1">p</span> <span class="pl-k">instanceof</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">String</span>&gt;) {
+}</pre></div>
+<p>原因和前面一样，并不存在<code class="notranslate">Pair&lt;String&gt;.class</code>，而是只有唯一的<code class="notranslate">Pair.class</code>。</p>
+<p>局限四：不能实例化<code class="notranslate">T</code>类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>() {
+        <span class="pl-c">// Compile error:</span>
+        <span class="pl-s1">first</span> = <span class="pl-k">new</span> <span class="pl-smi">T</span>();
+        <span class="pl-s1">last</span> = <span class="pl-k">new</span> <span class="pl-smi">T</span>();
+    }
+}</pre></div>
+<p>上述代码无法通过编译，因为构造方法的两行语句：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s1">first</span> = <span class="pl-k">new</span> <span class="pl-smi">T</span>();
+<span class="pl-s1">last</span> = <span class="pl-k">new</span> <span class="pl-smi">T</span>();</pre></div>
+<p>擦拭后实际上变成了：</p>
+<pre class="notranslate"><code class="notranslate">first = new Object();
+last = new Object();
+</code></pre>
+<p>这样一来，创建<code class="notranslate">new Pair&lt;String&gt;()</code>和创建<code class="notranslate">new Pair&lt;Integer&gt;()</code>就全部成了<code class="notranslate">Object</code>，显然编译器要阻止这种类型不对的代码。<br>
+要实例化<code class="notranslate">T</code>类型，我们必须借助额外的<code class="notranslate">Class&lt;T&gt;</code>参数：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">Class</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-s1">clazz</span>) {
+        <span class="pl-s1">first</span> = <span class="pl-s1">clazz</span>.<span class="pl-en">newInstance</span>();
+        <span class="pl-s1">last</span> = <span class="pl-s1">clazz</span>.<span class="pl-en">newInstance</span>();
+    }</pre></div>
+<p>上述代码借助<code class="notranslate">Class&lt;T&gt;</code>参数并通过反射来实例化<code class="notranslate">T</code>类型，使用的时候，也必须传入<code class="notranslate">Class&lt;T&gt;</code>。例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">pair</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-smi">String</span>.<span class="pl-k">class</span>);</pre></div>
+<p>因为传入了<code class="notranslate">Class&lt;String&gt;</code>的实例，所以我们借助<code class="notranslate">String.class</code>就可以实例化<code class="notranslate">String</code>类型。</p>
+<h3>不恰当的覆写方法</h3>
+<p>有些时候，一个看似正确定义的方法会无法通过编译。例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">equals</span>(<span class="pl-smi">T</span> <span class="pl-s1">t</span>) {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span> == <span class="pl-s1">t</span>;
+    }
+}</pre></div>
+<p>这是因为，定义的<code class="notranslate">equals(T t)</code>方法实际上会被擦拭成<code class="notranslate">equals(Object t)</code>，而这个方法是继承自<code class="notranslate">Object</code>的，<strong>编译器会阻止一个实际上会变成覆写的泛型方法定义。</strong></p>
+<p>换个方法名，避开与<code class="notranslate">Object.equals(Object)</code>的冲突就可以成功编译：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">same</span>(<span class="pl-smi">T</span> <span class="pl-s1">t</span>) {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span> == <span class="pl-s1">t</span>;
+    }</pre></div>
+<h2>泛型继承</h2>
+<p>一个类可以继承自一个泛型类。例如：父类的类型是<code class="notranslate">Pair&lt;Integer&gt;</code>，子类的类型是<code class="notranslate">IntPair</code>，可以这么继承：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">IntPair</span> <span class="pl-k">extends</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; {
+}</pre></div>
+<p>使用的时候，因为子类<code class="notranslate">IntPair</code>并没有泛型类型，所以，正常使用即可：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">IntPair</span> <span class="pl-s1">ip</span> = <span class="pl-k">new</span> <span class="pl-smi">IntPair</span>(<span class="pl-c1">1</span>, <span class="pl-c1">2</span>);</pre></div>
+<p>前面讲了，我们无法获取<code class="notranslate">Pair&lt;T&gt;</code>的<code class="notranslate">T</code>类型，即给定一个变量<code class="notranslate">Pair&lt;Integer&gt; p</code>，无法从p中获取到<code class="notranslate">Integer</code>类型。</p>
+<p>但是，在父类是泛型类型的情况下，编译器就必须把类型<code class="notranslate">T</code>（对<code class="notranslate">IntPair</code>来说，也就是<code class="notranslate">Integer</code>类型）保存到子类的<code class="notranslate">class</code>文件中，不然编译器就不知道<code class="notranslate">IntPair</code>只能存取<code class="notranslate">Integer</code>这种类型。<br>
+在继承了泛型类型的情况下，子类可以获取父类的泛型类型。例如：<code class="notranslate">IntPair</code>可以获取到父类的泛型类型<code class="notranslate">Integer</code>。获取父类的泛型类型代码比较复杂：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">lang</span>.<span class="pl-s1">reflect</span>.<span class="pl-s1">ParameterizedType</span>;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">lang</span>.<span class="pl-s1">reflect</span>.<span class="pl-s1">Type</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Class</span>&lt;<span class="pl-smi">IntPair</span>&gt; <span class="pl-s1">clazz</span> = <span class="pl-smi">IntPair</span>.<span class="pl-k">class</span>;
+        <span class="pl-smi">Type</span> <span class="pl-s1">t</span> = <span class="pl-s1">clazz</span>.<span class="pl-en">getGenericSuperclass</span>();
+        <span class="pl-k">if</span> (<span class="pl-s1">t</span> <span class="pl-k">instanceof</span> <span class="pl-smi">ParameterizedType</span>) {
+            <span class="pl-smi">ParameterizedType</span> <span class="pl-s1">pt</span> = (<span class="pl-smi">ParameterizedType</span>) <span class="pl-s1">t</span>;
+            <span class="pl-smi">Type</span>[] <span class="pl-s1">types</span> = <span class="pl-s1">pt</span>.<span class="pl-en">getActualTypeArguments</span>(); <span class="pl-c">// 可能有多个泛型类型</span>
+            <span class="pl-smi">Type</span> <span class="pl-s1">firstType</span> = <span class="pl-s1">types</span>[<span class="pl-c1">0</span>]; <span class="pl-c">// 取第一个泛型类型</span>
+            <span class="pl-smi">Class</span>&lt;?&gt; <span class="pl-s1">typeClass</span> = (<span class="pl-smi">Class</span>&lt;?&gt;) <span class="pl-s1">firstType</span>;
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">typeClass</span>); <span class="pl-c">// Integer</span>
+        }
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">IntPair</span> <span class="pl-k">extends</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; {
+    <span class="pl-k">public</span> <span class="pl-smi">IntPair</span>(<span class="pl-smi">Integer</span> <span class="pl-s1">first</span>, <span class="pl-smi">Integer</span> <span class="pl-s1">last</span>) {
+        <span class="pl-en">super</span>(<span class="pl-s1">first</span>, <span class="pl-s1">last</span>);
+    }
+}</pre></div>
+<p>因为Java引入了泛型，所以，只用<code class="notranslate">Class</code>来标识类型已经不够了。实际上，Java的类型系统结构如下：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/391ad703-7c3a-4ba2-925e-abb1f73aa8dc"><img src="https://github.com/user-attachments/assets/391ad703-7c3a-4ba2-925e-abb1f73aa8dc" alt="Image" style="max-width: 100%;"></a></p>
+<h2>extends通配符</h2>
+<p>我们前面已经讲到了泛型的继承关系：<code class="notranslate">Pair&lt;Integer&gt;</code>不是<code class="notranslate">Pair&lt;Number&gt;</code>的子类。</p>
+<p>假设我们定义了<code class="notranslate">Pair&lt;T&gt;</code>：<br>
+``java<br>
+public class Pair { ... }</p>
+<pre class="notranslate"><code class="notranslate">然后，我们又针对`Pair&lt;Number&gt;`类型写了一个静态方法，它接收的参数类型是`Pair&lt;Number&gt;`：
+```java
+public class PairHelper {
+    static int add(Pair&lt;Number&gt; p) {
+        Number first = p.getFirst();
+        Number last = p.getLast();
+        return first.intValue() + last.intValue();
+    }
+}
+</code></pre>
+<p>上述代码是可以正常编译的。使用的时候，我们传入：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-s1">sum</span> = <span class="pl-smi">PairHelper</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Number</span>&gt;(<span class="pl-c1">1</span>, <span class="pl-c1">2</span>));</pre></div>
+<p>注意：传入的类型是<code class="notranslate">Pair&lt;Number&gt;</code>，实际参数类型是<code class="notranslate">(Integer, Integer)</code>。<br>
+既然实际参数是<code class="notranslate">Integer</code>类型，试试传入<code class="notranslate">Pair&lt;Integer&gt;</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-en">add</span>(<span class="pl-s1">p</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span>);
+    }
+
+    <span class="pl-k">static</span> <span class="pl-smi">int</span> <span class="pl-en">add</span>(<span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Number</span>&gt; <span class="pl-s1">p</span>) {
+        <span class="pl-smi">Number</span> <span class="pl-s1">first</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();
+        <span class="pl-smi">Number</span> <span class="pl-s1">last</span> = <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>();
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>.<span class="pl-en">intValue</span>() + <span class="pl-s1">last</span>.<span class="pl-en">intValue</span>();
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>直接运行，会得到一个编译错误：</p>
+<pre class="notranslate"><code class="notranslate">incompatible types: Pair&lt;Integer&gt; cannot be converted to Pair&lt;Number&gt;
+</code></pre>
+<p>原因很明显，因为<code class="notranslate">Pair&lt;Integer&gt;</code>不是<code class="notranslate">Pair&lt;Number&gt;</code>的子类，因此，<code class="notranslate">add(Pair&lt;Number&gt;)</code>不接受参数类型<code class="notranslate">Pair&lt;Integer&gt;</code>。</p>
+<p>但是从<code class="notranslate">add()</code>方法的代码可知，传入<code class="notranslate">Pair&lt;Integer&gt;</code>是完全符合内部代码的类型规范，因为语句：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Number</span> <span class="pl-s1">first</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();
+<span class="pl-smi">Number</span> <span class="pl-s1">last</span> = <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>();</pre></div>
+<p>实际类型是<code class="notranslate">Integer</code>，引用类型是<code class="notranslate">Number</code>，没有问题。问题在于方法参数类型定死了只能传入<code class="notranslate">Pair&lt;Number&gt;</code>。<br>
+有没有办法使得方法参数接受<code class="notranslate">Pair&lt;Integer&gt;</code>？办法是有的，这就是使用<code class="notranslate">Pair&lt;? extends Number&gt;</code>使得方法接收所有泛型类型为<code class="notranslate">Number</code>或<code class="notranslate">Number</code>子类的Pair类型。我们把代码改写如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-en">add</span>(<span class="pl-s1">p</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span>);
+    }
+
+    <span class="pl-k">static</span> <span class="pl-smi">int</span> <span class="pl-en">add</span>(<span class="pl-smi">Pair</span>&lt;? <span class="pl-k">extends</span> <span class="pl-smi">Number</span>&gt; <span class="pl-s1">p</span>) {
+        <span class="pl-smi">Number</span> <span class="pl-s1">first</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();
+        <span class="pl-smi">Number</span> <span class="pl-s1">last</span> = <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>();
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>.<span class="pl-en">intValue</span>() + <span class="pl-s1">last</span>.<span class="pl-en">intValue</span>();
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>这样一来，给方法传入<code class="notranslate">Pair&lt;Integer&gt;</code>类型时，它符合参数<code class="notranslate">Pair&lt;? extends Number&gt;</code>类型。这种使用<code class="notranslate">&lt;? extends Number&gt;</code>的泛型定义称之为<strong>上界通配符（Upper Bounds Wildcards）</strong>，即把泛型类型<code class="notranslate">T</code>的上界限定在<code class="notranslate">Number</code>了。<br>
+除了可以传入<code class="notranslate">Pair&lt;Integer&gt;</code>类型，我们还可以传入<code class="notranslate">Pair&lt;Double&gt;</code>类型，<code class="notranslate">Pair&lt;BigDecimal&gt;</code>类型等等，因为<code class="notranslate">Double</code>和<code class="notranslate">BigDecimal</code>都是<code class="notranslate">Number</code>的子类。<br>
+如果我们考察对<code class="notranslate">Pair&lt;? extends Number&gt;</code>类型调用<code class="notranslate">getFirst()</code>方法，实际的方法签名变成了：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate">&lt;? <span class="pl-k">extends</span> <span class="pl-smi">Number</span>&gt; <span class="pl-smi">getFirst</span><span class="pl-en"></span>();</pre></div>
+<p>即返回值是<code class="notranslate">Number</code>或<code class="notranslate">Number</code>的子类，因此，可以安全赋值给<code class="notranslate">Number</code>类型的变量：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Number</span> <span class="pl-s1">x</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();</pre></div>
+<p>然后，我们不可预测实际类型就是<code class="notranslate">Integer</code>，例如，下面的代码是无法通过编译的：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Integer</span> <span class="pl-s1">x</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();</pre></div>
+<p>这是因为实际的返回类型可能是<code class="notranslate">Integer</code>，也可能是<code class="notranslate">Double</code>或者其他类型，编译器只能确定类型一定是<code class="notranslate">Number</code>的子类（包括<code class="notranslate">Number</code>类型本身），但具体类型无法确定。<br>
+我们再来考察一下<code class="notranslate">Pair&lt;T&gt;</code>的<code class="notranslate">set</code>方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-en">add</span>(<span class="pl-s1">p</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span>);
+    }
+
+    <span class="pl-k">static</span> <span class="pl-smi">int</span> <span class="pl-en">add</span>(<span class="pl-smi">Pair</span>&lt;? <span class="pl-k">extends</span> <span class="pl-smi">Number</span>&gt; <span class="pl-s1">p</span>) {
+        <span class="pl-smi">Number</span> <span class="pl-s1">first</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();
+        <span class="pl-smi">Number</span> <span class="pl-s1">last</span> = <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>();
+        <span class="pl-s1">p</span>.<span class="pl-en">setFirst</span>(<span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-s1">first</span>.<span class="pl-en">intValue</span>() + <span class="pl-c1">100</span>));
+        <span class="pl-s1">p</span>.<span class="pl-en">setLast</span>(<span class="pl-k">new</span> <span class="pl-smi">Integer</span>(<span class="pl-s1">last</span>.<span class="pl-en">intValue</span>() + <span class="pl-c1">100</span>));
+        <span class="pl-k">return</span> <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>().<span class="pl-en">intValue</span>() + <span class="pl-s1">p</span>.<span class="pl-en">getLast</span>().<span class="pl-en">intValue</span>();
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">setFirst</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">setLast</span>(<span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>不出意外，我们会得到一个编译错误：</p>
+<pre class="notranslate"><code class="notranslate">incompatible types: Integer cannot be converted to CAP#1
+where CAP#1 is a fresh type-variable:
+    CAP#1 extends Number from capture of ? extends Number
+</code></pre>
+<p>编译错误发生在<code class="notranslate">p.setFirst()</code>传入的参数是<code class="notranslate">Integer</code>类型。有些童鞋会问了，既然<code class="notranslate">p</code>的定义是<code class="notranslate">Pair&lt;? extends Number&gt;</code>，那么<code class="notranslate">setFirst(? extends Number)</code>为什么不能传入<code class="notranslate">Integer</code>？<br>
+原因还在于擦拭法。如果我们传入的<code class="notranslate">p</code>是<code class="notranslate">Pair&lt;Double&gt;</code>，显然它满足参数定义<code class="notranslate">Pair&lt;? extends Number&gt;</code>，然而，<code class="notranslate">Pair&lt;Double&gt;</code>的<code class="notranslate">setFirst()</code>显然无法接受<code class="notranslate">Integer</code>类型。</p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>这就是<code class="notranslate">&lt;? extends Number&gt;</code>通配符的一个重要限制：方法参数签名<code class="notranslate">setFirst(? extends Number)</code>无法传递任何<code class="notranslate">Number</code>的子类型给<code class="notranslate">setFirst(? extends Number)</code>。</p>
+</div>
+<p>这里唯一的例外是可以给方法参数传入<code class="notranslate">null</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s1">p</span>.<span class="pl-en">setFirst</span>(<span class="pl-c1">null</span>); <span class="pl-c">// ok, 但是后面会抛出NullPointerException</span>
+<span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>().<span class="pl-en">intValue</span>(); <span class="pl-c">// NullPointerException</span></pre></div>
+<h3>extends通配符的作用</h3>
+<p>如果我们考察Java标准库的<code class="notranslate">java.util.List&lt;T&gt;</code>接口，它实现的是一个类似“可变数组”的列表，主要功能包括：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-smi">int</span> <span class="pl-en">size</span>(); <span class="pl-c">// 获取个数</span>
+    <span class="pl-smi">T</span> <span class="pl-en">get</span>(<span class="pl-smi">int</span> <span class="pl-s1">index</span>); <span class="pl-c">// 根据索引获取指定元素</span>
+    <span class="pl-smi">void</span> <span class="pl-en">add</span>(<span class="pl-smi">T</span> <span class="pl-s1">t</span>); <span class="pl-c">// 添加一个新元素</span>
+    <span class="pl-smi">void</span> <span class="pl-en">remove</span>(<span class="pl-smi">T</span> <span class="pl-s1">t</span>); <span class="pl-c">// 删除一个已有元素</span>
+}</pre></div>
+<p>现在，让我们定义一个方法来处理列表的每个元素：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-en">sumOfList</span>(<span class="pl-smi">List</span>&lt;? <span class="pl-k">extends</span> <span class="pl-smi">Integer</span>&gt; <span class="pl-s1">list</span>) {
+    <span class="pl-smi">int</span> <span class="pl-s1">sum</span> = <span class="pl-c1">0</span>;
+    <span class="pl-k">for</span> (<span class="pl-smi">int</span> <span class="pl-s1">i</span>=<span class="pl-c1">0</span>; <span class="pl-s1">i</span>&lt;<span class="pl-s1">list</span>.<span class="pl-en">size</span>(); <span class="pl-s1">i</span>++) {
+        <span class="pl-smi">Integer</span> <span class="pl-s1">n</span> = <span class="pl-s1">list</span>.<span class="pl-en">get</span>(<span class="pl-s1">i</span>);
+        <span class="pl-s1">sum</span> = <span class="pl-s1">sum</span> + <span class="pl-s1">n</span>;
+    }
+    <span class="pl-k">return</span> <span class="pl-s1">sum</span>;
+}</pre></div>
+<p>为什么我们定义的方法参数类型是<code class="notranslate">List&lt;? extends Integer&gt;</code>而不是<code class="notranslate">List&lt;Integer&gt;</code>？从方法内部代码看，传入<code class="notranslate">List&lt;? extends Integer&gt;</code>或者<code class="notranslate">List&lt;Integer&gt;</code>是完全一样的，但是，注意到<code class="notranslate">List&lt;? extends Integer&gt;</code>的限制：</p>
+<ul>
+<li>允许调用<code class="notranslate">get()</code>方法获取<code class="notranslate">Integer</code>的引用；</li>
+<li>不允许调用<code class="notranslate">set(? extends Integer)</code>方法并传入任何<code class="notranslate">Integer</code>的引用（<code class="notranslate">null</code>除外）。</li>
+</ul>
+<p>因此，方法参数类型<code class="notranslate">List&lt;? extends Integer&gt;</code>表明了该方法内部只会读取<code class="notranslate">List</code>的元素，不会修改<code class="notranslate">List</code>的元素（因为无法调用<code class="notranslate">add(? extends Integer)</code>、<code class="notranslate">remove(? extends Integer)</code>这些方法。换句话说，这是一个对参数<code class="notranslate">List&lt;? extends Integer&gt;</code>进行只读的方法（恶意调用<code class="notranslate">set(null)</code>除外）。</p>
+<h3>使用extends限定T类型</h3>
+<p>在定义泛型类型<code class="notranslate">Pair&lt;T&gt;</code>的时候，也可以使用<code class="notranslate">extends</code>通配符来限定T的类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span> <span class="pl-k">extends</span> <span class="pl-smi">Number</span>&gt; { ... }</pre></div>
+<p>现在，我们只能定义：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Number</span>&gt; <span class="pl-s1">p1</span> = <span class="pl-c1">null</span>;
+<span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p2</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">1</span>, <span class="pl-c1">2</span>);
+<span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Double</span>&gt; <span class="pl-s1">p3</span> = <span class="pl-c1">null</span>;</pre></div>
+<p>因为<code class="notranslate">Number</code>、<code class="notranslate">Integer</code>和<code class="notranslate">Double</code>都符合<code class="notranslate">&lt;T extends Number&gt;</code>。<br>
+非<code class="notranslate">Number</code>类型将无法通过编译：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">air</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">p1</span> = <span class="pl-c1">null</span>; <span class="pl-c">// compile error!</span>
+<span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Object</span>&gt; <span class="pl-s1">p2</span> = <span class="pl-c1">null</span>; <span class="pl-c">// compile error!</span></pre></div>
+<p>因为<code class="notranslate">String</code>、<code class="notranslate">Object</code>都不符合<code class="notranslate">&lt;T extends Number&gt;</code>，因为它们不是<code class="notranslate">Number</code>类型或<code class="notranslate">Number</code>的子类。</p>
+<h2>super通配符</h2>
+<p>我们前面已经讲到了泛型的继承关系：<code class="notranslate">Pair&lt;Integer&gt;</code>不是<code class="notranslate">Pair&lt;Number&gt;</code>的子类。<br>
+考察下面的<code class="notranslate">set</code>方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">void</span> <span class="pl-en">set</span>(<span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span>, <span class="pl-smi">Integer</span> <span class="pl-s1">first</span>, <span class="pl-smi">Integer</span> <span class="pl-s1">last</span>) {
+    <span class="pl-s1">p</span>.<span class="pl-en">setFirst</span>(<span class="pl-s1">first</span>);
+    <span class="pl-s1">p</span>.<span class="pl-en">setLast</span>(<span class="pl-s1">last</span>);
+}</pre></div>
+<p>传入<code class="notranslate">Pair&lt;Integer&gt;</code>是允许的，但是传入<code class="notranslate">Pair&lt;Number&gt;</code>是不允许的。</p>
+<p>和<code class="notranslate">extends</code>通配符相反，这次，我们希望接受<code class="notranslate">Pair&lt;Integer&gt;</code>类型，以及<code class="notranslate">Pair&lt;Number&gt;</code>、<code class="notranslate">Pair&lt;Object&gt;</code>，因为<code class="notranslate">Number</code>和<code class="notranslate">Object</code>是<code class="notranslate">Integer</code>的父类，<code class="notranslate">setFirst(Number)</code>和<code class="notranslate">setFirst(Object)</code>实际上允许接受<code class="notranslate">Integer</code>类型。<br>
+我们使用<code class="notranslate">super</code>通配符来改写这个方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">void</span> <span class="pl-en">set</span>(<span class="pl-smi">Pair</span>&lt;? <span class="pl-en">super</span> <span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span>, <span class="pl-smi">Integer</span> <span class="pl-s1">first</span>, <span class="pl-smi">Integer</span> <span class="pl-s1">last</span>) {
+    <span class="pl-s1">p</span>.<span class="pl-en">setFirst</span>(<span class="pl-s1">first</span>);
+    <span class="pl-s1">p</span>.<span class="pl-en">setLast</span>(<span class="pl-s1">last</span>);
+}</pre></div>
+<p>注意到<code class="notranslate">Pair&lt;? super Integer&gt;</code>表示，方法参数接受所有泛型类型为<code class="notranslate">Integer</code>或<code class="notranslate">Integer</code>父类的<code class="notranslate">Pair</code>类型。<br>
+下面的代码可以被正常编译：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Number</span>&gt; <span class="pl-s1">p1</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">12.3</span>, <span class="pl-c1">4.56</span>);
+        <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p2</span> = <span class="pl-k">new</span> <span class="pl-smi">Pair</span>&lt;&gt;(<span class="pl-c1">123</span>, <span class="pl-c1">456</span>);
+        <span class="pl-en">setSame</span>(<span class="pl-s1">p1</span>, <span class="pl-c1">100</span>);
+        <span class="pl-en">setSame</span>(<span class="pl-s1">p2</span>, <span class="pl-c1">200</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p1</span>.<span class="pl-en">getFirst</span>() + <span class="pl-s">", "</span> + <span class="pl-s1">p1</span>.<span class="pl-en">getLast</span>());
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p2</span>.<span class="pl-en">getFirst</span>() + <span class="pl-s">", "</span> + <span class="pl-s1">p2</span>.<span class="pl-en">getLast</span>());
+    }
+
+    <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">setSame</span>(<span class="pl-smi">Pair</span>&lt;? <span class="pl-en">super</span> <span class="pl-smi">Integer</span>&gt; <span class="pl-s1">p</span>, <span class="pl-smi">Integer</span> <span class="pl-s1">n</span>) {
+        <span class="pl-s1">p</span>.<span class="pl-en">setFirst</span>(<span class="pl-s1">n</span>);
+        <span class="pl-s1">p</span>.<span class="pl-en">setLast</span>(<span class="pl-s1">n</span>);
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Pair</span>&lt;<span class="pl-smi">T</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">first</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">T</span> <span class="pl-s1">last</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Pair</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>, <span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getFirst</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">T</span> <span class="pl-en">getLast</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">last</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">setFirst</span>(<span class="pl-smi">T</span> <span class="pl-s1">first</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">first</span> = <span class="pl-s1">first</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">setLast</span>(<span class="pl-smi">T</span> <span class="pl-s1">last</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">last</span> = <span class="pl-s1">last</span>;
+    }
+}</pre></div>
+<p>考察<code class="notranslate">Pair&lt;? super Integer&gt;</code>的<code class="notranslate">setFirst()</code>方法，它的方法签名实际上是：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">void</span> <span class="pl-en">setFirst</span>(? <span class="pl-en">super</span> <span class="pl-smi">Integer</span>);</pre></div>
+<p>因此，可以安全地传入<code class="notranslate">Integer</code>类型。<br>
+再考察<code class="notranslate">Pair&lt;? super Integer&gt;的getFirst()</code>方法，它的方法签名实际上是：</p>
+<pre class="notranslate"><code class="notranslate">? super Integer getFirst();
+</code></pre>
+<p>这里注意到我们无法使用<code class="notranslate">Integer</code>类型来接收<code class="notranslate">getFirst()</code>的返回值，即下面的语句将无法通过编译：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Integer</span> <span class="pl-s1">x</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();</pre></div>
+<p>因为如果传入的实际类型是<code class="notranslate">Pair&lt;Number&gt;</code>，编译器无法将<code class="notranslate">Number</code>类型转型为<code class="notranslate">Integer</code>。</p>
+<div class="markdown-alert markdown-alert-warning"><p class="markdown-alert-title"><svg class="octicon octicon-alert mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p><p>注意：虽然<code class="notranslate">Number</code>是一个抽象类，我们无法直接实例化它。但是，即便<code class="notranslate">Number</code>不是抽象类，这里仍然无法通过编译。此外，传入<code class="notranslate">Pair&lt;Object&gt;</code>类型时，编译器也无法将<code class="notranslate">Object</code>类型转型为<code class="notranslate">Integer</code>。</p>
+</div>
+<p>唯一可以接收<code class="notranslate">getFirst()</code>方法返回值的是<code class="notranslate">Object</code>类型：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Object</span> <span class="pl-s1">obj</span> = <span class="pl-s1">p</span>.<span class="pl-en">getFirst</span>();</pre></div>
+<p>因此，使用<code class="notranslate">&lt;? super Integer&gt;</code>通配符表示：</p>
+<ul>
+<li>允许调用<code class="notranslate">set(? super Integer)</code>方法传入<code class="notranslate">Integer</code>的引用；</li>
+<li>不允许调用<code class="notranslate">get()</code>方法获得<code class="notranslate">Integer</code>的引用。<br>
+唯一例外是可以获取<code class="notranslate">Object</code>的引用：<code class="notranslate">Object o = p.getFirst()</code>。<br>
+换句话说，使用<code class="notranslate">&lt;? super Integer&gt;</code>通配符作为方法参数，表示方法内部代码对于参数只能写，不能读。</li>
+</ul>
+<h2>对比extends和super通配符</h2>
+<p>我们再回顾一下<code class="notranslate">extends</code>通配符。作为方法参数，<code class="notranslate">&lt;? extends T&gt;</code>类型和<code class="notranslate">&lt;? super T&gt;</code>类型的区别在于：</p>
+<ul>
+<li><code class="notranslate">&lt;? extends T&gt;</code>允许调用读方法<code class="notranslate">T get()</code>获取<code class="notranslate">T</code>的引用，但不允许调用写方法<code class="notranslate">set(T)</code>传入<code class="notranslate">T</code>的引用（传入<code class="notranslate">null</code>除外）；</li>
+<li><code class="notranslate">&lt;? super T&gt;</code>允许调用写方法<code class="notranslate">set(T)</code>传入<code class="notranslate">T</code>的引用，但不允许调用读方法<code class="notranslate">T get()</code>获取T的引用（获取<code class="notranslate">Object</code>除外）。</li>
+</ul>
+<p>一个是允许读不允许写，另一个是允许写不允许读。</p>
+<p>我们来看Java标准库的<code class="notranslate">Collections</code>类定义的<code class="notranslate">copy()</code>方法：</p>
+<pre class="notranslate"><code class="notranslate">public class Collections {
+    // 把src的每个元素复制到dest中:
+    public static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src) {
+        for (int i=0; i&lt;src.size(); i++) {
+            T t = src.get(i);
+            dest.add(t);
+        }
+    }
+}
+</code></pre>
+<p>它的作用是把一个<code class="notranslate">List</code>的每个元素依次添加到另一个<code class="notranslate">List</code>中。它的第一个参数是<code class="notranslate">List&lt;? super T&gt;</code>，表示目标<code class="notranslate">List</code>，第二个参数<code class="notranslate">List&lt;? extends T&gt;</code>，表示要复制的<code class="notranslate">List</code>。我们可以简单地用<code class="notranslate">for</code>循环实现复制。在<code class="notranslate">for</code>循环中，我们可以看到，对于类型<code class="notranslate">&lt;? extends T&gt;</code>的变量<code class="notranslate">src</code>，我们可以安全地获取类型<code class="notranslate">T</code>的引用，而对于类型<code class="notranslate">&lt;? super T&gt;</code>的变量<code class="notranslate">dest</code>，我们可以安全地传入<code class="notranslate">T</code>的引用。<br>
+这个<code class="notranslate">copy()</code>方法的另一个好处是可以安全地把一个<code class="notranslate">List&lt;Integer&gt;</code>添加到<code class="notranslate">List&lt;Number&gt;</code>，但是无法反过来添加：</p>
+<pre class="notranslate"><code class="notranslate">// copy List&lt;Integer&gt; to List&lt;Number&gt; ok:
+List&lt;Number&gt; numList = ...;
+List&lt;Integer&gt; intList = ...;
+Collections.copy(numList, intList);
+
+// ERROR: cannot copy List&lt;Number&gt; to List&lt;Integer&gt;:
+Collections.copy(intList, numList);
+</code></pre>
+<h3>PECS原则</h3>
+<p>何时使用<code class="notranslate">extends</code>，何时使用<code class="notranslate">super</code>？为了便于记忆，我们可以用<strong>PECS原则：Producer Extends Consumer Super。</strong></p>
+<p>即：如果需要返回<code class="notranslate">T</code>，它是生产者（Producer），要使用<code class="notranslate">extends</code>通配符；如果需要写入T，它是消费者（Consumer），要使用<code class="notranslate">super</code>通配符。</p>
+<p>还是以<code class="notranslate">Collections</code>的<code class="notranslate">copy()</code>方法为例：</p>
+<pre class="notranslate"><code class="notranslate">public class Collections {
+    public static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src) {
+        for (int i=0; i&lt;src.size(); i++) {
+            T t = src.get(i); // src是producer
+            dest.add(t); // dest是consumer
+        }
+    }
+}
+</code></pre>
+<h3>无限定通配符</h3>
+<p>我们已经讨论了<code class="notranslate">&lt;? extends T&gt;</code>和<code class="notranslate">&lt;? super T&gt;</code>作为方法参数的作用。实际上，Java的泛型还允许使用无限定通配符（Unbounded Wildcard Type），即只定义一个<code class="notranslate">?</code>：</p>
+<pre class="notranslate"><code class="notranslate">void sample(Pair&lt;?&gt; p) {
+}
+</code></pre>
+<p>因为<code class="notranslate">&lt;?&gt;</code>通配符既没有<code class="notranslate">extends</code>，也没有<code class="notranslate">super</code>，因此：</p>
+<ul>
+<li>不允许调用<code class="notranslate">set(T)</code>方法并传入引用（<code class="notranslate">null</code>除外）；</li>
+<li>不允许调用<code class="notranslate">T get()</code>方法并获取<code class="notranslate">T</code>引用（只能获取<code class="notranslate">Object</code>引用）。</li>
+</ul>
+<p>换句话说，既不能读，也不能写，那只能做一些null判断<br>
+无限定通配符<code class="notranslate">&lt;?&gt;</code>很少使用，可以用<code class="notranslate">&lt;T&gt;</code>替换，同时它是所有<code class="notranslate">&lt;T&gt;</code>类型的超类。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
