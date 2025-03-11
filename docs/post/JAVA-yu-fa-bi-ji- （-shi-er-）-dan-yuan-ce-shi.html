@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="什么是单元测试呢？单元测试就是针对最小的功能单元编写测试代码。">
+<meta property="og:title" content="JAVA语法笔记 （十二）单元测试">
+<meta property="og:description" content="什么是单元测试呢？单元测试就是针对最小的功能单元编写测试代码。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%20%EF%BC%88-shi-er-%EF%BC%89-dan-yuan-ce-shi.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记 （十二）单元测试</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记 （十二）单元测试</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/30" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>什么是单元测试呢？单元测试就是针对最小的功能单元编写测试代码。Java程序最小的功能单元是方法，因此，对Java程序进行单元测试就是针对单个Java方法的测试。<br>
+单元测试有什么好处呢？在学习单元测试前，我们可以先了解一下测试驱动开发。</p>
+<p>所谓测试驱动开发，是指先编写接口，紧接着编写测试。编写完测试后，我们才开始真正编写实现代码。在编写实现代码的过程中，一边写，一边测，什么时候测试全部通过了，那就表示编写的实现完成了：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/0ce933e4-fcf9-4de0-9a1e-b4c255f45e4e"><img src="https://github.com/user-attachments/assets/0ce933e4-fcf9-4de0-9a1e-b4c255f45e4e" alt="Image" style="max-width: 100%;"></a></p>
+<p>这就是传说中的……</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/d9e9ba9f-320a-442a-b6b5-1fcc1dd68911"><img src="https://github.com/user-attachments/assets/d9e9ba9f-320a-442a-b6b5-1fcc1dd68911" alt="Image" style="max-width: 100%;"></a></p>
+<p>我们先通过一个示例来看如何编写测试。假定我们编写了一个计算阶乘的类，它只有一个静态方法来计算阶乘：<br>
+$n!=1×2×3×...×n$</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Factorial</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">long</span> <span class="pl-en">fact</span>(<span class="pl-smi">long</span> <span class="pl-s1">n</span>) {
+        <span class="pl-smi">long</span> <span class="pl-s1">r</span> = <span class="pl-c1">1</span>;
+        <span class="pl-k">for</span> (<span class="pl-smi">long</span> <span class="pl-s1">i</span> = <span class="pl-c1">1</span>; <span class="pl-s1">i</span> &lt;= <span class="pl-s1">n</span>; <span class="pl-s1">i</span>++) {
+            <span class="pl-s1">r</span> = <span class="pl-s1">r</span> * <span class="pl-s1">i</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-s1">r</span>;
+    }
+}</pre></div>
+<p>要测试这个方法，一个很自然的想法是编写一个<code class="notranslate">main()</code>方法，然后运行一些测试代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Test</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-k">if</span> (<span class="pl-en">fact</span>(<span class="pl-c1">10</span>) == <span class="pl-c1">3628800</span>) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"pass"</span>);
+        } <span class="pl-k">else</span> {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"fail"</span>);
+        }
+    }
+}</pre></div>
+<p>这样我们就可以通过运行<code class="notranslate">main()</code>方法来运行测试代码。<br>
+不过，使用<code class="notranslate">main()</code>方法测试有很多缺点：<br>
+一是只能有一个<code class="notranslate">main()</code>方法，不能把测试代码分离，二是没有打印出测试结果和期望结果，例如，<code class="notranslate">expected: 3628800, but actual: 123456</code>，三是很难编写一组通用的测试代码。<br>
+因此，我们需要一种测试框架，帮助我们编写测试。</p>
+<h2>JUnit</h2>
+<p>JUnit是一个开源的Java语言的单元测试框架，专门针对Java设计，使用最广泛。JUnit是事实上的单元测试的标准框架，任何Java开发者都应当学习并使用JUnit编写单元测试。<br>
+使用JUnit编写单元测试的好处在于，我们可以非常简单地组织测试代码，并随时运行它们，JUnit就会给出成功的测试和失败的测试，还可以生成测试报告，不仅包含测试的成功率，还可以统计测试的代码覆盖率，即被测试的代码本身有多少经过了测试。对于高质量的代码来说，测试覆盖率应该在80%以上。<br>
+此外，几乎所有的IDE工具都集成了JUnit，这样我们就可以直接在IDE中编写并运行JUnit测试。JUnit目前最新版本是5。<br>
+当我们已经编写了一个<code class="notranslate">Factorial.java</code>文件后，我们想对其进行测试，需要编写一个对应的<code class="notranslate">FactorialTest.java</code>文件，<strong>以Test为后缀是一个惯例</strong>，并分别将其放入<code class="notranslate">src</code>和<code class="notranslate">test</code>目录中。最后，在<code class="notranslate">Project</code>- <code class="notranslate">Properties</code> - <code class="notranslate">Java Build Path</code> - <code class="notranslate">Libraries</code>中添加<code class="notranslate">JUnit 5</code>的库：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/77c8fb25-d0c3-4931-ad34-4a567d7fdeb0"><img src="https://github.com/user-attachments/assets/77c8fb25-d0c3-4931-ad34-4a567d7fdeb0" alt="Image" style="max-width: 100%;"></a><br>
+整个项目结构如下：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/c93ec9b6-581e-42dd-909f-45af4ae72535"><img src="https://github.com/user-attachments/assets/c93ec9b6-581e-42dd-909f-45af4ae72535" alt="Image" style="max-width: 100%;"></a><br>
+<code class="notranslate">FactorialTest.java</code>的内容：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">package</span> <span class="pl-s1">com</span>.<span class="pl-s1">itranswarp</span>.<span class="pl-s1">learnjava</span>;
+
+<span class="pl-k">import</span> <span class="pl-k">static</span> <span class="pl-s1">org</span>.<span class="pl-s1">junit</span>.<span class="pl-s1">jupiter</span>.<span class="pl-s1">api</span>.<span class="pl-s1">Assertions</span>.*;
+<span class="pl-k">import</span> <span class="pl-s1">org</span>.<span class="pl-s1">junit</span>.<span class="pl-s1">jupiter</span>.<span class="pl-s1">api</span>.<span class="pl-s1">Test</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">FactorialTest</span> {
+
+    <span class="pl-c1">@</span><span class="pl-c1">Test</span>
+    <span class="pl-smi">void</span> <span class="pl-en">testFact</span>() {
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">1</span>, <span class="pl-smi">Factorial</span>.<span class="pl-en">fact</span>(<span class="pl-c1">1</span>));
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">2</span>, <span class="pl-smi">Factorial</span>.<span class="pl-en">fact</span>(<span class="pl-c1">2</span>));
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">6</span>, <span class="pl-smi">Factorial</span>.<span class="pl-en">fact</span>(<span class="pl-c1">3</span>));
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">3628800</span>, <span class="pl-smi">Factorial</span>.<span class="pl-en">fact</span>(<span class="pl-c1">10</span>));
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">2432902008176640000L</span>, <span class="pl-smi">Factorial</span>.<span class="pl-en">fact</span>(<span class="pl-c1">20</span>));
+    }
+}</pre></div>
+<p>核心测试方法<code class="notranslate">testFact()</code>加上了<code class="notranslate">@Test</code>注解，这是<code class="notranslate">JUnit</code>要求的，它会把带有<code class="notranslate">@Test</code>的方法识别为测试方法。在测试方法内部，我们用<code class="notranslate">assertEquals(1, Factorial.fact(1))</code>表示，期望<code class="notranslate">Factorial.fact(1)</code>返回1。<code class="notranslate">assertEquals(expected, actual)</code>是最常用的测试方法，它在<code class="notranslate">Assertion</code>类中定义。<code class="notranslate">Assertion</code>还定义了其他断言方法，例如：</p>
+<ul>
+<li><code class="notranslate">assertTrue()</code>: 期待结果为true</li>
+<li><code class="notranslate">assertFalse()</code>: 期待结果为false</li>
+<li><code class="notranslate">assertNotNull()</code>: 期待结果为非null</li>
+<li><code class="notranslate">assertArrayEquals()</code>: 期待结果为数组并与期望数组每个元素的值均相等</li>
+<li>...</li>
+</ul>
+<p>运行单元测试非常简单。选中<code class="notranslate">FactorialTest.java</code>文件，点击<code class="notranslate">Run</code> - <code class="notranslate">Run As</code> - <code class="notranslate">JUnit Test</code>，<code class="notranslate">Eclipse</code>会自动运行这个<code class="notranslate">JUnit</code>测试，并显示结果：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/14173e76-8f20-4795-966a-ba0ced976549"><img src="https://github.com/user-attachments/assets/14173e76-8f20-4795-966a-ba0ced976549" alt="Image" style="max-width: 100%;"></a></p>
+<p>如果测试结果与预期不符，<code class="notranslate">assertEquals()</code>会抛出异常，我们就会得到一个测试失败的结果：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/4acf20df-b056-4268-8348-ce8e14f85509"><img src="https://github.com/user-attachments/assets/4acf20df-b056-4268-8348-ce8e14f85509" alt="Image" style="max-width: 100%;"></a></p>
+<p>在Failure Trace中，JUnit会告诉我们详细的错误结果：</p>
+<blockquote>
+<p>org.opentest4j.AssertionFailedError: expected: &lt;3628800&gt; but was: &lt;362880&gt;<br>
+at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)<br>
+at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:195)<br>
+at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:168)<br>
+at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:163)<br>
+at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:611)<br>
+at com.itranswarp.learnjava.FactorialTest.testFact(FactorialTest.java:14)<br>
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+at ...</p>
+</blockquote>
+<p>第一行的失败信息的意思是期待结果<code class="notranslate">3628800</code>但是实际返回是<code class="notranslate">362880</code>，此时，我们要么修正实现代码，要么修正测试代码，直到测试通过为止。</p>
+<p>使用浮点数时，由于浮点数无法精确地进行比较，因此，我们需要调用<code class="notranslate">assertEquals(double expected, double actual, double delta)</code>这个重载方法，指定一个误差值：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-en">assertEquals</span>(<span class="pl-c1">0.1</span>, <span class="pl-smi">Math</span>.<span class="pl-en">abs</span>(<span class="pl-c1">1</span> - <span class="pl-c1">9</span> / <span class="pl-c1">10.0</span>), <span class="pl-c1">0.0000001</span>);</pre></div>
+<h3>单元测试的好处</h3>
+<p>单元测试可以确保单个方法按照正确预期运行，如果修改了某个方法的代码，只需确保其对应的单元测试通过，即可认为改动正确。此外，测试代码本身就可以作为示例代码，用来演示如何调用该方法。</p>
+<p>使用JUnit进行单元测试，我们可以使用断言（<code class="notranslate">Assertion</code>）来测试期望结果，可以方便地组织和运行测试，并方便地查看测试结果。此外，JUnit既可以直接在IDE中运行，也可以方便地集成到Maven这些自动化工具中运行。</p>
+<h2>Fixture</h2>
+<p>在一个单元测试中，我们经常编写多个<code class="notranslate">@Test</code>方法，来分组、分类对目标代码进行测试。<br>
+在测试的时候，我们经常遇到一个对象需要初始化，测试完可能还需要清理的情况。如果每个<code class="notranslate">@Test</code>方法都写一遍这样的重复代码，显然比较麻烦。<br>
+JUnit提供了编写测试前准备、测试后清理的固定代码，我们称之为<code class="notranslate">Fixture</code>。</p>
+<p>我们来看一个具体的<code class="notranslate">Calculator</code>的例子：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Calculator</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">long</span> <span class="pl-s1">n</span> = <span class="pl-c1">0</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">long</span> <span class="pl-en">add</span>(<span class="pl-smi">long</span> <span class="pl-s1">x</span>) {
+        <span class="pl-s1">n</span> = <span class="pl-s1">n</span> + <span class="pl-s1">x</span>;
+        <span class="pl-k">return</span> <span class="pl-s1">n</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">long</span> <span class="pl-en">sub</span>(<span class="pl-smi">long</span> <span class="pl-s1">x</span>) {
+        <span class="pl-s1">n</span> = <span class="pl-s1">n</span> - <span class="pl-s1">x</span>;
+        <span class="pl-k">return</span> <span class="pl-s1">n</span>;
+    }
+}</pre></div>
+<p>这个类的功能很简单，但是测试的时候，我们要先初始化对象，我们不必在每个测试方法中都写上初始化代码，而是通过<code class="notranslate">@BeforeEach</code>来初始化，通过<code class="notranslate">@AfterEach</code>来清理资源：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">CalculatorTest</span> {
+
+    <span class="pl-smi">Calculator</span> <span class="pl-s1">calculator</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">BeforeEach</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">setUp</span>() {
+        <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span> = <span class="pl-k">new</span> <span class="pl-smi">Calculator</span>();
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">AfterEach</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">tearDown</span>() {
+        <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span> = <span class="pl-c1">null</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Test</span>
+    <span class="pl-smi">void</span> <span class="pl-en">testAdd</span>() {
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">100</span>, <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span>.<span class="pl-en">add</span>(<span class="pl-c1">100</span>));
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">150</span>, <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span>.<span class="pl-en">add</span>(<span class="pl-c1">50</span>));
+        <span class="pl-en">assertEquals</span>(<span class="pl-c1">130</span>, <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span>.<span class="pl-en">add</span>(-<span class="pl-c1">20</span>));
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Test</span>
+    <span class="pl-smi">void</span> <span class="pl-en">testSub</span>() {
+        <span class="pl-en">assertEquals</span>(-<span class="pl-c1">100</span>, <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span>.<span class="pl-en">sub</span>(<span class="pl-c1">100</span>));
+        <span class="pl-en">assertEquals</span>(-<span class="pl-c1">150</span>, <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span>.<span class="pl-en">sub</span>(<span class="pl-c1">50</span>));
+        <span class="pl-en">assertEquals</span>(-<span class="pl-c1">130</span>, <span class="pl-smi">this</span>.<span class="pl-s1">calculator</span>.<span class="pl-en">sub</span>(-<span class="pl-c1">20</span>));
+    }
+}</pre></div>
+<p>在<code class="notranslate">CalculatorTest</code>测试中，有两个标记为<code class="notranslate">@BeforeEach</code>和<code class="notranslate">@AfterEach</code>的方法，它们会在运行每个<code class="notranslate">@Test</code>方法前后自动运行。</p>
+<p>上面的测试代码在JUnit中运行顺序如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-en">invokeBeforeAll</span>(<span class="pl-smi">CalculatorTest</span>.<span class="pl-k">class</span>);
+<span class="pl-k">for</span> (<span class="pl-smi">Method</span> <span class="pl-s1">testMethod</span> : <span class="pl-en">findTestMethods</span>(<span class="pl-smi">CalculatorTest</span>.<span class="pl-k">class</span>)) {
+    <span class="pl-smi">var</span> <span class="pl-s1">test</span> = <span class="pl-k">new</span> <span class="pl-smi">CalculatorTest</span>(); <span class="pl-c">// 创建Test实例</span>
+    <span class="pl-en">invokeBeforeEach</span>(<span class="pl-s1">test</span>);
+        <span class="pl-en">invokeTestMethod</span>(<span class="pl-s1">test</span>, <span class="pl-s1">testMethod</span>);
+    <span class="pl-en">invokeAfterEach</span>(<span class="pl-s1">test</span>);
+}
+<span class="pl-en">invokeAfterAll</span>(<span class="pl-smi">CalculatorTest</span>.<span class="pl-k">class</span>);</pre></div>
+<p>因为<code class="notranslate">@BeforeAll</code>和<code class="notranslate">@AfterAll</code>在所有<code class="notranslate">@Test</code>方法运行前后仅运行一次，因此，它们只能初始化静态变量，例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">DatabaseTest</span> {
+    <span class="pl-k">static</span> <span class="pl-smi">Database</span> <span class="pl-s1">db</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">BeforeAll</span>
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">initDatabase</span>() {
+        <span class="pl-s1">db</span> = <span class="pl-en">createDb</span>(...);
+    }
+    
+    <span class="pl-c1">@</span><span class="pl-c1">AfterAll</span>
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">dropDatabase</span>() {
+        ...
+    }
+}</pre></div>
+<p>事实上，<code class="notranslate">@BeforeAll</code>和<code class="notranslate">@AfterAll</code>也只能标注在静态方法上。</p>
+<p>因此，我们总结出编写Fixture的套路如下：</p>
+<ul>
+<li>对于实例变量，在<a class="user-mention notranslate" data-hovercard-type="organization" data-hovercard-url="/orgs/beforeeach/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/beforeeach">@beforeeach</a>中初始化，在@AfterEach中清理，它们在各个<a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/test/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/test">@test</a>方法中互不影响，因为是不同的实例；</li>
+<li>对于静态变量，在@BeforeAll中初始化，在<a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/afterall/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/afterall">@afterall</a>中清理，它们在各个<a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/test/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/test">@test</a>方法中均是唯一实例，会影响各个<a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/test/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/test">@test</a>方法。</li>
+</ul>
+<p>大多数情况下，使用<code class="notranslate">@BeforeEach</code>和<code class="notranslate">@AfterEach</code>就足够了。只有某些测试资源初始化耗费时间太长，以至于我们不得不尽量“复用”时才会用到<code class="notranslate">@BeforeAll</code>和<code class="notranslate">@AfterAll</code>。</p>
+<p>最后，注意到每次运行一个<code class="notranslate">@Test</code>方法前，JUnit首先创建一个<code class="notranslate">XxxTest</code>实例，因此，每个<code class="notranslate">@Test</code>方法内部的成员变量都是独立的，不能也无法把成员变量的状态从一个<code class="notranslate">@Test</code>方法带到另一个<code class="notranslate">@Test</code>方法。</p>
+<h2>条件测试</h2>
+<p>在运行测试的时候，有些时候，我们需要排出某些<code class="notranslate">@Test</code>方法，不要让它运行，这时，我们就可以给它标记一个<code class="notranslate">@Disabled</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Disabled</span>
+<span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-smi">void</span> <span class="pl-en">testBug101</span>() {
+    <span class="pl-c">// 这个测试不会运行</span>
+}</pre></div>
+<p>为什么我们不直接注释掉<code class="notranslate">@Test</code>，而是要加一个<code class="notranslate">@Disabled</code>？这是因为注释掉<code class="notranslate">@Test</code>，JUnit就不知道这是个测试方法，而加上<code class="notranslate">@Disabled</code>，JUnit仍然识别出这是个测试方法，只是暂时不运行。它会在测试结果中显示：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Tests</span> <span class="pl-s1">run</span>: <span class="pl-c1">68</span>, <span class="pl-s1">Failures</span>: <span class="pl-c1">2</span>, <span class="pl-s1">Errors</span>: <span class="pl-c1">0</span>, <span class="pl-s1">Skipped</span>: <span class="pl-c1">5</span></pre></div>
+<p>类似<code class="notranslate">@Disabled</code>这种注解就称为条件测试（Conditional Test），JUnit根据不同的条件注解，决定是否运行当前的<code class="notranslate">@Test</code>方法。<br>
+我们来看一个例子：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Config</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getConfigFile</span>(<span class="pl-smi">String</span> <span class="pl-s1">filename</span>) {
+        <span class="pl-smi">String</span> <span class="pl-s1">os</span> = <span class="pl-smi">System</span>.<span class="pl-en">getProperty</span>(<span class="pl-s">"os.name"</span>).<span class="pl-en">toLowerCase</span>();
+        <span class="pl-k">if</span> (<span class="pl-s1">os</span>.<span class="pl-en">contains</span>(<span class="pl-s">"win"</span>)) {
+            <span class="pl-k">return</span> <span class="pl-s">"C:<span class="pl-cce">\\</span>"</span> + <span class="pl-s1">filename</span>;
+        }
+        <span class="pl-k">if</span> (<span class="pl-s1">os</span>.<span class="pl-en">contains</span>(<span class="pl-s">"mac"</span>) || <span class="pl-s1">os</span>.<span class="pl-en">contains</span>(<span class="pl-s">"linux"</span>) || <span class="pl-s1">os</span>.<span class="pl-en">contains</span>(<span class="pl-s">"unix"</span>)) {
+            <span class="pl-k">return</span> <span class="pl-s">"/usr/local/"</span> + <span class="pl-s1">filename</span>;
+        }
+        <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">UnsupportedOperationException</span>();
+    }
+}</pre></div>
+<p>我们想要测试<code class="notranslate">getConfigFile()</code>这个方法，但是在Windows上跑，和在Linux上跑的代码路径不同，因此，针对两个系统的测试方法，其中一个只能在Windows上跑，另一个只能在Mac/Linux上跑：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-smi">void</span> <span class="pl-en">testWindows</span>() {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s">"C:<span class="pl-cce">\\</span>test.ini"</span>, <span class="pl-s1">config</span>.<span class="pl-en">getConfigFile</span>(<span class="pl-s">"test.ini"</span>));
+}
+
+<span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-smi">void</span> <span class="pl-en">testLinuxAndMac</span>() {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s">"/usr/local/test.cfg"</span>, <span class="pl-s1">config</span>.<span class="pl-en">getConfigFile</span>(<span class="pl-s">"test.cfg"</span>));
+}</pre></div>
+<p>因此，我们给上述两个测试方法分别加上条件如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-c1">@</span><span class="pl-c1">EnabledOnOs</span>(<span class="pl-c1">OS</span>.<span class="pl-c1">WINDOWS</span>)
+<span class="pl-smi">void</span> <span class="pl-en">testWindows</span>() {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s">"C:<span class="pl-cce">\\</span>test.ini"</span>, <span class="pl-s1">config</span>.<span class="pl-en">getConfigFile</span>(<span class="pl-s">"test.ini"</span>));
+}
+
+<span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-c1">@</span><span class="pl-c1">EnabledOnOs</span>({ <span class="pl-c1">OS</span>.<span class="pl-c1">LINUX</span>, <span class="pl-c1">OS</span>.<span class="pl-c1">MAC</span> })
+<span class="pl-smi">void</span> <span class="pl-en">testLinuxAndMac</span>() {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s">"/usr/local/test.cfg"</span>, <span class="pl-s1">config</span>.<span class="pl-en">getConfigFile</span>(<span class="pl-s">"test.cfg"</span>));
+}</pre></div>
+<p><code class="notranslate">@EnableOnOs</code>就是一个条件测试判断。<br>
+我们来看一些常用的条件测试：<br>
+不在Windows平台执行的测试，可以加上<code class="notranslate">@DisabledOnOs(OS.WINDOWS)</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-c1">@</span><span class="pl-c1">DisabledOnOs</span>(<span class="pl-c1">OS</span>.<span class="pl-c1">WINDOWS</span>)
+<span class="pl-smi">void</span> <span class="pl-en">testOnNonWindowsOs</span>() {
+    <span class="pl-c">// TODO: this test is disabled on windows</span>
+}</pre></div>
+<p>只能在Java 9或更高版本执行的测试，可以加上<code class="notranslate">@DisabledOnJre(JRE.JAVA_8)</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-c1">@</span><span class="pl-c1">DisabledOnJre</span>(<span class="pl-c1">JRE</span>.<span class="pl-c1">JAVA_8</span>)
+<span class="pl-smi">void</span> <span class="pl-en">testOnJava9OrAbove</span>() {
+    <span class="pl-c">// TODO: this test is disabled on java 8</span>
+}</pre></div>
+<p>只能在64位操作系统上执行的测试，可以用<code class="notranslate">@EnabledIfSystemProperty</code>判断：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-c1">@</span><span class="pl-c1">EnabledIfSystemProperty</span>(<span class="pl-s1">named</span> = <span class="pl-s">"os.arch"</span>, <span class="pl-s1">matches</span> = <span class="pl-s">".*64.*"</span>)
+<span class="pl-smi">void</span> <span class="pl-en">testOnlyOn64bitSystem</span>() {
+    <span class="pl-c">// TODO: this test is only run on 64 bit system</span>
+}</pre></div>
+<p>需要传入环境变量<code class="notranslate">DEBUG=true</code>才能执行的测试，可以用<code class="notranslate">@EnabledIfEnvironmentVariable</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">Test</span>
+<span class="pl-c1">@</span><span class="pl-c1">EnabledIfEnvironmentVariable</span>(<span class="pl-s1">named</span> = <span class="pl-s">"DEBUG"</span>, <span class="pl-s1">matches</span> = <span class="pl-s">"true"</span>)
+<span class="pl-smi">void</span> <span class="pl-en">testOnlyOnDebugMode</span>() {
+    <span class="pl-c">// TODO: this test is only run on DEBUG=true</span>
+}</pre></div>
+<h2>参数化测试</h2>
+<p>如果待测试的输入和输出是一组数据，可以把测试数据组织起来，用不同的测试数据调用相同的测试方法，这就是参数化测试。<br>
+参数化测试和普通测试稍微不同的地方在于，一个测试方法需要接收至少一个参数，然后，传入一组参数反复运行。<br>
+JUnit提供了一个<code class="notranslate">@ParameterizedTest</code>注解，用来进行参数化测试。<br>
+假设我们想对<code class="notranslate">Math.abs()</code>进行测试，先用一组正数进行测试：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">ParameterizedTest</span>
+<span class="pl-c1">@</span><span class="pl-c1">ValueSource</span>(<span class="pl-s1">ints</span> = { <span class="pl-c1">0</span>, <span class="pl-c1">1</span>, <span class="pl-c1">5</span>, <span class="pl-c1">100</span> })
+<span class="pl-smi">void</span> <span class="pl-en">testAbs</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>) {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s1">x</span>, <span class="pl-smi">Math</span>.<span class="pl-en">abs</span>(<span class="pl-s1">x</span>));
+}</pre></div>
+<p>再用一组负数进行测试：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">ParameterizedTest</span>
+<span class="pl-c1">@</span><span class="pl-c1">ValueSource</span>(<span class="pl-s1">ints</span> = { -<span class="pl-c1">1</span>, -<span class="pl-c1">5</span>, -<span class="pl-c1">100</span> })
+<span class="pl-smi">void</span> <span class="pl-en">testAbsNegative</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>) {
+    <span class="pl-en">assertEquals</span>(-<span class="pl-s1">x</span>, <span class="pl-smi">Math</span>.<span class="pl-en">abs</span>(<span class="pl-s1">x</span>));
+}</pre></div>
+<p>注意到参数化测试的注解是<code class="notranslate">@ParameterizedTest</code>，而不是普通的<code class="notranslate">@Test</code>。<br>
+实际的测试场景往往没有这么简单。假设我们自己编写了一个<code class="notranslate">StringUtils.capitalize()</code>方法，它会把字符串的第一个字母变为大写，后续字母变为小写：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">StringUtils</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">String</span> <span class="pl-en">capitalize</span>(<span class="pl-smi">String</span> <span class="pl-s1">s</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">s</span>.<span class="pl-en">length</span>() == <span class="pl-c1">0</span>) {
+            <span class="pl-k">return</span> <span class="pl-s1">s</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-smi">Character</span>.<span class="pl-en">toUpperCase</span>(<span class="pl-s1">s</span>.<span class="pl-en">charAt</span>(<span class="pl-c1">0</span>)) + <span class="pl-s1">s</span>.<span class="pl-en">substring</span>(<span class="pl-c1">1</span>).<span class="pl-en">toLowerCase</span>();
+    }
+}</pre></div>
+<p>要用参数化测试的方法来测试，我们不但要给出输入，还要给出预期输出。因此，测试方法至少需要接收两个参数：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">ParameterizedTest</span>
+<span class="pl-smi">void</span> <span class="pl-en">testCapitalize</span>(<span class="pl-smi">String</span> <span class="pl-s1">input</span>, <span class="pl-smi">String</span> <span class="pl-s1">result</span>) {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s1">result</span>, <span class="pl-smi">StringUtils</span>.<span class="pl-en">capitalize</span>(<span class="pl-s1">input</span>));
+}</pre></div>
+<p>现在问题来了：参数如何传入？<br>
+最简单的方法是通过<code class="notranslate">@MethodSource</code>注解，它允许我们编写一个同名的静态方法来提供测试参数：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">ParameterizedTest</span>
+<span class="pl-c1">@</span><span class="pl-c1">MethodSource</span>
+<span class="pl-smi">void</span> <span class="pl-en">testCapitalize</span>(<span class="pl-smi">String</span> <span class="pl-s1">input</span>, <span class="pl-smi">String</span> <span class="pl-s1">result</span>) {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s1">result</span>, <span class="pl-smi">StringUtils</span>.<span class="pl-en">capitalize</span>(<span class="pl-s1">input</span>));
+}
+
+<span class="pl-k">static</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">Arguments</span>&gt; <span class="pl-en">testCapitalize</span>() {
+    <span class="pl-k">return</span> <span class="pl-smi">List</span>.<span class="pl-en">of</span>( <span class="pl-c">// arguments:</span>
+            <span class="pl-smi">Arguments</span>.<span class="pl-en">of</span>(<span class="pl-s">"abc"</span>, <span class="pl-s">"Abc"</span>), <span class="pl-c">//</span>
+            <span class="pl-smi">Arguments</span>.<span class="pl-en">of</span>(<span class="pl-s">"APPLE"</span>, <span class="pl-s">"Apple"</span>), <span class="pl-c">//</span>
+            <span class="pl-smi">Arguments</span>.<span class="pl-en">of</span>(<span class="pl-s">"gooD"</span>, <span class="pl-s">"Good"</span>));
+}</pre></div>
+<p>上面的代码很容易理解：静态方法<code class="notranslate">testCapitalize()</code>返回了一组测试参数，每个参数都包含两个String，正好作为测试方法的两个参数传入。</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>如果静态方法和测试方法的名称不同，@MethodSource也允许指定方法名。但使用默认同名方法最方便。</p>
+</div>
+<p>另一种传入测试参数的方法是使用<code class="notranslate">@CsvSource</code>，它的每一个字符串表示一行，一行包含的若干参数用,分隔，因此，上述测试又可以改写如下:</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">ParameterizedTest</span>
+<span class="pl-c1">@</span><span class="pl-c1">CsvSource</span>({ <span class="pl-s">"abc, Abc"</span>, <span class="pl-s">"APPLE, Apple"</span>, <span class="pl-s">"gooD, Good"</span> })
+<span class="pl-smi">void</span> <span class="pl-en">testCapitalize</span>(<span class="pl-smi">String</span> <span class="pl-s1">input</span>, <span class="pl-smi">String</span> <span class="pl-s1">result</span>) {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s1">result</span>, <span class="pl-smi">StringUtils</span>.<span class="pl-en">capitalize</span>(<span class="pl-s1">input</span>));
+}</pre></div>
+<p>如果有成百上千的测试输入，那么，直接写<code class="notranslate">@CsvSource</code>就很不方便。这个时候，我们可以把测试数据提到一个独立的CSV文件中，然后标注上<code class="notranslate">@CsvFileSource</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">ParameterizedTest</span>
+<span class="pl-c1">@</span><span class="pl-c1">CsvFileSource</span>(<span class="pl-s1">resources</span> = { <span class="pl-s">"/test-capitalize.csv"</span> })
+<span class="pl-smi">void</span> <span class="pl-en">testCapitalizeUsingCsvFile</span>(<span class="pl-smi">String</span> <span class="pl-s1">input</span>, <span class="pl-smi">String</span> <span class="pl-s1">result</span>) {
+    <span class="pl-en">assertEquals</span>(<span class="pl-s1">result</span>, <span class="pl-smi">StringUtils</span>.<span class="pl-en">capitalize</span>(<span class="pl-s1">input</span>));
+}</pre></div>
+<p>JUnit只在<code class="notranslate">classpath</code>中查找指定的CSV文件，因此，<code class="notranslate">test-capitalize.csv</code>这个文件要放到test目录下，内容如下：</p>
+<blockquote>
+<p>apple, Apple<br>
+HELLO, Hello<br>
+JUnit, Junit<br>
+reSource, Resource</p>
+</blockquote>
+<p>使用参数化测试，可以提供一组测试数据，对一个测试方法反复测试；<br>
+参数既可以在测试代码中写死，也可以通过<code class="notranslate">@CsvFileSource</code>放到外部的CSV文件中。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</html>
