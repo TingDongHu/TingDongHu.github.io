@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="IO流是一种流式的数据输入/输出模型：
+
+- 二进制数据以`byte`为最小单位在`InputStream/OutputStream`中单向流动；
+- 字符数据以`char`为最小单位在`Reader/Writer`中单向流动。">
+<meta property="og:title" content="JAVA语法笔记 (十一) IO流">
+<meta property="og:description" content="IO流是一种流式的数据输入/输出模型：
+
+- 二进制数据以`byte`为最小单位在`InputStream/OutputStream`中单向流动；
+- 字符数据以`char`为最小单位在`Reader/Writer`中单向流动。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA-yu-fa-bi-ji-%20%28-shi-yi-%29%20IO-liu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA语法笔记 (十一) IO流</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA语法笔记 (十一) IO流</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/29" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>IO流是一种流式的数据输入/输出模型：</p>
+<ul>
+<li>二进制数据以<code class="notranslate">byte</code>为最小单位在<code class="notranslate">InputStream/OutputStream</code>中单向流动；</li>
+<li>字符数据以<code class="notranslate">char</code>为最小单位在<code class="notranslate">Reader/Writer</code>中单向流动。</li>
+</ul>
+<p>Java标准库的<code class="notranslate">java.io</code>包提供了同步IO功能：</p>
+<ul>
+<li>字节流接口：<code class="notranslate">InputStream/OutputStream</code>；</li>
+<li>字符流接口：<code class="notranslate">Reader/Writer</code>。</li>
+</ul>
+<h2>简单读取</h2>
+<h3>File对象</h3>
+<p>在计算机系统中，文件是非常重要的存储方式。Java的标准库<code class="notranslate">java.io</code>提供了<code class="notranslate">File</code>对象来操作文件和目录。</p>
+<p>要构造一个File对象，需要传入文件路径：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">io</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">File</span> <span class="pl-s1">f</span> = <span class="pl-k">new</span> <span class="pl-smi">File</span>(<span class="pl-s">"C:<span class="pl-cce">\\</span>Windows<span class="pl-cce">\\</span>notepad.exe"</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">f</span>);
+    }
+}</pre></div>
+<p>构造File对象时，既可以传入绝对路径，也可以传入相对路径。绝对路径是以根目录开头的完整路径</p>
+<h3>创建和删除文件</h3>
+<p>File对象表示一个文件时，可以通过<code class="notranslate">createNewFile()</code>创建一个新文件，用<code class="notranslate">delete()</code>删除该文件：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">File</span> <span class="pl-s1">file</span> = <span class="pl-k">new</span> <span class="pl-smi">File</span>(<span class="pl-s">"/path/to/file"</span>);
+<span class="pl-k">if</span> (<span class="pl-s1">file</span>.<span class="pl-en">createNewFile</span>()) {
+    <span class="pl-c">// 文件创建成功:</span>
+    <span class="pl-c">// TODO:</span>
+    <span class="pl-k">if</span> (<span class="pl-s1">file</span>.<span class="pl-en">delete</span>()) {
+        <span class="pl-c">// 删除文件成功:</span>
+    }
+}</pre></div>
+<p>有些时候，程序需要读写一些临时文件，File对象提供了<code class="notranslate">createTempFile()</code>来创建一个临时文件，以及<code class="notranslate">deleteOnExit()</code>在JVM退出时自动删除该文件。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">io</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+        <span class="pl-smi">File</span> <span class="pl-s1">f</span> = <span class="pl-smi">File</span>.<span class="pl-en">createTempFile</span>(<span class="pl-s">"tmp-"</span>, <span class="pl-s">".txt"</span>); <span class="pl-c">// 提供临时文件的前缀和后缀</span>
+        <span class="pl-s1">f</span>.<span class="pl-en">deleteOnExit</span>(); <span class="pl-c">// JVM退出时自动删除</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">f</span>.<span class="pl-en">isFile</span>());
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">f</span>.<span class="pl-en">getAbsolutePath</span>());
+    }
+}</pre></div>
+<h3>Path</h3>
+<p>Java标准库还提供了一个Path对象，它位于<code class="notranslate">java.nio.file</code>包。<code class="notranslate">Path</code>对象和<code class="notranslate">File</code>对象类似，但操作更加简单：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">io</span>.*;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">nio</span>.<span class="pl-s1">file</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+        <span class="pl-smi">Path</span> <span class="pl-s1">p1</span> = <span class="pl-smi">Paths</span>.<span class="pl-en">get</span>(<span class="pl-s">"."</span>, <span class="pl-s">"project"</span>, <span class="pl-s">"study"</span>); <span class="pl-c">// 构造一个Path对象</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p1</span>);
+        <span class="pl-smi">Path</span> <span class="pl-s1">p2</span> = <span class="pl-s1">p1</span>.<span class="pl-en">toAbsolutePath</span>(); <span class="pl-c">// 转换为绝对路径</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p2</span>);
+        <span class="pl-smi">Path</span> <span class="pl-s1">p3</span> = <span class="pl-s1">p2</span>.<span class="pl-en">normalize</span>(); <span class="pl-c">// 转换为规范路径</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">p3</span>);
+        <span class="pl-smi">File</span> <span class="pl-s1">f</span> = <span class="pl-s1">p3</span>.<span class="pl-en">toFile</span>(); <span class="pl-c">// 转换为File对象</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">f</span>);
+        <span class="pl-k">for</span> (<span class="pl-smi">Path</span> <span class="pl-s1">p</span> : <span class="pl-smi">Paths</span>.<span class="pl-en">get</span>(<span class="pl-s">".."</span>).<span class="pl-en">toAbsolutePath</span>()) { <span class="pl-c">// 可以直接遍历Path</span>
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"  "</span> + <span class="pl-s1">p</span>);
+        }
+    }
+}</pre></div>
+<p>如果需要对目录进行复杂的拼接、遍历等操作，使用<code class="notranslate">Path</code>对象更方便。</p>
+<h2>InputStream</h2>
+<p><code class="notranslate">InputStream</code>就是Java标准库提供的最基本的输入流。它位于<code class="notranslate">java.io</code>这个包里。<code class="notranslate">java.io</code>包提供了所有同步IO的功能。</p>
+<p>要特别注意的一点是，<code class="notranslate">InputStream</code>并不是一个接口，而是一个<strong>抽象类</strong>，它是所有输入流的超类。这个抽象类定义的一个最重要的方法就是<code class="notranslate">int read()</code>，签名如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-smi">int</span> <span class="pl-en">read</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span>;</pre></div>
+<p>这个方法会读取输入流的下一个字节，并返回字节表示的<code class="notranslate">int</code>值（0~255）。如果已读到末尾，返回-1表示不能继续读取了。<br>
+<code class="notranslate">FileInputStream</code>是<code class="notranslate">InputStream</code>的一个子类。顾名思义，<code class="notranslate">FileInputStream</code>就是从文件流中读取数据。下面的代码演示了如何完整地读取一个<code class="notranslate">FileInputStream</code>的所有字节：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">readFile</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+    <span class="pl-c">// 创建一个FileInputStream对象:</span>
+    <span class="pl-smi">InputStream</span> <span class="pl-s1">input</span> = <span class="pl-k">new</span> <span class="pl-smi">FileInputStream</span>(<span class="pl-s">"src/readme.txt"</span>);
+    <span class="pl-k">for</span> (;;) {
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">input</span>.<span class="pl-en">read</span>(); <span class="pl-c">// 反复调用read()方法，直到返回-1</span>
+        <span class="pl-k">if</span> (<span class="pl-s1">n</span> == -<span class="pl-c1">1</span>) {
+            <span class="pl-k">break</span>;
+        }
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span>); <span class="pl-c">// 打印byte的值</span>
+    }
+    <span class="pl-s1">input</span>.<span class="pl-en">close</span>(); <span class="pl-c">// 关闭流</span>
+}</pre></div>
+<p>在计算机中，类似文件、网络端口这些资源，都是由操作系统统一管理的。应用程序在运行的过程中，如果打开了一个文件进行读写，完成后要及时地关闭，以便让操作系统把资源释放掉，否则，应用程序占用的资源会越来越多，不但白白占用内存，还会影响其他应用程序的运行。</p>
+<p><code class="notranslate">InputStream</code>和<code class="notranslate">OutputStream</code>都是通过<code class="notranslate">close()</code>方法来关闭流。关闭流就会释放对应的底层资源。</p>
+<p>我们还要注意到在读取或写入IO流的过程中，可能会发生错误，例如，文件不存在导致无法读取，没有写权限导致写入失败，等等，这些底层错误由Java虚拟机自动封装成<code class="notranslate">IOException</code>异常并抛出。因此，所有与IO操作相关的代码都必须正确处理<code class="notranslate">IOException</code>。</p>
+<p>仔细观察上面的代码，会发现一个潜在的问题：如果读取过程中发生了IO错误，<code class="notranslate">InputStream</code>就没法正确地关闭，资源也就没法及时释放。<br>
+因此，我们需要用<code class="notranslate">try ... finally</code>来保证<code class="notranslate">InputStream</code>在无论是否发生IO错误的时候都能够正确地关闭：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">readFile</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+    <span class="pl-smi">InputStream</span> <span class="pl-s1">input</span> = <span class="pl-c1">null</span>;
+    <span class="pl-k">try</span> {
+        <span class="pl-s1">input</span> = <span class="pl-k">new</span> <span class="pl-smi">FileInputStream</span>(<span class="pl-s">"src/readme.txt"</span>);
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+        <span class="pl-k">while</span> ((<span class="pl-s1">n</span> = <span class="pl-s1">input</span>.<span class="pl-en">read</span>()) != -<span class="pl-c1">1</span>) { <span class="pl-c">// 利用while同时读取并判断</span>
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span>);
+        }
+    } <span class="pl-k">finally</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">input</span> != <span class="pl-c1">null</span>) { <span class="pl-s1">input</span>.<span class="pl-en">close</span>(); }
+    }
+}</pre></div>
+<p>用<code class="notranslate">try ... finally</code>来编写上述代码会感觉比较复杂，更好的写法是利用Java 7引入的新的<code class="notranslate">try(resource)</code>的语法，只需要编写try语句，让编译器自动为我们关闭资源。推荐的写法如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">readFile</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+    <span class="pl-k">try</span> (<span class="pl-smi">InputStream</span> <span class="pl-s1">input</span> = <span class="pl-k">new</span> <span class="pl-smi">FileInputStream</span>(<span class="pl-s">"src/readme.txt"</span>)) {
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+        <span class="pl-k">while</span> ((<span class="pl-s1">n</span> = <span class="pl-s1">input</span>.<span class="pl-en">read</span>()) != -<span class="pl-c1">1</span>) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span>);
+        }
+    } <span class="pl-c">// 编译器在此自动为我们写入finally并调用close()</span>
+}</pre></div>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>实际上，编译器并不会特别地为<code class="notranslate">InputStream</code>加上自动关闭。编译器只看<code class="notranslate">try(resource = ...)</code>中的对象是否实现了<code class="notranslate">java.lang.AutoCloseable</code>接口，如果实现了，就自动加上<code class="notranslate">finally</code>语句并调用<code class="notranslate">close()</code>方法。</p>
+</div>
+<p><code class="notranslate">InputStream</code>和<code class="notranslate">OutputStream</code>都实现了这个接口，因此，都可以用在<code class="notranslate">try(resource)</code>中。</p>
+<h3>缓冲</h3>
+<p>在读取流的时候，一次读取一个字节并不是最高效的方法。很多流支持一次性读取多个字节到缓冲区，对于文件和网络流来说，利用缓冲区一次性读取多个字节效率往往要高很多。<code class="notranslate">InputStream</code>提供了两个重载方法来支持读取多个字节：</p>
+<ul>
+<li><code class="notranslate">int read(byte[] b)</code>：读取若干字节并填充到<code class="notranslate">byte[]</code>数组，返回读取的字节数</li>
+<li><code class="notranslate">int read(byte[] b, int off, int len)</code>：指定<code class="notranslate">byte[]</code>数组的偏移量和最大填充数</li>
+</ul>
+<p>利用上述方法一次读取多个字节时，需要先定义一个<code class="notranslate">byte[]</code>数组作为缓冲区，<code class="notranslate">read()</code>方法会尽可能多地读取字节到缓冲区， 但不会超过缓冲区的大小。<code class="notranslate">read()</code>方法的返回值不再是字节的<code class="notranslate">int</code>值，而是返回实际读取了多少个字节。如果返回<code class="notranslate">-1</code>，表示没有更多的数据了。</p>
+<p>利用缓冲区一次读取多个字节的代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">readFile</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+    <span class="pl-k">try</span> (<span class="pl-smi">InputStream</span> <span class="pl-s1">input</span> = <span class="pl-k">new</span> <span class="pl-smi">FileInputStream</span>(<span class="pl-s">"src/readme.txt"</span>)) {
+        <span class="pl-c">// 定义1000个字节大小的缓冲区:</span>
+        <span class="pl-smi">byte</span>[] <span class="pl-s1">buffer</span> = <span class="pl-k">new</span> <span class="pl-smi">byte</span>[<span class="pl-c1">1000</span>];
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+        <span class="pl-k">while</span> ((<span class="pl-s1">n</span> = <span class="pl-s1">input</span>.<span class="pl-en">read</span>(<span class="pl-s1">buffer</span>)) != -<span class="pl-c1">1</span>) { <span class="pl-c">// 读取到缓冲区</span>
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"read "</span> + <span class="pl-s1">n</span> + <span class="pl-s">" bytes."</span>);
+        }
+    }
+}</pre></div>
+<h3>阻塞</h3>
+<p>在调用<code class="notranslate">InputStream</code>的<code class="notranslate">read()</code>方法读取数据时，我们说<code class="notranslate">read()</code>方法是阻塞（Blocking）的。它的意思是，对于下面的代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+<span class="pl-s1">n</span> = <span class="pl-s1">input</span>.<span class="pl-en">read</span>(); <span class="pl-c">// 必须等待read()方法返回才能执行下一行代码</span>
+<span class="pl-smi">int</span> <span class="pl-s1">m</span> = <span class="pl-s1">n</span>;</pre></div>
+<p>执行到第二行代码时，必须等<code class="notranslate">read()</code>方法返回后才能继续。因为读取IO流相比执行普通代码，速度会慢很多，因此，无法确定<code class="notranslate">read()</code>方法调用到底要花费多长时间。</p>
+<h2>OutputStream</h2>
+<p>和<code class="notranslate">InputStream</code>相反，<code class="notranslate">OutputStream</code>是Java标准库提供的最基本的输出流。<br>
+和<code class="notranslate">InputStream</code>类似，<code class="notranslate">OutputStream</code>也是抽象类，它是所有输出流的超类。这个抽象类定义的一个最重要的方法就是<code class="notranslate">void write(int b)</code>，签名如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-smi">void</span> <span class="pl-en">write</span>(<span class="pl-smi">int</span> <span class="pl-s1">b</span>) <span class="pl-k">throws</span> <span class="pl-smi">IOException</span>;</pre></div>
+<p>这个方法会写入一个字节到输出流。要注意的是，虽然传入的是<code class="notranslate">int</code>参数，但只会写入一个字节，即只写入<code class="notranslate">int</code>最低8位表示字节的部分（相当于<code class="notranslate">b &amp; 0xff</code>）。</p>
+<p>和<code class="notranslate">InputStream</code>类似，<code class="notranslate">OutputStream</code>也提供了<code class="notranslate">close()</code>方法关闭输出流，以便释放系统资源。要特别注意：<code class="notranslate">OutputStream</code>还提供了一个<code class="notranslate">flush()</code>方法，它的目的是将缓冲区的内容真正输出到目的地。</p>
+<p><strong>为什么要有<code class="notranslate">flush()</code>？</strong><br>
+因为向磁盘、网络写入数据的时候，出于效率的考虑，操作系统并不是输出一个字节就立刻写入到文件或者发送到网络，而是把输出的字节先放到内存的一个缓冲区里（本质上就是一个<code class="notranslate">byte[]</code>数组），等到缓冲区写满了，再一次性写入文件或者网络。对于很多IO设备来说，一次写一个字节和一次写1000个字节，花费的时间几乎是完全一样的，所以<code class="notranslate">OutputStream</code>有个<code class="notranslate">flush()</code>方法，能强制把缓冲区内容输出。</p>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>通常情况下，我们不需要调用这个<code class="notranslate">flush()</code>方法，因为缓冲区写满了<code class="notranslate">OutputStream</code>会自动调用它，并且，在调用<code class="notranslate">close()</code>方法关闭<code class="notranslate">OutputStream</code>之前，也会自动调用<code class="notranslate">flush()</code>方法。</p>
+</div>
+<p>但是，在某些情况下，我们必须手动调用flush()方法。举个栗子：</p>
+<blockquote>
+<p>小明正在开发一款在线聊天软件，当用户输入一句话后，就通过<code class="notranslate">OutputStream</code>的<code class="notranslate">write()</code>方法写入网络流。小明测试的时候发现，发送方输入后，接收方根本收不到任何信息，怎么回事？<br>
+原因就在于写入网络流是先写入内存缓冲区，等缓冲区满了才会一次性发送到网络。如果缓冲区大小是4K，则发送方要敲几千个字符后，操作系统才会把缓冲区的内容发送出去，这个时候，接收方会一次性收到大量消息。</p>
+</blockquote>
+<p>解决办法就是每输入一句话后，立刻调用<code class="notranslate">flush()</code>，不管当前缓冲区是否已满，强迫操作系统把缓冲区的内容立刻发送出去。<br>
+实际上，<code class="notranslate">InputStream</code>也有缓冲区。例如，从<code class="notranslate">FileInputStream</code>读取一个字节时，操作系统往往会一次性读取若干字节到缓冲区，并维护一个指针指向未读的缓冲区。然后，每次我们调用<code class="notranslate">int read()</code>读取下一个字节时，可以直接返回缓冲区的下一个字节，避免每次读一个字节都导致IO操作。当缓冲区全部读完后继续调用<code class="notranslate">read()</code>，则会触发操作系统的下一次读取并再次填满缓冲区。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">writeFile</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+    <span class="pl-smi">OutputStream</span> <span class="pl-s1">output</span> = <span class="pl-k">new</span> <span class="pl-smi">FileOutputStream</span>(<span class="pl-s">"out/readme.txt"</span>);
+    <span class="pl-s1">output</span>.<span class="pl-en">write</span>(<span class="pl-s">"Hello"</span>.<span class="pl-en">getBytes</span>(<span class="pl-s">"UTF-8"</span>)); <span class="pl-c">// Hello</span>
+    <span class="pl-s1">output</span>.<span class="pl-en">close</span>();
+}</pre></div>
+<p>和<code class="notranslate">InputStream</code>一样，上述代码没有考虑到在发生异常的情况下如何正确地关闭资源。写入过程也会经常发生IO错误，例如，磁盘已满，无权限写入等等。我们需要用<code class="notranslate">try(resource)</code>来保证<code class="notranslate">OutputStream</code>在无论是否发生IO错误的时候都能够正确地关闭：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">writeFile</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+    <span class="pl-k">try</span> (<span class="pl-smi">OutputStream</span> <span class="pl-s1">output</span> = <span class="pl-k">new</span> <span class="pl-smi">FileOutputStream</span>(<span class="pl-s">"out/readme.txt"</span>)) {
+        <span class="pl-s1">output</span>.<span class="pl-en">write</span>(<span class="pl-s">"Hello"</span>.<span class="pl-en">getBytes</span>(<span class="pl-s">"UTF-8"</span>)); <span class="pl-c">// Hello</span>
+    } <span class="pl-c">// 编译器在此自动为我们写入finally并调用close()</span>
+}</pre></div>
+<h2>Filter模式</h2>
+<p>Java的IO标准库提供的<code class="notranslate">InputStream</code>根据来源可以包括：</p>
+<ul>
+<li><code class="notranslate">FileInputStream</code>：从文件读取数据，是最终数据源；</li>
+<li><code class="notranslate">ServletInputStream</code>：从HTTP请求读取数据，是最终数据源；</li>
+<li><code class="notranslate">Socket.getInputStream()</code>：从TCP连接读取数据，是最终数据源；</li>
+<li>...</li>
+</ul>
+<p>如果我们要给<code class="notranslate">FileInputStream</code>添加缓冲功能，则可以从<code class="notranslate">FileInputStream</code>派生一个类：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">BufferedFileInputStream</span> <span class="pl-s1">extends</span> <span class="pl-s1">FileInputStream</span> {}</pre></div>
+<p>如果要给<code class="notranslate">FileInputStream</code>添加计算签名的功能，类似的，也可以从<code class="notranslate">FileInputStream</code>派生一个类：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">DigestFileInputStream</span> <span class="pl-s1">extends</span> <span class="pl-s1">FileInputStream</span> {}</pre></div>
+<p>如果要给<code class="notranslate">FileInputStream</code>添加加密/解密功能，还是可以从<code class="notranslate">FileInputStream</code>派生一个类：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">CipherFileInputStream</span> <span class="pl-s1">extends</span> <span class="pl-s1">FileInputStream</span> {}</pre></div>
+<p>如果要给<code class="notranslate">FileInputStream</code>添加缓冲和签名的功能，那么我们还需要派生<code class="notranslate">BufferedDigestFileInputStream</code>。如果要给<code class="notranslate">FileInputStream</code>添加缓冲和加解密的功能，则需要派生<code class="notranslate">BufferedCipherFileInputStream</code>。<br>
+我们发现，给<code class="notranslate">FileInputStream</code>添加3种功能，至少需要3个子类。这3种功能的组合，又需要更多的子类：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/068a9b92-5495-4c43-8714-d4b0e90a6b5f"><img src="https://github.com/user-attachments/assets/068a9b92-5495-4c43-8714-d4b0e90a6b5f" alt="Image" style="max-width: 100%;"></a></p>
+<p>这还只是针对<code class="notranslate">FileInputStream</code>设计，如果针对另一种<code class="notranslate">InputStream</code>设计，很快会出现子类爆炸的情况。<br>
+因此，直接使用继承，为各种<code class="notranslate">InputStream</code>附加更多的功能，根本无法控制代码的复杂度，很快就会失控。<br>
+为了解决依赖继承会导致子类数量失控的问题，JDK首先将<code class="notranslate">InputStream</code>分为两大类：<br>
+一类是直接提供数据的基础<code class="notranslate">InputStream</code>，例如：</p>
+<ul>
+<li>FileInputStream</li>
+<li>ByteArrayInputStream</li>
+<li>ServletInputStream</li>
+<li>...</li>
+</ul>
+<p>一类是提供额外附加功能的<code class="notranslate">InputStream</code>，例如：</p>
+<ul>
+<li>BufferedInputStream</li>
+<li>DigestInputStream</li>
+<li>CipherInputStream</li>
+<li>...</li>
+</ul>
+<p>当我们需要给一个“基础”<code class="notranslate">InputStream</code>附加各种功能时，我们先确定这个能提供数据源的<code class="notranslate">InputStream</code>，因为我们需要的数据总得来自某个地方，例如，<code class="notranslate">FileInputStream</code>，数据来源自文件：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">InputStream</span> <span class="pl-s1">file</span> = <span class="pl-k">new</span> <span class="pl-smi">FileInputStream</span>(<span class="pl-s">"test.gz"</span>);</pre></div>
+<p>紧接着，我们希望<code class="notranslate">FileInputStream</code>能提供缓冲的功能来提高读取的效率，因此我们用<code class="notranslate">BufferedInputStream</code>包装这个<code class="notranslate">InputStream</code>，得到的包装类型是<code class="notranslate">BufferedInputStream</code>，但它仍然被视为一个<code class="notranslate">InputStream</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">InputStream</span> <span class="pl-s1">buffered</span> = <span class="pl-k">new</span> <span class="pl-smi">BufferedInputStream</span>(<span class="pl-s1">file</span>);</pre></div>
+<p>最后，假设该文件已经用<code class="notranslate">gzip</code>压缩了，我们希望直接读取解压缩的内容，就可以再包装一个<code class="notranslate">GZIPInputStream</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">InputStream</span> <span class="pl-s1">gzip</span> = <span class="pl-k">new</span> <span class="pl-smi">GZIPInputStream</span>(<span class="pl-s1">buffered</span>);</pre></div>
+<p>无论我们包装多少次，得到的对象始终是<code class="notranslate">InputStream</code>，我们直接用<code class="notranslate">InputStream</code>来引用它，就可以正常读取：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/b37b763e-fb65-4a4e-a541-56df6a542965"><img src="https://github.com/user-attachments/assets/b37b763e-fb65-4a4e-a541-56df6a542965" alt="Image" style="max-width: 100%;"></a></p>
+<p>上述这种通过一个“基础”组件再叠加各种“附加”功能组件的模式，称之为Filter模式（或者装饰器模式：Decorator）。它可以让我们通过少量的类来实现各种功能的组合：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/e6017d0f-cd19-461e-9192-790d62529e9f"><img src="https://github.com/user-attachments/assets/e6017d0f-cd19-461e-9192-790d62529e9f" alt="Image" style="max-width: 100%;"></a></p>
+<p>类似的，<code class="notranslate">OutputStream</code>也是以这种模式来提供各种功能：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/56c41853-cae3-40a4-beb4-c0460ec0b436"><img src="https://github.com/user-attachments/assets/56c41853-cae3-40a4-beb4-c0460ec0b436" alt="Image" style="max-width: 100%;"></a></p>
+<p>我们也可以自己编写<code class="notranslate">FilterInputStream</code>，以便可以把自己的<code class="notranslate">FilterInputStream</code>“叠加”到任何一个<code class="notranslate">InputStream</code>中。<br>
+下面的例子演示了如何编写一个<code class="notranslate">CountInputStream</code>，它的作用是对输入的字节进行计数：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">mport</span> <span class="pl-s1">java</span>.<span class="pl-s1">io</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+        <span class="pl-smi">byte</span>[] <span class="pl-s1">data</span> = <span class="pl-s">"hello, world!"</span>.<span class="pl-en">getBytes</span>(<span class="pl-s">"UTF-8"</span>);
+        <span class="pl-k">try</span> (<span class="pl-smi">CountInputStream</span> <span class="pl-s1">input</span> = <span class="pl-k">new</span> <span class="pl-smi">CountInputStream</span>(<span class="pl-k">new</span> <span class="pl-smi">ByteArrayInputStream</span>(<span class="pl-s1">data</span>))) {
+            <span class="pl-smi">int</span> <span class="pl-s1">n</span>;
+            <span class="pl-k">while</span> ((<span class="pl-s1">n</span> = <span class="pl-s1">input</span>.<span class="pl-en">read</span>()) != -<span class="pl-c1">1</span>) {
+                <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>((<span class="pl-smi">char</span>)<span class="pl-s1">n</span>);
+            }
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Total read "</span> + <span class="pl-s1">input</span>.<span class="pl-en">getBytesRead</span>() + <span class="pl-s">" bytes"</span>);
+        }
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">CountInputStream</span> <span class="pl-k">extends</span> <span class="pl-smi">FilterInputStream</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">int</span> <span class="pl-s1">count</span> = <span class="pl-c1">0</span>;
+
+    <span class="pl-smi">CountInputStream</span>(<span class="pl-smi">InputStream</span> <span class="pl-s1">in</span>) {
+        <span class="pl-en">super</span>(<span class="pl-s1">in</span>);
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">getBytesRead</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>.<span class="pl-s1">count</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">read</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">in</span>.<span class="pl-en">read</span>();
+        <span class="pl-k">if</span> (<span class="pl-s1">n</span> != -<span class="pl-c1">1</span>) {
+            <span class="pl-smi">this</span>.<span class="pl-s1">count</span> ++;
+        }
+        <span class="pl-k">return</span> <span class="pl-s1">n</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">read</span>(<span class="pl-smi">byte</span>[] <span class="pl-s1">b</span>, <span class="pl-smi">int</span> <span class="pl-s1">off</span>, <span class="pl-smi">int</span> <span class="pl-s1">len</span>) <span class="pl-k">throws</span> <span class="pl-smi">IOException</span> {
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">in</span>.<span class="pl-en">read</span>(<span class="pl-s1">b</span>, <span class="pl-s1">off</span>, <span class="pl-s1">len</span>);
+        <span class="pl-k">if</span> (<span class="pl-s1">n</span> != -<span class="pl-c1">1</span>) {
+            <span class="pl-smi">this</span>.<span class="pl-s1">count</span> += <span class="pl-s1">n</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-s1">n</span>;
+    }
+}</pre></div>
+<p>注意到在叠加多个<code class="notranslate">FilterInputStream</code>，我们只需要持有最外层的<code class="notranslate">InputStream</code>，并且，当最外层的<code class="notranslate">InputStream</code>关闭时（在<code class="notranslate">try(resource)</code>块的结束处自动关闭），内层的<code class="notranslate">InputStream</code>的<code class="notranslate">close()</code>方法也会被自动调用，并最终调用到最核心的“基础”<code class="notranslate">InputStream</code>，因此不存在资源泄露。</p>
+<h2>Reader</h2>
+<p><code class="notranslate">Reader</code>是Java的IO库提供的另一个输入流接口。和<code class="notranslate">InputStream</code>的区别是，<code class="notranslate">InputStream</code>是一个字节流，即以<code class="notranslate">byte</code>为单位读取，而<code class="notranslate">Reader</code>是一个字符流，即以<code class="notranslate">char</code>为单位读取：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/e708081c-973a-480a-9e1e-f46e29aef6de"><img src="https://github.com/user-attachments/assets/e708081c-973a-480a-9e1e-f46e29aef6de" alt="Image" style="max-width: 100%;"></a></p>
+<p><code class="notranslate">java.io.Reader</code>是所有字符输入流的超类，它最主要的方法是：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">read</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span>;</pre></div>
+<p>这个方法读取字符流的下一个字符，并返回字符表示的<code class="notranslate">int</code>，范围是<code class="notranslate">0~65535</code>。如果已读到末尾，返回<code class="notranslate">-1</code>。</p>
+<h2>Writer</h2>
+<p><code class="notranslate">Reader</code>是带编码转换器的<code class="notranslate">InputStream</code>，它把<code class="notranslate">byte</code>转换为<code class="notranslate">char</code>，而<code class="notranslate">Writer</code>就是带编码转换器的<code class="notranslate">OutputStream</code>，它把<code class="notranslate">char</code>转换为<code class="notranslate">byte</code>并输出。<br>
+<code class="notranslate">Writer</code>和<code class="notranslate">OutputStream</code>的区别如下：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/04cd3e45-8a08-439a-8d1e-95a5e21e42bc"><img src="https://github.com/user-attachments/assets/04cd3e45-8a08-439a-8d1e-95a5e21e42bc" alt="Image" style="max-width: 100%;"></a></p>
+<h2>Files</h2>
+<p>从Java 7开始，提供了<code class="notranslate">Files</code>这个工具类，能极大地方便我们读写文件。</p>
+<p>虽然<code class="notranslate">Files</code>是<code class="notranslate">java.nio</code>包里面的类，但他俩封装了很多读写文件的简单方法，例如，我们要把一个文件的全部内容读取为一个<code class="notranslate">byte[]</code>，可以这么写：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">byte</span>[] <span class="pl-s1">data</span> = <span class="pl-smi">Files</span>.<span class="pl-en">readAllBytes</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path/to/file.txt"</span>));</pre></div>
+<p>如果是文本文件，可以把一个文件的全部内容读取为<code class="notranslate">String</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 默认使用UTF-8编码读取:</span>
+<span class="pl-smi">String</span> <span class="pl-s1">content1</span> = <span class="pl-smi">Files</span>.<span class="pl-en">readString</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path/to/file.txt"</span>));
+<span class="pl-c">// 可指定编码:</span>
+<span class="pl-smi">String</span> <span class="pl-s1">content2</span> = <span class="pl-smi">Files</span>.<span class="pl-en">readString</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path"</span>, <span class="pl-s">"to"</span>, <span class="pl-s">"file.txt"</span>), <span class="pl-smi">StandardCharsets</span>.<span class="pl-c1">ISO_8859_1</span>);
+<span class="pl-c">// 按行读取并返回每行内容:</span>
+<span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">lines</span> = <span class="pl-smi">Files</span>.<span class="pl-en">readAllLines</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path/to/file.txt"</span>));</pre></div>
+<p>写入文件也非常方便：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 写入二进制文件:</span>
+<span class="pl-smi">byte</span>[] <span class="pl-s1">data</span> = ...
+<span class="pl-smi">Files</span>.<span class="pl-en">write</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path/to/file.txt"</span>), <span class="pl-s1">data</span>);
+<span class="pl-c">// 写入文本并指定编码:</span>
+<span class="pl-smi">Files</span>.<span class="pl-en">writeString</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path/to/file.txt"</span>), <span class="pl-s">"文本内容..."</span>, <span class="pl-smi">StandardCharsets</span>.<span class="pl-c1">ISO_8859_1</span>);
+<span class="pl-c">// 按行写入文本:</span>
+<span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">lines</span> = ...
+<span class="pl-smi">Files</span>.<span class="pl-en">write</span>(<span class="pl-smi">Path</span>.<span class="pl-en">of</span>(<span class="pl-s">"/path/to/file.txt"</span>), <span class="pl-s1">lines</span>);</pre></div>
+<p>此外，<code class="notranslate">Files</code>工具类还有<code class="notranslate">copy()</code>、<code class="notranslate">delete()</code>、<code class="notranslate">exists()</code>、<code class="notranslate">move()</code>等快捷方法操作文件和目录。</p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>最后需要特别注意的是，Files提供的读写方法，受内存限制，只能读写小文件，例如配置文件等，不可一次读入几个G的大文件。读写大型文件仍然要使用文件流，每次只读写一部分文件内容。</p>
+</div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
