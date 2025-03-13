@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 数据库类别
+既然我们要使用关系数据库，就必须选择一个关系数据库。">
+<meta property="og:title" content="JAVA 学习笔记（十五）JDBC">
+<meta property="og:description" content="## 数据库类别
+既然我们要使用关系数据库，就必须选择一个关系数据库。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JAVA%20-xue-xi-bi-ji-%EF%BC%88-shi-wu-%EF%BC%89JDBC.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JAVA 学习笔记（十五）JDBC</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-warning {border-left-color:var(--borderColor-attention-emphasis, var(--color-attention-emphasis));background-color:var(--color-attention-subtle);}.markdown-alert.markdown-alert-warning .markdown-alert-title {color: var(--fgColor-attention,var(--color-attention-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JAVA 学习笔记（十五）JDBC</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/35" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>数据库类别</h2>
+<p>既然我们要使用关系数据库，就必须选择一个关系数据库。目前广泛使用的关系数据库也就这么几种：</p>
+<p>付费的商用数据库：</p>
+<ul>
+<li>
+<p>Oracle，典型的高富帅；</p>
+</li>
+<li>
+<p>SQL Server，微软自家产品，Windows定制专款；</p>
+</li>
+<li>
+<p>DB2，IBM的产品，听起来挺高端；</p>
+</li>
+<li>
+<p>Sybase，曾经跟微软是好基友，后来关系破裂，现在家境惨淡。<br>
+这些数据库都是不开源而且付费的，最大的好处是花了钱出了问题可以找厂家解决，不过在Web的世界里，常常需要部署成千上万的数据库服务器，当然不能把大把大把的银子扔给厂家，所以，无论是Google、Facebook，还是国内的BAT，无一例外都选择了免费的开源数据库：</p>
+</li>
+<li>
+<p>MySQL，大家都在用，一般错不了；</p>
+</li>
+<li>
+<p>PostgreSQL，学术气息有点重，其实挺不错，但知名度没有MySQL高；</p>
+</li>
+<li>
+<p>sqlite，嵌入式数据库，适合桌面和移动应用。</p>
+</li>
+</ul>
+<p>作为一个Java工程师，选择哪个免费数据库呢？当然是MySQL。因为MySQL普及率最高，出了错，可以很容易找到解决方法。而且，围绕MySQL有一大堆监控和运维的工具，安装和使用很方便。</p>
+<h2>JDBC</h2>
+<p>什么是JDBC？JDBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的标准接口。</p>
+<p>使用Java程序访问数据库时，Java代码并不是直接通过TCP连接去访问数据库，而是通过JDBC接口来访问，而JDBC接口则通过JDBC驱动来实现真正对数据库的访问。</p>
+<p>例如，我们在Java代码中如果要访问MySQL，那么必须编写代码操作JDBC接口。注意到JDBC接口是Java标准库自带的，所以可以直接编译。而具体的JDBC驱动是由数据库厂商提供的，例如，MySQL的JDBC驱动由Oracle提供。因此，访问某个具体的数据库，我们只需要引入该厂商提供的JDBC驱动，就可以通过JDBC接口来访问，这样保证了Java程序编写的是一套数据库访问代码，却可以访问各种不同的数据库，因为他们都提供了标准的JDBC驱动：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/72285c23-4576-4d69-869a-3c7bf05f7cd0"><img src="https://github.com/user-attachments/assets/72285c23-4576-4d69-869a-3c7bf05f7cd0" alt="Image" style="max-width: 100%;"></a></p>
+<p>从代码来看，Java标准库自带的JDBC接口其实就是定义了一组接口，而某个具体的JDBC驱动其实就是实现了这些接口的类：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/8940002d-a8a7-4299-88ec-7c42e52f9d2d"><img src="https://github.com/user-attachments/assets/8940002d-a8a7-4299-88ec-7c42e52f9d2d" alt="Image" style="max-width: 100%;"></a></p>
+<p>实际上，一个MySQL的JDBC的驱动就是一个jar包，它本身也是纯Java编写的。我们自己编写的代码只需要引用Java标准库提供的java.sql包下面的相关接口，由此再间接地通过MySQL驱动的jar包通过网络访问MySQL服务器，所有复杂的网络通讯都被封装到JDBC驱动中，因此，Java程序本身只需要引入一个MySQL驱动的jar包就可以正常访问MySQL服务器：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/642004f3-b2ba-475b-b6c1-904477e8b262"><img src="https://github.com/user-attachments/assets/642004f3-b2ba-475b-b6c1-904477e8b262" alt="Image" style="max-width: 100%;"></a></p>
+<h2>JDBC查询</h2>
+<p>因为JDBC接口并不知道我们要使用哪个数据库，所以，用哪个数据库，我们就去使用哪个数据库的“实现类”，我们把某个数据库实现了JDBC接口的jar包称为JDBC驱动。</p>
+<p>因为我们选择了MySQL 5.x作为数据库，所以我们首先得找一个MySQL的JDBC驱动。所谓JDBC驱动，其实就是一个第三方jar包，我们直接添加一个Maven依赖就可以了：</p>
+<pre class="notranslate"><code class="notranslate">&lt;dependency&gt;
+    &lt;groupId&gt;mysql&lt;/groupId&gt;
+    &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+    &lt;version&gt;5.1.47&lt;/version&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>注意到这里添加依赖的<code class="notranslate">scope</code>是<code class="notranslate">runtime</code>，因为编译Java程序并不需要MySQL的这个jar包，只有在运行期才需要使用。如果把<code class="notranslate">runtime</code>改成<code class="notranslate">compile</code>，虽然也能正常编译，但是在IDE里写程序的时候，会多出来一大堆类似<code class="notranslate">com.mysql.jdbc.Connection</code>这样的类，非常容易与Java标准库的JDBC接口混淆，所以坚决不要设置为<code class="notranslate">compile</code>。</p>
+<p>有了驱动，我们还要确保MySQL在本机正常运行，并且还需要准备一点数据。这里我们用一个脚本创建数据库和表，然后插入一些数据：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate">-- <span class="pl-s1">创建数据库learjdbc</span>:
+<span class="pl-smi">DROP</span> <span class="pl-c1">DATABASE</span> <span class="pl-smi">IF</span> <span class="pl-c1">EXISTS</span> <span class="pl-s1">learnjdbc</span>;
+<span class="pl-smi">CREATE</span> <span class="pl-c1">DATABASE</span> <span class="pl-s1">learnjdbc</span>;
+
+-- <span class="pl-s1">创建登录用户learn</span>/<span class="pl-smi">口令learnpassword</span>
+<span class="pl-c1">CREATE</span> <span class="pl-c1">USER</span> <span class="pl-c1">IF</span> <span class="pl-c1">NOT</span> <span class="pl-c1">EXISTS</span> <span class="pl-s1">learn</span><span class="pl-c1">@</span><span class="pl-s">'%'</span> <span class="pl-c1">IDENTIFIED</span> <span class="pl-c1">BY</span> <span class="pl-s">'learnpassword'</span>;
+<span class="pl-smi">GRANT</span> <span class="pl-c1">ALL</span> <span class="pl-smi">PRIVILEGES</span> <span class="pl-c1">ON</span> <span class="pl-smi">learnjdbc</span>.* <span class="pl-smi">TO</span> <span class="pl-s1">learn</span><span class="pl-c1">@</span><span class="pl-s">'%'</span> <span class="pl-c1">WITH</span> <span class="pl-c1">GRANT</span> <span class="pl-c1">OPTION</span>;
+<span class="pl-smi">FLUSH</span> <span class="pl-c1">PRIVILEGES</span>;
+
+-- <span class="pl-s1">创建表students</span>:
+<span class="pl-smi">USE</span> <span class="pl-s1">learnjdbc</span>;
+<span class="pl-smi">CREATE</span> <span class="pl-c1">TABLE</span> <span class="pl-s1">students</span> (
+  <span class="pl-smi">id</span> <span class="pl-c1">BIGINT</span> <span class="pl-c1">AUTO_INCREMENT</span> <span class="pl-c1">NOT</span> <span class="pl-c1">NULL</span>,
+  <span class="pl-smi">name</span> <span class="pl-c1">VARCHAR</span>(<span class="pl-c1">50</span>) <span class="pl-c1">NOT</span> <span class="pl-c1">NULL</span>,
+  <span class="pl-s1">gender</span> <span class="pl-c1">TINYINT</span>(<span class="pl-c1">1</span>) <span class="pl-smi">NOT</span> <span class="pl-c1">NULL</span>,
+  <span class="pl-s1">grade</span> <span class="pl-smi">INT</span> <span class="pl-c1">NOT</span> <span class="pl-c1">NULL</span>,
+  <span class="pl-s1">score</span> <span class="pl-smi">INT</span> <span class="pl-c1">NOT</span> <span class="pl-c1">NULL</span>,
+  <span class="pl-c1">PRIMARY</span> <span class="pl-c1">KEY</span>(<span class="pl-s1">id</span>)
+) <span class="pl-s1">Engine</span>=<span class="pl-smi">INNODB</span> <span class="pl-c1">DEFAULT</span> <span class="pl-c1">CHARSET</span>=<span class="pl-c1">UTF8</span>;
+
+-- <span class="pl-s1">插入初始数据</span>:
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小明'</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">88</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小红'</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">95</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小军'</span>, <span class="pl-c1">0</span>, <span class="pl-c1">1</span>, <span class="pl-c1">93</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小白'</span>, <span class="pl-c1">0</span>, <span class="pl-c1">1</span>, <span class="pl-c1">100</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小牛'</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">96</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小兵'</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">99</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小强'</span>, <span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">86</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小乔'</span>, <span class="pl-c1">0</span>, <span class="pl-c1">2</span>, <span class="pl-c1">79</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小青'</span>, <span class="pl-c1">1</span>, <span class="pl-c1">3</span>, <span class="pl-c1">85</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小王'</span>, <span class="pl-c1">1</span>, <span class="pl-c1">3</span>, <span class="pl-c1">90</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小林'</span>, <span class="pl-c1">0</span>, <span class="pl-c1">3</span>, <span class="pl-c1">91</span>);
+<span class="pl-smi">INSERT</span> <span class="pl-c1">INTO</span> <span class="pl-en">students</span> (<span class="pl-s1">name</span>, <span class="pl-s1">gender</span>, <span class="pl-s1">grade</span>, <span class="pl-s1">score</span>) <span class="pl-c1">VALUES</span> (<span class="pl-s">'小贝'</span>, <span class="pl-c1">0</span>, <span class="pl-c1">3</span>, <span class="pl-c1">77</span>);</pre></div>
+<p>在控制台输入<code class="notranslate">mysql -u root -p</code>，输入<code class="notranslate">root</code>口令后以<code class="notranslate">root</code>身份，把上述SQL贴到控制台执行一遍就行。如果你运行的是最新版MySQL 8.x，需要调整一下<code class="notranslate">CREATE USER</code>语句。</p>
+<p><strong>JDBC连接</strong><br>
+使用JDBC时，我们先了解什么是Connection。Connection代表一个JDBC连接，它相当于Java程序到数据库的连接（通常是TCP连接）。打开一个Connection时，需要准备URL、用户名和口令，才能成功连接到数据库。</p>
+<p>URL是由数据库厂商指定的格式，例如，MySQL的URL是：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s1">jdbc</span>:<span class="pl-s1">mysql</span>:<span class="pl-c">//&lt;hostname&gt;:&lt;port&gt;/&lt;db&gt;?key1=value1&amp;key2=value2</span></pre></div>
+<p>假设数据库运行在本机<code class="notranslate">localhost</code>，端口使用标准的<code class="notranslate">3306</code>，数据库名称是<code class="notranslate">learnjdbc</code>，那么URL如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-s1">jdbc</span>:<span class="pl-s1">mysql</span>:<span class="pl-c">//localhost:3306/learnjdbc?useSSL=false&amp;characterEncoding=utf8</span></pre></div>
+<p>后面的两个参数表示不使用SSL加密，使用UTF-8作为字符编码（注意MySQL的UTF-8是<code class="notranslate">utf8</code>）。</p>
+<p>要获取数据库连接，使用如下代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// JDBC连接的URL, 不同数据库有不同的格式:</span>
+<span class="pl-smi">String</span> <span class="pl-c1">JDBC_URL</span> = <span class="pl-s">"jdbc:mysql://localhost:3306/test"</span>;
+<span class="pl-smi">String</span> <span class="pl-c1">JDBC_USER</span> = <span class="pl-s">"root"</span>;
+<span class="pl-smi">String</span> <span class="pl-c1">JDBC_PASSWORD</span> = <span class="pl-s">"password"</span>;
+<span class="pl-c">// 获取连接:</span>
+<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>);
+<span class="pl-c">// TODO: 访问数据库...</span>
+<span class="pl-c">// 关闭连接:</span>
+<span class="pl-s1">conn</span>.<span class="pl-en">close</span>();</pre></div>
+<p>核心代码是<code class="notranslate">DriverManager</code>提供的静态方法<code class="notranslate">getConnection()</code>。<code class="notranslate">DriverManager</code>会自动扫描<code class="notranslate">classpath</code>，找到所有的JDBC驱动，然后根据我们传入的URL自动挑选一个合适的驱动。</p>
+<p>因为JDBC连接是一种昂贵的资源，所以使用后要及时释放。使用<code class="notranslate">try (resource)</code>来自动释放JDBC连接是一个好方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>)) {
+    ...
+}</pre></div>
+<p>查询示例：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>)) {
+    <span class="pl-k">try</span> (<span class="pl-smi">Statement</span> <span class="pl-s1">stmt</span> = <span class="pl-s1">conn</span>.<span class="pl-en">createStatement</span>()) {
+        <span class="pl-k">try</span> (<span class="pl-smi">ResultSet</span> <span class="pl-s1">rs</span> = <span class="pl-s1">stmt</span>.<span class="pl-en">executeQuery</span>(<span class="pl-s">"SELECT id, grade, name, gender FROM students WHERE gender=1"</span>)) {
+            <span class="pl-k">while</span> (<span class="pl-s1">rs</span>.<span class="pl-en">next</span>()) {
+                <span class="pl-smi">long</span> <span class="pl-s1">id</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getLong</span>(<span class="pl-c1">1</span>); <span class="pl-c">// 注意：索引从1开始</span>
+                <span class="pl-smi">long</span> <span class="pl-s1">grade</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getLong</span>(<span class="pl-c1">2</span>);
+                <span class="pl-smi">String</span> <span class="pl-s1">name</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getString</span>(<span class="pl-c1">3</span>);
+                <span class="pl-smi">int</span> <span class="pl-s1">gender</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getInt</span>(<span class="pl-c1">4</span>);
+            }
+        }
+    }
+}</pre></div>
+<p>注意要点：</p>
+<p><code class="notranslate">Statement</code>和<code class="notranslate">ResultSet</code>都是需要关闭的资源，因此嵌套使用<code class="notranslate">try (resource)</code>确保及时关闭；</p>
+<p><code class="notranslate">rs.next()</code>用于判断是否有下一行记录，如果有，将自动把当前行移动到下一行（一开始获得<code class="notranslate">ResultSet</code>时当前行不是第一行）；</p>
+<p><code class="notranslate">ResultSet</code>获取列时，索引从<code class="notranslate">1</code>开始而不是<code class="notranslate">0</code>；</p>
+<p>必须根据<code class="notranslate">SELECT</code>的列的对应位置来调用<code class="notranslate">getLong(1)</code>，<code class="notranslate">getString(2)</code>这些方法，否则对应位置的数据类型不对，将报错。</p>
+<p>要获取数据库连接，使用如下代码：</p>
+<h3>SQL注入</h3>
+<p>使用<code class="notranslate">Statement</code>拼字符串非常容易引发SQL注入的问题，这是因为SQL参数往往是从方法参数传入的。</p>
+<p>我们来看一个例子：假设用户登录的验证方法如下：</p>
+<pre class="notranslate"><code class="notranslate">User login(String name, String pass) {
+    ...
+    stmt.executeQuery("SELECT * FROM user WHERE login='" + name + "' AND pass='" + pass + "'");
+    ...
+}
+</code></pre>
+<p>其中，参数<code class="notranslate">name</code>和<code class="notranslate">pass</code>通常都是Web页面输入后由程序接收到的。</p>
+<p>如果用户的输入是程序期待的值，就可以拼出正确的SQL。例如：name =<code class="notranslate">"bob"</code>，pass = <code class="notranslate">"1234"</code>：</p>
+<div class="highlight highlight-source-sql"><pre class="notranslate"><span class="pl-k">SELECT</span> <span class="pl-k">*</span> <span class="pl-k">FROM</span> user <span class="pl-k">WHERE</span> login<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>bob<span class="pl-pds">'</span></span> <span class="pl-k">AND</span> pass<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>1234<span class="pl-pds">'</span></span></pre></div>
+<p>但是，如果用户的输入是一个精心构造的字符串，就可以拼出意想不到的SQL，这个SQL也是正确的，但它查询的条件不是程序设计的意图。例如：name =<code class="notranslate"> "bob' OR pass="</code>, <code class="notranslate">pass = " OR pass='"</code>：</p>
+<pre class="notranslate"><code class="notranslate">SELECT * FROM user WHERE login='bob' OR pass=' AND pass=' OR pass=''
+</code></pre>
+<p>这个SQL语句执行的时候，根本不用判断口令是否正确，这样一来，登录就形同虚设。</p>
+<p>要避免SQL注入攻击，一个办法是针对所有字符串参数进行转义，但是转义很麻烦，而且需要在任何使用SQL的地方增加转义代码。</p>
+<p>还有一个办法就是使用<code class="notranslate">PreparedStatement</code>。使用<code class="notranslate">PreparedStatement</code>可以完全避免SQL注入的问题，因为<code class="notranslate">PreparedStatement</code>始终使用<code class="notranslate">?</code>作为占位符，并且把数据连同SQL本身传给数据库，这样可以保证每次传给数据库的SQL语句是相同的，只是占位符的数据不同，还能高效利用数据库本身对查询的缓存。上述登录SQL如果用<code class="notranslate">PreparedStatement</code>可以改写如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">User</span> <span class="pl-en">login</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>, <span class="pl-smi">String</span> <span class="pl-s1">pass</span>) {
+    ...
+    <span class="pl-smi">String</span> <span class="pl-s1">sql</span> = <span class="pl-s">"SELECT * FROM user WHERE login=? AND pass=?"</span>;
+    <span class="pl-smi">PreparedStatement</span> <span class="pl-s1">ps</span> = <span class="pl-s1">conn</span>.<span class="pl-en">prepareStatement</span>(<span class="pl-s1">sql</span>);
+    <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">1</span>, <span class="pl-s1">name</span>);
+    <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">2</span>, <span class="pl-s1">pass</span>);
+    ...
+}</pre></div>
+<p>所以，<code class="notranslate">PreparedStatement</code>比<code class="notranslate">Statement</code>更安全，而且更快。</p>
+<div class="markdown-alert markdown-alert-warning"><p class="markdown-alert-title"><svg class="octicon octicon-alert mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p><p>使用Java对数据库进行操作时，必须使用PreparedStatement，严禁任何通过参数拼字符串的代码！</p>
+</div>
+<p>我们把上面使用<code class="notranslate">Statement</code>的代码改为使用<code class="notranslate">PreparedStatement</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>)) {
+    <span class="pl-k">try</span> (<span class="pl-smi">PreparedStatement</span> <span class="pl-s1">ps</span> = <span class="pl-s1">conn</span>.<span class="pl-en">prepareStatement</span>(<span class="pl-s">"SELECT id, grade, name, gender FROM students WHERE gender=? AND grade=?"</span>)) {
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">1</span>, <span class="pl-s">"M"</span>); <span class="pl-c">// 注意：索引从1开始</span>
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">2</span>, <span class="pl-c1">3</span>);
+        <span class="pl-k">try</span> (<span class="pl-smi">ResultSet</span> <span class="pl-s1">rs</span> = <span class="pl-s1">ps</span>.<span class="pl-en">executeQuery</span>()) {
+            <span class="pl-k">while</span> (<span class="pl-s1">rs</span>.<span class="pl-en">next</span>()) {
+                <span class="pl-smi">long</span> <span class="pl-s1">id</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getLong</span>(<span class="pl-s">"id"</span>);
+                <span class="pl-smi">long</span> <span class="pl-s1">grade</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getLong</span>(<span class="pl-s">"grade"</span>);
+                <span class="pl-smi">String</span> <span class="pl-s1">name</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getString</span>(<span class="pl-s">"name"</span>);
+                <span class="pl-smi">String</span> <span class="pl-s1">gender</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getString</span>(<span class="pl-s">"gender"</span>);
+            }
+        }
+    }
+}</pre></div>
+<p>使用<code class="notranslate">PreparedStatement</code>和<code class="notranslate">Statement</code>稍有不同，必须首先调用<code class="notranslate">setObject()</code>设置每个占位符<code class="notranslate">?</code>的值，最后获取的仍然是<code class="notranslate">ResultSet</code>对象。</p>
+<p>另外注意到从结果集读取列时，使用<code class="notranslate">String</code>类型的列名比索引要易读，而且不易出错。</p>
+<p>注意到JDBC查询的返回值总是<code class="notranslate">ResultSet</code>，即使我们写这样的聚合查询<code class="notranslate">SELECT SUM(score) FROM ...</code>，也需要按结果集读取：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">ResultSet</span> <span class="pl-s1">rs</span> = ...
+<span class="pl-k">if</span> (<span class="pl-s1">rs</span>.<span class="pl-en">next</span>()) {
+    <span class="pl-smi">double</span> <span class="pl-s1">sum</span> = <span class="pl-s1">rs</span>.<span class="pl-en">getDouble</span>(<span class="pl-c1">1</span>);
+}</pre></div>
+<p>数据类型对应：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/fe06f284-8832-49d1-b105-92fc0fb14e50"><img src="https://github.com/user-attachments/assets/fe06f284-8832-49d1-b105-92fc0fb14e50" alt="Image" style="max-width: 100%;"></a></p>
+<h2>JDBC更新</h2>
+<p>数据库操作总结起来就四个字：增删改查，行话叫CRUD：Create，Retrieve，Update和Delete。</p>
+<p>查就是查询，我们已经讲过了，就是使用<code class="notranslate">PreparedStatement</code>进行各种<code class="notranslate">SELECT</code>，然后处理结果集。现在我们来看看如何使用JDBC进行增删改。</p>
+<h3>插入</h3>
+<p>插入操作是<code class="notranslate">INSERT</code>，即插入一条新记录。通过JDBC进行插入，本质上也是用<code class="notranslate">PreparedStatement</code>执行一条SQL语句，不过最后执行的不是<code class="notranslate">executeQuery()</code>，而是<code class="notranslate">executeUpdate()</code>。示例代码如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>)) {
+    <span class="pl-k">try</span> (<span class="pl-smi">PreparedStatement</span> <span class="pl-s1">ps</span> = <span class="pl-s1">conn</span>.<span class="pl-en">prepareStatement</span>(
+            <span class="pl-s">"INSERT INTO students (id, grade, name, gender) VALUES (?,?,?,?)"</span>)) {
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">1</span>, <span class="pl-c1">999</span>); <span class="pl-c">// 注意：索引从1开始</span>
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">2</span>, <span class="pl-c1">1</span>); <span class="pl-c">// grade</span>
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">3</span>, <span class="pl-s">"Bob"</span>); <span class="pl-c">// name</span>
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">4</span>, <span class="pl-s">"M"</span>); <span class="pl-c">// gender</span>
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">ps</span>.<span class="pl-en">executeUpdate</span>(); <span class="pl-c">// 1</span>
+    }
+}</pre></div>
+<p>设置参数与查询是一样的，有几个?占位符就必须设置对应的参数。虽然<code class="notranslate">Statement</code>也可以执行插入操作，但我们仍然要严格遵循绝不能手动拼SQL字符串的原则，以避免安全漏洞。</p>
+<p>当成功执行<code class="notranslate">executeUpdate()</code>后，返回值是<code class="notranslate">int</code>，表示插入的记录数量。此处总是<code class="notranslate">1</code>，因为只插入了一条记录。</p>
+<h3>更新</h3>
+<p>更新操作是<code class="notranslate">UPDATE</code>语句，它可以一次更新若干列的记录。更新操作和插入操作在JDBC代码的层面上实际上没有区别，除了SQL语句不同：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>)) {
+    <span class="pl-k">try</span> (<span class="pl-smi">PreparedStatement</span> <span class="pl-s1">ps</span> = <span class="pl-s1">conn</span>.<span class="pl-en">prepareStatement</span>(<span class="pl-s">"UPDATE students SET name=? WHERE id=?"</span>)) {
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">1</span>, <span class="pl-s">"Bob"</span>); <span class="pl-c">// 注意：索引从1开始</span>
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">2</span>, <span class="pl-c1">999</span>);
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">ps</span>.<span class="pl-en">executeUpdate</span>(); <span class="pl-c">// 返回更新的行数</span>
+    }
+}</pre></div>
+<p><code class="notranslate">executeUpdate()</code>返回数据库实际更新的行数。返回结果可能是正数，也可能是<code class="notranslate">0</code>（表示没有任何记录更新）。</p>
+<h3>删除</h3>
+<p>删除操作是<code class="notranslate">DELETE</code>语句，它可以一次删除若干行。和更新一样，除了SQL语句不同外，JDBC代码都是相同的：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-smi">DriverManager</span>.<span class="pl-en">getConnection</span>(<span class="pl-c1">JDBC_URL</span>, <span class="pl-c1">JDBC_USER</span>, <span class="pl-c1">JDBC_PASSWORD</span>)) {
+    <span class="pl-k">try</span> (<span class="pl-smi">PreparedStatement</span> <span class="pl-s1">ps</span> = <span class="pl-s1">conn</span>.<span class="pl-en">prepareStatement</span>(<span class="pl-s">"DELETE FROM students WHERE id=?"</span>)) {
+        <span class="pl-s1">ps</span>.<span class="pl-en">setObject</span>(<span class="pl-c1">1</span>, <span class="pl-c1">999</span>); <span class="pl-c">// 注意：索引从1开始</span>
+        <span class="pl-smi">int</span> <span class="pl-s1">n</span> = <span class="pl-s1">ps</span>.<span class="pl-en">executeUpdate</span>(); <span class="pl-c">// 删除的行数</span>
+    }
+}</pre></div>
+<h2>JDBC事务</h2>
+<p>数据库事务（Transaction）是由若干个SQL语句构成的一个操作序列，有点类似于Java的<code class="notranslate">synchronized</code>同步。数据库系统保证在一个事务中的所有SQL要么全部执行成功，要么全部不执行，即数据库事务具有ACID特性：</p>
+<ul>
+<li>Atomicity：原子性</li>
+<li>Consistency：一致性</li>
+<li>Isolation：隔离性</li>
+<li>Durability：持久性</li>
+</ul>
+<p>数据库事务可以并发执行，而数据库系统从效率考虑，对事务定义了不同的隔离级别。SQL标准定义了4种隔离级别，分别对应可能出现的数据不一致的情况：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/4eff03c0-9a3d-45a1-b78c-859c7d181165"><img src="https://github.com/user-attachments/assets/4eff03c0-9a3d-45a1-b78c-859c7d181165" alt="Image" style="max-width: 100%;"></a></p>
+<p>对应用程序来说，数据库事务非常重要，很多运行着关键任务的应用程序，都必须依赖数据库事务保证程序的结果正常。</p>
+<p>举个例子：假设小明准备给小红支付100，两人在数据库中的记录主键分别是123和456，那么用两条SQL语句操作如下：</p>
+<div class="highlight highlight-source-sql"><pre class="notranslate"><span class="pl-k">UPDATE</span> accounts <span class="pl-k">SET</span> balance <span class="pl-k">=</span> balance <span class="pl-k">-</span> <span class="pl-c1">100</span> <span class="pl-k">WHERE</span> id <span class="pl-k">=</span> <span class="pl-c1">123</span> <span class="pl-k">AND</span> balance <span class="pl-k">&gt;=</span> <span class="pl-c1">100</span>;
+<span class="pl-k">UPDATE</span> accounts <span class="pl-k">SET</span> balance <span class="pl-k">=</span> balance <span class="pl-k">+</span> <span class="pl-c1">100</span> <span class="pl-k">WHERE</span> id <span class="pl-k">=</span> <span class="pl-c1">456</span>;</pre></div>
+<p>这两条语句必须以事务方式执行才能保证业务的正确性，因为一旦第一条SQL执行成功而第二条SQL失败的话，系统的钱就会凭空减少100，而有了事务，要么这笔转账成功，要么转账失败，双方账户的钱都不变。<br>
+如果对SQL事务不熟悉，请参考<a href="https://liaoxuefeng.com/books/sql/transaction/index.html" rel="nofollow">SQL事务</a>。<br>
+要在JDBC中执行事务，本质上就是如何把多条SQL包裹在一个数据库事务中执行。我们来看JDBC的事务代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-en">openConnection</span>();
+<span class="pl-k">try</span> {
+    <span class="pl-c">// 关闭自动提交:</span>
+    <span class="pl-s1">conn</span>.<span class="pl-en">setAutoCommit</span>(<span class="pl-c1">false</span>);
+    <span class="pl-c">// 执行多条SQL语句:</span>
+    <span class="pl-en">insert</span>(); <span class="pl-en">update</span>(); <span class="pl-en">delete</span>();
+    <span class="pl-c">// 提交事务:</span>
+    <span class="pl-s1">conn</span>.<span class="pl-en">commit</span>();
+} <span class="pl-k">catch</span> (<span class="pl-smi">SQLException</span> <span class="pl-s1">e</span>) {
+    <span class="pl-c">// 回滚事务:</span>
+    <span class="pl-s1">conn</span>.<span class="pl-en">rollback</span>();
+} <span class="pl-k">finally</span> {
+    <span class="pl-s1">conn</span>.<span class="pl-en">setAutoCommit</span>(<span class="pl-c1">true</span>);
+    <span class="pl-s1">conn</span>.<span class="pl-en">close</span>();
+}</pre></div>
+<p>其中，开启事务的关键代码是<code class="notranslate">conn.setAutoCommit(false)</code>，表示关闭自动提交。提交事务的代码在执行完指定的若干条SQL语句后，调用<code class="notranslate">conn.commit()</code>。要注意事务不是总能成功，如果事务提交失败，会抛出SQL异常（也可能在执行SQL语句的时候就抛出了），此时我们必须捕获并调用<code class="notranslate">conn.rollback()</code>回滚事务。最后，在<code class="notranslate">finally</code>中通过<code class="notranslate">conn.setAutoCommit(true)</code>把<code class="notranslate">Connection</code>对象的状态恢复到初始值。</p>
+<p>实际上，默认情况下，我们获取到<code class="notranslate">Connection</code>连接后，总是处于“自动提交”模式，也就是每执行一条SQL都是作为事务自动执行的，这也是为什么前面几节我们的更新操作总能成功的原因：因为默认有这种“隐式事务”。只要关闭了<code class="notranslate">Connection</code>的<code class="notranslate">autoCommit</code>，那么就可以在一个事务中执行多条语句，事务以<code class="notranslate">commit()</code>方法结束。</p>
+<p>如果要设定事务的隔离级别，可以使用如下代码：</p>
+<div class="highlight highlight-source-sql"><pre class="notranslate"><span class="pl-k">//</span> 设定隔离级别为READ COMMITTED:
+<span class="pl-c1">conn</span>.<span class="pl-c1">setTransactionIsolation</span>(<span class="pl-c1">Connection</span>.<span class="pl-c1">TRANSACTION_READ_COMMITTED</span>);</pre></div>
+<p>如果没有调用上述方法，那么会使用数据库的默认隔离级别。MySQL的默认隔离级别是<code class="notranslate">REPEATABLE_READ</code>。</p>
+<h2>BATCH 操作</h2>
+<p>把同一个SQL但参数不同的若干次操作合并为一个batch执行<br>
+示例：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">PreparedStatement</span> <span class="pl-s1">ps</span> = <span class="pl-s1">conn</span>.<span class="pl-en">prepareStatement</span>(<span class="pl-s">"INSERT INTO students (name, gender, grade, score) VALUES (?, ?, ?, ?)"</span>)) {
+    <span class="pl-c">// 对同一个PreparedStatement反复设置参数并调用addBatch():</span>
+    <span class="pl-k">for</span> (<span class="pl-smi">Student</span> <span class="pl-s1">s</span> : <span class="pl-s1">students</span>) {
+        <span class="pl-s1">ps</span>.<span class="pl-en">setString</span>(<span class="pl-c1">1</span>, <span class="pl-s1">s</span>.<span class="pl-s1">name</span>);
+        <span class="pl-s1">ps</span>.<span class="pl-en">setBoolean</span>(<span class="pl-c1">2</span>, <span class="pl-s1">s</span>.<span class="pl-s1">gender</span>);
+        <span class="pl-s1">ps</span>.<span class="pl-en">setInt</span>(<span class="pl-c1">3</span>, <span class="pl-s1">s</span>.<span class="pl-s1">grade</span>);
+        <span class="pl-s1">ps</span>.<span class="pl-en">setInt</span>(<span class="pl-c1">4</span>, <span class="pl-s1">s</span>.<span class="pl-s1">score</span>);
+        <span class="pl-s1">ps</span>.<span class="pl-en">addBatch</span>(); <span class="pl-c">// 添加到batch</span>
+    }
+    <span class="pl-c">// 执行batch:</span>
+    <span class="pl-smi">int</span>[] <span class="pl-s1">ns</span> = <span class="pl-s1">ps</span>.<span class="pl-en">executeBatch</span>();
+    <span class="pl-k">for</span> (<span class="pl-smi">int</span> <span class="pl-s1">n</span> : <span class="pl-s1">ns</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">n</span> + <span class="pl-s">" inserted."</span>); <span class="pl-c">// batch中每个SQL执行的结果数量</span>
+    }
+}</pre></div>
+<p>执行batch和执行一个SQL不同点在于，需要对同一个<code class="notranslate">PreparedStatement</code>反复设置参数并调用<code class="notranslate">addBatch()</code>，这样就相当于给一个SQL加上了多组参数，相当于变成了“多行”SQL。<br>
+第二个不同点是调用的不是<code class="notranslate">executeUpdate()</code>，而是<code class="notranslate">executeBatch()</code>，因为我们设置了多组参数，相应地，返回结果也是多个<code class="notranslate">int</code>值，因此返回类型是<code class="notranslate">int[]</code>，循环<code class="notranslate">int[]</code>数组即可获取每组参数执行后影响的结果数量。</p>
+<h2>JDBC连接池</h2>
+<p>创建线程是一个昂贵的操作，如果有大量的小任务需要执行，并且频繁地创建和销毁线程，实际上会消耗大量的系统资源，往往创建和消耗线程所耗费的时间比执行任务的时间还长，所以，为了提高效率，可以用线程池。</p>
+<p>类似的，在执行JDBC的增删改查的操作时，如果每一次操作都来一次打开连接，操作，关闭连接，那么创建和销毁JDBC连接的开销就太大了。为了避免频繁地创建和销毁JDBC连接，我们可以通过连接池（Connection Pool）复用已经创建好的连接。</p>
+<p>JDBC连接池有一个标准的接口<code class="notranslate">javax.sql.DataSource</code>，注意这个类位于Java标准库中，但仅仅是接口。要使用JDBC连接池，我们必须选择一个JDBC连接池的实现。常用的JDBC连接池有：</p>
+<ul>
+<li>HikariCP</li>
+<li>C3P0</li>
+<li>BoneCP</li>
+<li>Druid</li>
+</ul>
+<p>目前使用最广泛的是HikariCP。我们以HikariCP为例，要使用JDBC连接池，先添加HikariCP的依赖如下：</p>
+<blockquote>
+<p>com.zaxxer:HikariCP:2.7.1</p>
+</blockquote>
+<p>紧接着，我们需要创建一个<code class="notranslate">DataSource</code>实例，这个实例就是连接池：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">HikariConfig</span> <span class="pl-s1">config</span> = <span class="pl-k">new</span> <span class="pl-smi">HikariConfig</span>();
+<span class="pl-s1">config</span>.<span class="pl-en">setJdbcUrl</span>(<span class="pl-s">"jdbc:mysql://localhost:3306/test"</span>);
+<span class="pl-s1">config</span>.<span class="pl-en">setUsername</span>(<span class="pl-s">"root"</span>);
+<span class="pl-s1">config</span>.<span class="pl-en">setPassword</span>(<span class="pl-s">"password"</span>);
+<span class="pl-s1">config</span>.<span class="pl-en">addDataSourceProperty</span>(<span class="pl-s">"connectionTimeout"</span>, <span class="pl-s">"1000"</span>); <span class="pl-c">// 连接超时：1秒</span>
+<span class="pl-s1">config</span>.<span class="pl-en">addDataSourceProperty</span>(<span class="pl-s">"idleTimeout"</span>, <span class="pl-s">"60000"</span>); <span class="pl-c">// 空闲超时：60秒</span>
+<span class="pl-s1">config</span>.<span class="pl-en">addDataSourceProperty</span>(<span class="pl-s">"maximumPoolSize"</span>, <span class="pl-s">"10"</span>); <span class="pl-c">// 最大连接数：10</span>
+<span class="pl-smi">DataSource</span> <span class="pl-s1">ds</span> = <span class="pl-k">new</span> <span class="pl-smi">HikariDataSource</span>(<span class="pl-s1">config</span>);</pre></div>
+<p>注意创建<code class="notranslate">DataSource</code>也是一个非常昂贵的操作，所以通常<code class="notranslate">DataSource</code>实例总是作为一个全局变量存储，并贯穿整个应用程序的生命周期。<br>
+有了连接池以后，我们如何使用它呢？和前面的代码类似，只是获取<code class="notranslate">Connection</code>时，把<code class="notranslate">DriverManage.getConnection()</code>改为<code class="notranslate">ds.getConnection()</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">try</span> (<span class="pl-smi">Connection</span> <span class="pl-s1">conn</span> = <span class="pl-s1">ds</span>.<span class="pl-en">getConnection</span>()) { <span class="pl-c">// 在此获取连接</span>
+    ...
+} <span class="pl-c">// 在此“关闭”连接</span></pre></div>
+<p>通过连接池获取连接时，并不需要指定JDBC的相关URL、用户名、口令等信息，因为这些信息已经存储在连接池内部了（创建<code class="notranslate">HikariDataSource</code>时传入的<code class="notranslate">HikariConfig</code>持有这些信息）。一开始，连接池内部并没有连接，所以，第一次调用<code class="notranslate">ds.getConnection()</code>，会迫使连接池内部先创建一个<code class="notranslate">Connection</code>，再返回给客户端使用。当我们调用<code class="notranslate">conn.close()</code>方法时（在<code class="notranslate">try(resource){...}</code>结束处），不是真正“关闭”连接，而是释放到连接池中，以便下次获取连接时能直接返回。</p>
+<p>因此，连接池内部维护了若干个<code class="notranslate">Connection</code>实例，如果调用<code class="notranslate">ds.getConnection()</code>，就选择一个空闲连接，并标记它为“正在使用”然后返回，如果对<code class="notranslate">Connection</code>调用<code class="notranslate">close()</code>，那么就把连接再次标记为“空闲”从而等待下次调用。这样一来，我们就通过连接池维护了少量连接，但可以频繁地执行大量的SQL语句。</p>
+<p>通常连接池提供了大量的参数可以配置，例如，维护的最小、最大活动连接数，指定一个连接在空闲一段时间后自动关闭等，需要根据应用程序的负载合理地配置这些参数。此外，大多数连接池都提供了详细的实时状态以便进行监控。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
