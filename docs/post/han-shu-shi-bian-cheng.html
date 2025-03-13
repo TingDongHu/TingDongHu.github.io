@@ -53,7 +53,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     font-size: 12px;
 }
 </style>
-
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
 
 
 
@@ -134,7 +134,158 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>如果只有一行<code class="notranslate">return xxx</code>的代码，完全可以用更简单的写法：</p>
 <div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">array</span>, (<span class="pl-s1">s1</span>, <span class="pl-s1">s2</span>) -&gt; <span class="pl-s1">s1</span>.<span class="pl-en">compareTo</span>(<span class="pl-s1">s2</span>));</pre></div>
 <p>返回值的类型也是由编译器自动推断的，这里推断出的返回值是<code class="notranslate">int</code>，因此，只要返回<code class="notranslate">int</code>，编译器就不会报错。</p>
-<h3>FunctionalInterface</h3></div>
+<h3>FunctionalInterface</h3>
+<p>我们把只定义了单方法的接口称之为<code class="notranslate">FunctionalInterface</code>，用注解<code class="notranslate">@FunctionalInterface</code>标记。例如，<code class="notranslate">Callable</code>接口：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">FunctionalInterface</span>
+<span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">Callable</span>&lt;<span class="pl-smi">V</span>&gt; {
+    <span class="pl-smi">V</span> <span class="pl-en">call</span>() <span class="pl-k">throws</span> <span class="pl-smi">Exception</span>;
+}</pre></div>
+<p>再来看<code class="notranslate">Comparator</code>接口：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">FunctionalInterface</span>
+<span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">Comparator</span>&lt;<span class="pl-smi">T</span>&gt; {
+
+    <span class="pl-smi">int</span> <span class="pl-en">compare</span>(<span class="pl-smi">T</span> <span class="pl-s1">o1</span>, <span class="pl-smi">T</span> <span class="pl-s1">o2</span>);
+
+    <span class="pl-smi">boolean</span> <span class="pl-en">equals</span>(<span class="pl-smi">Object</span> <span class="pl-s1">obj</span>);
+
+    <span class="pl-k">default</span> <span class="pl-smi">Comparator</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-en">reversed</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">Collections</span>.<span class="pl-en">reverseOrder</span>(<span class="pl-smi">this</span>);
+    }
+
+    <span class="pl-k">default</span> <span class="pl-smi">Comparator</span>&lt;<span class="pl-smi">T</span>&gt; <span class="pl-en">thenComparing</span>(<span class="pl-smi">Comparator</span>&lt;? <span class="pl-en">super</span> <span class="pl-smi">T</span>&gt; <span class="pl-s1">other</span>) {
+        ...
+    }
+    ...
+}</pre></div>
+<p>虽然<code class="notranslate">Comparator</code>接口有很多方法，但只有一个抽象方法<code class="notranslate">int compare(T o1, T o2)</code>，其他的方法都是<code class="notranslate">default</code>方法或<code class="notranslate">static</code>方法。另外注意到<code class="notranslate">boolean equals(Object obj)</code>是<code class="notranslate">Object</code>定义的方法，不算在接口方法内。因此，<code class="notranslate">Comparator</code>也是一个<code class="notranslate">FunctionalInterface</code>。</p>
+<h2>方法引用</h2>
+<p>使用Lambda表达式，我们就可以不必编写<code class="notranslate">FunctionalInterface</code>接口的实现类，从而简化代码：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">array</span>, (<span class="pl-s1">s1</span>, <span class="pl-s1">s2</span>) -&gt; {
+    <span class="pl-k">return</span> <span class="pl-s1">s1</span>.<span class="pl-en">compareTo</span>(<span class="pl-s1">s2</span>);
+});</pre></div>
+<p>实际上，除了Lambda表达式，我们还可以直接传入方法引用。例如：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Arrays</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span>[] <span class="pl-s1">array</span> = <span class="pl-k">new</span> <span class="pl-smi">String</span>[] { <span class="pl-s">"Apple"</span>, <span class="pl-s">"Orange"</span>, <span class="pl-s">"Banana"</span>, <span class="pl-s">"Lemon"</span> };
+        <span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">array</span>, <span class="pl-smi">Main</span>::<span class="pl-s1">cmp</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">String</span>.<span class="pl-en">join</span>(<span class="pl-s">", "</span>, <span class="pl-s1">array</span>));
+    }
+
+    <span class="pl-k">static</span> <span class="pl-smi">int</span> <span class="pl-en">cmp</span>(<span class="pl-smi">String</span> <span class="pl-s1">s1</span>, <span class="pl-smi">String</span> <span class="pl-s1">s2</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">s1</span>.<span class="pl-en">compareTo</span>(<span class="pl-s1">s2</span>);
+    }
+}</pre></div>
+<p>上述代码在<code class="notranslate">Arrays.sort()</code>中直接传入了静态方法<code class="notranslate">cmp</code>的引用，用<code class="notranslate">Main::cmp</code>表示。</p>
+<p>因此，所谓方法引用，是指如果某个方法签名和接口恰好一致，就可以直接传入方法引用。</p>
+<p>因为<code class="notranslate">Comparator&lt;String&gt;</code>接口定义的方法是<code class="notranslate">int compare(String, String)</code>，和静态方法<code class="notranslate">int cmp(String, String)</code>相比，除了方法名外，方法参数一致，返回类型相同，因此，我们说两者的方法签名一致，可以直接把方法名作为Lambda表达式传入：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">array</span>, <span class="pl-smi">Main</span>::<span class="pl-s1">cmp</span>);</pre></div>
+<p>注意：在这里，方法签名只看参数类型和返回类型，不看方法名称，也不看类的继承关系。</p>
+<p>我们再看看如何引用实例方法。如果我们把代码改写如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">Arrays</span>;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">String</span>[] <span class="pl-s1">array</span> = <span class="pl-k">new</span> <span class="pl-smi">String</span>[] { <span class="pl-s">"Apple"</span>, <span class="pl-s">"Orange"</span>, <span class="pl-s">"Banana"</span>, <span class="pl-s">"Lemon"</span> };
+        <span class="pl-smi">Arrays</span>.<span class="pl-en">sort</span>(<span class="pl-s1">array</span>, <span class="pl-smi">String</span>::<span class="pl-s1">compareTo</span>);
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-smi">String</span>.<span class="pl-en">join</span>(<span class="pl-s">", "</span>, <span class="pl-s1">array</span>));
+    }
+}</pre></div>
+<p>不但可以编译通过，而且运行结果也是一样的，这说明<code class="notranslate">String.compareTo()</code>方法也符合Lambda定义。<br>
+观察<code class="notranslate">String.compareTo()</code>的方法定义：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-smi">String</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">int</span> <span class="pl-en">compareTo</span>(<span class="pl-smi">String</span> <span class="pl-s1">o</span>) {
+        ...
+    }
+}</pre></div>
+<p>这个方法的签名只有一个参数，为什么和<code class="notranslate">int Comparator&lt;String&gt;.compare(String, String)</code>能匹配呢？<br>
+因为实例方法有一个隐含的<code class="notranslate">this</code>参数，<strong><code class="notranslate">String</code>类的<code class="notranslate">compareTo()</code>方法在实际调用的时候，第一个隐含参数总是传入this，相当于静态方法：</strong></p>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>为什么传入一个this就是静态方法呢，没搞明白静态的定义到底是什么，后面查查资料</p>
+</div>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">int</span> <span class="pl-en">compareTo</span>(<span class="pl-smi">String</span> <span class="pl-smi">this</span>, <span class="pl-smi">String</span> <span class="pl-s1">o</span>);
+···
+
+<span class="pl-smi">所以</span>，`<span class="pl-s1">String</span>.<span class="pl-s1">compareTo</span>()`<span class="pl-s1">方法也可作为方法引用传入</span>。
+
+### <span class="pl-s1">构造方法引用</span>
+<span class="pl-s1">除了可以引用静态方法和实例方法</span>，<span class="pl-s1">我们还可以引用构造方法</span>。
+
+<span class="pl-s1">我们来看一个例子</span>：<span class="pl-s1">如果要把一个</span>`<span class="pl-s1">List</span>&lt;<span class="pl-smi">String</span>&gt;`<span class="pl-smi">转换为</span>`<span class="pl-s1">List</span>&lt;<span class="pl-s1">Person</span>&gt;`，<span class="pl-s1">应该怎么办</span>？
+```<span class="pl-s1">java</span>
+<span class="pl-s1">class</span> <span class="pl-s1">Person</span> {
+    <span class="pl-s1">String</span> <span class="pl-s1">name</span>;
+    <span class="pl-k">public</span> <span class="pl-en">Person</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+    }
+}
+
+<span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">names</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"Bob"</span>, <span class="pl-s">"Alice"</span>, <span class="pl-s">"Tim"</span>);
+<span class="pl-smi">List</span>&lt;<span class="pl-smi">Person</span>&gt; <span class="pl-s1">persons</span> = ???</pre></div>
+<p>传统的做法是先定义一个<code class="notranslate">ArrayList&lt;Person&gt;</code>，然后用<code class="notranslate">for</code>循环填充这个<code class="notranslate">List</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">names</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"Bob"</span>, <span class="pl-s">"Alice"</span>, <span class="pl-s">"Tim"</span>);
+<span class="pl-smi">List</span>&lt;<span class="pl-smi">Person</span>&gt; <span class="pl-s1">persons</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+<span class="pl-k">for</span> (<span class="pl-smi">String</span> <span class="pl-s1">name</span> : <span class="pl-s1">names</span>) {
+    <span class="pl-s1">persons</span>.<span class="pl-en">add</span>(<span class="pl-k">new</span> <span class="pl-smi">Person</span>(<span class="pl-s1">name</span>));
+}</pre></div>
+<p>要更简单地实现<code class="notranslate">String</code>到<code class="notranslate">Person</code>的转换，我们可以引用Person的构造方法：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 引用构造方法</span>
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.*;
+<span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">stream</span>.*;
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">String</span>&gt; <span class="pl-s1">names</span> = <span class="pl-smi">List</span>.<span class="pl-en">of</span>(<span class="pl-s">"Bob"</span>, <span class="pl-s">"Alice"</span>, <span class="pl-s">"Tim"</span>);
+        <span class="pl-smi">List</span>&lt;<span class="pl-smi">Person</span>&gt; <span class="pl-s1">persons</span> = <span class="pl-s1">names</span>.<span class="pl-en">stream</span>().<span class="pl-en">map</span>(<span class="pl-smi">Person</span>::<span class="pl-k">new</span>).<span class="pl-en">collect</span>(<span class="pl-smi">Collectors</span>.<span class="pl-en">toList</span>());
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">persons</span>);
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Person</span> {
+    <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+    <span class="pl-k">public</span> <span class="pl-smi">Person</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-s">"Person:"</span> + <span class="pl-smi">this</span>.<span class="pl-s1">name</span>;
+    }
+}</pre></div>
+<p>后面我们会讲到<code class="notranslate">Stream</code>的<code class="notranslate">map()</code>方法。现在我们看到，这里的<code class="notranslate">map()</code>需要传入的FunctionalInterface的定义是：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c1">@</span><span class="pl-c1">FunctionalInterface</span>
+<span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">Function</span>&lt;<span class="pl-smi">T</span>, <span class="pl-smi">R</span>&gt; {
+    <span class="pl-smi">R</span> <span class="pl-en">apply</span>(<span class="pl-smi">T</span> <span class="pl-s1">t</span>);
+}</pre></div>
+<p>把泛型对应上就是方法签名<code class="notranslate">Person apply(String)</code>，即传入参数<code class="notranslate">String</code>，返回类型<code class="notranslate">Person</code>。而<code class="notranslate">Person</code>类的构造方法恰好满足这个条件，因为构造方法的参数是<code class="notranslate">String</code>，而构造方法虽然没有<code class="notranslate">return</code>语句，但它会隐式地返回<code class="notranslate">this</code>实例，类型就是<code class="notranslate">Person</code>，因此，此处可以引用构造方法。构造方法的引用写法是类名<code class="notranslate">::new</code>，因此，此处传入<code class="notranslate">Person::new</code>。</p>
+<h2>Stream</h2>
+<p>Java从8开始，不但引入了Lambda表达式，还引入了一个全新的流式API：Stream API。它位于<code class="notranslate">java.util.stream</code>包中。<br>
+**划重点：这个<code class="notranslate">Stream</code>不同于<code class="notranslate">java.io</code>的<code class="notranslate">InputStream</code>和<code class="notranslate">OutputStream</code>，它代表的是任意Java对象的序列。**两者对比如下：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/5980c842-4c45-48dd-8a64-68533bac7be5"><img src="https://github.com/user-attachments/assets/5980c842-4c45-48dd-8a64-68533bac7be5" alt="Image" style="max-width: 100%;"></a></p>
+<p>有同学会问：一个顺序输出的Java对象序列，不就是一个<code class="notranslate">List</code>容器吗？</p>
+<p><strong>再次划重点：这个<code class="notranslate">Stream</code>和<code class="notranslate">List</code>也不一样，<code class="notranslate">List</code>存储的每个元素都是已经存储在内存中的某个Java对象，而<code class="notranslate">Stream</code>输出的元素可能并没有预先存储在内存中，而是实时计算出来的。</strong></p>
+<p>换句话说，<code class="notranslate">List</code>的用途是操作一组已存在的Java对象，而<code class="notranslate">Stream</code>实现的是惰性计算，两者对比如下：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/a9655c9d-1498-4fcd-ba43-6eabaff48473"><img src="https://github.com/user-attachments/assets/a9655c9d-1498-4fcd-ba43-6eabaff48473" alt="Image" style="max-width: 100%;"></a></p>
+<p><code class="notranslate">Stream</code>看上去有点不好理解，但我们举个例子就明白了。</p>
+<p>如果我们要表示一个全体自然数的集合，显然，用<code class="notranslate">List</code>是不可能写出来的，因为自然数是无限的，内存再大也没法放到<code class="notranslate">List</code>中：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">List</span>&lt;<span class="pl-smi">BigInteger</span>&gt; <span class="pl-s1">list</span> = ??? <span class="pl-c">// 全体自然数?</span></pre></div>
+<p>但是，用<code class="notranslate">Stream</code>可以做到。写法如下：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Stream</span>&lt;<span class="pl-smi">BigInteger</span>&gt; <span class="pl-s1">naturals</span> = <span class="pl-en">createNaturalStream</span>(); <span class="pl-c">// 全体自然数</span></pre></div>
+<p>我们先不考虑<code class="notranslate">createNaturalStream()</code>这个方法是如何实现的，我们看看如何使用这个<code class="notranslate">Stream</code>。</p>
+<p>首先，我们可以对每个自然数做一个平方，这样我们就把这个<code class="notranslate">Stream</code>转换成了另一个<code class="notranslate">Stream</code>：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Stream</span>&lt;<span class="pl-smi">BigInteger</span>&gt; <span class="pl-s1">naturals</span> = <span class="pl-en">createNaturalStream</span>(); <span class="pl-c">// 全体自然数</span>
+<span class="pl-smi">Stream</span>&lt;<span class="pl-smi">BigInteger</span>&gt; <span class="pl-s1">streamNxN</span> = <span class="pl-s1">naturals</span>.<span class="pl-en">map</span>(<span class="pl-s1">n</span> -&gt; <span class="pl-s1">n</span>.<span class="pl-en">multiply</span>(<span class="pl-s1">n</span>)); <span class="pl-c">// 全体自然数的平方</span></pre></div>
+<p>因为这个<code class="notranslate">streamNxN</code>也有无限多个元素，要打印它，必须首先把无限多个元素变成有限个元素，可以用<code class="notranslate">limit()</code>方法截取前100个元素，最后用<code class="notranslate">forEach()</code>处理每个元素，这样，我们就打印出了前100个自然数的平方：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-smi">Stream</span>&lt;<span class="pl-smi">BigInteger</span>&gt; <span class="pl-s1">naturals</span> = <span class="pl-en">createNaturalStream</span>();
+<span class="pl-s1">naturals</span>.<span class="pl-en">map</span>(<span class="pl-s1">n</span> -&gt; <span class="pl-s1">n</span>.<span class="pl-en">multiply</span>(<span class="pl-s1">n</span>)) <span class="pl-c">// 1, 4, 9, 16, 25...</span>
+        .<span class="pl-en">limit</span>(<span class="pl-c1">100</span>)
+        .<span class="pl-en">forEach</span>(<span class="pl-smi">System</span>.<span class="pl-s1">out</span>::<span class="pl-s1">println</span>);</pre></div>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>此处内容太多了，目前不打算学这么多，后续再回来补</p>
+</div>
+<p>Stream API的特点是：</p>
+<ul>
+<li>Stream API提供了一套新的流式处理的抽象序列；</li>
+<li>Stream API支持函数式编程和链式操作；</li>
+<li>Stream可以表示无限序列，并且大多数情况下是惰性求值的。</li>
+</ul></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
