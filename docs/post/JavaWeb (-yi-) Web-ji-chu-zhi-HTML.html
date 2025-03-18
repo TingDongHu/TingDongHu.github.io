@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="之前在看韩老魔的JAVA教程时，由于是文字教程，总感觉WEB这块的知识很懵懂，学不明白，故打算看黑马程序员教程，重新总结一下自己的笔记。">
+<meta property="og:title" content="JavaWeb (一) Web基础之HTML">
+<meta property="og:description" content="之前在看韩老魔的JAVA教程时，由于是文字教程，总感觉WEB这块的知识很懵懂，学不明白，故打算看黑马程序员教程，重新总结一下自己的笔记。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/JavaWeb%20%28-yi-%29%20Web-ji-chu-zhi-HTML.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>JavaWeb (一) Web基础之HTML</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">JavaWeb (一) Web基础之HTML</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/38" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>之前在看韩老魔的JAVA教程时，由于是文字教程，总感觉WEB这块的知识很懵懂，学不明白，故打算看黑马程序员教程，重新总结一下自己的笔记。</p>
+<h2>HTML</h2>
+<h3>css修改样式</h3>
+<p>css引入分为三种：行内样式、内嵌样式、外联样式。<br>
+一般使用内嵌和外联较多，行内样式只有效果非常简单的时候会使用。<br>
+外联样式示例</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-ent">h1</span>{
+    <span class="pl-c1">color</span><span class="pl-kos">:</span>red
+}</pre></div>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"> <span class="pl-kos">&lt;</span><span class="pl-ent">link</span> <span class="pl-c1">rel</span>="<span class="pl-s">stylesheet</span>" <span class="pl-c1">href</span>="<span class="pl-s">./css/news.css</span>"<span class="pl-kos">&gt;</span></pre></div>
+<h3>css选择器</h3>
+<p>选择器分为三种：元素选择器、id选择器、类选择器。<br>
+几个修改器可同时修饰同一个元素，优先级：id选择器&gt;类选择器&gt;元素选择器。<br>
+示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">style</span><span class="pl-kos">&gt;</span>
+    
+    <span class="pl-ent">span</span>{
+        <span class="pl-c1">color</span><span class="pl-kos">:</span>cadetblue;
+    }
+    .<span class="pl-c1">timelan</span>{
+        <span class="pl-c1">color</span><span class="pl-kos">:</span><span class="pl-en">rgb</span>(<span class="pl-c1">47</span><span class="pl-kos">,</span> <span class="pl-c1">73</span><span class="pl-kos">,</span> <span class="pl-c1">47</span>)
+    }
+    <span class="pl-kos">#</span><span class="pl-c1">timeclock</span>{
+        <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-en">rgb</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">0</span>);
+    }
+    <span class="pl-kos">#</span><span class="pl-c1">center</span>{
+        <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">65<span class="pl-smi">%</span></span>;
+        <span class="pl-c1">margin</span><span class="pl-kos">:</span><span class="pl-c1">0<span class="pl-smi">%</span></span> <span class="pl-c1">17.5<span class="pl-smi">%</span></span> <span class="pl-c1">0<span class="pl-smi">%</span></span> <span class="pl-c1">17.5<span class="pl-smi">%</span></span>;<span class="pl-c">/*上 右 下 左 */</span>
+    }
+
+<span class="pl-kos">&lt;/</span><span class="pl-ent">style</span><span class="pl-kos">&gt;</span></pre></div>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"> <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">class</span>="<span class="pl-s">timelan</span>"<span class="pl-kos">&gt;</span>2025年03月17日<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>  <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">id</span>="<span class="pl-s">timeclock</span>"  <span class="pl-kos">&gt;</span>21：50 央视网<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span></pre></div>
+<h3>超链接</h3>
+<p>示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">h3</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">a</span> <span class="pl-c1">href</span>="<span class="pl-s">https://tingdonghu.github.io/index.html</span>" <span class="pl-c1">target</span>="<span class="pl-s">_self</span>"<span class="pl-kos">&gt;</span>古月月仔的技术博客<span class="pl-kos">&lt;/</span><span class="pl-ent">a</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">h3</span><span class="pl-kos">&gt;</span></pre></div>
+<ul>
+<li><code class="notranslate">href</code> 键表示转到链接。</li>
+<li><code class="notranslate">target</code> 键表示使用哪种方式打开新的链接,<code class="notranslate">_self</code>表示在当前浏览器界面打开。</li>
+</ul>
+<p>###多媒体<br>
+audio示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"> <span class="pl-kos">&lt;</span><span class="pl-ent">audio</span> <span class="pl-c1">src</span>="<span class="pl-s">./audio/VØJ,Narvent - Memory Reboot.flac</span>" <span class="pl-c1">controls</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">audio</span><span class="pl-kos">&gt;</span></pre></div>
+<p><code class="notranslate">src</code> 键后附要播放的多媒体链接路径、想对路径/绝对路径均可。<br>
+<code class="notranslate">controls</code> 表示多媒体控制器，不加改键无法播放多媒体</p>
+<p>video示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">video</span> <span class="pl-c1">src</span>="<span class="pl-s">./video/bladerunner.mp4</span>" <span class="pl-c1">controls</span> <span class="pl-c1">width</span>="<span class="pl-s">950px</span>"<span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">video</span><span class="pl-kos">&gt;</span></pre></div>
+<p><code class="notranslate">src</code>和<code class="notranslate">audio</code>的用法一样，<code class="notranslate">width</code>和<code class="notranslate">height</code>表示视频播放组件的大小（长宽），单位为<code class="notranslate">px</code>，一般设置一个就可以，另一个会根据设置的那个等比缩放。<br>
+效果：</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/ac553cdc-a63a-4cf7-b2cd-5da9abb019c4"><img src="https://github.com/user-attachments/assets/ac553cdc-a63a-4cf7-b2cd-5da9abb019c4" alt="Image" style="max-width: 100%;"></a></p>
+<h3>排版和布局</h3>
+<p>盒子模型：页面中所有的元素(标签)，都可以看做是一个 盒子，由盒子将页面中的元素包含在一个矩形区域内，通过盒子的视角更方便的进行页面布局。<br>
+盒子模型组成:内容区域(content)、内边距区域(padding)、边框区域(border)、外边距区域(margin)。<br>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/789cba39-0a6c-46af-b0fb-63b26228a0c4"><img src="https://github.com/user-attachments/assets/789cba39-0a6c-46af-b0fb-63b26228a0c4" alt="Image" style="max-width: 100%;"></a></p>
+<p>示例-设置整体居中对齐：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">html</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">head</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">title</span><span class="pl-kos">&gt;</span>焦点访谈：如何俘获美女芳心<span class="pl-kos">&lt;/</span><span class="pl-ent">title</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">link</span> <span class="pl-c1">rel</span>="<span class="pl-s">stylesheet</span>" <span class="pl-c1">href</span>="<span class="pl-s">./css/news.css</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">style</span><span class="pl-kos">&gt;</span>           
+            <span class="pl-ent">span</span>{
+                <span class="pl-c1">color</span><span class="pl-kos">:</span>cadetblue;
+            }
+            .<span class="pl-c1">timelan</span>{
+                <span class="pl-c1">color</span><span class="pl-kos">:</span><span class="pl-en">rgb</span>(<span class="pl-c1">47</span><span class="pl-kos">,</span> <span class="pl-c1">73</span><span class="pl-kos">,</span> <span class="pl-c1">47</span>)
+            }
+            <span class="pl-kos">#</span><span class="pl-c1">timeclock</span>{
+                <span class="pl-c1">color</span><span class="pl-kos">:</span> <span class="pl-en">rgb</span>(<span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c1">0</span>);
+            }
+            <span class="pl-kos">#</span><span class="pl-c1">center</span>{
+                <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">65<span class="pl-smi">%</span></span>;
+                <span class="pl-c1">margin</span><span class="pl-kos">:</span><span class="pl-c1">0<span class="pl-smi">%</span></span> <span class="pl-c1">17.5<span class="pl-smi">%</span></span> <span class="pl-c1">0<span class="pl-smi">%</span></span> <span class="pl-c1">17.5<span class="pl-smi">%</span></span>;<span class="pl-c">/*上 右 下 左 */</span>
+            }
+        <span class="pl-kos">&lt;/</span><span class="pl-ent">style</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">head</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">body</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">id</span>="<span class="pl-s">center</span>"<span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>对王茜的诗意告白<span class="pl-kos">&lt;/</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>
+         
+            <span class="pl-kos">&lt;</span><span class="pl-ent">hr</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">class</span>="<span class="pl-s">timelan</span>"<span class="pl-kos">&gt;</span>2025年03月17日<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>  <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">id</span>="<span class="pl-s">timeclock</span>"  <span class="pl-kos">&gt;</span>21：50 央视网<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">hr</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">h3</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">a</span> <span class="pl-c1">href</span>="<span class="pl-s">https://tingdonghu.github.io/index.html</span>" <span class="pl-c1">target</span>="<span class="pl-s">_self</span>"<span class="pl-kos">&gt;</span>古月月仔的技术博客<span class="pl-kos">&lt;/</span><span class="pl-ent">a</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">h3</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">video</span> <span class="pl-c1">src</span>="<span class="pl-s">./video/bladerunner.mp4</span>" <span class="pl-c1">controls</span> <span class="pl-c1">width</span>="<span class="pl-s">950px</span>"<span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">video</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">audio</span> <span class="pl-c1">src</span>="<span class="pl-s">./audio/VØJ,Narvent - Memory Reboot.flac</span>" <span class="pl-c1">controls</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">audio</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">body</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">html</span><span class="pl-kos">&gt;</span></pre></div>
+<p>将整个网页内容包裹在标签<code class="notranslate">&lt;div&gt;</code>中，通过css 的id选择器进行设置样式。</p>
+<div class="highlight highlight-source-css"><pre class="notranslate"><span class="pl-kos">#</span><span class="pl-c1">center</span>{
+    <span class="pl-c1">width</span><span class="pl-kos">:</span> <span class="pl-c1">65<span class="pl-smi">%</span></span>;
+    <span class="pl-c1">margin</span><span class="pl-kos">:</span><span class="pl-c1">0<span class="pl-smi">%</span></span> <span class="pl-c1">17.5<span class="pl-smi">%</span></span> <span class="pl-c1">0<span class="pl-smi">%</span></span> <span class="pl-c1">17.5<span class="pl-smi">%</span></span>;<span class="pl-c">/*上 右 下 左 */</span>
+}</pre></div>
+<h3>表格和表单</h3>
+<p><strong>表格</strong><br>
+<strong>表格的标签</strong>：</p>
+<ul>
+<li><code class="notranslate">&lt;table&gt;</code>:定义表格整体，可以包裹多个</li>
+<li><code class="notranslate">&lt;tr&gt;</code>:表格的行，可以包裹多个</li>
+<li><code class="notranslate">&lt;td&gt;</code>:表格的单元格（普通），包裹内容，如果是表头单元格，可以替换为标签<code class="notranslate">&lt;th&gt;</code>.</li>
+</ul>
+<p>简单表格示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate">  <span class="pl-kos">&lt;</span><span class="pl-ent">h2</span><span class="pl-kos">&gt;</span>学生成绩表<span class="pl-kos">&lt;/</span><span class="pl-ent">h2</span><span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;</span><span class="pl-ent">table</span> <span class="pl-c1">border</span>="<span class="pl-s">1px</span>" <span class="pl-c1">cellspacing</span>="<span class="pl-s">0</span>" <span class="pl-c1">width</span>="<span class="pl-s">600px</span>"<span class="pl-kos">&gt;</span>
+      <span class="pl-kos">&lt;</span><span class="pl-ent">thead</span><span class="pl-kos">&gt;</span>
+          <span class="pl-kos">&lt;</span><span class="pl-ent">tr</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>姓名<span class="pl-kos">&lt;/</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>语文<span class="pl-kos">&lt;/</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>数学<span class="pl-kos">&lt;/</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>英语<span class="pl-kos">&lt;/</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>科学<span class="pl-kos">&lt;/</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>道法<span class="pl-kos">&lt;/</span><span class="pl-ent">th</span><span class="pl-kos">&gt;</span>
+          <span class="pl-kos">&lt;/</span><span class="pl-ent">tr</span><span class="pl-kos">&gt;</span>
+      <span class="pl-kos">&lt;/</span><span class="pl-ent">thead</span><span class="pl-kos">&gt;</span>
+      <span class="pl-kos">&lt;</span><span class="pl-ent">tbody</span><span class="pl-kos">&gt;</span>
+          <span class="pl-kos">&lt;</span><span class="pl-ent">tr</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>王茜<span class="pl-kos">&lt;/</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>88<span class="pl-kos">&lt;/</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>66<span class="pl-kos">&lt;/</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>95<span class="pl-kos">&lt;/</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>40<span class="pl-kos">&lt;/</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>
+              <span class="pl-kos">&lt;</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>47<span class="pl-kos">&lt;/</span><span class="pl-ent">td</span><span class="pl-kos">&gt;</span>
+          <span class="pl-kos">&lt;/</span><span class="pl-ent">tr</span><span class="pl-kos">&gt;</span>
+      <span class="pl-kos">&lt;/</span><span class="pl-ent">tbody</span><span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;/</span><span class="pl-ent">table</span><span class="pl-kos">&gt;</span></pre></div>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/3ba69d00-0fdd-40df-b168-f3371b2d7681"><img src="https://github.com/user-attachments/assets/3ba69d00-0fdd-40df-b168-f3371b2d7681" alt="Image" style="max-width: 100%;"></a></p>
+<p><strong>表单</strong><br>
+表单使用场景：在网页中主要负责数据采集功能，比如登录注册等</p>
+<p>表单的标签：<code class="notranslate">&lt;form&gt;</code></p>
+<p>表单项：不同类型的input元素、下拉表单、文本域等</p>
+<ul>
+<li><code class="notranslate">&lt;input&gt;</code>:定义表单项，通过type熟悉控制输入形式。</li>
+<li><code class="notranslate">&lt;select&gt;</code>：定义下拉列表。</li>
+<li><code class="notranslate">&lt;textarea&gt;</code>:定义文本域。</li>
+</ul>
+<p>属性：</p>
+<ul>
+<li><code class="notranslate">action</code>：规定当提交表单时向何处发送表单数据。</li>
+<li><code class="notranslate">method</code>：规定用于发送表单数据的方式。例如GET、POST</li>
+</ul>
+<p>简单表单示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">form</span> <span class="pl-c1">action</span>="" <span class="pl-c1">method</span>="<span class="pl-s">get</span>"<span class="pl-kos">&gt;</span>
+    用户名：<span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">text</span>" <span class="pl-c1">name</span>="<span class="pl-s">username</span>"<span class="pl-kos">&gt;</span>
+    年龄：<span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">text</span>" <span class="pl-c1">name</span>="<span class="pl-s">age</span>"<span class="pl-kos">&gt;</span>
+    
+    <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">submit</span>" <span class="pl-c1">value</span>="<span class="pl-s">提交信息</span>"<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">form</span><span class="pl-kos">&gt;</span></pre></div>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/a5744697-538e-4afe-a62a-d4be15a078cf"><img src="https://github.com/user-attachments/assets/a5744697-538e-4afe-a62a-d4be15a078cf" alt="Image" style="max-width: 100%;"></a></p>
+<p>复杂表单示例：</p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-c1">&lt;!DOCTYPE html<span class="pl-kos">&gt;</span></span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">html</span> <span class="pl-c1">lang</span>="<span class="pl-s">zh-CN</span>"<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">head</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">charset</span>="<span class="pl-s">UTF-8</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">meta</span> <span class="pl-c1">name</span>="<span class="pl-s">viewport</span>" <span class="pl-c1">content</span>="<span class="pl-s">width=device-width, initial-scale=1.0</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">title</span><span class="pl-kos">&gt;</span>用户信息表单<span class="pl-kos">&lt;/</span><span class="pl-ent">title</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">head</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">body</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>用户信息表单<span class="pl-kos">&lt;/</span><span class="pl-ent">h1</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">form</span> <span class="pl-c1">action</span>="<span class="pl-s">/submit</span>" <span class="pl-c1">method</span>="<span class="pl-s">post</span>" <span class="pl-c1">enctype</span>="<span class="pl-s">multipart/form-data</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-c">&lt;!-- 密码输入框 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">password</span>"<span class="pl-kos">&gt;</span>密码：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">password</span>" <span class="pl-c1">id</span>="<span class="pl-s">password</span>" <span class="pl-c1">name</span>="<span class="pl-s">password</span>" <span class="pl-c1">required</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 性别单选按钮 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>性别：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">radio</span>" <span class="pl-c1">name</span>="<span class="pl-s">gender</span>" <span class="pl-c1">value</span>="<span class="pl-s">1</span>" <span class="pl-c1">checked</span><span class="pl-kos">&gt;</span> 男<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">radio</span>" <span class="pl-c1">name</span>="<span class="pl-s">gender</span>" <span class="pl-c1">value</span>="<span class="pl-s">2</span>"<span class="pl-kos">&gt;</span> 女<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 爱好复选框 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>爱好：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">checkbox</span>" <span class="pl-c1">name</span>="<span class="pl-s">hobby</span>" <span class="pl-c1">value</span>="<span class="pl-s">java</span>"<span class="pl-kos">&gt;</span> Java<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">checkbox</span>" <span class="pl-c1">name</span>="<span class="pl-s">hobby</span>" <span class="pl-c1">value</span>="<span class="pl-s">game</span>"<span class="pl-kos">&gt;</span> 游戏<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">checkbox</span>" <span class="pl-c1">name</span>="<span class="pl-s">hobby</span>" <span class="pl-c1">value</span>="<span class="pl-s">sing</span>"<span class="pl-kos">&gt;</span> 唱歌<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 文件上传 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">image</span>"<span class="pl-kos">&gt;</span>图像：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">file</span>" <span class="pl-c1">id</span>="<span class="pl-s">image</span>" <span class="pl-c1">name</span>="<span class="pl-s">image</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 生日日期选择 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">birthday</span>"<span class="pl-kos">&gt;</span>生日：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">date</span>" <span class="pl-c1">id</span>="<span class="pl-s">birthday</span>" <span class="pl-c1">name</span>="<span class="pl-s">birthday</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 时间选择 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">time</span>"<span class="pl-kos">&gt;</span>时间：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">time</span>" <span class="pl-c1">id</span>="<span class="pl-s">time</span>" <span class="pl-c1">name</span>="<span class="pl-s">time</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 日期时间选择 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">datetime</span>"<span class="pl-kos">&gt;</span>日期时间：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">datetime-local</span>" <span class="pl-c1">id</span>="<span class="pl-s">datetime</span>" <span class="pl-c1">name</span>="<span class="pl-s">datetime</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 邮箱输入框 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">email</span>"<span class="pl-kos">&gt;</span>邮箱：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">email</span>" <span class="pl-c1">id</span>="<span class="pl-s">email</span>" <span class="pl-c1">name</span>="<span class="pl-s">email</span>" <span class="pl-c1">required</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 年龄输入框 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">age</span>"<span class="pl-kos">&gt;</span>年龄：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">number</span>" <span class="pl-c1">id</span>="<span class="pl-s">age</span>" <span class="pl-c1">name</span>="<span class="pl-s">age</span>" <span class="pl-c1">min</span>="<span class="pl-s">0</span>" <span class="pl-c1">max</span>="<span class="pl-s">120</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 学历下拉菜单 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">degree</span>"<span class="pl-kos">&gt;</span>学历：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">select</span> <span class="pl-c1">id</span>="<span class="pl-s">degree</span>" <span class="pl-c1">name</span>="<span class="pl-s">degree</span>"<span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>=""<span class="pl-kos">&gt;</span>请选择<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">1</span>"<span class="pl-kos">&gt;</span>大专<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">2</span>"<span class="pl-kos">&gt;</span>本科<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">3</span>"<span class="pl-kos">&gt;</span>硕士<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">4</span>"<span class="pl-kos">&gt;</span>博士<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;/</span><span class="pl-ent">select</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 描述文本域 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">label</span> <span class="pl-c1">for</span>="<span class="pl-s">description</span>"<span class="pl-kos">&gt;</span>描述：<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">textarea</span> <span class="pl-c1">id</span>="<span class="pl-s">description</span>" <span class="pl-c1">name</span>="<span class="pl-s">description</span>" <span class="pl-c1">rows</span>="<span class="pl-s">5</span>" <span class="pl-c1">cols</span>="<span class="pl-s">30</span>"<span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">textarea</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">br</span><span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 隐藏输入 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">hidden</span>" <span class="pl-c1">name</span>="<span class="pl-s">image_id</span>" <span class="pl-c1">value</span>="<span class="pl-s">1</span>"<span class="pl-kos">&gt;</span>
+
+        <span class="pl-c">&lt;!-- 表单按钮 --&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">button</span>" <span class="pl-c1">value</span>="<span class="pl-s">按钮</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">reset</span>" <span class="pl-c1">value</span>="<span class="pl-s">重置</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">submit</span>" <span class="pl-c1">value</span>="<span class="pl-s">提交</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">form</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">body</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">html</span><span class="pl-kos">&gt;</span></pre></div>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/c9a9c302-bb5f-4ad6-9c74-6dc97ab8b30f"><img src="https://github.com/user-attachments/assets/c9a9c302-bb5f-4ad6-9c74-6dc97ab8b30f" alt="Image" style="max-width: 100%;"></a></p>
+<h2>示例中主要的表单标签用法和意义：</h2>
+<h4>1. <strong>密码输入框</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">password</span>" <span class="pl-c1">name</span>="<span class="pl-s">password</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：用于输入密码，输入内容会被隐藏（显示为圆点或星号）。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="password"</code>：指定输入类型为密码。<br>
+• <code class="notranslate">name="password"</code>：用于标识该字段，提交表单时会作为字段名称。</p>
+<hr>
+<h4>2. <strong>性别选择（单选按钮）</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">radio</span>" <span class="pl-c1">name</span>="<span class="pl-s">gender</span>" <span class="pl-c1">value</span>="<span class="pl-s">1</span>"<span class="pl-kos">&gt;</span>男<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">radio</span>" <span class="pl-c1">name</span>="<span class="pl-s">gender</span>" <span class="pl-c1">value</span>="<span class="pl-s">2</span>"<span class="pl-kos">&gt;</span>女<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：允许用户从一组选项中选择一个。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="radio"</code>：指定输入类型为单选按钮。<br>
+• <code class="notranslate">name="gender"</code>：用于将单选按钮分组，确保同一组中只能选择一个。<br>
+• <code class="notranslate">value="1"</code> 和 <code class="notranslate">value="2"</code>：表示选中该选项时提交的值。<br>
+• <strong><code class="notranslate">&lt;label&gt;</code></strong>：将文本与输入框关联，点击文本也可以选中按钮。</p>
+<hr>
+<h4>3. <strong>爱好选择（复选框）</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">checkbox</span>" <span class="pl-c1">name</span>="<span class="pl-s">hobby</span>" <span class="pl-c1">value</span>="<span class="pl-s">java</span>"<span class="pl-kos">&gt;</span>Java<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">checkbox</span>" <span class="pl-c1">name</span>="<span class="pl-s">hobby</span>" <span class="pl-c1">value</span>="<span class="pl-s">game</span>"<span class="pl-kos">&gt;</span>游戏<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">checkbox</span>" <span class="pl-c1">name</span>="<span class="pl-s">hobby</span>" <span class="pl-c1">value</span>="<span class="pl-s">sing</span>"<span class="pl-kos">&gt;</span>唱歌<span class="pl-kos">&lt;/</span><span class="pl-ent">label</span><span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：允许用户从一组选项中选择多个。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="checkbox"</code>：指定输入类型为复选框。<br>
+• <code class="notranslate">name="hobby"</code>：用于标识该字段，提交表单时会作为字段名称。<br>
+• <code class="notranslate">value="java"</code> 等：表示选中该选项时提交的值。</p>
+<hr>
+<h4>4. <strong>文件上传</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">file</span>" <span class="pl-c1">name</span>="<span class="pl-s">image</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：允许用户上传文件（如图片、文档等）。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="file"</code>：指定输入类型为文件上传。<br>
+• <code class="notranslate">name="image"</code>：用于标识该字段，提交表单时会作为字段名称。</p>
+<hr>
+<h4>5. <strong>日期和时间输入</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">date</span>" <span class="pl-c1">name</span>="<span class="pl-s">birthday</span>"<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">time</span>" <span class="pl-c1">name</span>="<span class="pl-s">time</span>"<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">datetime-local</span>" <span class="pl-c1">name</span>="<span class="pl-s">datetime</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：<br>
+• <code class="notranslate">type="date"</code>：允许用户选择日期。<br>
+• <code class="notranslate">type="time"</code>：允许用户选择时间。<br>
+• <code class="notranslate">type="datetime-local"</code>：允许用户选择日期和时间。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">name="birthday"</code> 等：用于标识该字段，提交表单时会作为字段名称。</p>
+<hr>
+<h4>6. <strong>邮箱输入</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">email</span>" <span class="pl-c1">name</span>="<span class="pl-s">email</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：用于输入邮箱地址，浏览器会自动验证输入格式。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="email"</code>：指定输入类型为邮箱。<br>
+• <code class="notranslate">name="email"</code>：用于标识该字段，提交表单时会作为字段名称。</p>
+<hr>
+<h4>7. <strong>年龄输入</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">number</span>" <span class="pl-c1">name</span>="<span class="pl-s">age</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：用于输入数字（如年龄）。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="number"</code>：指定输入类型为数字。<br>
+• <code class="notranslate">name="age"</code>：用于标识该字段，提交表单时会作为字段名称。</p>
+<hr>
+<h4>8. <strong>学历选择（下拉菜单）</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">select</span> <span class="pl-c1">name</span>="<span class="pl-s">degree</span>"<span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>=""<span class="pl-kos">&gt;</span>请选择<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">1</span>"<span class="pl-kos">&gt;</span>大专<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">2</span>"<span class="pl-kos">&gt;</span>本科<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">3</span>"<span class="pl-kos">&gt;</span>硕士<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+  <span class="pl-kos">&lt;</span><span class="pl-ent">option</span> <span class="pl-c1">value</span>="<span class="pl-s">4</span>"<span class="pl-kos">&gt;</span>博士<span class="pl-kos">&lt;/</span><span class="pl-ent">option</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">select</span><span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：允许用户从下拉列表中选择一个选项。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">name="degree"</code>：用于标识该字段，提交表单时会作为字段名称。<br>
+• <code class="notranslate">&lt;option&gt;</code>：定义下拉列表中的选项。<br>
+◦ <code class="notranslate">value="1"</code> 等：表示选中该选项时提交的值。</p>
+<hr>
+<h4>9. <strong>描述文本域</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">textarea</span> <span class="pl-c1">name</span>="<span class="pl-s">description</span>" <span class="pl-c1">cols</span>="<span class="pl-s">30</span>" <span class="pl-c1">rows</span>="<span class="pl-s">10</span>"<span class="pl-kos">&gt;</span><span class="pl-kos">&lt;/</span><span class="pl-ent">textarea</span><span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：用于输入多行文本（如个人描述）。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">name="description"</code>：用于标识该字段，提交表单时会作为字段名称。<br>
+• <code class="notranslate">cols="30"</code>：指定文本域的列数（宽度）。<br>
+• <code class="notranslate">rows="10"</code>：指定文本域的行数（高度）。</p>
+<hr>
+<p>###3 10. <strong>隐藏输入</strong></p>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">hidden</span>" <span class="pl-c1">name</span>="<span class="pl-s">id</span>" <span class="pl-c1">value</span>="<span class="pl-s">1</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：用于在表单中传递隐藏数据，用户不可见。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">type="hidden"</code>：指定输入类型为隐藏。<br>
+• <code class="notranslate">name="id"</code>：用于标识该字段，提交表单时会作为字段名称。<br>
+• <code class="notranslate">value="1"</code>：表示提交的值。</p>
+<hr>
+<h4>11. <strong>按钮</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">button</span>" <span class="pl-c1">value</span>="<span class="pl-s">按钮</span>"<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">reset</span>" <span class="pl-c1">value</span>="<span class="pl-s">重置</span>"<span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">submit</span>" <span class="pl-c1">value</span>="<span class="pl-s">提交</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：<br>
+• <code class="notranslate">type="button"</code>：普通按钮，通常用于触发 JavaScript 事件。<br>
+• <code class="notranslate">type="reset"</code>：重置按钮，用于清空表单内容。<br>
+• <code class="notranslate">type="submit"</code>：提交按钮，用于提交表单数据。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">value="按钮"</code> 等：按钮上显示的文本。</p>
+<hr>
+<h4>12. <strong>表单标签</strong></h4>
+<div class="highlight highlight-text-html-basic"><pre class="notranslate"><span class="pl-kos">&lt;</span><span class="pl-ent">form</span> <span class="pl-c1">action</span>="<span class="pl-s">/submit</span>" <span class="pl-c1">method</span>="<span class="pl-s">post</span>" <span class="pl-c1">enctype</span>="<span class="pl-s">multipart/form-data</span>"<span class="pl-kos">&gt;</span></pre></div>
+<p>• <strong>作用</strong>：定义表单的开始和结束。<br>
+• <strong>属性</strong>：<br>
+• <code class="notranslate">action="/submit"</code>：指定表单提交的目标 URL。<br>
+• <code class="notranslate">method="post"</code>：指定表单提交的方式（<code class="notranslate">GET</code> 或 <code class="notranslate">POST</code>）。<br>
+• <code class="notranslate">enctype="multipart/form-data"</code>：指定表单数据的编码方式，通常用于文件上传。</p>
+<hr></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
