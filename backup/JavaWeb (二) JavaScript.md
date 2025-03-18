@@ -469,3 +469,173 @@ setTimeout(function() {
   alert("JS");
 }, 3000);
 ```
+
+### Document Object Model（DOM）
+**文档对象模型DOM（Document Object Model）​** 是 JavaScript 中用于操作 HTML 和 XML 文档的接口。它将文档解析为一个树形结构，每个节点都是一个对象，可以通过 JavaScript 访问和操作。
+
+![Image](https://github.com/user-attachments/assets/dfdfd4dd-c1f0-4c08-873f-cc9f03ec120a)
+
+​树形结构：DOM 将文档解析为一个树形结构，每个节点都是一个对象。
+
+​节点类型：
+- ​文档节点（Document）​：整个文档的根节点。
+- ​元素节点（Element）​：HTML 标签（如 `<div>`、`<p>`）。
+- ​文本节点（Text）​：元素中的文本内容。
+- ​属性节点（Attribute）​：元素的属性（如 `id`、`class`）。
+
+​常用方法：获取元素、操作内容、操作属性、操作样式、创建和插入元素、删除元素。
+
+事件处理：通过 `addEventListener() `为元素添加事件监听器。
+
+示例代码：
+```html
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>课程表</title>
+  <style>
+    /* 表格样式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #f2f2f2; /* 灰色背景 */
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #4CAF50; /* 表头绿色背景 */
+      color: white; /* 表头白色文字 */
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9; /* 偶数行浅灰色背景 */
+    }
+    tr:hover {
+      background-color: #e0e0e0; /* 鼠标悬停时深灰色背景 */
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align: center;">课程表</h2>
+  <table id="courseTable">
+    <thead>
+      <tr>
+        <th>学号</th>
+        <th>姓名</th>
+        <th>分数</th>
+        <th>评语</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>001</td>
+        <td>张三</td>
+        <td>90</td>
+        <td>很优秀</td>
+      </tr>
+      <tr>
+        <td>002</td>
+        <td>李四</td>
+        <td>92</td>
+        <td>优秀</td>
+      </tr>
+      <tr>
+        <td>003</td>
+        <td>王五</td>
+        <td>83</td>
+        <td>很努力，不错</td>
+      </tr>
+      <tr>
+        <td>004</td>
+        <td>赵六</td>
+        <td>98</td>
+        <td>666</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button onclick="changeContent()">修改第一行内容</button>
+    <button onclick="addRow()">添加新行</button>
+    <button onclick="changeStyle()">修改表头样式</button>
+  </div>
+
+  <script>
+    // 修改第一行内容
+    function changeContent() {
+      var firstRow = document.querySelector("#courseTable tbody tr:first-child");
+      firstRow.cells[0].textContent = "010"; // 修改学号
+      firstRow.cells[1].textContent = "小明"; // 修改姓名
+      firstRow.cells[2].textContent = "95"; // 修改分数
+      firstRow.cells[3].textContent = "进步很大"; // 修改评语
+    }
+
+    // 添加新行
+    function addRow() {
+      var tbody = document.querySelector("#courseTable tbody");
+      var newRow = document.createElement("tr");
+
+      newRow.innerHTML = `
+        <td>005</td>
+        <td>小红</td>
+        <td>88</td>
+        <td>继续加油</td>
+      `;
+
+      tbody.appendChild(newRow);
+    }
+
+    // 修改表头样式
+    function changeStyle() {
+      var headers = document.querySelectorAll("#courseTable th");
+      headers.forEach(function(header) {
+        header.style.backgroundColor = "#FF5733"; // 修改背景颜色
+        header.style.color = "#FFF"; // 修改文字颜色
+        header.style.fontSize = "18px"; // 修改字体大小
+      });
+    }
+  </script>
+</body>
+</html>
+```
+DOM中的三个部分：
+**Core DOM**所有文档类型的标准模型。
+- ​Document：整个文档对象。
+- ​Element：元素对象。
+- ​Attribute：属性对象。
+- ​Text：文本对象。
+- ​Comment：注释对象。
+
+**XML DOM**XML 文档的标准模型。
+
+**HTML DOM**HTML 文档的标准模型.
+- ​Image：`<img>` 标签。
+- ​Button：`<input type="button">` 标签。
+
+DOM常用方法：
+- `document.getElementById()` 通过` id `获取元素。
+- `document.getElementsByClassName()`通过 class 获取元素集合。
+- `document.getElementsByTagName()`通过标签名获取元素集合。
+- `document.querySelector()`通过 CSS 选择器获取第一个匹配的元素。
+- `document.querySelectorAll()`通过 CSS 选择器获取所有匹配的元素。
+- `getAttribute()`、`setAttribute()`、`removeAttribute()`获取修改操作元素的属性值。
+
+### 事件监听
+
+两种方法：
+直接在 HTML 标签中定义事件属性
+```html
+<button onclick="alert('按钮被点击了！')">点击我</button>
+```
+使用 `addEventListener() `方法为元素添加事件监听。
+```javascript
+var button = document.querySelector("button");
+button.addEventListener("click", function() {
+  alert("按钮被点击了！");
+});
+```
+
