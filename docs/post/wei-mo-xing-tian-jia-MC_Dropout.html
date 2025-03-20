@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/147360624?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 什么是MC_DropOut
+**MC DropOut(Monte Carlo Dropout)** 是一种在深度学习中使用Dropout技术进行不确定性估计的方法。">
+<meta property="og:title" content="为模型添加MC_Dropout">
+<meta property="og:description" content="## 什么是MC_DropOut
+**MC DropOut(Monte Carlo Dropout)** 是一种在深度学习中使用Dropout技术进行不确定性估计的方法。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://TingDongHu.github.io/post/wei-mo-xing-tian-jia-MC_Dropout.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
+<title>为模型添加MC_Dropout</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">为模型添加MC_Dropout</h1>
+<div class="title-right">
+    <a href="https://TingDongHu.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/TingDongHu/TingDongHu.github.io/issues/41" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>什么是MC_DropOut</h2>
+<p><strong>MC DropOut(Monte Carlo Dropout)</strong> 是一种在深度学习中使用Dropout技术进行不确定性估计的方法。它由Yarin Gal和Zoubin Ghahramani在2016年提出，主要用于贝叶斯神经网络中，通过Dropout机制来近似贝叶斯推断。</p>
+<p><strong>特征：</strong><br>
+在传统的神经网络中，模型训练完成后，Dropout通常会被关闭，以获得确定的预测结果。然而，Dropout在训练时引入的随机性实际上可以用于估计模型的不确定性。<strong>MC DropOut的核心思想是在测试阶段（推理阶段）仍然保留DropOut，通过多次前向传播（Monte Carlo采样）来估计模型预测的分布。</strong></p>
+<h2>总体思路与引文</h2>
+<p>主要实验思路参考这篇文章<a href="https://arxiv.org/pdf/%5B2206.00214%5D(https://arxiv.org/pdf/2206.00214)" rel="nofollow">https://arxiv.org/pdf/[2206.00214](https://arxiv.org/pdf/2206.00214)</a><br>
+选用<strong>PointPillar</strong>和<strong>SECOND</strong>两个3D目标检测模型。<br>
+框架为OpenPCDet <a href="https://github.com/open-mmlab/OpenPCDet">https://github.com/open-mmlab/OpenPCDet</a></p>
+<blockquote>
+<p>We evaluate LiDAR-MIMO against MC dropout and ensembles on two detectors, PointPillars (PP) and SECOND (SC). We use the PP and SC implementations provided in OpenPCDet [33], and extend them with MC dropout, ensembling, and MIMO-BEV. We refer to the resulting detectors for MC dropout, ensemble and MIMO-BEV as multi-output. More efficient ensemble approaches such as TreeNet [34] or BatchEnsemble [35] were not tested due to their lower performance compared to a standard ensemble [7].<br>
+<strong>Baseline:</strong> The baseline models for evaluating detection performance use the original PP and SC implementations. For KITTI, we use the PP and SC models provided with OpenPCDet. All baseline models are trained with the sigmoid focal loss for 80 epochs.<br>
+<strong>Multi-output:</strong> Each multi-input model shares the same voxel-feature network, backbone, and head from the original PP and SC, with some exceptions for MC dropout and MIMO-BEV as described shortly. Further, all multi-output detectors use the softmax focal classification loss, smooth L1 regression losses, and the previously described aleatoric regression losses, and share the same clustering and merging stage. Each multi-input model is trained for an extra 40 epochs compared to the baseline models in order to have the models converge with the new loss functions.<br>
+<strong>MC dropout:</strong> We create a variant of the backbone by inserting a dropout layer, with 0.5 probability, after the ReLU of each deconvolution block. During inference, we keep the dropout layers active for MC dropout. This model is trained with a batch size of 6 for 120 epochs.<br>
+<strong>Ensemble:</strong> We train four unique models to form our ensemble. Each model is trained with a different random seed for frame order shuffling, for a batch size of 6 with 120 epochs.<br>
+<strong>MIMO-BEV:</strong> MIMO-BEV requires additional code for pseudo images combination and adding multiple heads. There are three hyper parameters for MIMO: number of heads, input repetition (IR) and batch repetition (BR). We selected the number of heads to be 2 as the base networks have low capacity. IR is used to select a percentage of frame groupings in a batch to have matching frame, while BR duplicates each frame in a batch for smoother training. Since we are using a low batch size we were able to train with an IR of 0% and a BR of 0. This model is trained with a batch size of 3 with 120 epochs.</p>
+</blockquote>
+<p>附上一段翻译：</p>
+<blockquote>
+<p>我们在两种检测器（PointPillars (PP) 和 SECOND (SC)）上评估了 LiDAR-MIMO 与 MC Dropout 和集成方法的效果。我们使用了 OpenPCDet [33] 提供的 PP 和 SC 实现，并对其进行了扩展，增加了 MC Dropout、集成方法和 MIMO-BEV。我们将这些扩展后的检测器（MC Dropout、集成方法和 MIMO-BEV）称为多输出检测器。由于性能较低，我们未测试更高效的集成方法，如 TreeNet [34] 或 BatchEnsemble [35] [7]。<br>
+**基线模型：**用于评估检测性能的基线模型使用了原始的 PP 和 SC 实现。对于 KITTI 数据集，我们使用了 OpenPCDet 提供的 PP 和 SC 模型。所有基线模型均使用 Sigmoid Focal Loss 训练 80 个 epoch。<br>
+**多输出模型：**每个多输入模型共享原始 PP 和 SC 的体素特征网络、骨干网络和头部网络，但 MC Dropout 和 MIMO-BEV 有一些例外，稍后会描述。此外，所有多输出检测器均使用 Softmax Focal 分类损失、平滑 L1 回归损失以及之前描述的偶然性回归损失，并共享相同的聚类和合并阶段。与基线模型相比，每个多输入模型额外训练了 40 个 epoch，以确保模型在新损失函数下收敛。<br>
+**MC Dropout：**我们在骨干网络的每个反卷积块的 ReLU 后插入了一个概率为 0.5 的 Dropout 层，创建了一个变体。在推理过程中，我们保持 Dropout 层激活以进行 MC Dropout。该模型以 6 的批量大小训练了 120 个 epoch。<br>
+集成方法：我们训练了四个独立的模型来组成集成。每个模型使用不同的随机种子对帧顺序进行打乱，并以 6 的批量大小训练了 120 个 epoch。<br>
+**MIMO-BEV：**MIMO-BEV 需要额外的代码来组合伪图像并添加多个头部。MIMO 有三个超参数：头部数量、输入重复（IR）和批次重复（BR）。由于基础网络容量较低，我们选择头部数量为 2。IR 用于选择批次中帧分组的匹配帧百分比，而 BR 则复制批次中的每一帧以实现更平滑的训练。由于我们使用了较小的批量大小，因此能够在 IR 为 0% 和 BR 为 0 的情况下进行训练。该模型以 3 的批量大小训练了 120 个 epoch。</p>
+</blockquote>
+<p><strong>大致实验思路：</strong></p>
+<ul>
+<li>在骨干网络的每个反卷积块的ReLU后插入概率为的DropOut层。</li>
+<li>以 6 的批量大小训练 120 个 epoch。</li>
+<li>在推理过程中，保持 Dropout 层激活以进行 MC Dropout。</li>
+</ul>
+<h2>模型中插入DropOut层</h2>
+<p>在<code class="notranslate">pcdet/models/backbones_2d/base_bev_backbone.py</code>中找到PointPillar和SECOND网络提取特征的骨干网络<code class="notranslate">BaseBEVBackbone(nn.Module):</code><br>
+为该类添加DropOut配置：</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">class</span> <span class="pl-v">BaseBEVBackbone</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Module</span>):
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">model_cfg</span>, <span class="pl-s1">input_channels</span>):
+        <span class="pl-en">super</span>().<span class="pl-c1">__init__</span>()
+        <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span> <span class="pl-c1">=</span> <span class="pl-s1">model_cfg</span>
+
+        <span class="pl-c"># 读取 Dropout 配置</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">use_dropout</span> <span class="pl-c1">=</span> <span class="pl-s1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'USE_DROPOUT'</span>, <span class="pl-c1">True</span>)
+        <span class="pl-s1">self</span>.<span class="pl-c1">dropout_prob</span> <span class="pl-c1">=</span> <span class="pl-s1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'DROPOUT_PROB'</span>, <span class="pl-c1">0.5</span>)
+
+        <span class="pl-c"># 配置日志输出</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">logger</span> <span class="pl-c1">=</span> <span class="pl-s1">logging</span>.<span class="pl-c1">getLogger</span>(<span class="pl-s1">__name__</span>)
+        <span class="pl-s1">logging</span>.<span class="pl-c1">basicConfig</span>(<span class="pl-s1">level</span><span class="pl-c1">=</span><span class="pl-s1">logging</span>.<span class="pl-c1">DEBUG</span>)
+
+        <span class="pl-c"># 读取下采样层参数</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'LAYER_NUMS'</span>, <span class="pl-c1">None</span>) <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+            <span class="pl-k">assert</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_NUMS</span>) <span class="pl-c1">==</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_STRIDES</span>) <span class="pl-c1">==</span> <span class="pl-en">len</span>(
+                <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_FILTERS</span>)
+            <span class="pl-s1">layer_nums</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_NUMS</span>
+            <span class="pl-s1">layer_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">LAYER_STRIDES</span>
+            <span class="pl-s1">num_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_FILTERS</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">layer_nums</span> <span class="pl-c1">=</span> <span class="pl-s1">layer_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">num_filters</span> <span class="pl-c1">=</span> []
+
+        <span class="pl-c"># 读取上采样层参数</span>
+        <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'UPSAMPLE_STRIDES'</span>, <span class="pl-c1">None</span>) <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+            <span class="pl-k">assert</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">UPSAMPLE_STRIDES</span>) <span class="pl-c1">==</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_UPSAMPLE_FILTERS</span>)
+            <span class="pl-s1">num_upsample_filters</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">NUM_UPSAMPLE_FILTERS</span>
+            <span class="pl-s1">upsample_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">UPSAMPLE_STRIDES</span>
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">upsample_strides</span> <span class="pl-c1">=</span> <span class="pl-s1">num_upsample_filters</span> <span class="pl-c1">=</span> []
+
+        <span class="pl-s1">num_levels</span> <span class="pl-c1">=</span> <span class="pl-en">len</span>(<span class="pl-s1">layer_nums</span>)
+        <span class="pl-s1">c_in_list</span> <span class="pl-c1">=</span> [<span class="pl-s1">input_channels</span>, <span class="pl-c1">*</span><span class="pl-s1">num_filters</span>[:<span class="pl-c1">-</span><span class="pl-c1">1</span>]]
+        <span class="pl-s1">self</span>.<span class="pl-c1">blocks</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">ModuleList</span>()
+        <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">ModuleList</span>()
+
+        <span class="pl-c"># 添加Dropout层</span>
+        <span class="pl-k">for</span> <span class="pl-s1">idx</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_levels</span>):
+            <span class="pl-s1">cur_layers</span> <span class="pl-c1">=</span> [
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ZeroPad2d</span>(<span class="pl-c1">1</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+                    <span class="pl-s1">c_in_list</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">3</span>,
+                    <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">layer_strides</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">padding</span><span class="pl-c1">=</span><span class="pl-c1">0</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+                ),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+            ]
+
+            <span class="pl-k">for</span> <span class="pl-s1">k</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">layer_nums</span>[<span class="pl-s1">idx</span>]):
+                <span class="pl-s1">cur_layers</span>.<span class="pl-c1">extend</span>([
+                    <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(<span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">kernel_size</span><span class="pl-c1">=</span><span class="pl-c1">3</span>, <span class="pl-s1">padding</span><span class="pl-c1">=</span><span class="pl-c1">1</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>),
+                    <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                    <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+                ])
+
+                <span class="pl-c"># 在ReLU后面添加Dropout层,logger用于观测训练时DropOut是否打开</span>
+                <span class="pl-k">if</span> <span class="pl-s1">self</span>.<span class="pl-c1">use_dropout</span>:
+                    <span class="pl-s1">cur_layers</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Dropout</span>(<span class="pl-s1">p</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">dropout_prob</span>))
+                    <span class="pl-s1">self</span>.<span class="pl-c1">logger</span>.<span class="pl-c1">debug</span>(<span class="pl-s">f"Dropout enabled with probability: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">self</span>.<span class="pl-c1">dropout_prob</span><span class="pl-kos">}</span></span> at layer <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">idx</span><span class="pl-kos">}</span></span>-<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">k</span><span class="pl-kos">}</span></span>"</span>)
+
+            <span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(<span class="pl-c1">*</span><span class="pl-s1">cur_layers</span>))
+
+            <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">upsample_strides</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span>:
+                <span class="pl-s1">stride</span> <span class="pl-c1">=</span> <span class="pl-s1">upsample_strides</span>[<span class="pl-s1">idx</span>]
+                <span class="pl-k">if</span> <span class="pl-s1">stride</span> <span class="pl-c1">&gt;</span> <span class="pl-c1">1</span> <span class="pl-c1">or</span> (<span class="pl-s1">stride</span> <span class="pl-c1">==</span> <span class="pl-c1">1</span> <span class="pl-c1">and</span> <span class="pl-c1">not</span> <span class="pl-s1">self</span>.<span class="pl-c1">model_cfg</span>.<span class="pl-c1">get</span>(<span class="pl-s">'USE_CONV_FOR_NO_STRIDE'</span>, <span class="pl-c1">False</span>)):
+                    <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">ConvTranspose2d</span>(
+                            <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>],
+                            <span class="pl-s1">upsample_strides</span>[<span class="pl-s1">idx</span>],
+                            <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">upsample_strides</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+                        ),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+                    ))
+                <span class="pl-k">else</span>:
+                    <span class="pl-s1">stride</span> <span class="pl-c1">=</span> <span class="pl-s1">np</span>.<span class="pl-c1">round</span>(<span class="pl-c1">1</span> <span class="pl-c1">/</span> <span class="pl-s1">stride</span>).<span class="pl-c1">astype</span>(<span class="pl-s1">np</span>.<span class="pl-c1">int</span>)
+                    <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">Conv2d</span>(
+                            <span class="pl-s1">num_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>],
+                            <span class="pl-s1">stride</span>,
+                            <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">stride</span>, <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+                        ),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">num_upsample_filters</span>[<span class="pl-s1">idx</span>], <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                        <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>()
+                    ))
+
+        <span class="pl-s1">c_in</span> <span class="pl-c1">=</span> <span class="pl-en">sum</span>(<span class="pl-s1">num_upsample_filters</span>)
+        <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">upsample_strides</span>) <span class="pl-c1">&gt;</span> <span class="pl-s1">num_levels</span>:
+            <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>.<span class="pl-c1">append</span>(<span class="pl-s1">nn</span>.<span class="pl-c1">Sequential</span>(
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ConvTranspose2d</span>(<span class="pl-s1">c_in</span>, <span class="pl-s1">c_in</span>, <span class="pl-s1">upsample_strides</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>], <span class="pl-s1">stride</span><span class="pl-c1">=</span><span class="pl-s1">upsample_strides</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>], <span class="pl-s1">bias</span><span class="pl-c1">=</span><span class="pl-c1">False</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">BatchNorm2d</span>(<span class="pl-s1">c_in</span>, <span class="pl-s1">eps</span><span class="pl-c1">=</span><span class="pl-c1">1e-3</span>, <span class="pl-s1">momentum</span><span class="pl-c1">=</span><span class="pl-c1">0.01</span>),
+                <span class="pl-s1">nn</span>.<span class="pl-c1">ReLU</span>(),
+            ))
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_bev_features</span> <span class="pl-c1">=</span> <span class="pl-s1">c_in</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">forward</span>(<span class="pl-s1">self</span>, <span class="pl-s1">data_dict</span>):
+        <span class="pl-s">"""</span>
+<span class="pl-s">        Args:</span>
+<span class="pl-s">            data_dict:</span>
+<span class="pl-s">                spatial_features</span>
+<span class="pl-s">        Returns:</span>
+<span class="pl-s">        """</span>
+        <span class="pl-s1">spatial_features</span> <span class="pl-c1">=</span> <span class="pl-s1">data_dict</span>[<span class="pl-s">'spatial_features'</span>]
+        <span class="pl-s1">ups</span> <span class="pl-c1">=</span> []
+        <span class="pl-s1">ret_dict</span> <span class="pl-c1">=</span> {}
+        <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">spatial_features</span>
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">logger</span>.<span class="pl-c1">debug</span>(<span class="pl-s">f"Starting forward pass, Dropout enabled: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">self</span>.<span class="pl-c1">use_dropout</span><span class="pl-kos">}</span></span>"</span>)
+
+        <span class="pl-c"># 对每个block进行前向传播</span>
+        <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>)):
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>[<span class="pl-s1">i</span>](<span class="pl-s1">x</span>)
+
+            <span class="pl-s1">stride</span> <span class="pl-c1">=</span> <span class="pl-en">int</span>(<span class="pl-s1">spatial_features</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">2</span>] <span class="pl-c1">/</span> <span class="pl-s1">x</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">2</span>])
+            <span class="pl-s1">ret_dict</span>[<span class="pl-s">'spatial_features_%dx'</span> <span class="pl-c1">%</span> <span class="pl-s1">stride</span>] <span class="pl-c1">=</span> <span class="pl-s1">x</span>
+
+            <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span>:
+                <span class="pl-s1">ups</span>.<span class="pl-c1">append</span>(<span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>[<span class="pl-s1">i</span>](<span class="pl-s1">x</span>))
+            <span class="pl-k">else</span>:
+                <span class="pl-s1">ups</span>.<span class="pl-c1">append</span>(<span class="pl-s1">x</span>)
+
+        <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">ups</span>) <span class="pl-c1">&gt;</span> <span class="pl-c1">1</span>:
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cat</span>(<span class="pl-s1">ups</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">1</span>)
+        <span class="pl-k">elif</span> <span class="pl-en">len</span>(<span class="pl-s1">ups</span>) <span class="pl-c1">==</span> <span class="pl-c1">1</span>:
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">ups</span>[<span class="pl-c1">0</span>]
+
+        <span class="pl-k">if</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>) <span class="pl-c1">&gt;</span> <span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">blocks</span>):
+            <span class="pl-s1">x</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">deblocks</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>](<span class="pl-s1">x</span>)
+
+        <span class="pl-s1">data_dict</span>[<span class="pl-s">'spatial_features_2d'</span>] <span class="pl-c1">=</span> <span class="pl-s1">x</span>
+        <span class="pl-k">return</span> <span class="pl-s1">data_dict</span></pre></div>
+<p>配置新的<code class="notranslate">pointpillar_MCdropout.yaml</code>文件添加到<code class="notranslate">tools/cfgs/kitti_models/</code>文件路径下,SECOND网络同理。</p>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">CLASS_NAMES</span>: <span class="pl-s">['Car', 'Pedestrian', 'Cyclist']</span>
+
+<span class="pl-ent">DATA_CONFIG</span>:
+    <span class="pl-ent">_BASE_CONFIG_</span>: <span class="pl-s">cfgs/dataset_configs/kitti_dataset.yaml</span>
+
+    <span class="pl-ent">POINT_CLOUD_RANGE</span>: <span class="pl-s">[0, -39.68, -3, 69.12, 39.68, 1]</span>
+    <span class="pl-ent">DATA_PROCESSOR</span>:
+        - <span class="pl-ent">NAME</span>: <span class="pl-s">mask_points_and_boxes_outside_range</span>
+          <span class="pl-ent">REMOVE_OUTSIDE_BOXES</span>: <span class="pl-c1">True</span>
+
+        - <span class="pl-ent">NAME</span>: <span class="pl-s">shuffle_points</span>
+          <span class="pl-ent">SHUFFLE_ENABLED</span>: <span class="pl-s">{</span>
+            <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">train</span><span class="pl-pds">'</span></span>: <span class="pl-s">True,</span>
+            <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">test</span><span class="pl-pds">'</span></span>: <span class="pl-c1">False</span>
+          <span class="pl-s">}</span>
+
+        - <span class="pl-ent">NAME</span>: <span class="pl-s">transform_points_to_voxels</span>
+          <span class="pl-ent">VOXEL_SIZE</span>: <span class="pl-s">[0.16, 0.16, 4]</span>
+          <span class="pl-ent">MAX_POINTS_PER_VOXEL</span>: <span class="pl-c1">32</span>
+          <span class="pl-ent">MAX_NUMBER_OF_VOXELS</span>: <span class="pl-s">{</span>
+            <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">train</span><span class="pl-pds">'</span></span>: <span class="pl-c1">16000,</span>
+            <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">test</span><span class="pl-pds">'</span></span>: <span class="pl-c1">40000</span>
+          <span class="pl-s">}</span>
+    <span class="pl-ent">DATA_AUGMENTOR</span>:
+        <span class="pl-ent">DISABLE_AUG_LIST</span>: <span class="pl-s">['placeholder']</span>
+        <span class="pl-ent">AUG_CONFIG_LIST</span>:
+            - <span class="pl-ent">NAME</span>: <span class="pl-s">gt_sampling</span>
+              <span class="pl-ent">USE_ROAD_PLANE</span>: <span class="pl-c1">False</span>
+              <span class="pl-ent">DB_INFO_PATH</span>:
+                  - <span class="pl-s">kitti_dbinfos_train.pkl</span>
+              <span class="pl-ent">PREPARE</span>: <span class="pl-s">{</span>
+                 <span class="pl-ent">filter_by_min_points</span>: <span class="pl-s">['Car:5', 'Pedestrian:5', 'Cyclist:5'],</span>
+                 <span class="pl-ent">filter_by_difficulty</span>: <span class="pl-s">[-1],</span>
+              <span class="pl-s">}</span>
+
+              <span class="pl-ent">SAMPLE_GROUPS</span>: <span class="pl-s">['Car:15','Pedestrian:15', 'Cyclist:15']</span>
+              <span class="pl-ent">NUM_POINT_FEATURES</span>: <span class="pl-c1">4</span>
+              <span class="pl-ent">DATABASE_WITH_FAKELIDAR</span>: <span class="pl-c1">False</span>
+              <span class="pl-ent">REMOVE_EXTRA_WIDTH</span>: <span class="pl-s">[0.0, 0.0, 0.0]</span>
+              <span class="pl-ent">LIMIT_WHOLE_SCENE</span>: <span class="pl-c1">False</span>
+
+            - <span class="pl-ent">NAME</span>: <span class="pl-s">random_world_flip</span>
+              <span class="pl-ent">ALONG_AXIS_LIST</span>: <span class="pl-s">['x']</span>
+
+            - <span class="pl-ent">NAME</span>: <span class="pl-s">random_world_rotation</span>
+              <span class="pl-ent">WORLD_ROT_ANGLE</span>: <span class="pl-s">[-0.78539816, 0.78539816]</span>
+
+            - <span class="pl-ent">NAME</span>: <span class="pl-s">random_world_scaling</span>
+              <span class="pl-ent">WORLD_SCALE_RANGE</span>: <span class="pl-s">[0.95, 1.05]</span>
+
+<span class="pl-ent">MODEL</span>:
+    <span class="pl-ent">NAME</span>: <span class="pl-s">PointPillar</span>
+
+    <span class="pl-ent">VFE</span>:
+        <span class="pl-ent">NAME</span>: <span class="pl-s">PillarVFE</span>
+        <span class="pl-ent">WITH_DISTANCE</span>: <span class="pl-c1">False</span>
+        <span class="pl-ent">USE_ABSLOTE_XYZ</span>: <span class="pl-c1">True</span>
+        <span class="pl-ent">USE_NORM</span>: <span class="pl-c1">True</span>
+        <span class="pl-ent">NUM_FILTERS</span>: <span class="pl-s">[64]</span>
+
+    <span class="pl-ent">MAP_TO_BEV</span>:
+        <span class="pl-ent">NAME</span>: <span class="pl-s">PointPillarScatter</span>
+        <span class="pl-ent">NUM_BEV_FEATURES</span>: <span class="pl-c1">64</span>
+
+    <span class="pl-ent">BACKBONE_2D</span>:
+        <span class="pl-ent">NAME</span>: <span class="pl-s">BaseBEVBackbone</span>
+        <span class="pl-ent">LAYER_NUMS</span>: <span class="pl-s">[3, 5, 5]</span>
+        <span class="pl-ent">LAYER_STRIDES</span>: <span class="pl-s">[2, 2, 2]</span>
+        <span class="pl-ent">NUM_FILTERS</span>: <span class="pl-s">[64, 128, 256]</span>
+        <span class="pl-ent">UPSAMPLE_STRIDES</span>: <span class="pl-s">[1, 2, 4]</span>
+        <span class="pl-ent">NUM_UPSAMPLE_FILTERS</span>: <span class="pl-s">[128, 128, 128]</span>
+      <span class="pl-c"><span class="pl-c">#</span> 在这里添加 Dropout 配置</span>
+        <span class="pl-ent">USE_MC_DROPOUT</span>: <span class="pl-c1">True</span>
+        <span class="pl-ent">DROPOUT_PROB</span>: <span class="pl-c1">0.5</span>  <span class="pl-c"><span class="pl-c">#</span> Dropout 的概率，可根据需要调整</span>
+    <span class="pl-ent">DENSE_HEAD</span>:
+        <span class="pl-ent">NAME</span>: <span class="pl-s">AnchorHeadSingle</span>
+        <span class="pl-ent">CLASS_AGNOSTIC</span>: <span class="pl-c1">False</span>
+
+        <span class="pl-ent">USE_DIRECTION_CLASSIFIER</span>: <span class="pl-c1">True</span>
+        <span class="pl-ent">DIR_OFFSET</span>: <span class="pl-c1">0.78539</span>
+        <span class="pl-ent">DIR_LIMIT_OFFSET</span>: <span class="pl-c1">0.0</span>
+        <span class="pl-ent">NUM_DIR_BINS</span>: <span class="pl-c1">2</span>
+
+        <span class="pl-ent">ANCHOR_GENERATOR_CONFIG</span>: <span class="pl-s">[</span>
+            <span class="pl-s">{</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">class_name</span><span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>Car<span class="pl-pds">'</span></span><span class="pl-s">,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_sizes</span><span class="pl-pds">'</span></span>: <span class="pl-s">[[3.9, 1.6, 1.56]],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_rotations</span><span class="pl-pds">'</span></span>: <span class="pl-s">[0, 1.57],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_bottom_heights</span><span class="pl-pds">'</span></span>: <span class="pl-s">[-1.78],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">align_center</span><span class="pl-pds">'</span></span>: <span class="pl-s">False,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">feature_map_stride</span><span class="pl-pds">'</span></span>: <span class="pl-c1">2,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">matched_threshold</span><span class="pl-pds">'</span></span>: <span class="pl-s">0.6,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">unmatched_threshold</span><span class="pl-pds">'</span></span>: <span class="pl-c1">0.45</span>
+            <span class="pl-s">},</span>
+            <span class="pl-s">{</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">class_name</span><span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>Pedestrian<span class="pl-pds">'</span></span><span class="pl-s">,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_sizes</span><span class="pl-pds">'</span></span>: <span class="pl-s">[[0.8, 0.6, 1.73]],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_rotations</span><span class="pl-pds">'</span></span>: <span class="pl-s">[0, 1.57],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_bottom_heights</span><span class="pl-pds">'</span></span>: <span class="pl-s">[-0.6],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">align_center</span><span class="pl-pds">'</span></span>: <span class="pl-s">False,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">feature_map_stride</span><span class="pl-pds">'</span></span>: <span class="pl-c1">2,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">matched_threshold</span><span class="pl-pds">'</span></span>: <span class="pl-s">0.5,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">unmatched_threshold</span><span class="pl-pds">'</span></span>: <span class="pl-c1">0.35</span>
+            <span class="pl-s">},</span>
+            <span class="pl-s">{</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">class_name</span><span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>Cyclist<span class="pl-pds">'</span></span><span class="pl-s">,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_sizes</span><span class="pl-pds">'</span></span>: <span class="pl-s">[[1.76, 0.6, 1.73]],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_rotations</span><span class="pl-pds">'</span></span>: <span class="pl-s">[0, 1.57],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">anchor_bottom_heights</span><span class="pl-pds">'</span></span>: <span class="pl-s">[-0.6],</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">align_center</span><span class="pl-pds">'</span></span>: <span class="pl-s">False,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">feature_map_stride</span><span class="pl-pds">'</span></span>: <span class="pl-c1">2,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">matched_threshold</span><span class="pl-pds">'</span></span>: <span class="pl-s">0.5,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">unmatched_threshold</span><span class="pl-pds">'</span></span>: <span class="pl-c1">0.35</span>
+            <span class="pl-s">}</span>
+        <span class="pl-s">]</span>
+
+        <span class="pl-ent">TARGET_ASSIGNER_CONFIG</span>:
+            <span class="pl-ent">NAME</span>: <span class="pl-s">AxisAlignedTargetAssigner</span>
+            <span class="pl-ent">POS_FRACTION</span>: <span class="pl-c1">-1.0</span>
+            <span class="pl-ent">SAMPLE_SIZE</span>: <span class="pl-c1">512</span>
+            <span class="pl-ent">NORM_BY_NUM_EXAMPLES</span>: <span class="pl-c1">False</span>
+            <span class="pl-ent">MATCH_HEIGHT</span>: <span class="pl-c1">False</span>
+            <span class="pl-ent">BOX_CODER</span>: <span class="pl-s">ResidualCoder</span>
+
+        <span class="pl-ent">LOSS_CONFIG</span>:
+            <span class="pl-ent">LOSS_WEIGHTS</span>: <span class="pl-s">{</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">cls_weight</span><span class="pl-pds">'</span></span>: <span class="pl-s">1.0,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">loc_weight</span><span class="pl-pds">'</span></span>: <span class="pl-s">2.0,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">dir_weight</span><span class="pl-pds">'</span></span>: <span class="pl-s">0.2,</span>
+                <span class="pl-s"><span class="pl-pds">'</span><span class="pl-ent">code_weights</span><span class="pl-pds">'</span></span>: <span class="pl-s">[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]</span>
+            <span class="pl-s">}</span>
+
+    <span class="pl-ent">POST_PROCESSING</span>:
+        <span class="pl-ent">RECALL_THRESH_LIST</span>: <span class="pl-s">[0.3, 0.5, 0.7]</span>
+        <span class="pl-ent">SCORE_THRESH</span>: <span class="pl-c1">0.1</span>
+        <span class="pl-ent">OUTPUT_RAW_SCORE</span>: <span class="pl-c1">False</span>
+
+        <span class="pl-ent">EVAL_METRIC</span>: <span class="pl-s">kitti</span>
+
+        <span class="pl-ent">NMS_CONFIG</span>:
+            <span class="pl-ent">MULTI_CLASSES_NMS</span>: <span class="pl-c1">False</span>
+            <span class="pl-ent">NMS_TYPE</span>: <span class="pl-s">nms_gpu</span>
+            <span class="pl-ent">NMS_THRESH</span>: <span class="pl-c1">0.01</span>
+            <span class="pl-ent">NMS_PRE_MAXSIZE</span>: <span class="pl-c1">4096</span>
+            <span class="pl-ent">NMS_POST_MAXSIZE</span>: <span class="pl-c1">500</span>
+
+
+<span class="pl-ent">OPTIMIZATION</span>:
+    <span class="pl-ent">BATCH_SIZE_PER_GPU</span>: <span class="pl-c1">6</span>
+    <span class="pl-c"><span class="pl-c">#</span>增加额外的训练轮数</span>
+    <span class="pl-ent">NUM_EPOCHS</span>: <span class="pl-c1">120</span>
+
+    <span class="pl-ent">OPTIMIZER</span>: <span class="pl-s">adam_onecycle</span>
+    <span class="pl-ent">LR</span>: <span class="pl-c1">0.003</span>
+    <span class="pl-ent">WEIGHT_DECAY</span>: <span class="pl-c1">0.01</span>
+    <span class="pl-ent">MOMENTUM</span>: <span class="pl-c1">0.9</span>
+
+    <span class="pl-ent">MOMS</span>: <span class="pl-s">[0.95, 0.85]</span>
+    <span class="pl-ent">PCT_START</span>: <span class="pl-c1">0.4</span>
+    <span class="pl-ent">DIV_FACTOR</span>: <span class="pl-c1">10</span>
+    <span class="pl-ent">DECAY_STEP_LIST</span>: <span class="pl-s">[35, 45]</span>
+    <span class="pl-ent">LR_DECAY</span>: <span class="pl-c1">0.1</span>
+    <span class="pl-ent">LR_CLIP</span>: <span class="pl-c1">0.0000001</span>
+
+    <span class="pl-ent">LR_WARMUP</span>: <span class="pl-c1">False</span>
+    <span class="pl-ent">WARMUP_EPOCH</span>: <span class="pl-c1">1</span>
+
+    <span class="pl-ent">GRAD_NORM_CLIP</span>: <span class="pl-c1">10</span></pre></div>
+<p><strong>进行训练</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">cd</span> tools</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python train.py --cfg_file cfgs/kitti_models/pointpillar_MCdropout.yaml --batch_size 6 --epochs 120 </pre></div>
+<p><strong>second同理</strong></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python train.py --cfg_file cfgs/kitti_models/second_MCdropout.yaml --batch_size 6 --epochs 120</pre></div>
+<p>训练完成后检查<code class="notranslate">output/kitti_models/pointpillar_MCdropout</code>中<code class="notranslate">ckpt</code>中有120的epoch，即表明训练成功，second<br>
+网络同理</p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/3da38ed3-cc9a-4b64-9c38-fe5bbd622bae"><img src="https://github.com/user-attachments/assets/3da38ed3-cc9a-4b64-9c38-fe5bbd622bae" alt="Image" style="max-width: 100%;"></a></p>
+<h2>评估过程中打开DropOut</h2>
+<p>OpenPCDet中，负责评估模型的文件为<code class="notranslate">test.py</code>,位于路径<code class="notranslate">tools/test.py</code><br>
+修改该文件下的<code class="notranslate">eval_single_ckpt</code>函数</p>
+<pre class="notranslate"><code class="notranslate">
+def eval_single_ckpt(model, test_loader, args, eval_output_dir, logger, epoch_id, dist_test=False):
+    logger.info(f'Loading checkpoint from: {args.ckpt}')
+    if not os.path.exists(args.ckpt):
+        logger.error(f'Checkpoint file not found: {args.ckpt}')
+        return
+
+    # 加载检查点
+    model.load_params_from_file(filename=args.ckpt, logger=logger, to_cpu=dist_test,
+                                pre_trained_path=args.pretrained_model)
+    model.cuda()
+
+    # 将整个模型设置为 eval 模式
+    model.eval()
+
+    # 如果启用 MC Dropout，手动将 Dropout 层设置为 train 模式
+    if args.mc_dropout:
+        for m in model.modules():
+            if isinstance(m, torch.nn.Dropout):
+                m.train()
+                logger.info('Dropout layer set to train mode: %s' % str(m))
+
+    # 开始评估
+    eval_utils.eval_one_epoch(
+        cfg, args, model, test_loader, epoch_id, logger, dist_test=dist_test,
+        result_dir=eval_output_dir
+    )
+
+
+
+</code></pre>
+<p>核心修改为：</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">for</span> <span class="pl-s1">m</span> <span class="pl-c1">in</span> <span class="pl-s1">model</span>.<span class="pl-c1">modules</span>():
+    <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">m</span>, <span class="pl-s1">torch</span>.<span class="pl-c1">nn</span>.<span class="pl-c1">Dropout</span>):
+        <span class="pl-s1">m</span>.<span class="pl-c1">train</span>()
+        <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'Dropout layer set to train mode: %s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">m</span>))</pre></div>
+<p>遍历模型的所有子模块，找到 Dropout 层，并将其设置为 train 模式。<br>
+在 train 模式下，Dropout 层会随机丢弃神经元。</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-s1">num_samples</span> <span class="pl-c1">=</span> <span class="pl-c1">10</span>  <span class="pl-c"># 默认采样 10 次</span></pre></div>
+<p>定义 MC Dropout 的采样次数（即对每个输入进行多少次前向传播）。<br>
+采样次数越多，模型的不确定性估计越准确，但计算成本也越高。<br>
+10 次是一个常用的默认值，可以根据实际需求调整。</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-s1">pred_dicts_list</span> <span class="pl-c1">=</span> []
+<span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_samples</span>):
+    <span class="pl-k">with</span> <span class="pl-s1">torch</span>.<span class="pl-c1">no_grad</span>():  <span class="pl-c"># 禁用梯度计算</span>
+        <span class="pl-s1">pred_dicts</span>, <span class="pl-s1">ret_dict</span> <span class="pl-c1">=</span> <span class="pl-en">model</span>(<span class="pl-s1">batch_dict</span>)
+        <span class="pl-s1">pred_dicts_list</span>.<span class="pl-c1">append</span>(<span class="pl-s1">pred_dicts</span>)</pre></div>
+<p>对每个输入进行多次前向传播，每次前向传播时 Dropout 层会随机丢弃不同的神经元。<br>
+将每次前向传播的结果保存到 <code class="notranslate">pred_dicts_list </code>中</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-s1">pred_dicts</span> <span class="pl-c1">=</span> <span class="pl-s1">pred_dicts_list</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>]</pre></div>
+<p>使用最后一次前向传播的结果进行后续处理（例如计算指标、保存结果等）。<br>
+<strong>此处有争议，尚未弄明白，后续更新</strong></p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>注意此处不可以简单粗暴的把整个评估模式由<code class="notranslate">model.eval()</code>改为<code class="notranslate">model.train()</code> ，虽然看起来在评估过程中一直在输出Dropout enabled with probability：True的消息，但是多次评估的结果并无变化。而是需要保持评估模式为 eval 模式，再手动设置Dropout层为train模式（有先后顺序）。</p>
+</div>
+<p>在eval模式下BatchNorm 层会使用全局统计量（而不是当前 batch 的统计量），MC Dropout 的核心思想是通过多次前向传播（每次随机丢弃不同的神经元）来估计模型的不确定性。</p>
+<p>如果不想破坏test.py文件的公共使用性，可以在<code class="notranslate">tools/eval_utils/eval_utils.py</code>中写一个专用的MC_Dropout评估，效果是一样的：</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-c">#这个是默认打开MC_DropOut的</span>
+<span class="pl-k">def</span> <span class="pl-en">eval_one_epoch</span>(<span class="pl-s1">cfg</span>, <span class="pl-s1">args</span>, <span class="pl-s1">model</span>, <span class="pl-s1">dataloader</span>, <span class="pl-s1">epoch_id</span>, <span class="pl-s1">logger</span>, <span class="pl-s1">dist_test</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">result_dir</span><span class="pl-c1">=</span><span class="pl-c1">None</span>):
+    <span class="pl-s1">result_dir</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+    <span class="pl-s1">final_output_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">result_dir</span> <span class="pl-c1">/</span> <span class="pl-s">'final_result'</span> <span class="pl-c1">/</span> <span class="pl-s">'data'</span>
+    <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">save_to_file</span>:
+        <span class="pl-s1">final_output_dir</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+    <span class="pl-s1">metric</span> <span class="pl-c1">=</span> {
+        <span class="pl-s">'gt_num'</span>: <span class="pl-c1">0</span>,
+    }
+    <span class="pl-k">for</span> <span class="pl-s1">cur_thresh</span> <span class="pl-c1">in</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">MODEL</span>.<span class="pl-c1">POST_PROCESSING</span>.<span class="pl-c1">RECALL_THRESH_LIST</span>:
+        <span class="pl-s1">metric</span>[<span class="pl-s">'recall_roi_%s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">cur_thresh</span>)] <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+        <span class="pl-s1">metric</span>[<span class="pl-s">'recall_rcnn_%s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">cur_thresh</span>)] <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+
+    <span class="pl-s1">dataset</span> <span class="pl-c1">=</span> <span class="pl-s1">dataloader</span>.<span class="pl-c1">dataset</span>
+    <span class="pl-s1">class_names</span> <span class="pl-c1">=</span> <span class="pl-s1">dataset</span>.<span class="pl-c1">class_names</span>
+    <span class="pl-s1">det_annos</span> <span class="pl-c1">=</span> []
+
+    <span class="pl-k">if</span> <span class="pl-en">getattr</span>(<span class="pl-s1">args</span>, <span class="pl-s">'infer_time'</span>, <span class="pl-c1">False</span>):
+        <span class="pl-s1">start_iter</span> <span class="pl-c1">=</span> <span class="pl-en">int</span>(<span class="pl-en">len</span>(<span class="pl-s1">dataloader</span>) <span class="pl-c1">*</span> <span class="pl-c1">0.1</span>)
+        <span class="pl-s1">infer_time_meter</span> <span class="pl-c1">=</span> <span class="pl-s1">common_utils</span>.<span class="pl-c1">AverageMeter</span>()
+
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'*************** EPOCH %s EVALUATION *****************'</span> <span class="pl-c1">%</span> <span class="pl-s1">epoch_id</span>)
+    <span class="pl-k">if</span> <span class="pl-s1">dist_test</span>:
+        <span class="pl-s1">num_gpus</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cuda</span>.<span class="pl-c1">device_count</span>()
+        <span class="pl-s1">local_rank</span> <span class="pl-c1">=</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span> <span class="pl-c1">%</span> <span class="pl-s1">num_gpus</span>
+        <span class="pl-s1">model</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">nn</span>.<span class="pl-c1">parallel</span>.<span class="pl-c1">DistributedDataParallel</span>(
+                <span class="pl-s1">model</span>,
+                <span class="pl-s1">device_ids</span><span class="pl-c1">=</span>[<span class="pl-s1">local_rank</span>],
+                <span class="pl-s1">broadcast_buffers</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+        )
+
+    <span class="pl-c"># 将整个模型设置为 eval 模式</span>
+    <span class="pl-s1">model</span>.<span class="pl-c1">eval</span>()
+
+    <span class="pl-c"># 默认开启 MC Dropout，手动将 Dropout 层设置为 train 模式</span>
+    <span class="pl-k">for</span> <span class="pl-s1">m</span> <span class="pl-c1">in</span> <span class="pl-s1">model</span>.<span class="pl-c1">modules</span>():
+        <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">m</span>, <span class="pl-s1">torch</span>.<span class="pl-c1">nn</span>.<span class="pl-c1">Dropout</span>):
+            <span class="pl-s1">m</span>.<span class="pl-c1">train</span>()
+            <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'Dropout layer set to train mode: %s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">m</span>))
+
+    <span class="pl-c"># 设置 MC Dropout 的采样次数</span>
+    <span class="pl-s1">num_samples</span> <span class="pl-c1">=</span> <span class="pl-c1">10</span>  <span class="pl-c"># 默认采样 10 次</span>
+
+    <span class="pl-k">if</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span> <span class="pl-c1">==</span> <span class="pl-c1">0</span>:
+        <span class="pl-s1">progress_bar</span> <span class="pl-c1">=</span> <span class="pl-s1">tqdm</span>.<span class="pl-c1">tqdm</span>(<span class="pl-s1">total</span><span class="pl-c1">=</span><span class="pl-en">len</span>(<span class="pl-s1">dataloader</span>), <span class="pl-s1">leave</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">desc</span><span class="pl-c1">=</span><span class="pl-s">'eval'</span>, <span class="pl-s1">dynamic_ncols</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+    <span class="pl-s1">start_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>()
+
+    <span class="pl-k">for</span> <span class="pl-s1">i</span>, <span class="pl-s1">batch_dict</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">dataloader</span>):
+        <span class="pl-en">load_data_to_gpu</span>(<span class="pl-s1">batch_dict</span>)
+
+        <span class="pl-k">if</span> <span class="pl-en">getattr</span>(<span class="pl-s1">args</span>, <span class="pl-s">'infer_time'</span>, <span class="pl-c1">False</span>):
+            <span class="pl-s1">start_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>()
+
+        <span class="pl-c"># 进行多次前向传播（MC Dropout）</span>
+        <span class="pl-s1">pred_dicts_list</span> <span class="pl-c1">=</span> []
+        <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_samples</span>):
+            <span class="pl-k">with</span> <span class="pl-s1">torch</span>.<span class="pl-c1">no_grad</span>():  <span class="pl-c"># 禁用梯度计算</span>
+                <span class="pl-s1">pred_dicts</span>, <span class="pl-s1">ret_dict</span> <span class="pl-c1">=</span> <span class="pl-en">model</span>(<span class="pl-s1">batch_dict</span>)
+                <span class="pl-s1">pred_dicts_list</span>.<span class="pl-c1">append</span>(<span class="pl-s1">pred_dicts</span>)
+
+        <span class="pl-c"># 使用最后一次预测结果进行后续处理</span>
+        <span class="pl-s1">pred_dicts</span> <span class="pl-c1">=</span> <span class="pl-s1">pred_dicts_list</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>]
+
+        <span class="pl-s1">disp_dict</span> <span class="pl-c1">=</span> {}
+
+        <span class="pl-k">if</span> <span class="pl-en">getattr</span>(<span class="pl-s1">args</span>, <span class="pl-s">'infer_time'</span>, <span class="pl-c1">False</span>):
+            <span class="pl-s1">inference_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>() <span class="pl-c1">-</span> <span class="pl-s1">start_time</span>
+            <span class="pl-s1">infer_time_meter</span>.<span class="pl-c1">update</span>(<span class="pl-s1">inference_time</span> <span class="pl-c1">*</span> <span class="pl-c1">1000</span>)
+            <span class="pl-c"># use ms to measure inference time</span>
+            <span class="pl-s1">disp_dict</span>[<span class="pl-s">'infer_time'</span>] <span class="pl-c1">=</span> <span class="pl-s">f'<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">infer_time_meter</span>.<span class="pl-c1">val</span>:.2f<span class="pl-kos">}</span></span>(<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">infer_time_meter</span>.<span class="pl-c1">avg</span>:.2f<span class="pl-kos">}</span></span>)'</span>
+
+        <span class="pl-en">statistics_info</span>(<span class="pl-s1">cfg</span>, <span class="pl-s1">ret_dict</span>, <span class="pl-s1">metric</span>, <span class="pl-s1">disp_dict</span>)
+        <span class="pl-s1">annos</span> <span class="pl-c1">=</span> <span class="pl-s1">dataset</span>.<span class="pl-c1">generate_prediction_dicts</span>(
+            <span class="pl-s1">batch_dict</span>, <span class="pl-s1">pred_dicts</span>, <span class="pl-s1">class_names</span>,
+            <span class="pl-s1">output_path</span><span class="pl-c1">=</span><span class="pl-s1">final_output_dir</span> <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">save_to_file</span> <span class="pl-k">else</span> <span class="pl-c1">None</span>
+        )
+        <span class="pl-s1">det_annos</span> <span class="pl-c1">+=</span> <span class="pl-s1">annos</span>
+        <span class="pl-k">if</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span> <span class="pl-c1">==</span> <span class="pl-c1">0</span>:
+            <span class="pl-s1">progress_bar</span>.<span class="pl-c1">set_postfix</span>(<span class="pl-s1">disp_dict</span>)
+            <span class="pl-s1">progress_bar</span>.<span class="pl-c1">update</span>()
+
+    <span class="pl-k">if</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span> <span class="pl-c1">==</span> <span class="pl-c1">0</span>:
+        <span class="pl-s1">progress_bar</span>.<span class="pl-c1">close</span>()
+
+    <span class="pl-k">if</span> <span class="pl-s1">dist_test</span>:
+        <span class="pl-s1">rank</span>, <span class="pl-s1">world_size</span> <span class="pl-c1">=</span> <span class="pl-s1">common_utils</span>.<span class="pl-c1">get_dist_info</span>()
+        <span class="pl-s1">det_annos</span> <span class="pl-c1">=</span> <span class="pl-s1">common_utils</span>.<span class="pl-c1">merge_results_dist</span>(<span class="pl-s1">det_annos</span>, <span class="pl-en">len</span>(<span class="pl-s1">dataset</span>), <span class="pl-s1">tmpdir</span><span class="pl-c1">=</span><span class="pl-s1">result_dir</span> <span class="pl-c1">/</span> <span class="pl-s">'tmpdir'</span>)
+        <span class="pl-s1">metric</span> <span class="pl-c1">=</span> <span class="pl-s1">common_utils</span>.<span class="pl-c1">merge_results_dist</span>([<span class="pl-s1">metric</span>], <span class="pl-s1">world_size</span>, <span class="pl-s1">tmpdir</span><span class="pl-c1">=</span><span class="pl-s1">result_dir</span> <span class="pl-c1">/</span> <span class="pl-s">'tmpdir'</span>)
+
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'*************** Performance of EPOCH %s *****************'</span> <span class="pl-c1">%</span> <span class="pl-s1">epoch_id</span>)
+    <span class="pl-s1">sec_per_example</span> <span class="pl-c1">=</span> (<span class="pl-s1">time</span>.<span class="pl-c1">time</span>() <span class="pl-c1">-</span> <span class="pl-s1">start_time</span>) <span class="pl-c1">/</span> <span class="pl-en">len</span>(<span class="pl-s1">dataloader</span>.<span class="pl-c1">dataset</span>)
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'Generate label finished(sec_per_example: %.4f second).'</span> <span class="pl-c1">%</span> <span class="pl-s1">sec_per_example</span>)
+
+    <span class="pl-k">if</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span> <span class="pl-c1">!=</span> <span class="pl-c1">0</span>:
+        <span class="pl-k">return</span> {}
+
+    <span class="pl-s1">ret_dict</span> <span class="pl-c1">=</span> {}
+    <span class="pl-k">if</span> <span class="pl-s1">dist_test</span>:
+        <span class="pl-k">for</span> <span class="pl-s1">key</span>, <span class="pl-s1">val</span> <span class="pl-c1">in</span> <span class="pl-s1">metric</span>[<span class="pl-c1">0</span>].<span class="pl-c1">items</span>():
+            <span class="pl-k">for</span> <span class="pl-s1">k</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">1</span>, <span class="pl-s1">world_size</span>):
+                <span class="pl-s1">metric</span>[<span class="pl-c1">0</span>][<span class="pl-s1">key</span>] <span class="pl-c1">+=</span> <span class="pl-s1">metric</span>[<span class="pl-s1">k</span>][<span class="pl-s1">key</span>]
+        <span class="pl-s1">metric</span> <span class="pl-c1">=</span> <span class="pl-s1">metric</span>[<span class="pl-c1">0</span>]
+
+    <span class="pl-s1">gt_num_cnt</span> <span class="pl-c1">=</span> <span class="pl-s1">metric</span>[<span class="pl-s">'gt_num'</span>]
+    <span class="pl-k">for</span> <span class="pl-s1">cur_thresh</span> <span class="pl-c1">in</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">MODEL</span>.<span class="pl-c1">POST_PROCESSING</span>.<span class="pl-c1">RECALL_THRESH_LIST</span>:
+        <span class="pl-s1">cur_roi_recall</span> <span class="pl-c1">=</span> <span class="pl-s1">metric</span>[<span class="pl-s">'recall_roi_%s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">cur_thresh</span>)] <span class="pl-c1">/</span> <span class="pl-en">max</span>(<span class="pl-s1">gt_num_cnt</span>, <span class="pl-c1">1</span>)
+        <span class="pl-s1">cur_rcnn_recall</span> <span class="pl-c1">=</span> <span class="pl-s1">metric</span>[<span class="pl-s">'recall_rcnn_%s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">cur_thresh</span>)] <span class="pl-c1">/</span> <span class="pl-en">max</span>(<span class="pl-s1">gt_num_cnt</span>, <span class="pl-c1">1</span>)
+        <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'recall_roi_%s: %f'</span> <span class="pl-c1">%</span> (<span class="pl-s1">cur_thresh</span>, <span class="pl-s1">cur_roi_recall</span>))
+        <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'recall_rcnn_%s: %f'</span> <span class="pl-c1">%</span> (<span class="pl-s1">cur_thresh</span>, <span class="pl-s1">cur_rcnn_recall</span>))
+        <span class="pl-s1">ret_dict</span>[<span class="pl-s">'recall/roi_%s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">cur_thresh</span>)] <span class="pl-c1">=</span> <span class="pl-s1">cur_roi_recall</span>
+        <span class="pl-s1">ret_dict</span>[<span class="pl-s">'recall/rcnn_%s'</span> <span class="pl-c1">%</span> <span class="pl-en">str</span>(<span class="pl-s1">cur_thresh</span>)] <span class="pl-c1">=</span> <span class="pl-s1">cur_rcnn_recall</span>
+
+    <span class="pl-s1">total_pred_objects</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-k">for</span> <span class="pl-s1">anno</span> <span class="pl-c1">in</span> <span class="pl-s1">det_annos</span>:
+        <span class="pl-s1">total_pred_objects</span> <span class="pl-c1">+=</span> <span class="pl-s1">anno</span>[<span class="pl-s">'name'</span>].<span class="pl-c1">__len__</span>()
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'Average predicted number of objects(%d samples): %.3f'</span>
+                <span class="pl-c1">%</span> (<span class="pl-en">len</span>(<span class="pl-s1">det_annos</span>), <span class="pl-s1">total_pred_objects</span> <span class="pl-c1">/</span> <span class="pl-en">max</span>(<span class="pl-c1">1</span>, <span class="pl-en">len</span>(<span class="pl-s1">det_annos</span>))))
+
+    <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">result_dir</span> <span class="pl-c1">/</span> <span class="pl-s">'result.pkl'</span>, <span class="pl-s">'wb'</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+        <span class="pl-s1">pickle</span>.<span class="pl-c1">dump</span>(<span class="pl-s1">det_annos</span>, <span class="pl-s1">f</span>)
+
+    <span class="pl-s1">result_str</span>, <span class="pl-s1">result_dict</span> <span class="pl-c1">=</span> <span class="pl-s1">dataset</span>.<span class="pl-c1">evaluation</span>(
+        <span class="pl-s1">det_annos</span>, <span class="pl-s1">class_names</span>,
+        <span class="pl-s1">eval_metric</span><span class="pl-c1">=</span><span class="pl-s1">cfg</span>.<span class="pl-c1">MODEL</span>.<span class="pl-c1">POST_PROCESSING</span>.<span class="pl-c1">EVAL_METRIC</span>,
+        <span class="pl-s1">output_path</span><span class="pl-c1">=</span><span class="pl-s1">final_output_dir</span>
+    )
+
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s1">result_str</span>)
+    <span class="pl-s1">ret_dict</span>.<span class="pl-c1">update</span>(<span class="pl-s1">result_dict</span>)
+
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'Result is saved to %s'</span> <span class="pl-c1">%</span> <span class="pl-s1">result_dir</span>)
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'****************Evaluation done.*****************'</span>)
+    <span class="pl-k">return</span> <span class="pl-s1">ret_dict</span></pre></div>
+<h2>进行评估</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python test.py     --cfg_file /home/tdhu/OpenPCDet/tools/cfgs/kitti_models/pointpillar_MCdropout.yaml     --batch_size 4     --ckpt /home/tdhu/OpenPCDet/output/kitti_models/pointpillar_MCdropout/default/ckpt/checkpoint_epoch_120.pth    </pre></div>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>打开MC_DropOut后的评估速度会明显下降，这是因为计算量提高了很多，属于正常现象。</p>
+</div>
+<p>由于打开了MC_DropOut后模型会随机丢弃一些节点，所以每次的评估结果是不同的，写个脚本直接评估十次。<br>
+修改在<code class="notranslate">test.py</code>文件中:</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">def</span> <span class="pl-en">main</span>():
+    <span class="pl-s1">args</span>, <span class="pl-s1">cfg</span> <span class="pl-c1">=</span> <span class="pl-en">parse_config</span>()
+
+    <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">infer_time</span>:
+        <span class="pl-s1">os</span>.<span class="pl-c1">environ</span>[<span class="pl-s">'CUDA_LAUNCH_BLOCKING'</span>] <span class="pl-c1">=</span> <span class="pl-s">'1'</span>
+
+    <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">launcher</span> <span class="pl-c1">==</span> <span class="pl-s">'none'</span>:
+        <span class="pl-s1">dist_test</span> <span class="pl-c1">=</span> <span class="pl-c1">False</span>
+        <span class="pl-s1">total_gpus</span> <span class="pl-c1">=</span> <span class="pl-c1">1</span>
+    <span class="pl-k">else</span>:
+        <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">local_rank</span> <span class="pl-c1">is</span> <span class="pl-c1">None</span>:
+            <span class="pl-s1">args</span>.<span class="pl-c1">local_rank</span> <span class="pl-c1">=</span> <span class="pl-en">int</span>(<span class="pl-s1">os</span>.<span class="pl-c1">environ</span>.<span class="pl-c1">get</span>(<span class="pl-s">'LOCAL_RANK'</span>, <span class="pl-s">'0'</span>))
+
+        <span class="pl-s1">total_gpus</span>, <span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span> <span class="pl-c1">=</span> <span class="pl-en">getattr</span>(<span class="pl-s1">common_utils</span>, <span class="pl-s">'init_dist_%s'</span> <span class="pl-c1">%</span> <span class="pl-s1">args</span>.<span class="pl-c1">launcher</span>)(<span class="pl-s1">args</span>.<span class="pl-c1">tcp_port</span>, <span class="pl-s1">args</span>.<span class="pl-c1">local_rank</span>, <span class="pl-s1">backend</span><span class="pl-c1">=</span><span class="pl-s">'nccl'</span>)
+        <span class="pl-s1">dist_test</span> <span class="pl-c1">=</span> <span class="pl-c1">True</span>
+
+    <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span> <span class="pl-c1">is</span> <span class="pl-c1">None</span>:
+        <span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span> <span class="pl-c1">=</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">OPTIMIZATION</span>.<span class="pl-c1">BATCH_SIZE_PER_GPU</span>
+    <span class="pl-k">else</span>:
+        <span class="pl-k">assert</span> <span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span> <span class="pl-c1">%</span> <span class="pl-s1">total_gpus</span> <span class="pl-c1">==</span> <span class="pl-c1">0</span>, <span class="pl-s">'Batch size should match the number of gpus'</span>
+        <span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span> <span class="pl-c1">=</span> <span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span> <span class="pl-c1">//</span> <span class="pl-s1">total_gpus</span>
+
+    <span class="pl-s1">output_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">ROOT_DIR</span> <span class="pl-c1">/</span> <span class="pl-s">'output'</span> <span class="pl-c1">/</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">EXP_GROUP_PATH</span> <span class="pl-c1">/</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">TAG</span> <span class="pl-c1">/</span> <span class="pl-s1">args</span>.<span class="pl-c1">extra_tag</span>
+    <span class="pl-s1">output_dir</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+    <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">output_dir</span> <span class="pl-c1">/</span> <span class="pl-s">'eval'</span>
+
+    <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">args</span>.<span class="pl-c1">eval_all</span>:
+        <span class="pl-s1">num_list</span> <span class="pl-c1">=</span> <span class="pl-s1">re</span>.<span class="pl-c1">findall</span>(<span class="pl-s">r'\d+'</span>, <span class="pl-s1">args</span>.<span class="pl-c1">ckpt</span>) <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">ckpt</span> <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span> <span class="pl-k">else</span> []
+        <span class="pl-s1">epoch_id</span> <span class="pl-c1">=</span> <span class="pl-s1">num_list</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>] <span class="pl-k">if</span> <span class="pl-s1">num_list</span>.<span class="pl-c1">__len__</span>() <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span> <span class="pl-k">else</span> <span class="pl-s">'no_number'</span>
+        <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">/</span> (<span class="pl-s">'epoch_%s'</span> <span class="pl-c1">%</span> <span class="pl-s1">epoch_id</span>) <span class="pl-c1">/</span> <span class="pl-s1">cfg</span>.<span class="pl-c1">DATA_CONFIG</span>.<span class="pl-c1">DATA_SPLIT</span>[<span class="pl-s">'test'</span>]
+    <span class="pl-k">else</span>:
+        <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">/</span> <span class="pl-s">'eval_all_default'</span>
+
+    <span class="pl-k">if</span> <span class="pl-s1">args</span>.<span class="pl-c1">eval_tag</span> <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span>:
+        <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">/</span> <span class="pl-s1">args</span>.<span class="pl-c1">eval_tag</span>
+
+    <span class="pl-s1">eval_output_dir</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+    <span class="pl-s1">log_file</span> <span class="pl-c1">=</span> <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">/</span> (<span class="pl-s">'log_eval_%s.txt'</span> <span class="pl-c1">%</span> <span class="pl-s1">datetime</span>.<span class="pl-c1">datetime</span>.<span class="pl-c1">now</span>().<span class="pl-c1">strftime</span>(<span class="pl-s">'%Y%m%d-%H%M%S'</span>))
+    <span class="pl-s1">logger</span> <span class="pl-c1">=</span> <span class="pl-s1">common_utils</span>.<span class="pl-c1">create_logger</span>(<span class="pl-s1">log_file</span>, <span class="pl-s1">rank</span><span class="pl-c1">=</span><span class="pl-s1">cfg</span>.<span class="pl-c1">LOCAL_RANK</span>)
+
+    <span class="pl-c"># log to file</span>
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'**********************Start logging**********************'</span>)
+    <span class="pl-s1">gpu_list</span> <span class="pl-c1">=</span> <span class="pl-s1">os</span>.<span class="pl-c1">environ</span>[<span class="pl-s">'CUDA_VISIBLE_DEVICES'</span>] <span class="pl-k">if</span> <span class="pl-s">'CUDA_VISIBLE_DEVICES'</span> <span class="pl-c1">in</span> <span class="pl-s1">os</span>.<span class="pl-c1">environ</span>.<span class="pl-c1">keys</span>() <span class="pl-k">else</span> <span class="pl-s">'ALL'</span>
+    <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'CUDA_VISIBLE_DEVICES=%s'</span> <span class="pl-c1">%</span> <span class="pl-s1">gpu_list</span>)
+
+    <span class="pl-k">if</span> <span class="pl-s1">dist_test</span>:
+        <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'total_batch_size: %d'</span> <span class="pl-c1">%</span> (<span class="pl-s1">total_gpus</span> <span class="pl-c1">*</span> <span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span>))
+    <span class="pl-k">for</span> <span class="pl-s1">key</span>, <span class="pl-s1">val</span> <span class="pl-c1">in</span> <span class="pl-en">vars</span>(<span class="pl-s1">args</span>).<span class="pl-c1">items</span>():
+        <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">'{:16} {}'</span>.<span class="pl-c1">format</span>(<span class="pl-s1">key</span>, <span class="pl-s1">val</span>))
+    <span class="pl-en">log_config_to_file</span>(<span class="pl-s1">cfg</span>, <span class="pl-s1">logger</span><span class="pl-c1">=</span><span class="pl-s1">logger</span>)
+
+    <span class="pl-s1">test_set</span>, <span class="pl-s1">test_loader</span>, <span class="pl-s1">sampler</span> <span class="pl-c1">=</span> <span class="pl-en">build_dataloader</span>(
+        <span class="pl-s1">dataset_cfg</span><span class="pl-c1">=</span><span class="pl-s1">cfg</span>.<span class="pl-c1">DATA_CONFIG</span>,
+        <span class="pl-s1">class_names</span><span class="pl-c1">=</span><span class="pl-s1">cfg</span>.<span class="pl-c1">CLASS_NAMES</span>,
+        <span class="pl-s1">batch_size</span><span class="pl-c1">=</span><span class="pl-s1">args</span>.<span class="pl-c1">batch_size</span>,
+        <span class="pl-s1">dist</span><span class="pl-c1">=</span><span class="pl-s1">dist_test</span>, <span class="pl-s1">workers</span><span class="pl-c1">=</span><span class="pl-s1">args</span>.<span class="pl-c1">workers</span>, <span class="pl-s1">logger</span><span class="pl-c1">=</span><span class="pl-s1">logger</span>, <span class="pl-s1">training</span><span class="pl-c1">=</span><span class="pl-c1">False</span>
+    )
+
+    <span class="pl-s1">model</span> <span class="pl-c1">=</span> <span class="pl-en">build_network</span>(<span class="pl-s1">model_cfg</span><span class="pl-c1">=</span><span class="pl-s1">cfg</span>.<span class="pl-c1">MODEL</span>, <span class="pl-s1">num_class</span><span class="pl-c1">=</span><span class="pl-en">len</span>(<span class="pl-s1">cfg</span>.<span class="pl-c1">CLASS_NAMES</span>), <span class="pl-s1">dataset</span><span class="pl-c1">=</span><span class="pl-s1">test_set</span>)
+    <span class="pl-k">with</span> <span class="pl-s1">torch</span>.<span class="pl-c1">no_grad</span>():
+        <span class="pl-c"># 运行 10 次评估</span>
+        <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-c1">10</span>):
+            <span class="pl-s1">logger</span>.<span class="pl-c1">info</span>(<span class="pl-s">f'Running evaluation <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">i</span><span class="pl-c1">+</span><span class="pl-c1">1</span><span class="pl-kos">}</span></span>/10'</span>)
+            <span class="pl-c"># 设置随机种子</span>
+            <span class="pl-s1">seed</span> <span class="pl-c1">=</span> <span class="pl-s1">i</span>  <span class="pl-c"># 或者使用其他随机种子生成方式</span>
+            <span class="pl-s1">torch</span>.<span class="pl-c1">manual_seed</span>(<span class="pl-s1">seed</span>)
+            <span class="pl-s1">np</span>.<span class="pl-c1">random</span>.<span class="pl-c1">seed</span>(<span class="pl-s1">seed</span>)
+            <span class="pl-k">if</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cuda</span>.<span class="pl-c1">is_available</span>():
+                <span class="pl-s1">torch</span>.<span class="pl-c1">cuda</span>.<span class="pl-c1">manual_seed_all</span>(<span class="pl-s1">seed</span>)
+
+            <span class="pl-c"># 创建子目录保存当前评估结果</span>
+            <span class="pl-s1">current_eval_dir</span> <span class="pl-c1">=</span> <span class="pl-s1">eval_output_dir</span> <span class="pl-c1">/</span> <span class="pl-s">f'run_<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">i</span><span class="pl-c1">+</span><span class="pl-c1">1</span><span class="pl-kos">}</span></span>'</span>
+            <span class="pl-s1">current_eval_dir</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+            <span class="pl-c"># 运行评估</span>
+            <span class="pl-en">eval_single_ckpt</span>(<span class="pl-s1">model</span>, <span class="pl-s1">test_loader</span>, <span class="pl-s1">args</span>, <span class="pl-s1">current_eval_dir</span>, <span class="pl-s1">logger</span>, <span class="pl-s1">epoch_id</span>, <span class="pl-s1">dist_test</span><span class="pl-c1">=</span><span class="pl-s1">dist_test</span>)
+
+
+<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">'__main__'</span>:
+    <span class="pl-en">main</span>()'''<span class="pl-c">#MC_DROPOUT 评估10次版本</span></pre></div>
+<h2>评估结果</h2>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/7bce3eb6-0a1a-4f2a-a244-7eccffb40637"><img src="https://github.com/user-attachments/assets/7bce3eb6-0a1a-4f2a-a244-7eccffb40637" alt="Image" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/7aaa9cfc-b3c6-4491-946e-d2b0b27282d8"><img src="https://github.com/user-attachments/assets/7aaa9cfc-b3c6-4491-946e-d2b0b27282d8" alt="Image" style="max-width: 100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/4d99d298-35e5-4c0a-97f7-ba15794b2146"><img src="https://github.com/user-attachments/assets/4d99d298-35e5-4c0a-97f7-ba15794b2146" alt="Image" style="max-width: 100%;"></a></p>
+<p>结果各不相同，MC_dropout在评估过程中成功打开。评估结果用于后续实验，本实验结束。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://TingDongHu.github.io">古月月仔的编程学习博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","TingDongHu/TingDongHu.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
