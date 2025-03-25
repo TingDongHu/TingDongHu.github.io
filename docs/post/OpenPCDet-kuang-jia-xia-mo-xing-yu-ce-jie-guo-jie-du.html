@@ -10,9 +10,11 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="在 OpenPCDet  中，每个模型的推理结果通常是**一个包含多个键值对的字典**，其中包含与 3D 检测任务相关的信息。">
+<meta name="description" content="![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/aab43926a7fe400898d4bfc41f661d63.png)
+在 OpenPCDet  中，每个模型的推理结果通常是**一个包含多个键值对的字典**，其中包含与 3D 检测任务相关的信息。">
 <meta property="og:title" content="OpenPCDet框架下模型预测结果解读">
-<meta property="og:description" content="在 OpenPCDet  中，每个模型的推理结果通常是**一个包含多个键值对的字典**，其中包含与 3D 检测任务相关的信息。">
+<meta property="og:description" content="![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/aab43926a7fe400898d4bfc41f661d63.png)
+在 OpenPCDet  中，每个模型的推理结果通常是**一个包含多个键值对的字典**，其中包含与 3D 检测任务相关的信息。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://TingDongHu.github.io/post/OpenPCDet-kuang-jia-xia-mo-xing-yu-ce-jie-guo-jie-du.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/147360624?v=4">
@@ -83,7 +85,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>在 OpenPCDet  中，每个模型的推理结果通常是<strong>一个包含多个键值对的字典</strong>，其中包含与 3D 检测任务相关的信息。不同模型的输出结构可能略有不同，但一般来说，模型输出通常包含以下几个关键字段：<br>
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/4e811c0af59bcc5e0752667f3fb0a2a0caaae5f1e8d9ad6918c969d984202d71/68747470733a2f2f692d626c6f672e6373646e696d672e636e2f6469726563742f61616234333932366137666534303038393864346266633431663636316436332e706e67"><img src="https://camo.githubusercontent.com/4e811c0af59bcc5e0752667f3fb0a2a0caaae5f1e8d9ad6918c969d984202d71/68747470733a2f2f692d626c6f672e6373646e696d672e636e2f6469726563742f61616234333932366137666534303038393864346266633431663636316436332e706e67" alt="在这里插入图片描述" data-canonical-src="https://i-blog.csdnimg.cn/direct/aab43926a7fe400898d4bfc41f661d63.png" style="max-width: 100%;"></a><br>
+在 OpenPCDet  中，每个模型的推理结果通常是<strong>一个包含多个键值对的字典</strong>，其中包含与 3D 检测任务相关的信息。不同模型的输出结构可能略有不同，但一般来说，模型输出通常包含以下几个关键字段：<br>
 以下给一段<code class="notranslate">output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl</code>中选取某一帧的结果示例,提取为json文件便于阅读：</p>
 <div class="highlight highlight-source-json"><pre class="notranslate">{
 <span class="pl-ent">"pointrcnn"</span>: [
@@ -296,11 +299,84 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <li>z 轴：向上（垂直于地面）。</li>
 </ul>
 <h2>数据对应关系</h2>
-<p>​### location 和 ​boxes_lidar：<br>
-location 是基于相机坐标系的，而 boxes_lidar 是基于激光雷达坐标系的。<br>
+<h3>location 和 ​boxes_lidar：</h3>
+<p>location 是基于相机坐标系的，而 boxes_lidar 是基于激光雷达坐标系的。<br>
 如果需要将 location 转换到激光雷达坐标系，可以使用 KITTI 提供的外参矩阵。</p>
-<h2>bbox 和 ​boxes_lidar：</h2>
-<p>bbox 是物体在图像中的 2D 边界框，而 boxes_lidar 是物体在激光雷达坐标系中的 3D 边界框。</p></div>
+<h3>bbox 和 ​boxes_lidar：</h3>
+<p>bbox 是物体在图像中的 2D 边界框，而 boxes_lidar 是物体在激光雷达坐标系中的 3D 边界框。</p>
+<h2>提取json文件的代码</h2>
+<p>有朋友留言问我是怎么把pkl文件提取出来的，附下面的代码供参考：<br>
+使用时记得替换路径</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">pickle</span>
+<span class="pl-k">import</span> <span class="pl-s1">json</span>
+<span class="pl-k">import</span> <span class="pl-s1">numpy</span> <span class="pl-k">as</span> <span class="pl-s1">np</span>
+<span class="pl-k">import</span> <span class="pl-s1">os</span>
+
+<span class="pl-c"># 指定需要查看的 frame_id</span>
+<span class="pl-s1">target_frame_id</span> <span class="pl-c1">=</span> <span class="pl-s">"000015"</span>
+
+<span class="pl-c"># 所有模型的推理结果文件路径</span>
+<span class="pl-s1">result_paths</span> <span class="pl-c1">=</span> [
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/PartA2_free/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>,
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/pointpillar/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>,
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>,
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn_iou/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>,
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/pv_rcnn/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>,
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/second/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>,
+    <span class="pl-s">'/home/tdhu/OpenPCDet/output/kitti_models/second_iou/default/eval/eval_with_train/epoch_80/val/result.pkl'</span>
+]
+
+<span class="pl-c"># 处理 numpy 数据，转换为 Python 可序列化的数据结构</span>
+<span class="pl-k">def</span> <span class="pl-en">convert_to_serializable</span>(<span class="pl-s1">obj</span>):
+    <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">obj</span>, <span class="pl-s1">np</span>.<span class="pl-c1">ndarray</span>):
+        <span class="pl-k">return</span> <span class="pl-s1">obj</span>.<span class="pl-c1">tolist</span>()  <span class="pl-c"># numpy 数组转换为列表</span>
+    <span class="pl-k">elif</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">obj</span>, (<span class="pl-s1">np</span>.<span class="pl-c1">float32</span>, <span class="pl-s1">np</span>.<span class="pl-c1">float64</span>)):
+        <span class="pl-k">return</span> <span class="pl-en">float</span>(<span class="pl-s1">obj</span>)  <span class="pl-c"># numpy 浮点数转换为 Python float</span>
+    <span class="pl-k">elif</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">obj</span>, (<span class="pl-s1">np</span>.<span class="pl-c1">int32</span>, <span class="pl-s1">np</span>.<span class="pl-c1">int64</span>)):
+        <span class="pl-k">return</span> <span class="pl-en">int</span>(<span class="pl-s1">obj</span>)  <span class="pl-c"># numpy 整数转换为 Python int</span>
+    <span class="pl-k">return</span> <span class="pl-s1">obj</span>  <span class="pl-c"># 其他数据类型保持不变</span>
+
+<span class="pl-c"># 存储所有模型推理出的 `frame_id` 结果</span>
+<span class="pl-s1">all_model_results</span> <span class="pl-c1">=</span> {}
+
+<span class="pl-k">for</span> <span class="pl-s1">result_path</span> <span class="pl-c1">in</span> <span class="pl-s1">result_paths</span>:
+    <span class="pl-c"># 修正模型名称提取方式</span>
+    <span class="pl-s1">path_parts</span> <span class="pl-c1">=</span> <span class="pl-s1">result_path</span>.<span class="pl-c1">split</span>(<span class="pl-s">'/'</span>)
+    <span class="pl-k">if</span> <span class="pl-s">"kitti_models"</span> <span class="pl-c1">in</span> <span class="pl-s1">path_parts</span>:
+        <span class="pl-s1">model_index</span> <span class="pl-c1">=</span> <span class="pl-s1">path_parts</span>.<span class="pl-c1">index</span>(<span class="pl-s">"kitti_models"</span>) <span class="pl-c1">+</span> <span class="pl-c1">1</span>  <span class="pl-c"># 获取模型名索引</span>
+        <span class="pl-s1">model_name</span> <span class="pl-c1">=</span> <span class="pl-s1">path_parts</span>[<span class="pl-s1">model_index</span>]  <span class="pl-c"># 获取模型名称</span>
+    <span class="pl-k">else</span>:
+        <span class="pl-s1">model_name</span> <span class="pl-c1">=</span> <span class="pl-s">"Unknown"</span>
+
+    <span class="pl-k">try</span>:
+        <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">result_path</span>, <span class="pl-s">"rb"</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+            <span class="pl-s1">result_data</span> <span class="pl-c1">=</span> <span class="pl-s1">pickle</span>.<span class="pl-c1">load</span>(<span class="pl-s1">f</span>)
+
+        <span class="pl-c"># 确保数据是列表</span>
+        <span class="pl-k">if</span> <span class="pl-en">isinstance</span>(<span class="pl-s1">result_data</span>, <span class="pl-s1">list</span>):
+            <span class="pl-c"># 查找匹配的 frame_id</span>
+            <span class="pl-s1">matched_frames</span> <span class="pl-c1">=</span> [<span class="pl-s1">frame</span> <span class="pl-k">for</span> <span class="pl-s1">frame</span> <span class="pl-c1">in</span> <span class="pl-s1">result_data</span> <span class="pl-k">if</span> <span class="pl-s1">frame</span>.<span class="pl-c1">get</span>(<span class="pl-s">"frame_id"</span>) <span class="pl-c1">==</span> <span class="pl-s1">target_frame_id</span>]
+
+            <span class="pl-k">if</span> <span class="pl-s1">matched_frames</span>:
+                <span class="pl-en">print</span>(<span class="pl-s">f"模型 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">model_name</span><span class="pl-kos">}</span></span> 找到 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">matched_frames</span>)<span class="pl-kos">}</span></span> 个匹配 frame_id = <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">target_frame_id</span><span class="pl-kos">}</span></span> 的数据"</span>)
+                <span class="pl-s1">all_model_results</span>[<span class="pl-s1">model_name</span>] <span class="pl-c1">=</span> <span class="pl-s1">matched_frames</span>  <span class="pl-c"># 存储该模型的匹配数据</span>
+            <span class="pl-k">else</span>:
+                <span class="pl-en">print</span>(<span class="pl-s">f"模型 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">model_name</span><span class="pl-kos">}</span></span> 未找到 frame_id = <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">target_frame_id</span><span class="pl-kos">}</span></span> 的数据"</span>)
+        <span class="pl-k">else</span>:
+            <span class="pl-en">print</span>(<span class="pl-s">f"模型 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">model_name</span><span class="pl-kos">}</span></span> 数据格式异常: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">type</span>(<span class="pl-s1">result_data</span>)<span class="pl-kos">}</span></span>"</span>)
+
+    <span class="pl-k">except</span> <span class="pl-v">Exception</span> <span class="pl-k">as</span> <span class="pl-s1">e</span>:
+        <span class="pl-en">print</span>(<span class="pl-s">f"加载模型 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">model_name</span><span class="pl-kos">}</span></span> 的数据时发生错误: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">e</span><span class="pl-kos">}</span></span>"</span>)
+
+<span class="pl-c"># 如果找到数据，则保存为 JSON 文件</span>
+<span class="pl-k">if</span> <span class="pl-s1">all_model_results</span>:
+    <span class="pl-s1">output_json_path</span> <span class="pl-c1">=</span> <span class="pl-s">"output.json"</span>
+    <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">output_json_path</span>, <span class="pl-s">"w"</span>, <span class="pl-s1">encoding</span><span class="pl-c1">=</span><span class="pl-s">"utf-8"</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+        <span class="pl-s1">json</span>.<span class="pl-c1">dump</span>(<span class="pl-s1">all_model_results</span>, <span class="pl-s1">f</span>, <span class="pl-s1">indent</span><span class="pl-c1">=</span><span class="pl-c1">4</span>, <span class="pl-s1">ensure_ascii</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">default</span><span class="pl-c1">=</span><span class="pl-s1">convert_to_serializable</span>)
+    
+    <span class="pl-en">print</span>(<span class="pl-s">f"所有模型推理的 JSON 结果已保存为 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">output_json_path</span><span class="pl-kos">}</span></span>"</span>)
+<span class="pl-k">else</span>:
+    <span class="pl-en">print</span>(<span class="pl-s">"未找到任何匹配的 frame_id 数据"</span>)</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

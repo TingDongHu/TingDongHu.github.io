@@ -1,3 +1,4 @@
+![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/aab43926a7fe400898d4bfc41f661d63.png)
 在 OpenPCDet  中，每个模型的推理结果通常是**一个包含多个键值对的字典**，其中包含与 3D 检测任务相关的信息。不同模型的输出结构可能略有不同，但一般来说，模型输出通常包含以下几个关键字段：
 以下给一段`output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl`中选取某一帧的结果示例,提取为json文件便于阅读：
 ```json
@@ -212,8 +213,85 @@
 - z 轴：向上（垂直于地面）。
 
 ## 数据对应关系
-​### location 和 ​boxes_lidar：
+### location 和 ​boxes_lidar：
 location 是基于相机坐标系的，而 boxes_lidar 是基于激光雷达坐标系的。
 如果需要将 location 转换到激光雷达坐标系，可以使用 KITTI 提供的外参矩阵。
-## bbox 和 ​boxes_lidar：
+### bbox 和 ​boxes_lidar：
 bbox 是物体在图像中的 2D 边界框，而 boxes_lidar 是物体在激光雷达坐标系中的 3D 边界框。
+
+## 提取json文件的代码
+有朋友留言问我是怎么把pkl文件提取出来的，附下面的代码供参考：
+使用时记得替换路径
+```python
+import pickle
+import json
+import numpy as np
+import os
+
+# 指定需要查看的 frame_id
+target_frame_id = "000015"
+
+# 所有模型的推理结果文件路径
+result_paths = [
+    '/home/tdhu/OpenPCDet/output/kitti_models/PartA2_free/default/eval/eval_with_train/epoch_80/val/result.pkl',
+    '/home/tdhu/OpenPCDet/output/kitti_models/pointpillar/default/eval/eval_with_train/epoch_80/val/result.pkl',
+    '/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl',
+    '/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn_iou/default/eval/eval_with_train/epoch_80/val/result.pkl',
+    '/home/tdhu/OpenPCDet/output/kitti_models/pv_rcnn/default/eval/eval_with_train/epoch_80/val/result.pkl',
+    '/home/tdhu/OpenPCDet/output/kitti_models/second/default/eval/eval_with_train/epoch_80/val/result.pkl',
+    '/home/tdhu/OpenPCDet/output/kitti_models/second_iou/default/eval/eval_with_train/epoch_80/val/result.pkl'
+]
+
+# 处理 numpy 数据，转换为 Python 可序列化的数据结构
+def convert_to_serializable(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()  # numpy 数组转换为列表
+    elif isinstance(obj, (np.float32, np.float64)):
+        return float(obj)  # numpy 浮点数转换为 Python float
+    elif isinstance(obj, (np.int32, np.int64)):
+        return int(obj)  # numpy 整数转换为 Python int
+    return obj  # 其他数据类型保持不变
+
+# 存储所有模型推理出的 `frame_id` 结果
+all_model_results = {}
+
+for result_path in result_paths:
+    # 修正模型名称提取方式
+    path_parts = result_path.split('/')
+    if "kitti_models" in path_parts:
+        model_index = path_parts.index("kitti_models") + 1  # 获取模型名索引
+        model_name = path_parts[model_index]  # 获取模型名称
+    else:
+        model_name = "Unknown"
+
+    try:
+        with open(result_path, "rb") as f:
+            result_data = pickle.load(f)
+
+        # 确保数据是列表
+        if isinstance(result_data, list):
+            # 查找匹配的 frame_id
+            matched_frames = [frame for frame in result_data if frame.get("frame_id") == target_frame_id]
+
+            if matched_frames:
+                print(f"模型 {model_name} 找到 {len(matched_frames)} 个匹配 frame_id = {target_frame_id} 的数据")
+                all_model_results[model_name] = matched_frames  # 存储该模型的匹配数据
+            else:
+                print(f"模型 {model_name} 未找到 frame_id = {target_frame_id} 的数据")
+        else:
+            print(f"模型 {model_name} 数据格式异常: {type(result_data)}")
+
+    except Exception as e:
+        print(f"加载模型 {model_name} 的数据时发生错误: {e}")
+
+# 如果找到数据，则保存为 JSON 文件
+if all_model_results:
+    output_json_path = "output.json"
+    with open(output_json_path, "w", encoding="utf-8") as f:
+        json.dump(all_model_results, f, indent=4, ensure_ascii=False, default=convert_to_serializable)
+    
+    print(f"所有模型推理的 JSON 结果已保存为 {output_json_path}")
+else:
+    print("未找到任何匹配的 frame_id 数据")
+
+```
