@@ -1,0 +1,295 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>C++中::|-&gt;|.|*这些特殊字符的意义和用法区分 | 古月月仔的博客</title><meta name="author" content="古月月仔,2680957536@qq.com"><meta name="copyright" content="古月月仔"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在 C++ 中，::、-&gt; 、. 和*是四种不同的运算符，分别用于不同的上下文场景。它们的详细解释和用法对比： 1. 作用域解析运算符 ::用途 访问 命名空间、类、结构体或枚举 的成员 调用 静态成员（变量或函数） 区分同名的全局变量和局部变量  示例1234567891011121314151617181920212223242526#include &lt;iostream&gt;na">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中::|-&gt;|.|*这些特殊字符的意义和用法区分">
+<meta property="og:url" content="https://tingdonghu.github.io/2025/04/05/C++%E4%B8%AD%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/index.html">
+<meta property="og:site_name" content="古月月仔的博客">
+<meta property="og:description" content="在 C++ 中，::、-&gt; 、. 和*是四种不同的运算符，分别用于不同的上下文场景。它们的详细解释和用法对比： 1. 作用域解析运算符 ::用途 访问 命名空间、类、结构体或枚举 的成员 调用 静态成员（变量或函数） 区分同名的全局变量和局部变量  示例1234567891011121314151617181920212223242526#include &lt;iostream&gt;na">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tingdonghu.github.io/img/ChipDog.jpg">
+<meta property="article:published_time" content="2025-04-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-19T10:53:50.105Z">
+<meta property="article:author" content="古月月仔">
+<meta property="article:tag" content="语法">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="指针">
+<meta property="article:tag" content="智能指针">
+<meta property="article:tag" content="引用">
+<meta property="article:tag" content="作用域">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tingdonghu.github.io/img/ChipDog.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "C++中::|->|.|*这些特殊字符的意义和用法区分",
+  "url": "https://tingdonghu.github.io/2025/04/05/C++%E4%B8%AD%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/",
+  "image": "https://tingdonghu.github.io/img/ChipDog.jpg",
+  "datePublished": "2025-04-04T16:00:00.000Z",
+  "dateModified": "2025-04-19T10:53:50.105Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "古月月仔",
+      "url": "https://tingdonghu.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://tingdonghu.github.io/2025/04/05/C++%E4%B8%AD%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":250,"languages":{"author":"作者: 古月月仔","link":"链接: ","source":"来源: 古月月仔的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'C++中::|->|.|*这些特殊字符的意义和用法区分',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">15</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">30</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/1350790.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">古月月仔的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">C++中::|-&gt;|.|*这些特殊字符的意义和用法区分</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">C++中::|-&gt;|.|*这些特殊字符的意义和用法区分</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-04T16:00:00.000Z" title="发表于 2025-04-05 00:00:00">2025-04-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-19T10:53:50.105Z" title="更新于 2025-04-19 18:53:50">2025-04-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/C/">C++</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>在 C++ 中，<code>::</code>、<code>-&gt;</code> 、<code>.</code> 和<code>*</code>是四种不同的运算符，分别用于不同的上下文场景。它们的详细解释和用法对比：</p>
+<h2 id="1-作用域解析运算符"><a href="#1-作用域解析运算符" class="headerlink" title="1. 作用域解析运算符 ::"></a><strong>1. 作用域解析运算符 <code>::</code></strong></h2><h3 id="用途"><a href="#用途" class="headerlink" title="用途"></a><strong>用途</strong></h3><ul>
+<li>访问 <strong>命名空间、类、结构体或枚举</strong> 的成员</li>
+<li>调用 <strong>静态成员</strong>（变量或函数）</li>
+<li>区分同名的全局变量和局部变量</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a><strong>示例</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> MyNamespace &#123;</span><br><span class="line">    <span class="type">int</span> value = <span class="number">42</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> staticValue;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">staticMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Static method called!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> MyClass::staticValue = <span class="number">100</span>; <span class="comment">// 静态成员变量定义</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 访问命名空间成员</span></span><br><span class="line">    std::cout &lt;&lt; MyNamespace::value &lt;&lt; std::endl; <span class="comment">// 输出: 42</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 访问类的静态成员</span></span><br><span class="line">    std::cout &lt;&lt; MyClass::staticValue &lt;&lt; std::endl; <span class="comment">// 输出: 100</span></span><br><span class="line">    MyClass::<span class="built_in">staticMethod</span>(); <span class="comment">// 输出: Static method called!</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a><strong>关键点</strong></h3><ul>
+<li><code>::</code> <strong>不依赖对象实例</strong>，直接通过类名或命名空间访问成员。</li>
+<li>常用于 <strong>全局变量、静态成员、嵌套类</strong> 等场景。</li>
+</ul>
+<hr>
+<h2 id="2-成员访问运算符"><a href="#2-成员访问运算符" class="headerlink" title="2. 成员访问运算符 -&gt;"></a><strong>2. 成员访问运算符 <code>-&gt;</code></strong></h2><h3 id="用途-1"><a href="#用途-1" class="headerlink" title="用途"></a><strong>用途</strong></h3><ul>
+<li>通过 <strong>指针</strong> 访问对象的成员（变量或函数）</li>
+<li>等价于 <code>(*ptr).member</code>（先解引用，再用 <code>.</code> 访问）</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a><strong>示例</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span> value = <span class="number">10</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Value: &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyClass obj;</span><br><span class="line">    MyClass* ptr = &amp;obj; <span class="comment">// 指向对象的指针</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过指针访问成员</span></span><br><span class="line">    ptr-&gt;value = <span class="number">20</span>;     <span class="comment">// 等价于 (*ptr).value = 20;</span></span><br><span class="line">    ptr-&gt;<span class="built_in">print</span>();        <span class="comment">// 输出: Value: 20</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键点-1"><a href="#关键点-1" class="headerlink" title="关键点"></a><strong>关键点</strong></h3><ul>
+<li><code>-&gt;</code> <strong>只能用于指针</strong>，不能用于普通对象。</li>
+<li>在 <strong>智能指针</strong>（如 <code>std::shared_ptr</code>）和 <strong>迭代器</strong> 中也常用。</li>
+</ul>
+<hr>
+<h2 id="3-成员访问运算符"><a href="#3-成员访问运算符" class="headerlink" title="3. 成员访问运算符 ."></a><strong>3. 成员访问运算符 <code>.</code></strong></h2><h3 id="用途-2"><a href="#用途-2" class="headerlink" title="用途"></a><strong>用途</strong></h3><ul>
+<li>通过 <strong>对象实例</strong>（非指针）访问成员（变量或函数）</li>
+<li>适用于 <strong>结构体、类、联合体</strong> 等</li>
+</ul>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a><strong>示例</strong></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span> value = <span class="number">30</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Value: &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyClass obj;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过对象访问成员</span></span><br><span class="line">    obj.value = <span class="number">40</span>;</span><br><span class="line">    obj.<span class="built_in">print</span>(); <span class="comment">// 输出: Value: 40</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键点-2"><a href="#关键点-2" class="headerlink" title="关键点"></a><strong>关键点</strong></h3><ul>
+<li><code>.</code> <strong>只能用于对象实例</strong>，不能用于指针。</li>
+<li>在 <strong>结构体、类、联合体</strong> 中通用。</li>
+</ul>
+<h2 id="4-解引用-指针运算符"><a href="#4-解引用-指针运算符" class="headerlink" title="4. 解引用&#x2F;指针运算符 *"></a>4. 解引用&#x2F;指针运算符 <code>*</code></h2><h3 id="用途-3"><a href="#用途-3" class="headerlink" title="用途"></a><strong>用途</strong></h3><ol>
+<li><strong>指针声明</strong>：表示变量是指针类型</li>
+<li><strong>解引用</strong>：获取指针指向的实际值</li>
+<li><strong>乘法运算</strong>：算术乘法（本文不讨论，因与其他运算符无关）</li>
+</ol>
+<h3 id="示例与详解"><a href="#示例与详解" class="headerlink" title="示例与详解"></a><strong>示例与详解</strong></h3><h4 id="1-指针声明"><a href="#1-指针声明" class="headerlink" title="(1) 指针声明"></a><strong>(1) 指针声明</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> num = <span class="number">42</span>;</span><br><span class="line"><span class="type">int</span>* ptr = &amp;num;  <span class="comment">// ptr 是一个指向 int 的指针</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>int* ptr</code> 表示 <code>ptr</code> 存储的是内存地址，而非直接的值。</li>
+</ul>
+<h4 id="2-解引用（获取指针指向的值）"><a href="#2-解引用（获取指针指向的值）" class="headerlink" title="(2) 解引用（获取指针指向的值）"></a><strong>(2) 解引用（获取指针指向的值）</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> num = <span class="number">42</span>;</span><br><span class="line"><span class="type">int</span>* ptr = &amp;num;</span><br><span class="line"></span><br><span class="line">std::cout &lt;&lt; *ptr;  <span class="comment">// 输出: 42（通过 * 获取指针指向的实际值）</span></span><br><span class="line">*ptr = <span class="number">100</span>;         <span class="comment">// 修改指针指向的值</span></span><br><span class="line">std::cout &lt;&lt; num;   <span class="comment">// 输出: 100</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-与-的关系"><a href="#3-与-的关系" class="headerlink" title="(3) 与 -&gt; 的关系"></a><strong>(3) 与 <code>-&gt;</code> 的关系</strong></h4><p><code>ptr-&gt;member</code> 等价于 <code>(*ptr).member</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyClass obj;</span><br><span class="line">MyClass* ptr = &amp;obj;</span><br><span class="line"></span><br><span class="line">ptr-&gt;value = <span class="number">10</span>;     <span class="comment">// 使用 -&gt; 访问成员</span></span><br><span class="line">(*ptr).value = <span class="number">10</span>;   <span class="comment">// 等价写法：先解引用，再用 . 访问</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四者对比总结"><a href="#四者对比总结" class="headerlink" title="四者对比总结"></a><strong>四者对比总结</strong></h2><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>名称</th>
+<th>适用场景</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>::</code></td>
+<td>作用域解析符</td>
+<td>访问命名空间、类静态成员、全局变量</td>
+<td><code>MyClass::staticMethod()</code></td>
+</tr>
+<tr>
+<td><code>-&gt;</code></td>
+<td>成员访问（指针）</td>
+<td>通过指针访问对象的成员</td>
+<td><code>ptr-&gt;value = 10;</code></td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>成员访问（对象）</td>
+<td>通过对象实例访问成员</td>
+<td><code>obj.value = 10;</code></td>
+</tr>
+<tr>
+<td><code>*</code></td>
+<td>解引用&#x2F;指针声明</td>
+<td>1. 声明指针 2. 获取指针指向的值</td>
+<td><code>int* ptr;</code> <code>std::cout &lt;&lt; *ptr;</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="关键区别"><a href="#关键区别" class="headerlink" title="关键区别"></a><strong>关键区别</strong></h2><ol>
+<li><strong><code>*</code> vs <code>-&gt;</code></strong><ul>
+<li><code>*</code> 是解引用运算符，单独使用时不涉及成员访问。</li>
+<li><code>-&gt;</code> 是组合操作：<strong>先解引用，再访问成员</strong>（即 <code>-&gt;</code> &#x3D; <code>*</code> + <code>.</code>）。</li>
+</ul>
+</li>
+<li><strong><code>::</code> 的特殊性</strong><ul>
+<li>唯一不依赖对象&#x2F;指针的运算符，直接通过类名或命名空间访问成员。</li>
+</ul>
+</li>
+<li><strong>何时用 <code>-&gt;</code> 何时用 <code>.</code></strong><ul>
+<li>对象用 <code>.</code>，指针用 <code>-&gt;</code>。</li>
+<li>智能指针（如 <code>std::shared_ptr</code>）也使用 <code>-&gt;</code>。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="综合示例"><a href="#综合示例" class="headerlink" title="综合示例"></a><strong>综合示例</strong></h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> MyNamespace &#123;</span><br><span class="line">    <span class="type">int</span> global = <span class="number">50</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> staticVar;</span><br><span class="line">    <span class="type">int</span> instanceVar = <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> MyClass::staticVar = <span class="number">100</span>; <span class="comment">// 静态成员定义</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 1. 作用域解析符 ::</span></span><br><span class="line">    std::cout &lt;&lt; MyNamespace::global &lt;&lt; std::endl; <span class="comment">// 输出: 50</span></span><br><span class="line">    std::cout &lt;&lt; MyClass::staticVar &lt;&lt; std::endl;  <span class="comment">// 输出: 100</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 指针与解引用 *</span></span><br><span class="line">    MyClass obj;</span><br><span class="line">    MyClass* ptr = &amp;obj;</span><br><span class="line">    *ptr = <span class="built_in">MyClass</span>();          <span class="comment">// 解引用并赋值新对象</span></span><br><span class="line">    std::cout &lt;&lt; (*ptr).instanceVar &lt;&lt; std::endl; <span class="comment">// 输出: 0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. -&gt; 和 . 的对比</span></span><br><span class="line">    ptr-&gt;instanceVar = <span class="number">42</span>;     <span class="comment">// 指针用 -&gt;</span></span><br><span class="line">    obj.instanceVar = <span class="number">10</span>;      <span class="comment">// 对象用 .</span></span><br><span class="line">    std::cout &lt;&lt; ptr-&gt;instanceVar &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; obj.instanceVar; <span class="comment">// 输出: 42 10</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a><strong>常见问题</strong></h2><h3 id="1-可以访问非静态成员吗？"><a href="#1-可以访问非静态成员吗？" class="headerlink" title="1. :: 可以访问非静态成员吗？"></a><strong>1. <code>::</code> 可以访问非静态成员吗？</strong></h3><p>❌ <strong>不可以</strong>。<code>::</code> 只能访问 <strong>静态成员、命名空间成员、嵌套类型</strong>。</p>
+<h3 id="2-和-的关系？"><a href="#2-和-的关系？" class="headerlink" title="2. * 和 &amp; 的关系？"></a><strong>2. <code>*</code> 和 <code>&amp;</code> 的关系？</strong></h3><ul>
+<li><code>&amp;</code> 取地址（如 <code>int* ptr = #</code>）</li>
+<li><code>*</code> 解引用（如 <code>int val = *ptr;</code>）</li>
+<li>二者互为逆操作。</li>
+</ul>
+<h3 id="4-什么时候用-，什么时候用-？"><a href="#4-什么时候用-，什么时候用-？" class="headerlink" title="4. 什么时候用 -&gt;，什么时候用 .？"></a><strong>4. 什么时候用 <code>-&gt;</code>，什么时候用 <code>.</code>？</strong></h3><ul>
+<li>如果变量是 <strong>指针</strong>（如 <code>MyClass* ptr</code>），用 <code>-&gt;</code>。</li>
+<li>如果变量是 <strong>对象</strong>（如 <code>MyClass obj</code>），用 <code>.</code>。</li>
+</ul>
+<h3 id="5-为什么-不能用于对象？"><a href="#5-为什么-不能用于对象？" class="headerlink" title="5. 为什么 -&gt; 不能用于对象？"></a><strong>5. 为什么 <code>-&gt;</code> 不能用于对象？</strong></h3><p>因为 <code>-&gt;</code> 的设计初衷是简化指针操作（<code>(*ptr).member</code> 的语法糖），而对象本身不需要解引用。</p>
+<h3 id="6-智能指针怎么用？"><a href="#6-智能指针怎么用？" class="headerlink" title="6. 智能指针怎么用？"></a><strong>6. 智能指针怎么用？</strong></h3><p>智能指针（如 <code>std::shared_ptr</code>）也使用 <code>-&gt;</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;MyClass&gt; ptr = std::<span class="built_in">make_shared</span>&lt;MyClass&gt;();</span><br><span class="line">ptr-&gt;<span class="built_in">print</span>(); <span class="comment">// 正确</span></span><br><span class="line">ptr.<span class="built_in">print</span>();  <span class="comment">// 错误！智能指针本身不是对象</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-智能指针的-和普通指针有何不同？"><a href="#7-智能指针的-和普通指针有何不同？" class="headerlink" title="7. 智能指针的 -&gt; 和普通指针有何不同？"></a><strong>7. 智能指针的 <code>-&gt;</code> 和普通指针有何不同？</strong></h3><p>无本质区别，只是智能指针（如 <code>std::shared_ptr</code>）重载了 <code>-&gt;</code> 运算符，行为与原生指针一致：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::shared_ptr&lt;MyClass&gt; smartPtr = std::<span class="built_in">make_shared</span>&lt;MyClass&gt;();</span><br><span class="line">smartPtr-&gt;instanceVar = <span class="number">30</span>; <span class="comment">// 用法相同</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>掌握这四种运算符的差异，能彻底避免 C++ 中的指针和成员访问错误！ </p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io">古月月仔</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io/2025/04/05/C++%E4%B8%AD%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/">https://tingdonghu.github.io/2025/04/05/C++%E4%B8%AD%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://tingdonghu.github.io" target="_blank">古月月仔的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AF%AD%E6%B3%95/">语法</a><a class="post-meta__tags" href="/tags/c/">c++</a><a class="post-meta__tags" href="/tags/%E6%8C%87%E9%92%88/">指针</a><a class="post-meta__tags" href="/tags/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">智能指针</a><a class="post-meta__tags" href="/tags/%E5%BC%95%E7%94%A8/">引用</a><a class="post-meta__tags" href="/tags/%E4%BD%9C%E7%94%A8%E5%9F%9F/">作用域</a></div><div class="post-share"><div class="social-share" data-image="/img/ChipDog.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/03/25/JavaWeb%EF%BC%88%E5%9B%9B%EF%BC%89%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96/" title="JavaWeb(四)前端工程化"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">JavaWeb(四)前端工程化</div></div><div class="info-2"><div class="info-item-1">​Ajax 的缺点：  浏览器兼容性：不同浏览器对 XMLHttpRequest 的实现可能不同。 SEO 不友好：动态加载的内容可能无法被搜索引擎抓取。 调试复杂：异步通信的调试相对复杂。  AxiosAxios 是一个基于 ​Promise 的 HTTP 客户端，用于浏览器和 Node.js。它简化了与服务器的 HTTP 请求，并提供了强大的功能，如拦截请求和响应、自动转换 JSON 数据等。 Axios 的特点  基于 Promise：支持异步操作，代码更简洁。 跨平台：适用于浏览器和 Node.js。 自动转换数据：自动将请求和响应的数据转换为 JSON。 拦截器：可以拦截请求和响应，添加全局处理逻辑。 取消请求：支持取消未完成的请求。 错误处理：提供统一的错误处理机制。  基本使用：安装axios： 1npm install axios 导入axios 1import axios &#x27;axios&#x27; 使用Axios发送请求，并获取响应结果，官方提供的api很多，此处给出2种，如下发送 get 请求 123456axios(&#123;   ...</div></div></div></a><a class="pagination-related" href="/2025/04/06/%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84AI%E6%96%B9%E6%B3%95%E8%AE%BA%E6%80%BB%E7%BB%93/" title="游戏AI方法论总结"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">游戏AI方法论总结</div></div><div class="info-2"><div class="info-item-1">文章的思路来源于Voidmatrix大神视频总结，以及一些本人开发BossAI的感悟所写。 附上大神原视频链接：【游戏开发秘籍】状态机？行为树？一个视频速通游戏开发中的AI！#06 游戏AI是什么​	**游戏开发领域中，AI通常指的是对非玩家角色行为的设计与研究，让他们能够感知周围的环境，并且做出相应的动作表现。**例如和玩家交互聊天的NPC、按照特定规则巡逻的怪物或是直接与玩家进行对抗的人机等等，一个能与我们的游戏玩法相匹配，逻辑自洽的角色，除去策划上的工作，在开发技术上也是大有研究的。  游戏AI的核心目标  增强体验：通过智能的NPC行为、动态难度调整等提升游戏趣味性。 创造挑战：让敌人或对手具备合理的策略，避免过于简单或作弊。 模拟世界：构建逼真的生态系统（如《荒野之息》中的动物行为）。  状态机（FSM）​				 ​	最经典最简单的AI实现技术便是状态机，我们可以把NPC的每一个具体的行动都拆分成一个独立的状态。 ​	接下来我们只需要设计好状态间的挑战条件就可以了，譬如...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/04/10/2025-04-10-UC++%E7%9A%84%E5%AE%8F%E5%AE%9A%E4%B9%89%E8%AF%AD%E6%B3%95%E8%AF%A6%E8%A7%A3/" title="UC++的宏定义语法详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-10</div><div class="info-item-2">UC++的宏定义语法详解</div></div><div class="info-2"><div class="info-item-1">Unreal Engine中宏定义语法的使用示例代码：123456789101112131415161718192021222324// 类声明宏：使类被纳入Unreal反射系统// - Blueprintable：允许在蓝图中创建该类的子类// - meta=(DisplayName=&quot;My Object&quot;)：在编辑器中显示的自定义名称UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject  // 必须继承UObject或其子类&#123;    // 代码生成宏：必须出现在类体内第一个位置    // - 展开后会包含类型信息、反射数据等引擎所需的内容    GENERATED_BODY()        // 属性声明宏：将成员变量暴露给反射系统    // - EditAnywhere：可在编辑器的任意位置（如蓝图、细节面板）编辑此属性    // -...</div></div></div></a><a class="pagination-related" href="/2025/03/19/UrealEngineC++%E4%B8%8EC++%E7%9A%84%E5%8C%BA%E5%88%AB/" title="UnrealEngine C++ 与标准 C++ 的区别"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-19</div><div class="info-item-2">UnrealEngine C++ 与标准 C++ 的区别</div></div><div class="info-2"><div class="info-item-1">1. 类声明与反射系统1.1 类定义语法Unreal C++1234567891011// 必须继承UObject且使用反射宏UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject &#123;    GENERATED_BODY() // 必须包含        UPROPERTY(EditAnywhere, Category=&quot;Stats&quot;)    float Health = 100.0f;    UFUNCTION(BlueprintCallable)    void Heal(float Amount);&#125;;   标准 C++12345678class MyObject &#123;public:    float Health = 100.0f;        void Heal(float Amount) &#123;        Health += Amount;   ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">古月月仔</div><div class="author-info-description">计算机在校生&游戏程序员</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">15</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">30</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TingDongHu"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/TingDongHu" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:2680957536@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #hdhfbb;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">古月月仔的博客上新了！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BD%9C%E7%94%A8%E5%9F%9F%E8%A7%A3%E6%9E%90%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">1.</span> <span class="toc-text">1. 作用域解析运算符 ::</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E9%80%94"><span class="toc-number">1.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">关键点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%88%90%E5%91%98%E8%AE%BF%E9%97%AE%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">2.</span> <span class="toc-text">2. 成员访问运算符 -&gt;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E9%80%94-1"><span class="toc-number">2.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="toc-number">2.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9-1"><span class="toc-number">2.3.</span> <span class="toc-text">关键点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%88%90%E5%91%98%E8%AE%BF%E9%97%AE%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">3.</span> <span class="toc-text">3. 成员访问运算符 .</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E9%80%94-2"><span class="toc-number">3.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="toc-number">3.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9-2"><span class="toc-number">3.3.</span> <span class="toc-text">关键点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%A7%A3%E5%BC%95%E7%94%A8-%E6%8C%87%E9%92%88%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">4.</span> <span class="toc-text">4. 解引用&#x2F;指针运算符 *</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E9%80%94-3"><span class="toc-number">4.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B%E4%B8%8E%E8%AF%A6%E8%A7%A3"><span class="toc-number">4.2.</span> <span class="toc-text">示例与详解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%8C%87%E9%92%88%E5%A3%B0%E6%98%8E"><span class="toc-number">4.2.1.</span> <span class="toc-text">(1) 指针声明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E8%A7%A3%E5%BC%95%E7%94%A8%EF%BC%88%E8%8E%B7%E5%8F%96%E6%8C%87%E9%92%88%E6%8C%87%E5%90%91%E7%9A%84%E5%80%BC%EF%BC%89"><span class="toc-number">4.2.2.</span> <span class="toc-text">(2) 解引用（获取指针指向的值）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%B8%8E-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">4.2.3.</span> <span class="toc-text">(3) 与 -&gt; 的关系</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E8%80%85%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">四者对比总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%8C%BA%E5%88%AB"><span class="toc-number">6.</span> <span class="toc-text">关键区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%BC%E5%90%88%E7%A4%BA%E4%BE%8B"><span class="toc-number">7.</span> <span class="toc-text">综合示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="toc-number">8.</span> <span class="toc-text">常见问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E9%9D%9E%E9%9D%99%E6%80%81%E6%88%90%E5%91%98%E5%90%97%EF%BC%9F"><span class="toc-number">8.1.</span> <span class="toc-text">1. :: 可以访问非静态成员吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%92%8C-%E7%9A%84%E5%85%B3%E7%B3%BB%EF%BC%9F"><span class="toc-number">8.2.</span> <span class="toc-text">2. * 和 &amp; 的关系？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E7%94%A8-%EF%BC%8C%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E7%94%A8-%EF%BC%9F"><span class="toc-number">8.3.</span> <span class="toc-text">4. 什么时候用 -&gt;，什么时候用 .？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E4%B8%BA%E4%BB%80%E4%B9%88-%E4%B8%8D%E8%83%BD%E7%94%A8%E4%BA%8E%E5%AF%B9%E8%B1%A1%EF%BC%9F"><span class="toc-number">8.4.</span> <span class="toc-text">5. 为什么 -&gt; 不能用于对象？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E6%80%8E%E4%B9%88%E7%94%A8%EF%BC%9F"><span class="toc-number">8.5.</span> <span class="toc-text">6. 智能指针怎么用？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E7%9A%84-%E5%92%8C%E6%99%AE%E9%80%9A%E6%8C%87%E9%92%88%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C%EF%BC%9F"><span class="toc-number">8.6.</span> <span class="toc-text">7. 智能指针的 -&gt; 和普通指针有何不同？</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/19/2025-4-19-%E3%80%90MultiplayerCourse%E3%80%91%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/" title="【MultiplayerCourse】创建多人联机插件">【MultiplayerCourse】创建多人联机插件</a><time datetime="2025-04-18T16:00:00.000Z" title="发表于 2025-04-19 00:00:00">2025-04-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/" title="虚幻引擎中的委托(Delegates)与回调(Callbacks)">虚幻引擎中的委托(Delegates)与回调(Callbacks)</a><time datetime="2025-04-14T16:00:00.000Z" title="发表于 2025-04-15 00:00:00">2025-04-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/10/2025-04-10-UC++%E7%9A%84%E5%AE%8F%E5%AE%9A%E4%B9%89%E8%AF%AD%E6%B3%95%E8%AF%A6%E8%A7%A3/" title="UC++的宏定义语法详解">UC++的宏定义语法详解</a><time datetime="2025-04-09T16:00:00.000Z" title="发表于 2025-04-10 00:00:00">2025-04-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/06/%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84AI%E6%96%B9%E6%B3%95%E8%AE%BA%E6%80%BB%E7%BB%93/" title="游戏AI方法论总结">游戏AI方法论总结</a><time datetime="2025-04-05T16:00:00.000Z" title="发表于 2025-04-06 00:00:00">2025-04-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/05/C++%E4%B8%AD%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/" title="C++中::|-&gt;|.|*这些特殊字符的意义和用法区分">C++中::|-&gt;|.|*这些特殊字符的意义和用法区分</a><time datetime="2025-04-04T16:00:00.000Z" title="发表于 2025-04-05 00:00:00">2025-04-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2025 By 古月月仔</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
