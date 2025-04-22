@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4901017 */
-  src: url('//at.alicdn.com/t/c/font_4901017_4k2x96eykne.woff2?t=1745246000959') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4901017_4k2x96eykne.woff?t=1745246000959') format('woff'),
-       url('//at.alicdn.com/t/c/font_4901017_4k2x96eykne.ttf?t=1745246000959') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4901017_o58ehhkeqpk.woff2?t=1745316068135') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4901017_o58ehhkeqpk.woff?t=1745316068135') format('woff'),
+       url('//at.alicdn.com/t/c/font_4901017_o58ehhkeqpk.ttf?t=1745316068135') format('truetype');
 }
 
 .iconfont {
@@ -13,16 +13,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-bizhi:before {
+  content: "\e6ae";
+}
+
+.icon-tubiaoku_1:before {
+  content: "\e613";
+}
+
 .icon-csdn:before {
   content: "\e601";
 }
 
 .icon-zhihu:before {
   content: "\e602";
-}
-
-.icon-csdn1-copy:before {
-  content: "\e600";
 }
 
 .icon-bilibili:before {
