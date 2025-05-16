@@ -1,0 +1,608 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>虚幻引擎中的委托(Delegates)与回调(Callbacks) | 古月月仔的博客</title><meta name="author" content="Ethan Hu,2680957536@qq.com"><meta name="copyright" content="Ethan Hu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Unreal Engine 中的 Delegates（委托）详解Delegates（委托）是 Unreal Engine 中一种强大的事件通知机制，它允许开发者在不直接引用类的情况下调用成员函数。本质上，委托是一种类型安全的函数指针，特别适合用于实现观察者模式、事件系统和回调机制。 基本概念核心特点 类型安全：编译时会检查函数签名匹配 动态绑定：可以在运行时绑定&#x2F;解绑函数 多播能力：可以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚幻引擎中的委托(Delegates)与回调(Callbacks)">
+<meta property="og:url" content="https://tingdonghu.github.io/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="古月月仔的博客">
+<meta property="og:description" content="Unreal Engine 中的 Delegates（委托）详解Delegates（委托）是 Unreal Engine 中一种强大的事件通知机制，它允许开发者在不直接引用类的情况下调用成员函数。本质上，委托是一种类型安全的函数指针，特别适合用于实现观察者模式、事件系统和回调机制。 基本概念核心特点 类型安全：编译时会检查函数签名匹配 动态绑定：可以在运行时绑定&#x2F;解绑函数 多播能力：可以">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tingdonghu.github.io/img/unrealengine.png">
+<meta property="article:published_time" content="2024-04-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-16T13:59:21.160Z">
+<meta property="article:author" content="Ethan Hu">
+<meta property="article:tag" content="UnrealEngine">
+<meta property="article:tag" content="委托">
+<meta property="article:tag" content="回调">
+<meta property="article:tag" content="事件通信">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tingdonghu.github.io/img/unrealengine.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "虚幻引擎中的委托(Delegates)与回调(Callbacks)",
+  "url": "https://tingdonghu.github.io/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/",
+  "image": "https://tingdonghu.github.io/img/unrealengine.png",
+  "datePublished": "2024-04-14T16:00:00.000Z",
+  "dateModified": "2025-05-16T13:59:21.160Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Ethan Hu",
+      "url": "https://tingdonghu.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://tingdonghu.github.io/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":250,"languages":{"author":"作者: Ethan Hu","link":"链接: ","source":"来源: 古月月仔的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '虚幻引擎中的委托(Delegates)与回调(Callbacks)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="\source\css\font.css"><link rel="stylesheet" href="https://gcore.jsdelivr.net/gh/sviptzk/StaticFile_HEXO@latest/butterfly/css/macblack.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">60</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/sakura.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">古月月仔的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">虚幻引擎中的委托(Delegates)与回调(Callbacks)</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">虚幻引擎中的委托(Delegates)与回调(Callbacks)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-04-14T16:00:00.000Z" title="发表于 2024-04-15 00:00:00">2024-04-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-05-16T13:59:21.160Z" title="更新于 2025-05-16 21:59:21">2025-05-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/">游戏开发</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/%E8%99%9A%E5%B9%BB%E5%8A%9F%E8%83%BD%E8%AE%B0%E5%BD%95/">虚幻功能记录</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Unreal-Engine-中的-Delegates（委托）详解"><a href="#Unreal-Engine-中的-Delegates（委托）详解" class="headerlink" title="Unreal Engine 中的 Delegates（委托）详解"></a>Unreal Engine 中的 Delegates（委托）详解</h1><p>Delegates（委托）是 Unreal Engine 中一种强大的事件通知机制，它允许开发者在不直接引用类的情况下调用成员函数。本质上，委托是一种类型安全的函数指针，特别适合用于实现观察者模式、事件系统和回调机制。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="核心特点"><a href="#核心特点" class="headerlink" title="核心特点"></a>核心特点</h3><ul>
+<li><strong>类型安全</strong>：编译时会检查函数签名匹配</li>
+<li><strong>动态绑定</strong>：可以在运行时绑定&#x2F;解绑函数</li>
+<li><strong>多播能力</strong>：可以同时通知多个接收者（Multicast Delegates）</li>
+<li><strong>序列化支持</strong>：部分委托类型支持蓝图序列化</li>
+</ul>
+<h2 id="委托类型"><a href="#委托类型" class="headerlink" title="委托类型"></a>委托类型</h2><p>Unreal Engine 提供了几种主要的委托类型：</p>
+<h3 id="1-单播委托-Singlecast-Delegates"><a href="#1-单播委托-Singlecast-Delegates" class="headerlink" title="1. 单播委托 (Singlecast Delegates)"></a>1. 单播委托 (Singlecast Delegates)</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_DELEGATE</span>(MyDelegate); <span class="comment">// 无参数</span></span><br><span class="line"><span class="built_in">DECLARE_DELEGATE_OneParam</span>(MyParamDelegate, FString); <span class="comment">// 单参数</span></span><br><span class="line"><span class="built_in">DECLARE_DELEGATE_TwoParams</span>(MyTwoParamDelegate, int32, <span class="type">bool</span>); <span class="comment">// 双参数</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-多播委托-Multicast-Delegates"><a href="#2-多播委托-Multicast-Delegates" class="headerlink" title="2. 多播委托 (Multicast Delegates)"></a>2. 多播委托 (Multicast Delegates)</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_MULTICAST_DELEGATE</span>(MyMulticastDelegate);</span><br><span class="line"><span class="built_in">DECLARE_MULTICAST_DELEGATE_OneParam</span>(MyMulticastParamDelegate, <span class="type">float</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-动态委托-Dynamic-Delegates"><a href="#3-动态委托-Dynamic-Delegates" class="headerlink" title="3. 动态委托 (Dynamic Delegates)"></a>3. 动态委托 (Dynamic Delegates)</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_DYNAMIC_DELEGATE</span>(FMyDynamicDelegate);</span><br><span class="line"><span class="built_in">DECLARE_DYNAMIC_MULTICAST_DELEGATE</span>(FMyDynamicMulticastDelegate);</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-事件-Events"><a href="#4-事件-Events" class="headerlink" title="4. 事件 (Events)"></a>4. 事件 (Events)</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_EVENT</span>(MyOwnerClass, MyEvent);</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><h3 id="单播委托示例"><a href="#单播委托示例" class="headerlink" title="单播委托示例"></a>单播委托示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明一个带有一个参数(int32)的单播委托类型，命名为FScoreChangedDelegate</span></span><br><span class="line"><span class="comment">// 该委托用于在分数变化时通知订阅者</span></span><br><span class="line"><span class="built_in">DECLARE_DELEGATE_OneParam</span>(FScoreChangedDelegate, int32);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义一个继承自AActor的类AMyActor</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AMyActor</span> : <span class="keyword">public</span> AActor</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 声明一个FScoreChangedDelegate类型的委托实例OnScoreChanged</span></span><br><span class="line">    <span class="comment">// 这个委托将用于在分数更新时通知所有绑定的函数</span></span><br><span class="line">    FScoreChangedDelegate OnScoreChanged;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 更新分数的方法</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">UpdateScore</span><span class="params">(int32 NewScore)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 执行委托，通知所有绑定的函数</span></span><br><span class="line">        <span class="comment">// ExecuteIfBound是安全执行方法，只有在有绑定时才会实际调用</span></span><br><span class="line">        <span class="comment">// 参数NewScore将传递给所有绑定的函数</span></span><br><span class="line">        OnScoreChanged.<span class="built_in">ExecuteIfBound</span>(NewScore);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义一个监听分数变化的类AMyListener</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AMyListener</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 绑定到分数变化委托的方法</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">BindToScoreChange</span><span class="params">(AMyActor* Actor)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 使用BindUObject将当前对象(this)的HandleScoreChanged方法绑定到Actor的OnScoreChanged委托</span></span><br><span class="line">        <span class="comment">// BindUObject专门用于绑定UObject成员函数，会自动处理对象生命周期</span></span><br><span class="line">        Actor-&gt;OnScoreChanged.<span class="built_in">BindUObject</span>(<span class="keyword">this</span>, &amp;AMyListener::HandleScoreChanged);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 处理分数变化的回调函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">HandleScoreChanged</span><span class="params">(int32 NewScore)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 当分数变化时，记录日志显示新分数</span></span><br><span class="line">        <span class="comment">// %d将被NewScore的值替换</span></span><br><span class="line">        <span class="built_in">UE_LOG</span>(LogTemp, Warning, <span class="built_in">TEXT</span>(<span class="string">&quot;Score changed to %d&quot;</span>), NewScore);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="执行流程"><a href="#执行流程" class="headerlink" title="执行流程"></a>执行流程</h4><pre class="mermaid">sequenceDiagram
+    participant 调用方 as 调用方(AMyActor)
+    participant 委托系统 as 委托系统(OnScoreChanged)
+    participant 监听方 as 监听方(AMyListener)
+
+    Note over 监听方: 初始化阶段
+    监听方->>委托系统: BindUObject(this, &AMyListener::HandleScoreChanged)
+    Note right of 委托系统: 存储绑定信息：<br>- 目标对象(this)<br>- 函数指针(HandleScoreChanged)
+
+    Note over 调用方: 执行阶段
+    调用方->>委托系统: ExecuteIfBound(NewScore)
+    委托系统->>监听方: 检查目标对象有效性
+    alt 对象有效
+        监听方-->>委托系统: 确认可调用
+        委托系统->>监听方: 调用HandleScoreChanged(NewScore)
+        监听方->>监听方: 执行日志输出 UE_LOG(...)
+    else 对象无效
+        委托系统--x 监听方: 跳过执行（自动清理绑定）
+    end</pre>
+
+<p>流程图有时候网页上无法基于代码绘制显示，再附一张截图</p>
+<p><img src="/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/image-20250419190556262.png" alt="image-20250419190556262"></p>
+<h3 id="播委托示例"><a href="#播委托示例" class="headerlink" title="播委托示例"></a>播委托示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_MULTICAST_DELEGATE</span>(FDeathDelegate);</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AMyCharacter</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    FDeathDelegate OnDeath;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Die</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 广播给所有绑定者</span></span><br><span class="line">        OnDeath.<span class="built_in">Broadcast</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 多个类可以绑定到同一个委托</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AListener1</span> &#123; <span class="function"><span class="type">void</span> <span class="title">HandleDeath</span><span class="params">()</span> </span>&#123; <span class="comment">/*...*/</span> &#125; &#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AListener2</span> &#123; <span class="function"><span class="type">void</span> <span class="title">HandleDeath</span><span class="params">()</span> </span>&#123; <span class="comment">/*...*/</span> &#125; &#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="动态委托（可用于蓝图）"><a href="#动态委托（可用于蓝图）" class="headerlink" title="动态委托（可用于蓝图）"></a>动态委托（可用于蓝图）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_DYNAMIC_DELEGATE_OneParam</span>(FBlueprintDelegate, FString, Message);</span><br><span class="line"></span><br><span class="line"><span class="built_in">UCLASS</span>()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UMyBlueprintCallableObject</span> : <span class="keyword">public</span> UObject</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">GENERATED_BODY</span>()</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">UFUNCTION</span>(BlueprintCallable)</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">SetupDelegate</span><span class="params">(FBlueprintDelegate Delegate)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        MyDelegate = Delegate;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">TriggerDelegate</span><span class="params">(FString Message)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        MyDelegate.<span class="built_in">ExecuteIfBound</span>(Message);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    FBlueprintDelegate MyDelegate;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="绑定方式"><a href="#绑定方式" class="headerlink" title="绑定方式"></a>绑定方式</h2><p>Unreal 提供了多种绑定方法：</p>
+<table>
+<thead>
+<tr>
+<th>绑定方法</th>
+<th>描述</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>BindUObject</code></td>
+<td>绑定到UObject成员函数</td>
+<td><code>Delegate.BindUObject(this, &amp;MyClass::Func)</code></td>
+</tr>
+<tr>
+<td><code>BindStatic</code></td>
+<td>绑定静态函数</td>
+<td><code>Delegate.BindStatic(&amp;MyStaticFunc)</code></td>
+</tr>
+<tr>
+<td><code>BindRaw</code></td>
+<td>绑定原始C++对象</td>
+<td><code>Delegate.BindRaw(RawPtr, &amp;RawClass::Func)</code></td>
+</tr>
+<tr>
+<td><code>BindLambda</code></td>
+<td>绑定Lambda表达式</td>
+<td><code>Delegate.BindLambda([]()&#123; /*...*/ &#125;)</code></td>
+</tr>
+<tr>
+<td><code>BindSP</code></td>
+<td>绑定共享指针对象</td>
+<td><code>Delegate.BindSP(SharedPtr, &amp;MyClass::Func)</code></td>
+</tr>
+</tbody></table>
+<h2 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h2><ol>
+<li><strong>选择合适的委托类型</strong>：<ul>
+<li>1对1通知 → 单播委托</li>
+<li>1对多通知 → 多播委托</li>
+<li>需要蓝图支持 → 动态委托</li>
+</ul>
+</li>
+<li><strong>内存管理</strong>：<ul>
+<li>使用<code>BindUObject</code>或<code>BindSP</code>而不是<code>BindRaw</code>，以避免悬空指针</li>
+<li>在对象销毁前调用<code>Unbind()</code>或<code>RemoveAll()</code></li>
+</ul>
+</li>
+<li><strong>性能考虑</strong>：<ul>
+<li>动态委托比普通委托慢</li>
+<li>高频触发的委托避免使用多播</li>
+</ul>
+</li>
+<li><strong>调试技巧</strong>：<ul>
+<li>使用<code>ExecuteIfBound</code>而不是<code>Execute</code>来避免崩溃</li>
+<li>使用<code>IsBound()</code>检查是否有绑定</li>
+</ul>
+</li>
+</ol>
+<h2 id="与蓝图交互"><a href="#与蓝图交互" class="headerlink" title="与蓝图交互"></a>与蓝图交互</h2><p>动态委托特别适合与蓝图交互：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam</span>(FOnHealthChanged, <span class="type">float</span>, NewHealth);</span><br><span class="line"></span><br><span class="line"><span class="built_in">UCLASS</span>()</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UHealthComponent</span> : <span class="keyword">public</span> UActorComponent</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">GENERATED_BODY</span>()</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">UPROPERTY</span>(BlueprintAssignable)</span><br><span class="line">    FOnHealthChanged OnHealthChanged;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">TakeDamage</span><span class="params">(<span class="type">float</span> Amount)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Health -= Amount;</span><br><span class="line">        OnHealthChanged.<span class="built_in">Broadcast</span>(Health);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在蓝图中，你可以直接为这个委托添加事件：</p>
+<ol>
+<li>创建HealthComponent变量</li>
+<li>拖出变量引脚 → “Assign OnHealthChanged”</li>
+<li>连接自定义事件</li>
+</ol>
+<h1 id="Unreal-Engine-中的-Callbacks（回调）的作用以及与委托的关系"><a href="#Unreal-Engine-中的-Callbacks（回调）的作用以及与委托的关系" class="headerlink" title="Unreal Engine 中的 Callbacks（回调）的作用以及与委托的关系"></a>Unreal Engine 中的 Callbacks（回调）的作用以及与委托的关系</h1><p>在 Unreal Engine（虚幻引擎）中，<strong>委托（Delegates）和回调（Callbacks）</strong> 是紧密相关的概念，但它们的设计目的、实现方式和应用场景存在关键差异。以下是两者的深度对比和关系解析：</p>
+<hr>
+<h3 id="1-核心定义"><a href="#1-核心定义" class="headerlink" title="1. 核心定义"></a><strong>1. 核心定义</strong></h3><table>
+<thead>
+<tr>
+<th><strong>概念</strong></th>
+<th><strong>委托（Delegates）</strong></th>
+<th><strong>回调（Callbacks）</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>本质</strong></td>
+<td>类型安全的函数包装器，支持多播和动态绑定</td>
+<td>通常是函数指针或简单函数对象</td>
+</tr>
+<tr>
+<td><strong>Unreal中的实现</strong></td>
+<td>通过<code>DECLARE_DELEGATE</code>等宏定义</td>
+<td>原生C++函数指针或<code>std::function</code></td>
+</tr>
+<tr>
+<td><strong>典型用途</strong></td>
+<td>事件系统、跨模块通信、蓝图交互</td>
+<td>底层API响应、异步操作完成通知</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-关键关系"><a href="#2-关键关系" class="headerlink" title="2. 关键关系"></a><strong>2. 关键关系</strong></h3><h4 id="委托是回调的增强版"><a href="#委托是回调的增强版" class="headerlink" title="委托是回调的增强版"></a><strong>委托是回调的增强版</strong></h4><h4 id="共同点"><a href="#共同点" class="headerlink" title="共同点"></a><strong>共同点</strong></h4><ul>
+<li>都用于<strong>解耦调用方和被调用方</strong></li>
+<li>都遵循**”订阅-通知”**模式</li>
+<li>都能处理<strong>异步操作完成事件</strong></li>
+</ul>
+<h4 id="核心差异"><a href="#核心差异" class="headerlink" title="核心差异"></a><strong>核心差异</strong></h4><table>
+<thead>
+<tr>
+<th><strong>特性</strong></th>
+<th><strong>委托</strong></th>
+<th><strong>回调</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>绑定方式</td>
+<td>支持UObject成员函数、Lambda等</td>
+<td>通常仅限静态函数或裸函数指针</td>
+</tr>
+<tr>
+<td>线程安全</td>
+<td>可配置（<code>ESPMode::ThreadSafe</code>）</td>
+<td>需手动实现</td>
+</tr>
+<tr>
+<td>多播支持</td>
+<td>原生支持（<code>DECLARE_MULTICAST_DELEGATE</code>）</td>
+<td>需自行维护列表</td>
+</tr>
+<tr>
+<td>生命周期管理</td>
+<td>自动处理UObject有效性</td>
+<td>需手动检查对象存活</td>
+</tr>
+<tr>
+<td>蓝图集成</td>
+<td>动态委托可直接暴露给蓝图</td>
+<td>无法直接使用</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3-Unreal-Engine-中的典型场景"><a href="#3-Unreal-Engine-中的典型场景" class="headerlink" title="3. Unreal Engine 中的典型场景"></a><strong>3. Unreal Engine 中的典型场景</strong></h3><h4 id="委托的适用场景"><a href="#委托的适用场景" class="headerlink" title="委托的适用场景"></a><strong>委托的适用场景</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 角色死亡事件（多播委托）</span></span><br><span class="line"><span class="built_in">DECLARE_MULTICAST_DELEGATE</span>(FOnCharacterDied);</span><br><span class="line">FOnCharacterDied OnDeath;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 多个系统订阅</span></span><br><span class="line">HealthComponent-&gt;OnDeath.<span class="built_in">AddUObject</span>(<span class="keyword">this</span>, &amp;AAchievementSystem::HandleDeath);</span><br><span class="line">UIWidget-&gt;OnDeath.<span class="built_in">AddLambda</span>([]()&#123; <span class="built_in">ShowGameOverScreen</span>(); &#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="回调的适用场景"><a href="#回调的适用场景" class="headerlink" title="回调的适用场景"></a><strong>回调的适用场景</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 文件异步加载完成回调</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">LoadFile</span><span class="params">(<span class="type">const</span> FString&amp; Path, TFunction&lt;<span class="type">void</span>(<span class="type">bool</span>)&gt; Callback)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">AsyncTask</span>([Path, Callback]()&#123;</span><br><span class="line">        <span class="type">bool</span> bSuccess = FFileHelper::<span class="built_in">LoadFileToArray</span>(...);</span><br><span class="line">        <span class="built_in">Callback</span>(bSuccess); <span class="comment">// 简单回调</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用示例</span></span><br><span class="line"><span class="built_in">LoadFile</span>(<span class="string">&quot;Save.dat&quot;</span>, [](<span class="type">bool</span> bSuccess)&#123;</span><br><span class="line">    <span class="built_in">UE_LOG</span>(LogTemp, Warning, <span class="built_in">TEXT</span>(<span class="string">&quot;Load result: %d&quot;</span>), bSuccess);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4-性能与内存对比"><a href="#4-性能与内存对比" class="headerlink" title="4. 性能与内存对比"></a><strong>4. 性能与内存对比</strong></h3><table>
+<thead>
+<tr>
+<th><strong>指标</strong></th>
+<th><strong>委托</strong></th>
+<th><strong>回调</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>调用开销</td>
+<td>较高（虚函数+安全性检查）</td>
+<td>较低（直接调用）</td>
+</tr>
+<tr>
+<td>内存占用</td>
+<td>较大（存储绑定信息）</td>
+<td>较小（仅存储函数指针）</td>
+</tr>
+<tr>
+<td>适用频率</td>
+<td>推荐用于高频事件（如每帧更新）</td>
+<td>适合低频一次性操作</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="5-相互转换与协作"><a href="#5-相互转换与协作" class="headerlink" title="5. 相互转换与协作"></a><strong>5. 相互转换与协作</strong></h3><h4 id="将回调封装为委托"><a href="#将回调封装为委托" class="headerlink" title="将回调封装为委托"></a><strong>将回调封装为委托</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第三方库的回调适配为Unreal委托</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">ThirdPartyLib_SetCallback</span><span class="params">(<span class="type">void</span>(*Callback)(int32))</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 第三方库的C风格回调</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 适配层</span></span><br><span class="line"><span class="built_in">DECLARE_DELEGATE_OneParam</span>(FMyDelegate, int32);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">SetupAdapter</span><span class="params">(FMyDelegate&amp; Delegate)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">ThirdPartyLib_SetCallback</span>([](int32 Val)&#123;</span><br><span class="line">        Delegate.<span class="built_in">ExecuteIfBound</span>(Val); <span class="comment">// 桥接回调到委托</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="委托降级为回调"><a href="#委托降级为回调" class="headerlink" title="委托降级为回调"></a><strong>委托降级为回调</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 需要C接口时转换</span></span><br><span class="line"><span class="type">static</span> FMyDelegate StaticDelegate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function"><span class="type">void</span> <span class="title">RegisterCallback</span><span class="params">(<span class="type">void</span>(*Callback)(int32))</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    StaticDelegate.<span class="built_in">BindStatic</span>(Callback); <span class="comment">// 委托绑定静态函数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 触发时</span></span><br><span class="line">StaticDelegate.<span class="built_in">Broadcast</span>(<span class="number">42</span>); <span class="comment">// 调用C回调</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="6-设计选择指南"><a href="#6-设计选择指南" class="headerlink" title="6. 设计选择指南"></a><strong>6. 设计选择指南</strong></h3><table>
+<thead>
+<tr>
+<th><strong>选择委托</strong> 当…</th>
+<th><strong>选择回调</strong> 当…</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>需要多播通知</td>
+<td>仅需单次响应</td>
+</tr>
+<tr>
+<td>要与蓝图交互</td>
+<td>纯C++模块内部使用</td>
+</tr>
+<tr>
+<td>涉及UObject生命周期</td>
+<td>处理底层API或第三方库集成</td>
+</tr>
+<tr>
+<td>需要线程安全保证</td>
+<td>性能敏感且无需复杂功能</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="7-底层实现窥探"><a href="#7-底层实现窥探" class="headerlink" title="7. 底层实现窥探"></a><strong>7. 底层实现窥探</strong></h3><h4 id="委托的内存结构（简化）"><a href="#委托的内存结构（简化）" class="headerlink" title="委托的内存结构（简化）"></a><strong>委托的内存结构（简化）</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">FDelegateInstance</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span>* ObjectPtr;        <span class="comment">// 目标对象（UObject*或裸指针）</span></span><br><span class="line">    <span class="type">void</span>* FunctionPtr;      <span class="comment">// 函数地址</span></span><br><span class="line">    FDelegateHandle Handle; <span class="comment">// 唯一标识符</span></span><br><span class="line">    ESPMode ThreadSafety;   <span class="comment">// 线程模式</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="回调的典型实现"><a href="#回调的典型实现" class="headerlink" title="回调的典型实现"></a><strong>回调的典型实现</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Unreal中回调的常见形式</span></span><br><span class="line"><span class="keyword">typedef</span> TFunction&lt;<span class="built_in">void</span>(int32)&gt; FSimpleCallback;</span><br><span class="line">TArray&lt;FSimpleCallback&gt; CallbackList; <span class="comment">// 回调列表</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>在Unreal Engine中：</p>
+<ul>
+<li><strong>委托</strong> 是引擎层面对回调概念的<strong>高级封装</strong>，提供类型安全、多播、蓝图集成等特性</li>
+<li><strong>回调</strong> 更接近原生C++实现，适合<strong>轻量级、高性能</strong>场景</li>
+<li>两者可相互配合，构建从底层到高层的完整事件系统</li>
+</ul>
+<p>正确选择的标准：<br> ​<strong>优先使用委托处理游戏逻辑事件，仅在需要与底层API交互或极端性能优化时使用原生回调。​</strong></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io">Ethan Hu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/">https://tingdonghu.github.io/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://tingdonghu.github.io" target="_blank">古月月仔的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/UnrealEngine/">UnrealEngine</a><a class="post-meta__tags" href="/tags/%E5%A7%94%E6%89%98/">委托</a><a class="post-meta__tags" href="/tags/%E5%9B%9E%E8%B0%83/">回调</a><a class="post-meta__tags" href="/tags/%E4%BA%8B%E4%BB%B6%E9%80%9A%E4%BF%A1/">事件通信</a></div><div class="post-share"><div class="social-share" data-image="/img/unrealengine.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2024/04/10/2025-04-10-UC++%E7%9A%84%E5%AE%8F%E5%AE%9A%E4%B9%89%E8%AF%AD%E6%B3%95%E8%AF%A6%E8%A7%A3/" title="UC++的宏定义语法详解"><img class="cover" src="/img/unrealengine.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">UC++的宏定义语法详解</div></div><div class="info-2"><div class="info-item-1">Unreal Engine中宏定义语法的使用示例代码：123456789101112131415161718192021222324// 类声明宏：使类被纳入Unreal反射系统// - Blueprintable：允许在蓝图中创建该类的子类// - meta=(DisplayName=&quot;My Object&quot;)：在编辑器中显示的自定义名称UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject  // 必须继承UObject或其子类&#123;    // 代码生成宏：必须出现在类体内第一个位置    // - 展开后会包含类型信息、反射数据等引擎所需的内容    GENERATED_BODY()        // 属性声明宏：将成员变量暴露给反射系统    // - EditAnywhere：可在编辑器的任意位置（如蓝图、细节面板）编辑此属性    // -...</div></div></div></a><a class="pagination-related" href="/2024/04/19/2025-4-19-%E3%80%90MultiplayerCourse%E3%80%91%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/" title="【MultiplayerCourse】创建多人联机插件"><img class="cover" src="/img/unrealengine.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【MultiplayerCourse】创建多人联机插件</div></div><div class="info-2"><div class="info-item-1">此博客为学习油管DruidMech大佬的广域网多人射击游戏的笔记附上项目GitHub源码地址https://github.com/DruidMech/MultiplayerCourseMenuSystem 新建项目首先使用引擎（5.0及以上）创建一个基于第三人称模板的.cpp项目，我这里将其命名为MenuSystem. Subsystem插件配置一、在编辑器-插件中打开Oline Subsystem Steam插件，然后重启项目。  二、在项目的Build.cs下找到一个PublicDependencyModuleNames,把插件的配置项OnlineSubsystemSteam、OnlineSubsystem添加到其中然后编译 1PublicDependencyModuleNames.AddRange(new string[] &#123; &quot;Core&quot;, &quot;CoreUObject&quot;, &quot;Engine&quot;, &quot;InputCore&quot;, &quot;HeadMountedDisplay&quot;,...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2024/04/10/2025-04-10-UC++%E7%9A%84%E5%AE%8F%E5%AE%9A%E4%B9%89%E8%AF%AD%E6%B3%95%E8%AF%A6%E8%A7%A3/" title="UC++的宏定义语法详解"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-10</div><div class="info-item-2">UC++的宏定义语法详解</div></div><div class="info-2"><div class="info-item-1">Unreal Engine中宏定义语法的使用示例代码：123456789101112131415161718192021222324// 类声明宏：使类被纳入Unreal反射系统// - Blueprintable：允许在蓝图中创建该类的子类// - meta=(DisplayName=&quot;My Object&quot;)：在编辑器中显示的自定义名称UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject  // 必须继承UObject或其子类&#123;    // 代码生成宏：必须出现在类体内第一个位置    // - 展开后会包含类型信息、反射数据等引擎所需的内容    GENERATED_BODY()        // 属性声明宏：将成员变量暴露给反射系统    // - EditAnywhere：可在编辑器的任意位置（如蓝图、细节面板）编辑此属性    // -...</div></div></div></a><a class="pagination-related" href="/2024/04/19/2025-4-19-%E3%80%90MultiplayerCourse%E3%80%91%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/" title="【MultiplayerCourse】创建多人联机插件"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-19</div><div class="info-item-2">【MultiplayerCourse】创建多人联机插件</div></div><div class="info-2"><div class="info-item-1">此博客为学习油管DruidMech大佬的广域网多人射击游戏的笔记附上项目GitHub源码地址https://github.com/DruidMech/MultiplayerCourseMenuSystem 新建项目首先使用引擎（5.0及以上）创建一个基于第三人称模板的.cpp项目，我这里将其命名为MenuSystem. Subsystem插件配置一、在编辑器-插件中打开Oline Subsystem Steam插件，然后重启项目。  二、在项目的Build.cs下找到一个PublicDependencyModuleNames,把插件的配置项OnlineSubsystemSteam、OnlineSubsystem添加到其中然后编译 1PublicDependencyModuleNames.AddRange(new string[] &#123; &quot;Core&quot;, &quot;CoreUObject&quot;, &quot;Engine&quot;, &quot;InputCore&quot;, &quot;HeadMountedDisplay&quot;,...</div></div></div></a><a class="pagination-related" href="/2023/12/01/UnrealEngine5-%E8%AE%BE%E7%BD%AEUI%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/" title="UnrealEngine5-设置UI自适应屏幕大小"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-01</div><div class="info-item-2">UnrealEngine5-设置UI自适应屏幕大小</div></div><div class="info-2"><div class="info-item-1">在游戏中，如果想实现不同分辨率下，都可以支持当前的UI界面布局，都需要用到锚点功能。‌虚幻引擎中的UI锚点（Anchor）是指控件在屏幕或父物体上的固定点，用于确定控件的位置和布局。‌ 锚点的作用是确保UI元素在屏幕缩放或形变时保持相对位置不变。 在虚幻引擎中，锚点可以理解为将子物体“挂”在父物体上的点。当父物体的位置或大小发生变化时，子物体的位置会相应地调整，保持它们之间的相对关系不变。锚点的位置可以在屏幕的任意角落，通常用于自适应屏幕尺寸和保持布局的稳定性‌。具体来说，锚点有以下几种情况：  当锚点与父物体的某个顶点重合时，子物体在该点的位置不会改变，只有当父物体该点位置改变时，子物体才会跟着移动。 如果锚点不重合，子物体在父物体变形时会跟着缩放，保持与父物体各顶点的距离不变‌。  具体实现：错误的UI锚点设置方法如下：  如上图为锚点设置不准确，导致缩放时出现屏幕空缺  将锚点修改为下图所示：  如果想保持UI中内容部件和画布等比缩放，需要将锚点拉伸至和部件相同大小  全部修改后现实正确：  </div></div></div></a><a class="pagination-related" href="/2024/04/21/UnrealEngine%E4%B8%AD%E7%9A%84GameMode%E5%92%8CGameSate%E8%AF%A6%E8%A7%A3/" title="UnrealEngine中的GameMode和GameSate详解"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-21</div><div class="info-item-2">UnrealEngine中的GameMode和GameSate详解</div></div><div class="info-2"><div class="info-item-1"> 在虚幻引擎（Unreal Engine）中，GameMode 和 GameState 都是多人游戏中的核心类，但它们的分工和用途有显著区别。以下是它们的对比和典型应用场景：  1. GameMode（游戏规则管理者）职责 仅存在于服务器端（不会复制到客户端）。 定义游戏的核心规则：胜利条件、玩家生成逻辑、回合制规则等。 管理玩家登录&#x2F;退出（通过Login&#x2F;Logout等事件）。 生成并持有PlayerController、PlayerState等。  典型用途12345678// 示例：在GameMode中设置玩家生成逻辑void AMyGameMode::PostLogin(APlayerController* NewPlayer) &#123;    Super::PostLogin(NewPlayer);    // 生成玩家角色    if (NewPlayer-&gt;GetPawn() == nullptr) &#123;        SpawnPlayerAtTransform(NewPlayer, SpawnTransform);   ...</div></div></div></a><a class="pagination-related" href="/2023/11/20/VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5UE5/" title="VRiod的二次元角色导入虚幻引擎"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="info-item-2">VRiod的二次元角色导入虚幻引擎</div></div><div class="info-2"><div class="info-item-1">VRiod的二次元角色导入虚幻引擎突然想在虚幻项目中用点二次元角色,找了些资料以及自己实践作如下博客,附一篇视频教程:如何在UE5中快速导入VroidStudio的二次元萌妹 VRoid Studio使用VRoid Studio是由pixiv开发的一款3D角色绘制软件,可以在Steam上免费下载使用.  软件的主要功能就是通过类似绘画的方式进行人物的建模，让用户可以更加轻松地创造自己的虚拟人物（形象）。软件的操作界面也非常的简单直观，里面配备了许多预设项目和参数，让用户不需要从头开始建模，只需选择项目、组合它们并调整参数即可创建自己的角色，其中就包含了面部、发型、衣服、化妆等等可定制的参数。同时，用户能直接想画画一样直观的模拟发型，还能直接在3D模型上绘制特定的面部表情、眼睛或服装设计。此外，用户可以通过全尺寸钢笔工具绘制自己所需要的纹理，它支持数位板压力感应，用户可以直接在3D模型或UV开发上直接实时绘制纹理用来创建角色。  对于我们这种只会写代码的人来说,使用VRoid...</div></div></div></a><a class="pagination-related" href="/2024/03/19/UrealEngineC++%E4%B8%8EC++%E7%9A%84%E5%8C%BA%E5%88%AB/" title="UnrealEngine C++ 与标准 C++ 的区别"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-19</div><div class="info-item-2">UnrealEngine C++ 与标准 C++ 的区别</div></div><div class="info-2"><div class="info-item-1">1. 类声明与反射系统1.1 类定义语法Unreal C++1234567891011// 必须继承UObject且使用反射宏UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject &#123;    GENERATED_BODY() // 必须包含        UPROPERTY(EditAnywhere, Category=&quot;Stats&quot;)    float Health = 100.0f;    UFUNCTION(BlueprintCallable)    void Heal(float Amount);&#125;;   标准 C++12345678class MyObject &#123;public:    float Health = 100.0f;        void Heal(float Amount) &#123;        Health += Amount;   ...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Ethan Hu</div><div class="author-info-description">计算机在校生&游戏程序员</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">60</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TingDongHu"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/TingDongHu" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:2680957536@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #hdhfbb;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">古月月仔的博客上新了！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Unreal-Engine-%E4%B8%AD%E7%9A%84-Delegates%EF%BC%88%E5%A7%94%E6%89%98%EF%BC%89%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.</span> <span class="toc-text">Unreal Engine 中的 Delegates（委托）详解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E7%82%B9"><span class="toc-number">1.1.1.</span> <span class="toc-text">核心特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A7%94%E6%89%98%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.2.</span> <span class="toc-text">委托类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%8D%95%E6%92%AD%E5%A7%94%E6%89%98-Singlecast-Delegates"><span class="toc-number">1.2.1.</span> <span class="toc-text">1. 单播委托 (Singlecast Delegates)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%A4%9A%E6%92%AD%E5%A7%94%E6%89%98-Multicast-Delegates"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 多播委托 (Multicast Delegates)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%8A%A8%E6%80%81%E5%A7%94%E6%89%98-Dynamic-Delegates"><span class="toc-number">1.2.3.</span> <span class="toc-text">3. 动态委托 (Dynamic Delegates)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BA%8B%E4%BB%B6-Events"><span class="toc-number">1.2.4.</span> <span class="toc-text">4. 事件 (Events)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.3.</span> <span class="toc-text">使用示例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E6%92%AD%E5%A7%94%E6%89%98%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.3.1.</span> <span class="toc-text">单播委托示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">执行流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%92%AD%E5%A7%94%E6%89%98%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.3.2.</span> <span class="toc-text">播委托示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E5%A7%94%E6%89%98%EF%BC%88%E5%8F%AF%E7%94%A8%E4%BA%8E%E8%93%9D%E5%9B%BE%EF%BC%89"><span class="toc-number">1.3.3.</span> <span class="toc-text">动态委托（可用于蓝图）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%91%E5%AE%9A%E6%96%B9%E5%BC%8F"><span class="toc-number">1.4.</span> <span class="toc-text">绑定方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">1.5.</span> <span class="toc-text">最佳实践</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8E%E8%93%9D%E5%9B%BE%E4%BA%A4%E4%BA%92"><span class="toc-number">1.6.</span> <span class="toc-text">与蓝图交互</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Unreal-Engine-%E4%B8%AD%E7%9A%84-Callbacks%EF%BC%88%E5%9B%9E%E8%B0%83%EF%BC%89%E7%9A%84%E4%BD%9C%E7%94%A8%E4%BB%A5%E5%8F%8A%E4%B8%8E%E5%A7%94%E6%89%98%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">2.</span> <span class="toc-text">Unreal Engine 中的 Callbacks（回调）的作用以及与委托的关系</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%A0%B8%E5%BF%83%E5%AE%9A%E4%B9%89"><span class="toc-number">2.0.1.</span> <span class="toc-text">1. 核心定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%85%B3%E9%94%AE%E5%85%B3%E7%B3%BB"><span class="toc-number">2.0.2.</span> <span class="toc-text">2. 关键关系</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A7%94%E6%89%98%E6%98%AF%E5%9B%9E%E8%B0%83%E7%9A%84%E5%A2%9E%E5%BC%BA%E7%89%88"><span class="toc-number">2.0.2.1.</span> <span class="toc-text">委托是回调的增强版</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B1%E5%90%8C%E7%82%B9"><span class="toc-number">2.0.2.2.</span> <span class="toc-text">共同点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%B7%AE%E5%BC%82"><span class="toc-number">2.0.2.3.</span> <span class="toc-text">核心差异</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Unreal-Engine-%E4%B8%AD%E7%9A%84%E5%85%B8%E5%9E%8B%E5%9C%BA%E6%99%AF"><span class="toc-number">2.0.3.</span> <span class="toc-text">3. Unreal Engine 中的典型场景</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A7%94%E6%89%98%E7%9A%84%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">2.0.3.1.</span> <span class="toc-text">委托的适用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9E%E8%B0%83%E7%9A%84%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">2.0.3.2.</span> <span class="toc-text">回调的适用场景</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%80%A7%E8%83%BD%E4%B8%8E%E5%86%85%E5%AD%98%E5%AF%B9%E6%AF%94"><span class="toc-number">2.0.4.</span> <span class="toc-text">4. 性能与内存对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%E4%B8%8E%E5%8D%8F%E4%BD%9C"><span class="toc-number">2.0.5.</span> <span class="toc-text">5. 相互转换与协作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%86%E5%9B%9E%E8%B0%83%E5%B0%81%E8%A3%85%E4%B8%BA%E5%A7%94%E6%89%98"><span class="toc-number">2.0.5.1.</span> <span class="toc-text">将回调封装为委托</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A7%94%E6%89%98%E9%99%8D%E7%BA%A7%E4%B8%BA%E5%9B%9E%E8%B0%83"><span class="toc-number">2.0.5.2.</span> <span class="toc-text">委托降级为回调</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E8%AE%BE%E8%AE%A1%E9%80%89%E6%8B%A9%E6%8C%87%E5%8D%97"><span class="toc-number">2.0.6.</span> <span class="toc-text">6. 设计选择指南</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E7%AA%A5%E6%8E%A2"><span class="toc-number">2.0.7.</span> <span class="toc-text">7. 底层实现窥探</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A7%94%E6%89%98%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%EF%BC%88%E7%AE%80%E5%8C%96%EF%BC%89"><span class="toc-number">2.0.7.1.</span> <span class="toc-text">委托的内存结构（简化）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9E%E8%B0%83%E7%9A%84%E5%85%B8%E5%9E%8B%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.0.7.2.</span> <span class="toc-text">回调的典型实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.0.8.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/30/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%20%E4%B8%AD%E5%B8%B8%E8%A7%81%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0/" title="深度学习中常见的激活函数"><img src="/img/mashinelearning.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深度学习中常见的激活函数"/></a><div class="content"><a class="title" href="/2025/01/30/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%20%E4%B8%AD%E5%B8%B8%E8%A7%81%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0/" title="深度学习中常见的激活函数">深度学习中常见的激活函数</a><time datetime="2025-01-29T16:00:00.000Z" title="发表于 2025-01-30 00:00:00">2025-01-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/01/20/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%B8%8E%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/" title="机器学习中的梯度下降与损失函数"><img src="/img/machinelearning.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="机器学习中的梯度下降与损失函数"/></a><div class="content"><a class="title" href="/2025/01/20/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%B8%8E%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/" title="机器学习中的梯度下降与损失函数">机器学习中的梯度下降与损失函数</a><time datetime="2025-01-19T16:00:00.000Z" title="发表于 2025-01-20 00:00:00">2025-01-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/12/31/PointPillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" title="PointPillar算法思路"><img src="/img/pointcloud.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PointPillar算法思路"/></a><div class="content"><a class="title" href="/2024/12/31/PointPillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" title="PointPillar算法思路">PointPillar算法思路</a><time datetime="2024-12-30T16:00:00.000Z" title="发表于 2024-12-31 00:00:00">2024-12-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/12/30/OpenPCDet%E4%B8%AD%E5%85%B3%E4%BA%8Espconv%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="OpenPCDet中关于spconv的一些问题解决方案"><img src="/img/pointcloud.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OpenPCDet中关于spconv的一些问题解决方案"/></a><div class="content"><a class="title" href="/2024/12/30/OpenPCDet%E4%B8%AD%E5%85%B3%E4%BA%8Espconv%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="OpenPCDet中关于spconv的一些问题解决方案">OpenPCDet中关于spconv的一些问题解决方案</a><time datetime="2024-12-29T16:00:00.000Z" title="发表于 2024-12-30 00:00:00">2024-12-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/12/20/OpenPCDet%E4%B8%AD%E5%AF%B9%E6%95%B0%E6%8D%AE%E8%BF%9B%E8%A1%8C%E9%87%87%E6%A0%B7%E8%AE%AD%E7%BB%83/" title="OpenPCDet框架下模型的数据采样训练"><img src="/img/pointcloud.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OpenPCDet框架下模型的数据采样训练"/></a><div class="content"><a class="title" href="/2024/12/20/OpenPCDet%E4%B8%AD%E5%AF%B9%E6%95%B0%E6%8D%AE%E8%BF%9B%E8%A1%8C%E9%87%87%E6%A0%B7%E8%AE%AD%E7%BB%83/" title="OpenPCDet框架下模型的数据采样训练">OpenPCDet框架下模型的数据采样训练</a><time datetime="2024-12-19T16:00:00.000Z" title="发表于 2024-12-20 00:00:00">2024-12-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2025 By Ethan Hu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'forest' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+
+  const disqusReset = conf => {
+    window.DISQUS && window.DISQUS.reset({
+      reload: true,
+      config: conf
+    })
+  }
+
+  const loadDisqus = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyDisqus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    window.disqus_identifier = isShuoshuo ? path : '/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/'
+    window.disqus_url = isShuoshuo ? location.origin + path : 'https://tingdonghu.github.io/2024/04/15/UnrealEngine%E4%B8%AD%E7%9A%84Delegates%E5%A7%94%E6%89%98%E5%92%8CCallbacks%E5%9B%9E%E8%B0%83%E8%AF%A6%E8%A7%A3/'
+
+    const disqus_config = function () {
+      this.page.url = disqus_url
+      this.page.identifier = disqus_identifier
+      this.page.title = '虚幻引擎中的委托(Delegates)与回调(Callbacks)'
+    }
+
+    if (window.DISQUS) disqusReset(disqus_config)
+    else {
+      const script = document.createElement('script')
+      script.src = 'https://.disqus.com/embed.js'
+      script.setAttribute('data-timestamp', +new Date())
+      document.head.appendChild(script)
+    }
+
+    btf.addGlobalFn('themeChange', () => disqusReset(disqus_config), 'disqus')
+  }
+
+  const getCount = async() => {
+    try {
+      const eleGroup = document.querySelector('#post-meta .disqus-comment-count')
+      if (!eleGroup) return
+      const cleanedLinks = eleGroup.href.replace(/#post-comment$/, '')
+
+      const res = await fetch(`https://disqus.com/api/3.0/threads/set.json?forum=&api_key=&thread:link=${cleanedLinks}`,{
+        method: 'GET'
+      })
+      const result = await res.json()
+
+      const count = result.response.length ? result.response[0].posts : 0
+      eleGroup.textContent = count
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Disqus' === 'Disqus'
+      ? window.shuoshuoComment = { loadComment: loadDisqus }
+      : window.loadOtherComment = loadDisqus
+    return
+  }
+
+  if ('Disqus' === 'Disqus' || !false) {
+    if (false) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+    else {
+      loadDisqus()
+      
+    }
+  } else {
+    window.loadOtherComment = loadDisqus
+  }
+})()</script></div><div class="aplayer no-destroy" data-id="2189835855" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><script charset="UTF-8" id="LA_COLLECT" src="https://sdk.51.la/js-sdk-pro.min.js"></script><script src="https://sdk.51.la/perf/js-sdk-perf.min.js" crossorigin="anonymous"></script><script> LA.init({id:"{YOU ID}",ck:"{YOU CK}"})</script><script>new LingQue.Monitor().init({id:"YOU ID",sendSuspicious:true});</script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      false 
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
