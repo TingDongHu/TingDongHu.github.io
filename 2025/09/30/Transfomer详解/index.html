@@ -1,0 +1,688 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Transformer架构宗述 | 古月月仔的博客</title><meta name="author" content="Ethan Hu,2680957536@qq.com"><meta name="copyright" content="Ethan Hu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="之前在学习大模型相关技术的时候，看了很多篇对Transfomer解释的博客，但是感觉总是理解不透彻，不久之后就忘掉了，打算自己整 理输出一下，以便更好的理解。 要讲Transformer,当然要先从NLP的技术应用演进开始讲起： NLP技术演进背景 传统的NLP方法（统计学习时期） 在神经网络技术普及之前，NLP领域主要依赖于基于规则的方法和统计学习方法。这些方法通过人工构建语言模型和统计方法来处">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transformer架构宗述">
+<meta property="og:url" content="https://tingdonghu.github.io/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="古月月仔的博客">
+<meta property="og:description" content="之前在学习大模型相关技术的时候，看了很多篇对Transfomer解释的博客，但是感觉总是理解不透彻，不久之后就忘掉了，打算自己整 理输出一下，以便更好的理解。 要讲Transformer,当然要先从NLP的技术应用演进开始讲起： NLP技术演进背景 传统的NLP方法（统计学习时期） 在神经网络技术普及之前，NLP领域主要依赖于基于规则的方法和统计学习方法。这些方法通过人工构建语言模型和统计方法来处">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tingdonghu.github.io/img/ArtificialIntelligence.png">
+<meta property="article:published_time" content="2025-09-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-10-15T17:19:01.206Z">
+<meta property="article:author" content="Ethan Hu">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="大模型">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="NLP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tingdonghu.github.io/img/ArtificialIntelligence.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Transformer架构宗述",
+  "url": "https://tingdonghu.github.io/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/",
+  "image": "https://tingdonghu.github.io/img/ArtificialIntelligence.png",
+  "datePublished": "2025-09-29T16:00:00.000Z",
+  "dateModified": "2025-10-15T17:19:01.206Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Ethan Hu",
+      "url": "https://tingdonghu.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://tingdonghu.github.io/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":250,"languages":{"author":"作者: Ethan Hu","link":"链接: ","source":"来源: 古月月仔的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Transformer架构宗述',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="\source\css\font.css"><link rel="stylesheet" href="https://gcore.jsdelivr.net/gh/sviptzk/StaticFile_HEXO@latest/butterfly/css/macblack.css"><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">80</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/linpory.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">古月月仔的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">Transformer架构宗述</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Transformer架构宗述</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-09-29T16:00:00.000Z" title="发表于 2025-09-30 00:00:00">2025-09-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-15T17:19:01.206Z" title="更新于 2025-10-16 01:19:01">2025-10-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Artificial-Intelligence/">Artificial Intelligence</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Artificial-Intelligence/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">8.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>26分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>之前在学习大模型相关技术的时候，看了很多篇对Transfomer解释的博客，但是感觉总是理解不透彻，不久之后就忘掉了，打算自己整</p>
+<p>理输出一下，以便更好的理解。</p>
+<p>要讲Transformer,当然要先从NLP的技术应用演进开始讲起：</p>
+<h2 id="NLP技术演进背景">NLP技术演进背景</h2>
+<h3 id="传统的NLP方法（统计学习时期）"><strong>传统的NLP方法（统计学习时期）</strong></h3>
+<p>在神经网络技术普及之前，NLP领域主要依赖于<strong>基于规则的方法</strong>和<strong>统计学习方法</strong>。这些方法通过人工构建语言模型和统计方法来处理文本。</p>
+<ul>
+<li><strong>基于规则的系统</strong>：依赖大量的语言学规则，如语法、句法规则和词汇规则，这些规则通常由语言学家手工编写。</li>
+<li><strong>统计学习方法</strong>：随着计算机能力的提升，统计方法开始兴起，常见的算法包括隐马尔可夫模型（HMM）、最大熵模型、条件随机场（CRF）等。这些方法通过学习大量标注数据中的统计规律来进行预测，比如词性标注、命名实体识别等。</li>
+</ul>
+<p>然而，这些方法有两个主要局限：第一，它们需要大量的手工标注数据；第二，基于规则的方法难以处理复杂的语言现象。</p>
+<h3 id="神经网络的兴起"><strong>神经网络的兴起</strong></h3>
+<p>神经网络的引入标志着NLP技术的根本转折。最早的神经网络应用在NLP中并不是很成功，直到2010年代深度学习的突破，才迎来了飞速的发展。</p>
+<h4 id="Word-Embeddings">Word Embeddings</h4>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251015205211766.png" alt="词嵌入技术示意"></p>
+<p>在传统方法中，词语是通过稀疏的词袋模型（Bag of Words）来表示的，这种方法无法捕捉词与词之间的关系。</p>
+<p><strong>Word2Vec</strong>（2013年）和<strong>GloVe</strong>（2014年）是深度学习在NLP中的第一个重大成功。它们通过神经网络学习将词语映射到一个连续的向量空间中，称为<strong>词嵌入（Word Embedding）</strong>，使得词与词之间的关系可以通过向量空间的几何距离来反映。例如，“国王”和“王后”在词嵌入空间中的距离比“国王”和“汽车”要近，这种方式有效地捕捉了词的语义。</p>
+<h4 id="RNN和LSTM"><strong>RNN和LSTM</strong></h4>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251015205426121.png" alt="RNN机构示意"></p>
+<p>**RNN（循环神经网络）**是处理序列数据（如文本）的核心架构之一，它可以通过循环连接记住前一时刻的信息。然而，RNN有一个缺陷——它难以捕捉长期依赖关系。为了解决这个问题，**LSTM（长短时记忆网络）**被提出（1997年），它能够更好地处理长期依赖问题。**GRU（门控循环单元）**是LSTM的一种变体，它简化了结构并且在某些任务中表现出与LSTM相当的效果。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251015205527512.png" alt="LSMT结构示意"></p>
+<h4 id="CNN">CNN</h4>
+<p>**卷积神经网络（CNN）**主要用于图像处理，但它们也开始被应用于NLP任务，如文本分类和情感分析。通过将文本视作一个序列，通过卷积层提取局部特征，CNN在一些文本分析任务中非常有效。</p>
+<h3 id="Transformer技术">Transformer技术</h3>
+<p>2017 年，Google 团队在论文**《Attention Is All You Need》<strong>中提出 Transformer，它完全摒弃递归结构，引入</strong>自注意力机制（Self-Attention）<strong>，实现了全局上下文感知与并行计算的平衡，成为 NLP 乃至深度学习领域的里程碑。<strong>Transformer</strong>是NLP技术的一次革命性突破。与RNN和LSTM不同，Transformer摒弃了序列数据的顺序处理方式，转而采用</strong>自注意力机制（Self-Attention）**，使得每个单词都能够直接与其它所有单词进行交互，从而提高了计算效率，并能捕捉更复杂的依赖关系。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/1533981-20250718224012244-220282788.png" alt="img"></p>
+<h4 id="BERT">BERT</h4>
+<p><strong>BERT（Bidirectional Encoder Representations from Transformers）<strong>是基于Transformer的预训练模型，通过在大规模文本上进行双向预训练，BERT能够更好地理解文本的上下文信息。BERT的出现彻底改变了NLP模型的训练方法，许多NLP任务通过</strong>迁移学习</strong>，即先在大规模语料上预训练，再在具体任务上微调，取得了显著的效果提升。</p>
+<h4 id="GPT">GPT</h4>
+<p>**GPT（Generative Pre-trained Transformer)**系列是由OpenAI提出的基于Transformer架构的生成模型。与BERT的“编码器”结构不同，GPT采用了“解码器”结构，专注于生成任务，如文本生成、翻译、问答等。</p>
+<p>随着模型规模的不断增大，NLP领域进入了<strong>大模型时代</strong>。例如，GPT-3有1750亿个参数，BERT的规模也达到了数百亿级别。预训练模型通过在大规模数据集上的训练，能够捕捉到丰富的语言知识，然后在特定任务上进行微调，显著提高了许多NLP任务的效果。</p>
+<h1>Transfomer是什么</h1>
+<p>直接给一个大模型给出的定义：</p>
+<blockquote>
+<p><strong>Transformer是一种用于自然语言处理（NLP）和其他序列到序列（sequence-to-sequence）任务的深度学习模型架构</strong>，它在2017年由Vaswani等人首次提出。Transformer架构引入了自注意力机制（self-attention mechanism），这是一个关键的创新，使其在处理序列数据时表现出色。<br>
+<strong>以下是Transformer的一些重要组成部分和特点：</strong></p>
+<p>**自注意力机制（Self-Attention）：**这是Transformer的核心概念之一，它使模型能够同时考虑输入序列中的所有位置，而不是像循环神经网络（RNN）或卷积神经网络（CNN）一样逐步处理。自注意力机制允许模型根据输入序列中的不同部分来赋予不同的注意权重，从而更好地捕捉语义关系。<br>
+**多头注意力（Multi-Head Attention）：**Transformer中的自注意力机制被扩展为多个注意力头，每个头可以学习不同的注意权重，以更好地捕捉不同类型的关系。多头注意力允许模型并行处理不同的信息子空间。<br>
+**堆叠层（Stacked Layers）：**Transformer通常由多个相同的编码器和解码器层堆叠而成。这些堆叠的层有助于模型学习复杂的特征表示和语义。<br>
+**位置编码（Positional Encoding）：**由于Transformer没有内置的序列位置信息，它需要额外的位置编码来表达输入序列中单词的位置顺序。<br>
+**残差连接和层归一化（Residual Connections and Layer Normalization）：**这些技术有助于减轻训练过程中的梯度消失和爆炸问题，使模型更容易训练。<br>
+**编码器和解码器：**Transformer通常包括一个编码器用于处理输入序列和一个解码器用于生成输出序列，这使其适用于序列到序列的任务，如机器翻译。</p>
+</blockquote>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/v2-613bffcc75eeae483f3d3de6dc1a1b54_r.jpg" alt="img"></p>
+<h2 id="自顶向下理解Transformer架构">自顶向下理解Transformer架构</h2>
+<h3 id="从整体上理解Transformer">从整体上理解Transformer</h3>
+<p>假定当前我们有这样一个Transformer模型的应用场景：</p>
+<blockquote>
+<p>使用机器翻译将一句西语翻译为应用：</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image.png" alt="ML翻译应用示意"></p>
+</blockquote>
+<p>对该Transformer模型进行进行分解，就会找到一个编码组件、一个解码组件以及它们之间的连接。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-1.png" alt="初步分解"></p>
+<p>编码组件和解码组件一般都是由一堆的解码器和编码器构成的，且他们之间的数量一般是相同的。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-2.png" alt="编码组件与解码组件构成"></p>
+<p>继续分解编码器：每个解码器的结构是完全相同的，不过他们的权重不同，每个解码器分为两个子层，一个注意力层，一个前馈神经网络层。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-3.png" alt="编码器结构"></p>
+<p>编码器的输入首先流经自注意力层(self-attention) - 该层可帮助编码器在编码特定单词时查看输入句子中的其他单词。后面将详细阐述自注意力机制。</p>
+<p>自注意力层的输出被馈送到前馈神经网络(Feed Forward)。完全相同的前馈网络独立应用于每个位置。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-4.png" alt="编码器与解码器数据流向"></p>
+<p>解码器也具有这两个层，但是他们之间还有一个解码注意力层，可以帮助解码器关注输入句子的相关部分（这里我并不是特别理解）。</p>
+<h3 id="将张量引入架构">将张量引入架构</h3>
+<p>现在我们已经了解了模型的主要组成部分，让我们开始看看各种向量/张量以及它们如何在这些组成部分之间流动，从而将训练模型的输入转化为输出。</p>
+<p>与常规的NLP模型一样，Transformer模型也会先尝试让机器读懂自然语言–即使用嵌入算法将每个书输入词转化为向量。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-5.png" alt="每个单词都嵌入到一个大小为512的向量中"></p>
+<p>嵌入仅发生在最底层的编码器中。所有编码器的共同抽象是它们接收一个向量列表，每个向量的大小为 512 。 在底层编码器中，这将是单词嵌入，但在其他编码器中，它将是直接位于下方的编码器的输出。此列表的大小是我们可以设置的超参数 – 基本上它将是我们训练数据集中最长句子的长度。</p>
+<blockquote>
+<p>此处也没有看很懂，后续查阅理解一下</p>
+</blockquote>
+<p>将单词嵌入到输入序列之后，每个单词都会流经编码器的两层中的每一层。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-6-1760189561169-87.png" alt="数据在编码器中的流向"></p>
+<p>这里我们开始看到 Transformer 的一个关键特性，即<strong>每个位置上的单词在编码器中流经自己的路径。在自注意力层中，这些路径之间存在依赖关系。然而，前馈层没有这些依赖关系，因此各种路径可以在流经前馈层时并行执行。</strong></p>
+<h3 id="自注意力机制">自注意力机制</h3>
+<p>假定下面是一个机器翻译应用中要翻译的句子：</p>
+<blockquote>
+<p>“ The animal didn’t cross the street because it was too tired”</p>
+</blockquote>
+<p>这句话中的“它”指的是什么？它指的是街道还是动物？对于人类来说，这是一个简单的问题，但对于算法来说却不那么简单。</p>
+<p>自注意力机制的作用就是当模型处理<code>it</code>这个词时，让模型将<code>it</code>与<code>animal</code>联系起来。</p>
+<p>当模型处理每个单词（输入序列中的每个位置）时，自我注意力机制允许它查看输入序列中的其他位置以寻找有助于更好地编码该单词的线索。说人话就是<strong>对于每一个单词，模型会运算该单词与输入内容中所有单词的内容的位置关系和相关性关系</strong>。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-8-1760534908273-1.png" alt="it对于输入内容中所有单词的关系"></p>
+<p>如上图所示，在进行单词<code>it</code>的相关性计算时，注意力机制根据计算得分，将其与<code>The animal</code>关联起来（其实不是真正意义上的关联，而是将计算结果矩阵和it的词嵌入矩阵合并，输入给下一层，对于观察者或者后面的层来说，这一步相当于把分数最高的相关性单词关联起来）。下面将详细阐述注意力机制的计算过程：</p>
+<h3 id="自注意力机制的计算详解">自注意力机制的计算详解</h3>
+<p>计算注意力机制的第一步是编码器给每个输入向量（在本例中理解为每个单词的嵌入）创建的三个向量（矩阵），分别为Query向量、Key向量、Value向量，这三个向量是注意力进行计算和思考的抽象概念。</p>
+<blockquote>
+<p>⚠注意：这里的新向量一般维度是小于嵌入向量的。它们的维度为64，而嵌入向量和编码器输入/输出的向量维度为512。这仅仅是一种架构选择，方便后续的多头注意力机制的计算保持恒定。</p>
+</blockquote>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-9-1760535614833-4.png" alt="x1乘以WQ权重矩阵可得出q1，即与该词相关的“查询”向量。最终会为输入句子中的每个词创建一个“查询”、“键”和一个“值”投影"></p>
+<h4 id="Q-K-V三个向量的具体意义是什么">Q|K|V三个向量的具体意义是什么</h4>
+<p>这里用一个巧妙的比喻来解释：</p>
+<blockquote>
+<p>想象你在一个巨大的图书馆（图书馆就是我们要处理的一段文本或一系列信息）。</p>
+<ul>
+<li><strong>Query ： 你的查询请求</strong>它就是<strong>你</strong>提出的问题。比如：“我想找一本关于‘宇宙哲学’的书。”<strong>意义</strong>：<code>Query</code>代表当前需要关注什么的“意图”或“问题”。在翻译任务中，当模型在生成“美丽”这个词时，它的 <code>Query</code>就是在问：“为了生成‘美丽’这个词，我应该关注输入句子中的哪些部分？”</li>
+<li><strong>Key ： 书脊上的书名和标签</strong>图书馆里每本书的书脊上都有书名和分类标签（如“哲学”、“天文”、“科幻”）。这些就是书的 <code>Key</code>。<strong>意义</strong>：<code>Key</code>是信息的“标识”或“摘要”。它用来与 <code>Query</code>进行匹配，判断这条信息是否相关。在文本中，每个单词的 <code>Key</code>向量就像是这个单词的“身份摘要”，用来回答 <code>Query</code>的提问。</li>
+<li><strong>Value ： 书中的具体内容</strong>这是书里面<strong>完整的知识内容</strong>。一本标签是“宇宙哲学”的书，其 <code>Value</code>就是书中关于宇宙、生命、万物之理的详细论述。<strong>意义</strong>：<code>Value</code>是信息的“实质内容”。一旦我们通过 <code>Query</code>和 <code>Key</code>的匹配找到了相关的书，我们真正需要获取和使用的是书中的具体内容，也就是 <code>Value</code>。</li>
+</ul>
+</blockquote>
+<p>在上述例子中，注意力机制的工作流程如下：</p>
+<ol>
+<li><strong>匹配（打分）</strong>：你将你的 <code>Query</code>（“宇宙哲学”）与图书馆里所有书的 <code>Key</code>（书脊上的标签）进行相似度比较。你会给《时间简史》打高分，给《烹饪大全》打低分。</li>
+<li><strong>加权（注意力权重）</strong>：根据匹配分数，你决定在每本书上花费多少“注意力”。你可能给《时间简史》100%的注意力，给《星际穿越》50%的注意力，而完全忽略《烹饪大全》。</li>
+<li><strong>汇总（加权求和）</strong>：最后，你将这些注意力权重分别应用到对应的 <code>Value</code>（书的内容）上，然后汇总。你最终得到的信息，是高度集中于《时间简史》内容，并略带《星际穿越》风格的、关于“宇宙哲学”的一个<strong>全新综合理解</strong>。</li>
+</ol>
+<h4 id="注意力机制的矩阵计算">注意力机制的矩阵计算</h4>
+<p>回归到注意力机制的计算，整个过程就很显而易见了：</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251015215752561.png" alt="注意力机制计算流程图"></p>
+<p>输入序列中的<strong>每个单词</strong>（更准确地说，是它的嵌入向量）都会通过三种不同的线性变换（即乘以三个不同的权重矩阵 <em>W**Q</em>, <em>W**K</em>, <em>W**V</em>），分别生成三个对应的向量：</p>
+<ul>
+<li><strong>Query 向量 *q*</strong>：代表“当前位置”想获取信息的意图。</li>
+<li><strong>Key 向量 *k*</strong>：代表“每个位置”所能提供信息的标识。</li>
+<li><strong>Value 向量 *v*</strong>：代表“每个位置”实际拥有的信息内容。</li>
+</ul>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-13-1760536378661-7.png" alt="向量的产生"></p>
+<p>注意力机制计算流程：</p>
+<p><strong>第1步：计算注意力分数（匹配）<strong>对于某个特定的 <code>Query</code>（比如对应“美丽”这个词的 <code>q_美丽</code>），我们用它与输入序列中</strong>所有单词</strong>的 <code>Key</code>进行点积计算相似度（<code>q_美丽 · k_我</code>, <code>q_美丽 · k_喜欢</code>, <code>q_美丽 · k_这个</code>, <code>q_美丽 · k_花园</code>）。这个分数回答了“在生成‘美丽’这个词时，与‘我’、‘喜欢’、‘这个’、‘花园’这些词的关联度有多大？”结果可能发现 <code>q_美丽 · k_花园</code>的分数最高。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251016000034810.png" alt="image-20251016000034810"></p>
+<p><strong>第2步：应用 Softmax（归一化为权重）<strong>将这些分数通过 Softmax 函数处理，得到一组权重系数（和为1）。这步之后，“花园”对应的权重会接近1，而其他词的权重接近0。这步将分数转化为概率分布，明确了“注意力”应该如何</strong>分配</strong>。几乎所有的注意力都集中在了“花园”上。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251016000021074.png" alt="Softmax归一化处理计算出权重值"></p>
+<p><strong>第3步：加权求和 Value（汇总）<strong>将上一步得到的所有权重，分别与对应单词的 <code>Value</code>向量相乘，然后将所有结果相加，得到最终的</strong>注意力输出</strong>。<code>输出 = 权重_我 * v_我 + 权重_喜欢 * v_喜欢 + ... + ~1.0 * v_花园</code>这是最精妙的一步！最终的输出<strong>不是</strong>“花园”这个词的原始表示，而是所有单词 <code>Value</code>的加权平均，但其中“花园”的 <code>Value</code>占据了绝对主导。这个输出是一个<strong>融合了上下文信息的、全新的“花园”的表示</strong>。它包含了“为了理解‘美丽’，我们需要重点关注‘花园’”这一信息。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-14-1760544140467-20.png" alt="矩阵形式的自注意力机制计算"></p>
+<h3 id="多头注意力机制">多头注意力机制</h3>
+<p>还是以例句进行展示：</p>
+<blockquote>
+<p>看到句子 <strong>“那只苹果很甜，是乔布斯创立的公司”</strong> 时，你的大脑可能会并行地处理：</p>
+<ol>
+<li><strong>语义关联（一词多义）</strong>：“苹果”在这里指的是水果还是公司？你需要根据上下文（“甜” vs “乔布斯”）来判断。</li>
+<li><strong>语法结构</strong>：“很甜”修饰的是“苹果”，构成主谓关系。</li>
+<li><strong>指代关系</strong>：“是”后面的“公司”指代的是前面的“苹果”。</li>
+</ol>
+<p>单一的头（Single-Head）注意力机制，可以看作是<strong>一次综合性的注意力</strong>，它可能会同时捕捉到以上所有信息，但这些信息在同一个表示空间中是混杂在一起的。</p>
+</blockquote>
+<p><strong>多头注意力（Multi-Head Attention）的核心思想就是：</strong></p>
+<blockquote>
+<p><strong>“与其让一个注意力机制一次性完成所有信息的捕捉，不如将模型划分为多个‘头’（子空间），让每个头专注于学习一种特定的注意力模式。最后再将所有头的结果合并起来，从而得到更丰富、更细腻的上下文表示。”</strong></p>
+</blockquote>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-20251016000626298.png" alt="image-20251016000626298"></p>
+<h4 id="多头注意力机制的计算">多头注意力机制的计算</h4>
+<p><strong>第1步：初始化</strong></p>
+<p>假设输入序列有 <code>n</code>个词，每个词被表示为一个维度是 <code>d_model</code>（例如512）的向量。那么输入矩阵 <code>X</code>的维度是 <code>[n, d_model]</code>。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-15-1760545117765-23.png" alt="借助多头注意力机制，为每个头维护单独的 Q/K/V 权重矩阵，从而产生不同的 Q/K/V 矩阵。与之前一样，将 X 乘以 WQ/WK/WV 矩阵以生成 Q/K/V 矩阵。"></p>
+<p><strong>第2步：创建多个头（并行操作）</strong></p>
+<ol>
+<li><strong>线性投影：</strong> 对于每个头 <code>i</code>（假设共有 <code>h</code>个头，例如8个），我们使用三组<strong>独立的</strong>权重矩阵 <code>W_i^Q</code>, <code>W_i^K</code>, <code>W_i^V</code>将原始的 <code>Q, K, V</code>分别投影到<strong>更低的维度</strong>。通常，每个头的维度会变为 <code>d_k = d_v = d_model / h</code>（例如512/8=64）。这样做的好处是总计算量与单头注意力相似。</li>
+<li><strong>独立计算注意力：</strong> 在每个投影后的低维空间里，分别执行标准的缩放点积注意力（Scaled Dot-Product Attention）操作：<strong>计算注意力分数</strong>：<code>Attention(Q * W_i^Q, K * W_i^K, V * W_i^V)</code>这样，每个头都会产生一个输出矩阵 <code>head_i</code>，其维度是 <code>[n, d_v]</code>（例如 <code>[n, 64]</code>）。</li>
+</ol>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-16-1760545154207-26.png" alt="独立计算"></p>
+<p><strong>第3步：合并输出</strong></p>
+<ol>
+<li><strong>拼接：</strong> 将所有 <code>h</code>个头的输出矩阵 <code>head_1, head_2, ..., head_h</code>在<strong>特征维度</strong>上拼接起来，得到一个维度为 <code>[n, h * d_v] = [n, d_model]</code>的大矩阵。</li>
+<li><strong>最终线性投影：</strong> 将这个拼接后的大矩阵通过一个<strong>可学习的权重矩阵 <code>W^O</code></strong> 进行线性变换，得到最终的输出。<code>W^O</code>的维度通常是 <code>[d_model, d_model]</code>。这个步骤的作用是融合所有头的信息，并允许模型学习如何最有效地组合它们。</li>
+</ol>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-17-1760545184996-29.png" alt="矩阵拼接与线性投影"></p>
+<h4 id="多头注意力的优势">多头注意力的优势</h4>
+<ol>
+<li><strong>增强建模能力</strong>：允许模型在不同的表示子空间里协同关注来自不同位置的信息，大大扩展了模型的表示能力。</li>
+<li><strong>并行计算</strong>：多个头之间互不依赖，可以完全并行计算，效率极高。</li>
+<li><strong>可解释性</strong>：通过可视化不同头的注意力权重，我们可以直观地看到模型学习了哪些类型的语法或语义关系（如指代关系、形容词修饰关系等），这为理解模型提供了一扇窗口。</li>
+</ol>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-18-1760545226703-32.png" alt="多头注意力机制的完整展示"></p>
+<h4 id="常见的误区">常见的误区</h4>
+<p><strong>多头注意力的意思就是输入内容的每一个单词都会作为一个头去计算和别的单词的相关性吗？</strong></p>
+<blockquote>
+<p>这是一个非常常见的误解，这个描述更接近“自注意力机制”本身，而不是“多头”。</p>
+<p>在自注意力中，<strong>每个词</strong>都会扮演两个角色：<strong>主动查询者</strong>：它用自己的 Query 向量去“询问”序列中的所有词（包括自己）：“你们谁跟我最相关？”<strong>被查询对象</strong>：它的 Key 和 Value 向量被其他词的 Query 向量用来计算相关性。所以，自注意力机制<strong>本身</strong>就保证了每个词都会与所有其他词进行交互。</p>
+</blockquote>
+<p><strong>正确的理解：多头（Multi-Head）</strong></p>
+<p>“多头”是指在<strong>已经有的自注意力机制之上</strong>，再增加一个“并行化”的维度。它的意思是：</p>
+<blockquote>
+<p><strong>从多个不同的“视角”或“侧面”来并行地计算这种相关性，而不仅仅只计算一次。</strong></p>
+</blockquote>
+<p>还是举一个栗子：</p>
+<blockquote>
+<p>假设我们要分析一个“苹果”。</p>
+<ul>
+<li><strong>单头注意力（Single-Head）</strong>：相当于你<strong>一个人</strong>，综合地从颜色、形状、大小、气味等多个方面来观察这个苹果，然后得出一个整体的结论。</li>
+<li><strong>多头注意力（Multi-Head，比如8个头）</strong>：相当于你组建了一个<strong>8人的专家团队</strong>，让他们<strong>同时</strong>观察这个苹果：<strong>头1（颜色专家）</strong>：只专注于分析苹果的颜色（红、黄、绿），给出颜色方面的报告。<strong>头2（形状专家）</strong>：只专注于分析苹果的形状（圆、歪），给出形状方面的报告。<strong>头3（质地专家）</strong>：只专注于触摸苹果的表面（光滑、粗糙）。<strong>头4（语义专家，针对文本）</strong>：专注于分析“苹果”这个词是指水果还是科技公司。<strong>头5（语法专家）</strong>：专注于分析“苹果”在句子中是主语还是宾语。…（还有其他专家）最后，你将这8份<strong>不同视角</strong>的专家报告汇总起来，得到对这个苹果最全面、最深入的理解。</li>
+</ul>
+</blockquote>
+<p>再举一个更具体的例子，以上面的<code>我喜欢这个美丽花园</code>作为输入，在Transformer模型中:</p>
+<ol>
+<li>
+<p>**第一步：序列 <code>[我， 喜欢， 美丽， 花园]</code>输入模型。这是基础输入。</p>
+</li>
+<li>
+<p><strong>第二步</strong>：模型不会只计算<strong>一套</strong>注意力权重。它会同时初始化8个（例如）独立的“专家团队”（即8个头）。每个“头”都有自己的一套独立的参数（独立的 <code>W_Q</code>, <code>W_K</code>, <code>W_V</code>矩阵），这保证了它们会学习关注不同的方面。<strong>每个头都会独立地为序列中的每个词计算一次它与其他所有词的相关性</strong>。也就是说，<strong>每个头都会生成一个完整的、但视角不同的注意力权重矩阵</strong>。</p>
+<p>例如，在处理“美丽”这个词时：<strong>头1</strong> 可能计算出 <code>花园</code>与 <code>美丽</code>的相关性最强（关注<strong>语义搭配</strong>）。<strong>头2</strong> 可能计算出 <code>喜欢</code>与 <code>美丽</code>的相关性最强（关注<strong>语法动宾关系</strong>）。<strong>头3</strong> 可能更关注 <code>这个</code>与 <code>美丽</code>的关系（关注<strong>指代或修饰关系</strong>）。</p>
+</li>
+<li>
+<p><strong>第三步</strong>：将8个头得到的8组结果拼接起来，再通过一个线性层融合，得到最终的输出。这个输出融合了8种不同的关系信息。</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">机制</th>
+<th style="text-align:left">核心问题</th>
+<th style="text-align:left">比喻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>自注意力</strong></td>
+<td style="text-align:left"><strong>一个词如何与序列中所有词交互？</strong></td>
+<td style="text-align:left">保证团队里的每个人（每个词）都能和所有其他人交流。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>多头注意力</strong></td>
+<td style="text-align:left"><strong>我们能否从多个不同角度来评估这种交互？</strong></td>
+<td style="text-align:left">组建一个专家团队，每个人从不同视角（颜色、形状等）同时评估这些交流。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="位置编码">位置编码</h3>
+<p>到目前为止，我们所描述的模型只缺少一件事，那就是解释输入序列中单词顺序的方法。</p>
+<p>为了解决这个问题，Transformer 模型对每个输入的向量都添加了一个向量。这些向量遵循模型学习到的特定模式，有助于确定每个单词的位置，或者句子中不同单词之间的距离。这种做法背后的直觉是：将这些表示位置的向量添加到词向量中，得到了新的向量，这些新向量映射到 Q/K/V，然后计算点积得到 attention 时，可以提供有意义的信息。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-21-1760545770287-35.png" alt="为了让模型了解单词的顺序，添加了位置编码向量——其值遵循特定的模式。"></p>
+<p>假设嵌入的维数为 4，则实际的位置编码将如下所示：</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-22-1760545817067-38.png" alt="当嵌入向量的长度是4的时候，位置编码的长度也是4"></p>
+<p>更直观的展示一下位置编码：</p>
+<p>在下图中，每一行对应一个向量的位置编码。因此，第一行将是我们要添加到输入序列中第一个单词的嵌入的向量。每行包含 512 个值 - 每个值介于 1 和 -1 之间。对它们进行了颜色编码，以便模式清晰可见。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-23-1760545930841-41.png" alt="这是 20 个字（行）的位置编码的真实示例，嵌入大小为 512（列）。您可以看到它从中间一分为二。这是因为左半部分的值由一个函数（使用正弦）生成，右半部分的值由另一个函数（使用余弦）生成。然后将它们连接起来以形成每个位置编码向量。"></p>
+<h3 id="残差">残差</h3>
+<p>回到Transformer的架构图，可以发现：编码器结构中编码器的每个子层（Self Attention 层和 FFNN）都有一个残差连接和层标准化（layer-normalization）。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-25-1760546105022-44.png" alt="编码器结构"></p>
+<p>将自注意力机制的相关向量和层进行可视化：</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-26-1760546366786-47.png" alt="编码器向量可视化"></p>
+<p>是不是看的云里雾里，其实很简单，我仍然举一个通俗的例子：</p>
+<blockquote>
+<p>假设你（模型）要学习做一道菜，比如“西红柿炒鸡蛋”。我们把做菜的过程看成网络的一层。</p>
+<p><strong>1. 没有残差连接时（传统方式）：</strong></p>
+<ul>
+<li>你每次做菜，都是<strong>从零开始</strong>。</li>
+<li>师傅尝了你的菜说：“味道不够，需要改进。”</li>
+<li>但你不知道具体哪一步出了问题。是盐放少了？火候不对？鸡蛋炒老了？你需要<strong>猜测并调整整个做菜流程</strong>。这非常困难，而且很容易改得面目全非，甚至还不如上一版。</li>
+</ul>
+<p><strong>2. 有残差连接时（Transformer的方式）：</strong></p>
+<ul>
+<li>你做了一道“西红柿炒鸡蛋”（我们叫它 <strong>版本A</strong>）。</li>
+<li>师傅尝了后说：“味道不够，需要改进。”</li>
+<li>但现在，你不是从头开始做。你的任务是：<strong>在版本A的基础上，只做一个小小的“改进”或“补丁”</strong>。</li>
+<li>**具体步骤是：**<strong>保留原版</strong>：你把做好的“版本A”完整地留在盘子里。<code>（这就是 x，输入）</code><strong>制作“改进包”</strong>：你另外拿个小碗，调一点点更鲜的酱油汁，或者切一点葱花。<code>（这就是 F(x)，要学习的“残差”或“变化”）</code><strong>合并</strong>：最后，你把小碗里的“改进包”浇到“版本A”上。<code>（这就是 x + F(x)，输出 = 输入 + 变化）</code><strong>最终菜品 = 原来的菜 (x) + 改进的调料 (F(x))</strong></li>
+</ul>
+</blockquote>
+<p>在上面的示意图中，在Transformer的每一层（比如注意力层），发生的事情就是：</p>
+<p><strong>输入（一句话的词向量）</strong> --进入–&gt; <strong>【本层的复杂计算】</strong> --产生–&gt; <strong>一个“变化量”</strong></p>
+<p>然后：<strong>本层的最终输出 = 输入 + 变化量</strong></p>
+<p>这个“+”号，就是<strong>残差连接</strong>。它确保了这一层无论怎么折腾，最初输入的信息都原封不动地保留了一份，并传递到了下一层。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-27-1760546832738-50.png" alt=" 2 个堆叠的编码器和解码器组成的 Transformer的数据流"></p>
+<h4 id="为什么残差如此重要？">为什么残差如此重要？</h4>
+<p>残差连接解决了训练<strong>深度神经网络</strong>时的两个核心难题：</p>
+<blockquote>
+<p><strong>1. 梯度消失/爆炸问题</strong></p>
+<ul>
+<li><strong>没有残差连接</strong>：在反向传播时，梯度需要从最深层（第N层）一层一层地传回最浅层（第1层）。这个过程就像穿过一个漫长的、信号会不断衰减的隧道。当网络很深时，梯度可能会变得极小（消失）或极大（爆炸），导致浅层参数无法得到有效的更新。</li>
+<li><strong>有残差连接</strong>：梯度可以通过残差路径这条“捷径”直接、无损地传回更早的层。这确保了即使网络有几十甚至上百层，所有层都能获得有效的梯度信号，使得训练非常深的模型成为可能。</li>
+</ul>
+<p><strong>2. 网络退化问题</strong></p>
+<ul>
+<li>即使解决了梯度消失，实验发现，单纯增加网络深度反而会导致训练和测试误差都变大。这不是过拟合，而是网络<strong>退化</strong>了——更深的网络表现反而不如较浅的网络。</li>
+<li><strong>残差连接的妙处</strong>：如果一个更深的网络的最优解就是简单地模仿一个较浅的网络（即让新增的层什么也不做），那么学习 <code>F(x) = 0</code>要比学习 <code>H(x) = x</code>容易得多！因为 <code>F(x) = 0</code>意味着让权重逼近零即可。这样，更深的网络<strong>至少不会比浅层网络差</strong>。如果更深层有用，模型再去学习一个非零的 <code>F(x)</code>。</li>
+</ul>
+<p>它是 Transformer 能够构建得非常深（例如 GPT-3 有 96 层）、从而拥有强大能力的关键技术支柱之一。</p>
+</blockquote>
+<h3 id="解码器">解码器</h3>
+<p>现在我们已经介绍了编码器方面的大部分概念，也基本上知道了解码器组件的工作原理。让我们看看它们是如何协同工作的。</p>
+<p>编码器首先处理输入序列。然后，顶部编码器的输出被转换为一组注意向量 K 和 V。每个解码器将在其“编码器-解码器注意”层中使用它们，这有助于解码器将注意力集中在输入序列中的适当位置：</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/2-1760547169977-53.gif" alt="编码器的协同工作"></p>
+<p>还是举个例子方便理解</p>
+<blockquote>
+<h4 id="第1步：编码器处理输入序列">第1步：编码器处理输入序列</h4>
+<p>法语情报文档 <code>&quot;J'aime le beau jardin&quot;</code>（“我喜欢美丽的花园”）被送入编码器团队。这个团队由多个（比如6个）分析专家（编码器层）堆叠而成。</p>
+<ul>
+<li><strong>过程</strong>：第一个分析专家（编码器层1）阅读原始文档，进行初步分析，输出一份初步的“分析笔记”。这份笔记传递给第二个专家（编码器层2），他在前一个专家的分析基础上进行更深入、更综合的分析。以此类推，直到最顶层的专家（编码器层6）完成分析。</li>
+<li><strong>结果</strong>：顶层编码器输出的，不再是简单的单词表示，而是<strong>一份富含上下文、已经充分理解了整句话含义的“终极分析报告”</strong>。这份报告里的每个词（如 <code>&quot;J'aime&quot;</code>, <code>&quot;beau&quot;</code>, <code>&quot;jardin&quot;</code>）都已经被赋予了基于整个句子上下文的意义。</li>
+</ul>
+<h4 id="第2步：生成注意向量-K-和-V">第2步：生成注意向量 K 和 V</h4>
+<p>这份“终极分析报告”被转换成两份特殊的情报摘要：<strong>K（密钥）</strong> 和 <strong>V（值）</strong>。你可以理解为：<strong>K</strong> 像是报告内容的<strong>精确索引</strong>或<strong>关键词列表</strong>。它帮助快速定位信息。<strong>V</strong> 像是报告内容的<strong>实质信息</strong>或<strong>详细内容</strong>本身。</p>
+<ul>
+<li><strong>目的</strong>：这样做的目的是为了让解码器（报告撰写员）能够高效地查询这些信息，而无需重新阅读整个复杂的分析报告。</li>
+</ul>
+<h4 id="第3步：解码器逐步生成，并查询编码器">第3步：解码器逐步生成，并查询编码器</h4>
+<p>“每个解码器将在其‘编码器-解码器注意’层中使用它们，这有助于解码器将注意力集中在输入序列中的适当位置。”现在，报告撰写员（解码器）开始用英语一个字一个字地写报告。<strong>这是最关键的一步！</strong></p>
+<ul>
+<li><strong>具体过程（假设已经生成了前两个词 “I love”）：</strong> <strong>解码器自注意力</strong>：撰写员先看看自己已经写了什么（<code>&quot;I love&quot;</code>），确保下文连贯。（这是解码器的自注意力层）<strong>关键一步：询问编码器</strong>：接下来，撰写员要写下一个词了。他思考：“基于我目前写的 <code>‘I love’</code>，我应该去法语文档的哪个部分寻找最重要的信息来确定下一个词？”他拿着当前的状态（对应一个 Query，Q），去查询编码器提供的那份索引K。通过比对，他发现他的Q与编码器K中代表 <code>&quot;beau&quot;</code>（美丽）和 <code>&quot;jardin&quot;</code>（花园）的键最匹配。特别是 <code>&quot;jardin&quot;</code>（花园）匹配度最高。于是，他将<strong>注意力集中</strong>到编码器信息V中与 <code>&quot;jardin&quot;</code>相关的实质内容上。<strong>生成词语</strong>：综合了自身已写的内容（<code>&quot;I love&quot;</code>）和从编码器那里聚焦的信息（<code>&quot;jardin&quot;</code>的语义），他判断下一个词应该是 <code>&quot;the beautiful garden&quot;</code>，并先写出下一个词 <code>&quot;the&quot;</code>。</li>
+</ul>
+</blockquote>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/transformer_decoding_2-1760547718150-56.gif" alt="alt text"></p>
+<blockquote>
+<p>⚠注意：</p>
+<p>解码器中的自注意力层的操作方式与编码器中的自注意力层略有不同：</p>
+<p>在解码器中，自注意力层仅允许关注输出序列中的较早位置。这是通过<code>-inf</code>在自注意力计算中的 <code>softmax </code>步骤之前屏蔽未来位置（将其设置为0）来实现的。“编码器-解码器注意”层的工作原理与多头自注意类似，不同之处在于它从其下方的层创建查询矩阵，并从编码器堆栈的输出中获取键和值矩阵。</p>
+</blockquote>
+<h3 id="最后的线性层和-Softmax-层">最后的线性层和 Softmax 层</h3>
+<p>解码器堆栈输出一个浮点向量。我们如何将其转换成一个单词？这是最后一个线性层的工作，后面是 Softmax 层。</p>
+<p>线性层是一个简单的完全连接的神经网络，它将解码器堆栈产生的向量投影到一个更大的向量中，称为 logits 向量。</p>
+<p>假设我们的模型知道从训练数据集中学习到的 10,000 个独特的英语单词（我们模型的“输出词汇表”）。这将使 logits 向量宽度达到 10,000 个单元格 - 每个单元格对应一个独特单词的分数。这就是我们解释线性层之后的模型输出的方式。</p>
+<p>然后，softmax 层将这些分数转换为概率（所有分数均为正数，总和为 1.0）。选择概率最高的单元格，并生成与其关联的单词作为此时间步骤的输出。</p>
+<p><img src="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/image-30-1760548019903-59.png" alt="生成的向量作为解码器堆栈的输出。然后将其转换为输出字。"></p>
+<h2 id="总结">总结</h2>
+<p><strong>总之，Transformer 是一个基于自注意力的编码器-解码器架构。编码器负责将输入序列压缩为上下文向量，解码器则通过交叉注意力机制，基于编码器的输出和已生成的内容，自回归地生成目标序列。其高效、强大的特性使其成为自然语言处理领域的绝对主流。</strong></p>
+<h2 id="博客-学习网站-视频-推荐">博客|学习网站|视频 推荐</h2>
+<p><strong>博客：</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.eimoon.com/p/transformer-explained/">图解Transformer | 图形化深入浅出地解释 Transformer 模型的工作原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Kuo_Jun_Lin/article/details/114241287?spm=1001.2014.3001.5506">序列模型之王 - Transfomer 全细节详解-CSDN博客</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42475060/article/details/121101749">【超详细】【原理篇&amp;实战篇】一文读懂Transformer-CSDN博客</a></li>
+</ul>
+<p>视频：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1NCgVzoEG9/?share_source=copy_web&amp;vd_source=a06df7b174b0e55e45242729b8ce1758">一小时从函数到Transformer！一路大白话彻底理解AI原理</a></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io">Ethan Hu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/">https://tingdonghu.github.io/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://tingdonghu.github.io" target="_blank">古月月仔的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</a><a class="post-meta__tags" href="/tags/Transformer/">Transformer</a><a class="post-meta__tags" href="/tags/NLP/">NLP</a></div><div class="post-share"><div class="social-share" data-image="/img/ArtificialIntelligence.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/09/15/MCP%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E5%92%8C%E6%A6%82%E5%BF%B5%E6%A2%B3%E7%90%86/" title="MCP是什么？宗述和概念梳理"><img class="cover" src="/img/ArtificialIntelligence.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">MCP是什么？宗述和概念梳理</div></div><div class="info-2"><div class="info-item-1">MCP基本概念 一个简单的MCP案例 想象一下，你有一个智能助理小AI，负责帮你日常办公。某天你对它说：  “帮我把今天的日程表和邮件同步到Notion，然后顺便调用公司API生成一份日报。”  结果 AI 一脸懵逼，或者干脆“编”出来一份日报——因为它根本不知道怎么安全调用你的企业系统。  它的大脑（LLM）很强，但不会直接操作数据库。 它可能会产生幻觉，随便给你一份“看似合理”的日报。 如果你粗暴地给它 Root 权限，让它直接访问 Notion 和公司 API，那就存在巨大安全风险：它可能删库、越权调用。  怎么办？ 这就是 MCP（Model Context Protocol，模型上下文协议） 想要解决的问题。它的核心使命是： 👉 为大模型和外部服务之间提供一个安全、标准化、可控的调用接口。   MCP的定义 MCP，全称 Model Context Protocol，中文可译为 模型上下文协议。 它由 Anthropic（Claude） 在 2024 年提出，是一种 Agent 级系统协议，目标是让 大模型（LLM）能够安全、受控地访问外部工具和数据源。  MCP...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/09/13/2025-09-13-RAG%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E4%B8%8E%E8%AF%A6%E8%A7%A3/" title="RAG是什么？宗述与详解"><img class="cover" src="/img/ArtificialIntelligence.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-13</div><div class="info-item-2">RAG是什么？宗述与详解</div></div><div class="info-2"><div class="info-item-1">RAG基本概念 一个简单的RAG案例 许多纯小白对于大模型和RAG可能并没有一个具体的概念，现以下面的的简单案例介绍以下：   想象一下，你开了一家网店，生意越来越火，客服消息回不过来了。你听说现在AI很厉害，于是买了一个基于“Deepseek”大模型的AI客服机器人。 第一天上线，你就发现了问题：  顾客问：“你们最新款的iPhone 16什么时候预售？” AI客服答得头头是道，但内容却是基于去年的iPhone 14。因为它的大脑（Deepseek）训练数据只更新到2023年底，它根本不知道2024年发布的iPhone...</div></div></div></a><a class="pagination-related" href="/2025/09/15/MCP%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E5%92%8C%E6%A6%82%E5%BF%B5%E6%A2%B3%E7%90%86/" title="MCP是什么？宗述和概念梳理"><img class="cover" src="/img/ArtificialIntelligence.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-15</div><div class="info-item-2">MCP是什么？宗述和概念梳理</div></div><div class="info-2"><div class="info-item-1">MCP基本概念 一个简单的MCP案例 想象一下，你有一个智能助理小AI，负责帮你日常办公。某天你对它说：  “帮我把今天的日程表和邮件同步到Notion，然后顺便调用公司API生成一份日报。”  结果 AI 一脸懵逼，或者干脆“编”出来一份日报——因为它根本不知道怎么安全调用你的企业系统。  它的大脑（LLM）很强，但不会直接操作数据库。 它可能会产生幻觉，随便给你一份“看似合理”的日报。 如果你粗暴地给它 Root 权限，让它直接访问 Notion 和公司 API，那就存在巨大安全风险：它可能删库、越权调用。  怎么办？ 这就是 MCP（Model Context Protocol，模型上下文协议） 想要解决的问题。它的核心使命是： 👉 为大模型和外部服务之间提供一个安全、标准化、可控的调用接口。   MCP的定义 MCP，全称 Model Context Protocol，中文可译为 模型上下文协议。 它由 Anthropic（Claude） 在 2024 年提出，是一种 Agent 级系统协议，目标是让 大模型（LLM）能够安全、受控地访问外部工具和数据源。  MCP...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Ethan Hu</div><div class="author-info-description">计算机在校生&游戏程序员</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">80</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TingDongHu"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/TingDongHu" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:2680957536@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #hdhfbb;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">古月月仔的博客上新了！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#NLP%E6%8A%80%E6%9C%AF%E6%BC%94%E8%BF%9B%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">NLP技术演进背景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%A0%E7%BB%9F%E7%9A%84NLP%E6%96%B9%E6%B3%95%EF%BC%88%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%97%B6%E6%9C%9F%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">传统的NLP方法（统计学习时期）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%85%B4%E8%B5%B7"><span class="toc-number">1.2.</span> <span class="toc-text">神经网络的兴起</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Word-Embeddings"><span class="toc-number">1.2.1.</span> <span class="toc-text">Word Embeddings</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RNN%E5%92%8CLSTM"><span class="toc-number">1.2.2.</span> <span class="toc-text">RNN和LSTM</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CNN"><span class="toc-number">1.2.3.</span> <span class="toc-text">CNN</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Transformer%E6%8A%80%E6%9C%AF"><span class="toc-number">1.3.</span> <span class="toc-text">Transformer技术</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#BERT"><span class="toc-number">1.3.1.</span> <span class="toc-text">BERT</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#GPT"><span class="toc-number">1.3.2.</span> <span class="toc-text">GPT</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number"></span> <span class="toc-text">Transfomer是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E7%90%86%E8%A7%A3Transformer%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">自顶向下理解Transformer架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E6%95%B4%E4%BD%93%E4%B8%8A%E7%90%86%E8%A7%A3Transformer"><span class="toc-number">1.1.</span> <span class="toc-text">从整体上理解Transformer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%86%E5%BC%A0%E9%87%8F%E5%BC%95%E5%85%A5%E6%9E%B6%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">将张量引入架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6"><span class="toc-number">1.3.</span> <span class="toc-text">自注意力机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E7%9A%84%E8%AE%A1%E7%AE%97%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.4.</span> <span class="toc-text">自注意力机制的计算详解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Q-K-V%E4%B8%89%E4%B8%AA%E5%90%91%E9%87%8F%E7%9A%84%E5%85%B7%E4%BD%93%E6%84%8F%E4%B9%89%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.4.1.</span> <span class="toc-text">Q|K|V三个向量的具体意义是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E7%9A%84%E7%9F%A9%E9%98%B5%E8%AE%A1%E7%AE%97"><span class="toc-number">1.4.2.</span> <span class="toc-text">注意力机制的矩阵计算</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6"><span class="toc-number">1.5.</span> <span class="toc-text">多头注意力机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E7%9A%84%E8%AE%A1%E7%AE%97"><span class="toc-number">1.5.1.</span> <span class="toc-text">多头注意力机制的计算</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="toc-number">1.5.2.</span> <span class="toc-text">多头注意力的优势</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E8%AF%AF%E5%8C%BA"><span class="toc-number">1.5.3.</span> <span class="toc-text">常见的误区</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81"><span class="toc-number">1.6.</span> <span class="toc-text">位置编码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AE%8B%E5%B7%AE"><span class="toc-number">1.7.</span> <span class="toc-text">残差</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AE%8B%E5%B7%AE%E5%A6%82%E6%AD%A4%E9%87%8D%E8%A6%81%EF%BC%9F"><span class="toc-number">1.7.1.</span> <span class="toc-text">为什么残差如此重要？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E7%A0%81%E5%99%A8"><span class="toc-number">1.8.</span> <span class="toc-text">解码器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC1%E6%AD%A5%EF%BC%9A%E7%BC%96%E7%A0%81%E5%99%A8%E5%A4%84%E7%90%86%E8%BE%93%E5%85%A5%E5%BA%8F%E5%88%97"><span class="toc-number">1.8.1.</span> <span class="toc-text">第1步：编码器处理输入序列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC2%E6%AD%A5%EF%BC%9A%E7%94%9F%E6%88%90%E6%B3%A8%E6%84%8F%E5%90%91%E9%87%8F-K-%E5%92%8C-V"><span class="toc-number">1.8.2.</span> <span class="toc-text">第2步：生成注意向量 K 和 V</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC3%E6%AD%A5%EF%BC%9A%E8%A7%A3%E7%A0%81%E5%99%A8%E9%80%90%E6%AD%A5%E7%94%9F%E6%88%90%EF%BC%8C%E5%B9%B6%E6%9F%A5%E8%AF%A2%E7%BC%96%E7%A0%81%E5%99%A8"><span class="toc-number">1.8.3.</span> <span class="toc-text">第3步：解码器逐步生成，并查询编码器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E7%BA%BF%E6%80%A7%E5%B1%82%E5%92%8C-Softmax-%E5%B1%82"><span class="toc-number">1.9.</span> <span class="toc-text">最后的线性层和 Softmax 层</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%9A%E5%AE%A2-%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%AB%99-%E8%A7%86%E9%A2%91-%E6%8E%A8%E8%8D%90"><span class="toc-number">3.</span> <span class="toc-text">博客|学习网站|视频 推荐</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/" title="Transformer架构宗述"><img src="/img/ArtificialIntelligence.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Transformer架构宗述"/></a><div class="content"><a class="title" href="/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/" title="Transformer架构宗述">Transformer架构宗述</a><time datetime="2025-09-29T16:00:00.000Z" title="发表于 2025-09-30 00:00:00">2025-09-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/15/MCP%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E5%92%8C%E6%A6%82%E5%BF%B5%E6%A2%B3%E7%90%86/" title="MCP是什么？宗述和概念梳理"><img src="/img/ArtificialIntelligence.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MCP是什么？宗述和概念梳理"/></a><div class="content"><a class="title" href="/2025/09/15/MCP%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E5%92%8C%E6%A6%82%E5%BF%B5%E6%A2%B3%E7%90%86/" title="MCP是什么？宗述和概念梳理">MCP是什么？宗述和概念梳理</a><time datetime="2025-09-14T16:00:00.000Z" title="发表于 2025-09-15 00:00:00">2025-09-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/13/2025-09-13-RAG%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E4%B8%8E%E8%AF%A6%E8%A7%A3/" title="RAG是什么？宗述与详解"><img src="/img/ArtificialIntelligence.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RAG是什么？宗述与详解"/></a><div class="content"><a class="title" href="/2025/09/13/2025-09-13-RAG%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%97%E8%BF%B0%E4%B8%8E%E8%AF%A6%E8%A7%A3/" title="RAG是什么？宗述与详解">RAG是什么？宗述与详解</a><time datetime="2025-09-12T16:00:00.000Z" title="发表于 2025-09-13 00:00:00">2025-09-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/03/%E7%BA%B9%E7%90%86Texture/" title="纹理Texture"><img src="/img/ComputerGraphics.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="纹理Texture"/></a><div class="content"><a class="title" href="/2025/07/03/%E7%BA%B9%E7%90%86Texture/" title="纹理Texture">纹理Texture</a><time datetime="2025-07-02T16:00:00.000Z" title="发表于 2025-07-03 00:00:00">2025-07-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/01/%E7%9D%80%E8%89%B2Shadeing/" title="着色Shading"><img src="/img/ComputerGraphics.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="着色Shading"/></a><div class="content"><a class="title" href="/2025/07/01/%E7%9D%80%E8%89%B2Shadeing/" title="着色Shading">着色Shading</a><time datetime="2025-06-30T16:00:00.000Z" title="发表于 2025-07-01 00:00:00">2025-07-01</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2025 By Ethan Hu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'forest' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+
+  const disqusReset = conf => {
+    window.DISQUS && window.DISQUS.reset({
+      reload: true,
+      config: conf
+    })
+  }
+
+  const loadDisqus = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyDisqus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    window.disqus_identifier = isShuoshuo ? path : '/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/'
+    window.disqus_url = isShuoshuo ? location.origin + path : 'https://tingdonghu.github.io/2025/09/30/Transfomer%E8%AF%A6%E8%A7%A3/'
+
+    const disqus_config = function () {
+      this.page.url = disqus_url
+      this.page.identifier = disqus_identifier
+      this.page.title = 'Transformer架构宗述'
+    }
+
+    if (window.DISQUS) disqusReset(disqus_config)
+    else {
+      const script = document.createElement('script')
+      script.src = 'https://.disqus.com/embed.js'
+      script.setAttribute('data-timestamp', +new Date())
+      document.head.appendChild(script)
+    }
+
+    btf.addGlobalFn('themeChange', () => disqusReset(disqus_config), 'disqus')
+  }
+
+  const getCount = async() => {
+    try {
+      const eleGroup = document.querySelector('#post-meta .disqus-comment-count')
+      if (!eleGroup) return
+      const cleanedLinks = eleGroup.href.replace(/#post-comment$/, '')
+
+      const res = await fetch(`https://disqus.com/api/3.0/threads/set.json?forum=&api_key=&thread:link=${cleanedLinks}`,{
+        method: 'GET'
+      })
+      const result = await res.json()
+
+      const count = result.response.length ? result.response[0].posts : 0
+      eleGroup.textContent = count
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Disqus' === 'Disqus'
+      ? window.shuoshuoComment = { loadComment: loadDisqus }
+      : window.loadOtherComment = loadDisqus
+    return
+  }
+
+  if ('Disqus' === 'Disqus' || !false) {
+    if (false) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+    else {
+      loadDisqus()
+      
+    }
+  } else {
+    window.loadOtherComment = loadDisqus
+  }
+})()</script></div><div class="aplayer no-destroy" data-id="2189835855" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><script charset="UTF-8" id="LA_COLLECT" src="https://sdk.51.la/js-sdk-pro.min.js"></script><script src="https://sdk.51.la/perf/js-sdk-perf.min.js" crossorigin="anonymous"></script><script> LA.init({id:"{YOU ID}",ck:"{YOU CK}"})</script><script>new LingQue.Monitor().init({id:"YOU ID",sendSuspicious:true});</script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      false 
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
