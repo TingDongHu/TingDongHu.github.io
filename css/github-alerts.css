@@ -1,0 +1,91 @@
+/* GitHub Alerts 样式 for Butterfly Theme */
+.alert {
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 4px solid;
+  border-radius: 8px;
+  background: var(--card-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.alert::before {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Lato, Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.alert p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+/* 各类型样式 */
+.alert-note {
+  border-color: #1e88e5;
+  background: rgba(30, 136, 229, 0.05);
+}
+.alert-note::before {
+  content: "💡 NOTE";
+  color: #1e88e5;
+}
+
+.alert-warning {
+  border-color: #ff9800;
+  background: rgba(255, 152, 0, 0.08);
+}
+.alert-warning::before {
+  content: "⚠️ WARNING";
+  color: #ff9800;
+}
+
+.alert-tip {
+  border-color: #00bcd4;
+  background: rgba(0, 188, 212, 0.05);
+}
+.alert-tip::before {
+  content: "💡 TIP";
+  color: #00bcd4;
+}
+
+.alert-important {
+  border-color: #e91e63;
+  background: rgba(233, 30, 99, 0.05);
+}
+.alert-important::before {
+  content: "❗ IMPORTANT";
+  color: #e91e63;
+}
+
+.alert-caution {
+  border-color: #ff5722;
+  background: rgba(255, 87, 34, 0.08);
+}
+.alert-caution::before {
+  content: "🔥 CAUTION";
+  color: #ff5722;
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .alert {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .alert-note {
+  background: rgba(30, 136, 229, 0.1);
+}
+
+[data-theme="dark"] .alert-warning {
+  background: rgba(255, 152, 0, 0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .alert {
+    margin: 1rem 0;
+    padding: 0.8rem 1rem;
+  }
+}
