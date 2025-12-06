@@ -1,0 +1,412 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【OpenPCDet】Uncertainty Estimation学习笔记（一） | 古月月仔的博客</title><meta name="author" content="Ethan Hu,2680957536@qq.com"><meta name="copyright" content="Ethan Hu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="为什么要研究uncertainty？ 训练好的[神经网络模型本质是一个拥有大量确定参数的函数，不管你给什么输入，它都能给你一个输出。这会导致两种我们不愿意看到的意外情况：  对明明错误的预测结果，模型输出的[置信度]却很高 对没有见过的输入(OoD，Out-of-ditribution)，比如给一个识别猫&#x2F;狗的模型输入一张桌子图片，模型一定会输出：”这是猫“ or “这是狗”，而不是告诉我们 “它">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【OpenPCDet】Uncertainty Estimation学习笔记（一）">
+<meta property="og:url" content="https://tingdonghu.github.io/2024/12/01/%E3%80%90OpenPCDet%E3%80%91Uncertainty%20Estimation%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="古月月仔的博客">
+<meta property="og:description" content="为什么要研究uncertainty？ 训练好的[神经网络模型本质是一个拥有大量确定参数的函数，不管你给什么输入，它都能给你一个输出。这会导致两种我们不愿意看到的意外情况：  对明明错误的预测结果，模型输出的[置信度]却很高 对没有见过的输入(OoD，Out-of-ditribution)，比如给一个识别猫&#x2F;狗的模型输入一张桌子图片，模型一定会输出：”这是猫“ or “这是狗”，而不是告诉我们 “它">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tingdonghu.github.io/img/pointcloud.png">
+<meta property="article:published_time" content="2024-11-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-04T08:49:49.211Z">
+<meta property="article:author" content="Ethan Hu">
+<meta property="article:tag" content="自动驾驶">
+<meta property="article:tag" content="目标检测">
+<meta property="article:tag" content="CV">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tingdonghu.github.io/img/pointcloud.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【OpenPCDet】Uncertainty Estimation学习笔记（一）",
+  "url": "https://tingdonghu.github.io/2024/12/01/%E3%80%90OpenPCDet%E3%80%91Uncertainty%20Estimation%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/",
+  "image": "https://tingdonghu.github.io/img/pointcloud.png",
+  "datePublished": "2024-11-30T16:00:00.000Z",
+  "dateModified": "2025-12-04T08:49:49.211Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Ethan Hu",
+      "url": "https://tingdonghu.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://tingdonghu.github.io/2024/12/01/%E3%80%90OpenPCDet%E3%80%91Uncertainty%20Estimation%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":250,"languages":{"author":"作者: Ethan Hu","link":"链接: ","source":"来源: 古月月仔的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【OpenPCDet】Uncertainty Estimation学习笔记（一）',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/source/css/font.css"><link rel="stylesheet" href="https://gcore.jsdelivr.net/gh/sviptzk/StaticFile_HEXO@latest/butterfly/css/macblack.css"><link rel="stylesheet" href="/css/github-alerts.css"><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">115</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">古月月仔的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">【OpenPCDet】Uncertainty Estimation学习笔记（一）</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【OpenPCDet】Uncertainty Estimation学习笔记（一）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-11-30T16:00:00.000Z" title="发表于 2024-12-01 00:00:00">2024-12-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-12-04T08:49:49.211Z" title="更新于 2025-12-04 16:49:49">2025-12-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/3DComputerVison/">3DComputerVison</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h2 id="为什么要研究uncertainty？">为什么要研究uncertainty？</h2>
+<p>训练好的[神经网络模型本质是一个拥有大量确定参数的函数，不管你给什么输入，它都能给你一个输出。这会导致两种我们不愿意看到的意外情况：</p>
+<ul>
+<li>对明明错误的预测结果，模型输出的[置信度]却很高</li>
+<li>对没有见过的输入(OoD，Out-of-ditribution)，比如给一个识别猫/狗的模型输入一张桌子图片，模型一定会输出：”这是猫“ or “这是狗”，而不是告诉我们 “它似乎不是猫，也不是狗”</li>
+</ul>
+<p>所以，我们希望模型能输出 uncertainty，辅助使用模型的人进行更好地决策。比如上面的例子中，我们希望对错误分类的样本、OoD样本，模型能够给出一个较高的uncertainty。</p>
+<h2 id="uncertainy是什么？">uncertainy是什么？</h2>
+<p>参考NIPS2017年的论文 <a href="https://link.zhihu.com/?target=https%3A//papers.nips.cc/paper/7141-what-uncertainties-do-we-need-in-bayesian-deep-learning-for-computer-vision.pdf">What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision? </a>，Gal阐述了两种uncertainty：Aleatoric uncertainty(i.e. data uncertainty) 和 Epistemic uncertainty(i.e. model uncertainty)，即随机不确定度(也称数据不确定度)，和认知不确定度(也称模型不确定度)。</p>
+<p>Epistemic uncertainty可以通过增加数据解决，比如下图：只有一个data point的时候，符合要求的模型有很多种可能，uncertainty很高。当数据点增加，模型逐渐确定，uncertainty减小。<br>
+<img src="https://github.com/user-attachments/assets/82e8de7c-1ac8-4cbe-82c1-417cf2299c3c" alt="image"></p>
+<h2 id="How？怎么计算不确定度">How？怎么计算不确定度</h2>
+<h3 id="1-Epistemic-uncertainty建模">1.Epistemic uncertainty建模</h3>
+<p><img src="https://github.com/user-attachments/assets/0a9ea3a7-f202-4c11-919d-b599aed777dd" alt="image"><br>
+Monte-Carlo 和 Ensemble<br>
+对一个随机分布，不确定性建模的方法有很多，标准差、方差、风险值（VaR）和熵都是合适的度量。在深度学习中，建模不确定度需要用到Bayesian DeepLearning。从Bayesian的角度，深度学习训练的本质是求一个posterior distribution  <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>W</mi><mi mathvariant="normal">∣</mi><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(W|D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span></span></span></span> ，其中W是参数，D是数据。根据bayes theorem（贝叶斯定理），我们有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>W</mi><mi mathvariant="normal">∣</mi><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mi mathvariant="normal">∣</mi><mi>W</mi><mo stretchy="false">)</mo><mi>P</mi><mo stretchy="false">(</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">P(W|D)=\frac{P(D|W)P(W)}{P(D)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span><span class="mord mtight">∣</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">W</span><span class="mclose mtight">)</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">W</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><br>
+但是这个公式没法用，因为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span></span></span></span> 理论上代表的是真实的数据分布，无法获取; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(W)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">)</span></span></span></span> 在神经网络中也是不存在的，因为模型训练好以后，所有参数都是确定的数，而不是distribution，没法计算 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(W)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">)</span></span></span></span> 。于是我们想到bayes theorem的另一个公式: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mi mathvariant="normal">∣</mi><msub><mi>W</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mi>P</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(D)=\sum_i{P(D|W_i)P(W_i)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0497em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>如果我们知道所有W，那么就可以计算 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span></span></span></span>了，但这也是不可能的。不过我们可以用<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=125159798&amp;content_type=Article&amp;match_order=1&amp;q=%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%B3%95&amp;zhida_source=entity">蒙特卡洛法</a>(Monte-Carlo)多次采样逼近：多次采样W计算 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_i (D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span></span></span></span> ，得到<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span></span></span></span>的近似分布，进而得到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>W</mi><mi mathvariant="normal">∣</mi><mi>D</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(W|D)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mclose">)</span></span></span></span> 的估计。具体来说，有3种方式：</p>
+<ul>
+<li>Ensembles方法<br>
+用类似<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=125159798&amp;content_type=Article&amp;match_order=1&amp;q=bootstrap&amp;zhida_source=entity">bootstrap</a>的方法，对数据集D，采样N次，用N次的结果分别训练模型，然后ensemble模型结果。这个方法的好处是接近真实的Monte-Carlo方法</li>
+<li>MCDropout方法<br>
+在网络中加入Dropout层，在测试时也打开Dropout，让Dropout成为采样器。对采样N次的结果进行ensemble处理得到最后的uncertainty。这个方法的好处是不用做很多实验，节省成本，但是由于使用了Dropout，单次训练的时间会变长。</li>
+<li>MCDropConnect方法<br>
+和加Dropout的思路差不多。不过这里不用加Dropout layer，而是通过随机drop connection，来达到<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=125159798&amp;content_type=Article&amp;match_order=1&amp;q=%E9%9A%8F%E6%9C%BA%E9%87%87%E6%A0%B7&amp;zhida_source=entity">随机采样</a>的目的。</li>
+</ul>
+<p>从理论层面，MC-Dropout是variantianl inference(BNN的重要概念之一)的近似。</p>
+<h3 id="2-Aleatoric-uncertainty建模">2.Aleatoric uncertainty建模</h3>
+<p><img src="https://github.com/user-attachments/assets/26f4bc29-6aa5-48ed-a355-4135aacc0571" alt="image"><br>
+<img src="https://github.com/user-attachments/assets/edf5f90d-81ac-44d1-8f1d-905a5fed4153" alt="image"><br>
+有三种方式可以建模Aleatoric Uncertainty，这里介绍Probabilistic Deep Learning。从表格可以看出，其实就是在原始任务基础上，增加probability prediction，这个probability可用于measure uncertainty。<br>
+比如分类任务原来只输出类别，现在还需要输出probability。为了准确表示uncertainty，这里的probability要求<a href="https://link.zhihu.com/?target=https%3A//scikit-learn.org/stable/modules/calibration.html">calibrated probability</a>，不能直接用用softmax输出的score。由此，对<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=125159798&amp;content_type=Article&amp;match_order=1&amp;q=%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B&amp;zhida_source=entity">目标检测</a>任务也有<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1811.10800">Probabilistic Object Detection</a>。</p>
+<p>参考博客：<br>
+<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/166617220">https://zhuanlan.zhihu.com/p/166617220</a><br>
+<a target="_blank" rel="noopener" href="https://proceedings.neurips.cc/paper/2017/hash/2650d6089a6d640c5e85b2b88265dc2b-Abstract.html">https://proceedings.neurips.cc/paper/2017/hash/2650d6089a6d640c5e85b2b88265dc2b-Abstract.html</a><br>
+<a target="_blank" rel="noopener" href="https://www.cs.ox.ac.uk/people/yarin.gal/website/thesis/thesis.pdf">https://www.cs.ox.ac.uk/people/yarin.gal/website/thesis/thesis.pdf</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io">Ethan Hu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io/2024/12/01/%E3%80%90OpenPCDet%E3%80%91Uncertainty%20Estimation%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/">https://tingdonghu.github.io/2024/12/01/%E3%80%90OpenPCDet%E3%80%91Uncertainty%20Estimation%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://tingdonghu.github.io" target="_blank">古月月仔的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%87%AA%E5%8A%A8%E9%A9%BE%E9%A9%B6/">自动驾驶</a><a class="post-meta__tags" href="/tags/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/">目标检测</a><a class="post-meta__tags" href="/tags/CV/">CV</a></div><div class="post-share"><div class="social-share" data-image="/img/pointcloud.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2024/11/10/%E3%80%90%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E3%80%91%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88CNN%EF%BC%89%E7%9A%84%E8%AF%A6%E7%BB%86%E5%8E%9F%E7%90%86/" title="卷积神经网络(CNN)的原理"><img class="cover" src="/img/machinelearning.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">卷积神经网络(CNN)的原理</div></div><div class="info-2"><div class="info-item-1">引言 卷积神经网络（Convolutional Neural Network，CNN）是一种在计算机视觉领域取得了巨大成功的深度学习模型。它们的设计灵感来自于生物学中的视觉系统，旨在模拟人类视觉处理的方式。在过去的几年中，CNN已经在图像识别、目标检测、图像生成和许多其他领域取得了显著的进展，成为了计算机视觉和深度学习研究的重要组成部分。 卷积是什么？ 教科书上一般定义函数f,g的卷积f*g(n)如下： 连续形式：  离散形式：  并且也解释了，先对g函数进行翻转，相当于在数轴上把g函数从右边褶到左边去，也就是卷积的“卷”的由来。 然后再把g函数平移到n，在这个位置对两个函数的对应点相乘，然后相加，这个过程是卷积的“积”的过程。 对卷积的通俗理解 所谓两个函数的卷积，本质上就是先将一个函数翻转，然后进行滑动叠加 在连续情况下，叠加指的是对两个函数的乘积求积分，在离散情况下就是加权求和，为简单起见就统一称为叠加。 整体看来是这么个过程： 翻转——&gt;滑动——&gt;叠加——&gt;滑动——&gt;叠加——&gt;滑动——&gt;叠加...</div></div></div></a><a class="pagination-related" href="/2024/12/20/%E3%80%90OpenPCDet%E3%80%91%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E9%87%87%E6%A0%B7%E8%AE%AD%E7%BB%83/" title="【OpenPCDet】模型的数据采样训练"><img class="cover" src="/img/pointcloud.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【OpenPCDet】模型的数据采样训练</div></div><div class="info-2"><div class="info-item-1">在OpenPCDet中，KITTI 数据集的 ImageSet 中已经包含了训练和测试数据的索引信息，这使得可以不必直接扫描点云数据文件来获取某个特定的数据集。通过修改 ImageSet 中的索引，就可以直接选择不同的数据帧来进行训练、测试或推理。 1. KITTI 数据集中的 ImageSet imageset 文件夹包含了多个文本文件，其中每个文件列出了训练和测试数据的帧索引。这些文件通常以如下格式命名： 123456data/  ├── kitti/  │   ├── ImageSets/  │   │   ├── train.txt      # 训练集的帧索引  │   │   ├── val.txt        # 验证集的帧索引  │   │   └── test.txt       # 测试集的帧索引 每个 txt 文件中列出了一系列的帧编号，例如： 1234000000000001000002... 这些帧编号对应的是 velodyne 文件夹中的 .bin 点云数据文件. 2....</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2024/12/31/%E3%80%90OpenPCDet%E3%80%91PointPillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" title="【OpenPCDet】PointPillar算法思路"><img class="cover" src="/img/pointcloud.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-31</div><div class="info-item-2">【OpenPCDet】PointPillar算法思路</div></div><div class="info-2"><div class="info-item-1">PointPillar 是一种用于三维物体检测的深度学习模型，尤其适用于激光雷达点云数据的处理。它的设计思想相对简洁，并且在保持高效性的同时能获得较高的精度。 论文地址 代码地址 前言 本文要解析的模型叫做PointPillars，是2019年出自工业界的一篇Paper。 该模型最主要的特点是检测速度和精度的平衡。该模型的平均检测速度达到了62Hz，最快速度达到了105Hz，确实遥遥领先了其他的模型。这里我们引入CIA-SSD模型中的精度-速度图，具体对比如下所示。  截止CIA-SSD论文发表前，PointPillars的检测速度都是遥遥领先的，而且精度也不低。 现有的一些研究喜欢将不规则、稀疏的点云数据按照以下两种方式进行处理，然后引入RPN层进行3D Bbox...</div></div></div></a><a class="pagination-related" href="/2024/03/02/%E3%80%90OpenPCDet%E3%80%91%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/" title="【OpenPCDet】模型预测结果解读"><img class="cover" src="/img/pointcloud.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-02</div><div class="info-item-2">【OpenPCDet】模型预测结果解读</div></div><div class="info-2"><div class="info-item-1"> 在 OpenPCDet  中，每个模型的推理结果通常是一个包含多个键值对的字典，其中包含与 3D...</div></div></div></a><a class="pagination-related" href="/2024/12/20/%E3%80%90OpenPCDet%E3%80%91%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E9%87%87%E6%A0%B7%E8%AE%AD%E7%BB%83/" title="【OpenPCDet】模型的数据采样训练"><img class="cover" src="/img/pointcloud.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-20</div><div class="info-item-2">【OpenPCDet】模型的数据采样训练</div></div><div class="info-2"><div class="info-item-1">在OpenPCDet中，KITTI 数据集的 ImageSet 中已经包含了训练和测试数据的索引信息，这使得可以不必直接扫描点云数据文件来获取某个特定的数据集。通过修改 ImageSet 中的索引，就可以直接选择不同的数据帧来进行训练、测试或推理。 1. KITTI 数据集中的 ImageSet imageset 文件夹包含了多个文本文件，其中每个文件列出了训练和测试数据的帧索引。这些文件通常以如下格式命名： 123456data/  ├── kitti/  │   ├── ImageSets/  │   │   ├── train.txt      # 训练集的帧索引  │   │   ├── val.txt        # 验证集的帧索引  │   │   └── test.txt       # 测试集的帧索引 每个 txt 文件中列出了一系列的帧编号，例如： 1234000000000001000002... 这些帧编号对应的是 velodyne 文件夹中的 .bin 点云数据文件. 2....</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Ethan Hu</div><div class="author-info-description">计算机在校生&游戏程序员</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">115</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TingDongHu"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/TingDongHu" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:2680957536@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #hdhfbb;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客！👋 我是古月月仔，这里分享技术笔记 📚 与生活随笔 ✨，希望你能找到感兴趣的内容。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%A0%94%E7%A9%B6uncertainty%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">为什么要研究uncertainty？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#uncertainy%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">uncertainy是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How%EF%BC%9F%E6%80%8E%E4%B9%88%E8%AE%A1%E7%AE%97%E4%B8%8D%E7%A1%AE%E5%AE%9A%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">How？怎么计算不确定度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Epistemic-uncertainty%E5%BB%BA%E6%A8%A1"><span class="toc-number">3.1.</span> <span class="toc-text">1.Epistemic uncertainty建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Aleatoric-uncertainty%E5%BB%BA%E6%A8%A1"><span class="toc-number">3.2.</span> <span class="toc-text">2.Aleatoric uncertainty建模</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/12/07/%E3%80%90Games101%E3%80%91%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" title="【Games101】辐射度量学与光线追踪"><img src="/img/ComputerGraphics.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Games101】辐射度量学与光线追踪"/></a><div class="content"><a class="title" href="/2025/12/07/%E3%80%90Games101%E3%80%91%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" title="【Games101】辐射度量学与光线追踪">【Games101】辐射度量学与光线追踪</a><time datetime="2025-12-06T16:00:00.000Z" title="发表于 2025-12-07 00:00:00">2025-12-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/06/%E3%80%90%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98%E3%80%91%E5%9F%BA%E7%A1%80%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" title="【算法刷题】排序算法总结"><img src="/img/Algorithm.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【算法刷题】排序算法总结"/></a><div class="content"><a class="title" href="/2025/12/06/%E3%80%90%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98%E3%80%91%E5%9F%BA%E7%A1%80%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" title="【算法刷题】排序算法总结">【算法刷题】排序算法总结</a><time datetime="2025-12-05T16:00:00.000Z" title="发表于 2025-12-06 00:00:00">2025-12-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/04/%E3%80%90Games101%E3%80%91%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AARay-Tracing/" title="【Games101】光线追踪Ray Tracing"><img src="/img/ComputerGraphics.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Games101】光线追踪Ray Tracing"/></a><div class="content"><a class="title" href="/2025/12/04/%E3%80%90Games101%E3%80%91%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AARay-Tracing/" title="【Games101】光线追踪Ray Tracing">【Games101】光线追踪Ray Tracing</a><time datetime="2025-12-03T16:00:00.000Z" title="发表于 2025-12-04 00:00:00">2025-12-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Hexo%E6%B7%BB%E5%8A%A0-Github-alerts-%E6%94%AF%E6%8C%81/" title="【博客魔改】Hexo添加 Github alerts 支持"><img src="/img/BlogMakeover.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【博客魔改】Hexo添加 Github alerts 支持"/></a><div class="content"><a class="title" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Hexo%E6%B7%BB%E5%8A%A0-Github-alerts-%E6%94%AF%E6%8C%81/" title="【博客魔改】Hexo添加 Github alerts 支持">【博客魔改】Hexo添加 Github alerts 支持</a><time datetime="2025-12-02T16:00:00.000Z" title="发表于 2025-12-03 00:00:00">2025-12-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Butterfly-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE-Giscus-%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="【博客魔改】Butterfly 主题配置 Giscus 评论系统"><img src="/img/BlogMakeover.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【博客魔改】Butterfly 主题配置 Giscus 评论系统"/></a><div class="content"><a class="title" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Butterfly-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE-Giscus-%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="【博客魔改】Butterfly 主题配置 Giscus 评论系统">【博客魔改】Butterfly 主题配置 Giscus 评论系统</a><time datetime="2025-12-02T16:00:00.000Z" title="发表于 2025-12-03 00:00:00">2025-12-03</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2025 By Ethan Hu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'forest' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'TingDongHu/my-blog-comments',
+      'data-repo-id': 'R_kgDOQhh56g',
+      'data-category-id': 'DIC_kwDOQhh56s4CzU4H',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","meta[property=\"og:description\"]","link[rel=\"canonical\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      false 
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

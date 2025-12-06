@@ -1,0 +1,433 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【虚幻引擎】VRiod的二次元角色导入 | 古月月仔的博客</title><meta name="author" content="Ethan Hu,2680957536@qq.com"><meta name="copyright" content="Ethan Hu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="VRiod的二次元角色导入虚幻引擎 突然想在虚幻项目中用点二次元角色,找了些资料以及自己实践作如下博客,附一篇视频教程:如何在UE5中快速导入VroidStudio的二次元萌妹 VRoid Studio使用 VRoid Studio是由pixiv开发的一款3D角色绘制软件,可以在Steam上免费下载使用.  软件的主要功能就是通过类似绘画的方式进行人物的建模，让用户可以更加轻松地创造自己的虚拟人物">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【虚幻引擎】VRiod的二次元角色导入">
+<meta property="og:url" content="https://tingdonghu.github.io/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/index.html">
+<meta property="og:site_name" content="古月月仔的博客">
+<meta property="og:description" content="VRiod的二次元角色导入虚幻引擎 突然想在虚幻项目中用点二次元角色,找了些资料以及自己实践作如下博客,附一篇视频教程:如何在UE5中快速导入VroidStudio的二次元萌妹 VRoid Studio使用 VRoid Studio是由pixiv开发的一款3D角色绘制软件,可以在Steam上免费下载使用.  软件的主要功能就是通过类似绘画的方式进行人物的建模，让用户可以更加轻松地创造自己的虚拟人物">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tingdonghu.github.io/img/unrealengine.png">
+<meta property="article:published_time" content="2023-11-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-04T08:51:52.969Z">
+<meta property="article:author" content="Ethan Hu">
+<meta property="article:tag" content="UnrealEngine">
+<meta property="article:tag" content="插件">
+<meta property="article:tag" content="模型">
+<meta property="article:tag" content="骨骼绑定">
+<meta property="article:tag" content="动画映射">
+<meta property="article:tag" content="打包">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tingdonghu.github.io/img/unrealengine.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【虚幻引擎】VRiod的二次元角色导入",
+  "url": "https://tingdonghu.github.io/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/",
+  "image": "https://tingdonghu.github.io/img/unrealengine.png",
+  "datePublished": "2023-11-19T16:00:00.000Z",
+  "dateModified": "2025-12-04T08:51:52.969Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Ethan Hu",
+      "url": "https://tingdonghu.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://tingdonghu.github.io/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":250,"languages":{"author":"作者: Ethan Hu","link":"链接: ","source":"来源: 古月月仔的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【虚幻引擎】VRiod的二次元角色导入',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/source/css/font.css"><link rel="stylesheet" href="https://gcore.jsdelivr.net/gh/sviptzk/StaticFile_HEXO@latest/butterfly/css/macblack.css"><link rel="stylesheet" href="/css/github-alerts.css"><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">115</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">古月月仔的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">【虚幻引擎】VRiod的二次元角色导入</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【虚幻引擎】VRiod的二次元角色导入</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-19T16:00:00.000Z" title="发表于 2023-11-20 00:00:00">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-12-04T08:51:52.969Z" title="更新于 2025-12-04 16:51:52">2025-12-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/">游戏开发</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/%E8%99%9A%E5%B9%BB%E5%8A%9F%E8%83%BD%E8%AE%B0%E5%BD%95/">虚幻功能记录</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h1>VRiod的二次元角色导入虚幻引擎</h1>
+<p>突然想在虚幻项目中用点二次元角色,找了些资料以及自己实践作如下博客,附一篇视频教程:<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ox4y1v7dD/?share_source=copy_web&amp;vd_source=a06df7b174b0e55e45242729b8ce1758">如何在UE5中快速导入VroidStudio的二次元萌妹</a></p>
+<h2 id="VRoid-Studio使用">VRoid Studio使用</h2>
+<p><strong>VRoid Studio</strong>是由<code>pixiv</code>开发的一款3D角色绘制软件,可以在Steam上免费下载使用.</p>
+<blockquote>
+<p>软件的主要功能就是通过类似绘画的方式进行人物的建模，让用户可以更加轻松地创造自己的虚拟人物（形象）。软件的操作界面也非常的简单直观，里面配备了许多预设项目和参数，让用户不需要从头开始建模，只需选择项目、组合它们并调整参数即可创建自己的角色，其中就包含了面部、发型、衣服、化妆等等可定制的参数。同时，用户能直接想画画一样直观的模拟发型，还能直接在3D模型上绘制特定的面部表情、眼睛或服装设计。此外，用户可以通过全尺寸钢笔工具绘制自己所需要的纹理，它支持数位板压力感应，用户可以直接在3D模型或UV开发上直接实时绘制纹理用来创建角色。</p>
+</blockquote>
+<p>对于我们这种只会写代码的人来说,使用<code>VRoid Studio</code>只需要把他提供的资源组合一下,就能得到很好看的角色.</p>
+<p>比如我们选择软件提供的模板,这个蓝头发的美眉,进入微调界面:</p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424222850712.png" alt="image-20250424222850712"></p>
+<p>调整为自己心仪的模样后点击右上角导出为<code>VRM</code>文件.</p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424223042603.png" alt="image-20250424223042603"></p>
+<p>不进行骨骼贴图调整,直接使用默认选项导出:</p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424223201161.png" alt="image-20250424223201161"></p>
+<h2 id="导入虚幻引擎">导入虚幻引擎</h2>
+<p>要将VRM文件导入到虚幻引擎中需要使用一个插件<a target="_blank" rel="noopener" href="https://github.com/ruyo/VRM4U/releases">VRM4U</a></p>
+<p>从GitHub上下载对应版本的源码,导入到项目文件的<code>Plugins</code>目录下(不建议保存到引擎的<code>Plugins</code>中)</p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424223907223.png" alt="image-20250424223907223"></p>
+<p>用虚幻引擎打开项目,在项目-设置-插件中开启该插件,重启项目.</p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424225055135.png" alt="image-20250424225055135"></p>
+<p>之后就可以将之前制作好的VRM文件导入了(直接拖到某一文件夹下就行).需要注意的是在导入的时候要将高级选项-<code>Generate IK bone</code>勾选上:</p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424225515367.png" alt="image-20250424225515367"></p>
+<blockquote class="alert alert-warning">
+<p>如果这里这步遇到导入失败/引擎崩溃等情况,建议检查是否插件版本与虚幻引擎版本对不上的问题,如果确认没有版本问题,可以在制作模型的时候将毛发/面数适当减少,防止内存爆炸</p>
+</blockquote>
+<blockquote class="alert alert-warning">
+<p>后来在又一个新的项目中导入模型时一直闪退崩溃,检查插件版本和资源也没有问题,检查日志发现时因为<code>VRM4U</code>插件与我项目中的多人联机功能冲突,查询资料后得知是因为</p>
+<blockquote>
+<ul>
+<li>
+<p>VRM4U插件会在运行时动态修改骨骼网格体和动画（如重定向、表情控制），但多人联机要求所有客户端的数据<strong>严格同步</strong>。</p>
+</li>
+<li>
+<p>插件对模型的实时修改可能导致<strong>服务器与客户端数据不一致</strong>（例如骨骼位移不同步），触发引擎崩溃。</p>
+</li>
+</ul>
+</blockquote>
+<p>解决方法就是不使用<code>VRM4U</code>插件,先使用<code>Blender+VRM插件</code>将模型转换为<code>FBX</code>格式或者其他虚幻兼容的格式,再直接导入使用.</p>
+</blockquote>
+<h2 id="重定向动画">重定向动画</h2>
+<p>使用<code>VRM4U</code>插件导入后的模型文件目录下提供了一个自动重定向器叫做<code>RTG_yourmodlename</code></p>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424234857831.png" alt="image-20250424234857831"></p>
+<p>将模型与原骨骼保持相同的姿态,将骨骼调整为对应,保存即可.</p>
+<p>就可以发现角色已经可以使用我们原本的动画了.</p>
+<blockquote class="alert alert-tip">
+<p>如果你使用的插件版本过低,导致没有相应的重定向器,也可使用传统的<code>动画复制</code>/<code>骨骼替换</code>/<code>骨骼重定向</code>方法,最终能实现效果即可.</p>
+</blockquote>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424235303283.png" alt="image-20250424235303283"></p>
+<h2 id="打包的问题">打包的问题</h2>
+<p>项目开发测试阶段,本来想打包给我的队友看一下效果,结果在打包的时候报了以下错误:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/VrmAssetListObjectBPUE5.uasset is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/VRM4U_PostToon.umap is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_Unlit.uasset is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_SSSProfile.uasset is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_MToonUnLit.uasset is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/latest/VRM4U_Outline.umap is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/latest/VRM4U_SceneCapture.umap is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Util/Actor/latest/BP_SceneCapture.uasset is too new. Engine Version: 1008 Package Version: 1009</span><br><span class="line">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh</span><br></pre></td></tr></table></figure>
+<p><img src="/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424233609721.png" alt="image-20250424233609721"></p>
+<p>和插件作者交流后得知是插件版本太新了,插件的资源文件中多了一些只有高版本虚幻引擎(5.2/5.3以上)才支持的资源,但是这些资源对于我们的项目并无用处,所以直接根据这些报错的资源路径把不兼容旧版本的资源文件全部删掉就可以了.</p>
+<p>删掉之后即可正常打包项目.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io">Ethan Hu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://tingdonghu.github.io/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/">https://tingdonghu.github.io/2023/11/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91VRiod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://tingdonghu.github.io" target="_blank">古月月仔的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/UnrealEngine/">UnrealEngine</a><a class="post-meta__tags" href="/tags/%E6%8F%92%E4%BB%B6/">插件</a><a class="post-meta__tags" href="/tags/%E6%A8%A1%E5%9E%8B/">模型</a><a class="post-meta__tags" href="/tags/%E9%AA%A8%E9%AA%BC%E7%BB%91%E5%AE%9A/">骨骼绑定</a><a class="post-meta__tags" href="/tags/%E5%8A%A8%E7%94%BB%E6%98%A0%E5%B0%84/">动画映射</a><a class="post-meta__tags" href="/tags/%E6%89%93%E5%8C%85/">打包</a></div><div class="post-share"><div class="social-share" data-image="/img/unrealengine.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2023/10/30/%E3%80%90%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E3%80%91%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%80%BB%E7%BB%93/" title="【机器学习】基础知识总结"><img class="cover" src="/img/machinelearning.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">【机器学习】基础知识总结</div></div><div class="info-2"><div class="info-item-1">最近在复习专业课时，发现去年上过的机器学习的内容几乎已经都还给老师了（悲~），再去刷一遍课程的时间成本太高，所以就结合我去年画的思维导图和期末复习总结的一些资料汇总复习一下，内容有些来自公众号，有些来自老学长的圣遗物，有些是CSDN上看的。由于时间太长无法一一标明出处了，如果有侵权记得私信提醒我哈。 本文适合对机器学习已经有过学习和了解，准备期末突击/定时复习一下的同学，**如果你对机器学习尚无了解，推荐你先去看吴恩达老师的Machine Learning课程，一定会让你受益匪浅。**下附老师的课程地址(B站)。 [高清重置版-吴恩达机器学习](【【高清重制】2025年公认最好的【吴恩达机器学习课程】附课件、代码及实战项目！！！–人工智能/机器学习/深度学习】...</div></div></div></a><a class="pagination-related" href="/2023/12/01/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91%E8%AE%BE%E7%BD%AEUI%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/" title="【虚幻引擎】设置UI自适应屏幕大小"><img class="cover" src="/img/unrealengine.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【虚幻引擎】设置UI自适应屏幕大小</div></div><div class="info-2"><div class="info-item-1">在游戏中，如果想实现不同分辨率下，都可以支持当前的UI界面布局，都需要用到锚点功能。 ‌虚幻引擎中的UI锚点（Anchor）是指控件在屏幕或父物体上的固定点，用于确定控件的位置和布局。‌ 锚点的作用是确保UI元素在屏幕缩放或形变时保持相对位置不变。 在虚幻引擎中，锚点可以理解为将子物体“挂”在父物体上的点。当父物体的位置或大小发生变化时，子物体的位置会相应地调整，保持它们之间的相对关系不变。锚点的位置可以在屏幕的任意角落，通常用于自适应屏幕尺寸和保持布局的稳定性‌。 具体来说，锚点有以下几种情况：  当锚点与父物体的某个顶点重合时，子物体在该点的位置不会改变，只有当父物体该点位置改变时，子物体才会跟着移动。 如果锚点不重合，子物体在父物体变形时会跟着缩放，保持与父物体各顶点的距离不变‌。  具体实现： 错误的UI锚点设置方法如下：  如上图为锚点设置不准确，导致缩放时出现屏幕空缺  将锚点修改为下图所示：  如果想保持UI中内容部件和画布等比缩放，需要将锚点拉伸至和部件相同大小  全部修改后现实正确：  </div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2024/04/19/%E3%80%90MultiplayerCourse%E3%80%91%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/" title="【MultiplayerCourse】创建多人联机插件"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-19</div><div class="info-item-2">【MultiplayerCourse】创建多人联机插件</div></div><div class="info-2"><div class="info-item-1">此博客为学习油管DruidMech大佬的广域网多人射击游戏的笔记 附上项目GitHub源码地址https://github.com/DruidMech/MultiplayerCourseMenuSystem 新建项目 首先使用引擎（5.0及以上）创建一个基于第三人称模板的.cpp项目，我这里将其命名为MenuSystem. Subsystem插件配置 一、在编辑器-插件中打开Oline Subsystem Steam插件，然后重启项目。  二、在项目的Build.cs下找到一个PublicDependencyModuleNames,把插件的配置项OnlineSubsystemSteam、OnlineSubsystem添加到其中然后编译 1PublicDependencyModuleNames.AddRange(new string[] &#123; &quot;Core&quot;, &quot;CoreUObject&quot;, &quot;Engine&quot;, &quot;InputCore&quot;,...</div></div></div></a><a class="pagination-related" href="/2024/04/21/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91GameMode%E5%92%8CGameSate/" title="【虚幻引擎】GameMode和GameSate"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-21</div><div class="info-item-2">【虚幻引擎】GameMode和GameSate</div></div><div class="info-2"><div class="info-item-1"> 在虚幻引擎（Unreal Engine）中，GameMode 和 GameState 都是多人游戏中的核心类，但它们的分工和用途有显著区别。以下是它们的对比和典型应用场景：  1. GameMode（游戏规则管理者） 职责  仅存在于服务器端（不会复制到客户端）。 定义游戏的核心规则：胜利条件、玩家生成逻辑、回合制规则等。 管理玩家登录/退出（通过Login/Logout等事件）。 生成并持有PlayerController、PlayerState等。  典型用途 12345678// 示例：在GameMode中设置玩家生成逻辑void AMyGameMode::PostLogin(APlayerController* NewPlayer) &#123;    Super::PostLogin(NewPlayer);    // 生成玩家角色    if (NewPlayer-&gt;GetPawn() == nullptr) &#123;        SpawnPlayerAtTransform(NewPlayer, SpawnTransform);   ...</div></div></div></a><a class="pagination-related" href="/2024/03/19/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91UC++%E4%B8%8E%E6%A0%87%E5%87%86C++%E7%9A%84%E5%8C%BA%E5%88%AB/" title="【虚幻引擎】UC++与标准C++的区别"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-19</div><div class="info-item-2">【虚幻引擎】UC++与标准C++的区别</div></div><div class="info-2"><div class="info-item-1">1. 类声明与反射系统 1.1 类定义语法 Unreal C++ 1234567891011// 必须继承UObject且使用反射宏UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject &#123;    GENERATED_BODY() // 必须包含        UPROPERTY(EditAnywhere, Category=&quot;Stats&quot;)    float Health = 100.0f;    UFUNCTION(BlueprintCallable)    void Heal(float Amount);&#125;; 标准 C++ 12345678class MyObject &#123;public:    float Health = 100.0f;        void Heal(float Amount) &#123;        Health += Amount;   ...</div></div></div></a><a class="pagination-related" href="/2024/04/10/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91UC++%E7%9A%84%E5%AE%8F%E5%AE%9A%E4%B9%89%E8%AF%AD%E6%B3%95/" title="【虚幻引擎】UC++的宏定义语法"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-10</div><div class="info-item-2">【虚幻引擎】UC++的宏定义语法</div></div><div class="info-2"><div class="info-item-1">Unreal Engine中宏定义语法的使用 示例代码： 123456789101112131415161718192021222324// 类声明宏：使类被纳入Unreal反射系统// - Blueprintable：允许在蓝图中创建该类的子类// - meta=(DisplayName=&quot;My Object&quot;)：在编辑器中显示的自定义名称UCLASS(Blueprintable, meta=(DisplayName=&quot;My Object&quot;))class UMyObject : public UObject  // 必须继承UObject或其子类&#123;    // 代码生成宏：必须出现在类体内第一个位置    // - 展开后会包含类型信息、反射数据等引擎所需的内容    GENERATED_BODY()        // 属性声明宏：将成员变量暴露给反射系统    // - EditAnywhere：可在编辑器的任意位置（如蓝图、细节面板）编辑此属性    // -...</div></div></div></a><a class="pagination-related" href="/2024/04/15/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91%E5%A7%94%E6%89%98(Delegates)%E4%B8%8E%E5%9B%9E%E8%B0%83(Callbacks)/" title="【虚幻引擎】委托(Delegates)与回调(Callbacks)"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-15</div><div class="info-item-2">【虚幻引擎】委托(Delegates)与回调(Callbacks)</div></div><div class="info-2"><div class="info-item-1">Unreal Engine 中的 Delegates（委托）详解 Delegates（委托）是 Unreal Engine 中一种强大的事件通知机制，它允许开发者在不直接引用类的情况下调用成员函数。本质上，委托是一种类型安全的函数指针，特别适合用于实现观察者模式、事件系统和回调机制。 基本概念 核心特点  类型安全：编译时会检查函数签名匹配 动态绑定：可以在运行时绑定/解绑函数 多播能力：可以同时通知多个接收者（Multicast Delegates） 序列化支持：部分委托类型支持蓝图序列化  委托类型 Unreal Engine 提供了几种主要的委托类型： 1. 单播委托 (Singlecast Delegates) 123DECLARE_DELEGATE(MyDelegate); // 无参数DECLARE_DELEGATE_OneParam(MyParamDelegate, FString); // 单参数DECLARE_DELEGATE_TwoParams(MyTwoParamDelegate, int32, bool); // 双参数 2. 多播委托...</div></div></div></a><a class="pagination-related" href="/2024/04/20/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91%E8%99%9A%E5%B9%BB5.1UUserWidget%E4%B8%8D%E5%86%8D%E5%8C%85%E5%90%ABOnLevelRemovedFromWorld%E7%9A%84%E9%97%AE%E9%A2%98/" title="【虚幻引擎】虚幻5.1UUserWidget不再包含OnLevelRemovedFromWorld的问题"><img class="cover" src="/img/unrealengine.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-20</div><div class="info-item-2">【虚幻引擎】虚幻5.1UUserWidget不再包含OnLevelRemovedFromWorld的问题</div></div><div class="info-2"><div class="info-item-1">在跟着Blaster课程项目写Menu插件的时候,在Menu.h中一直报以下错误无法编译,百思不得其解.   严重性代码说明项目文件33行禁止显示状态详细信息 错误C3668“UMenu::OnLevelRemovedFromWorld”: 包含重写说明符“override”的方法没有重写任何基类方法MenuSystem	F:\UE\UEproject\MultiplayCourse\MenuSystem\Plugins\MultiplayerSessions\Source\MultiplayerSessions\Public\Menu.h23   查阅资料后发现是虚幻5.1和5.0的版本问题: 虚幻5.1 UUserWidget不再包含OnLevelRemovedFromWorld.我们可以重载一个类似的函数用于达到相同的效果: 1virtual void NativeDestruct() override; .cpp文件中实现: 12345void UMenu::NativeDestruct()&#123;    MenuTearDown();   ...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/ChipDog.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Ethan Hu</div><div class="author-info-description">计算机在校生&游戏程序员</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">115</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/TingDongHu"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/TingDongHu" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:2680957536@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #hdhfbb;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客！👋 我是古月月仔，这里分享技术笔记 📚 与生活随笔 ✨，希望你能找到感兴趣的内容。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">VRiod的二次元角色导入虚幻引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#VRoid-Studio%E4%BD%BF%E7%94%A8"><span class="toc-number">1.1.</span> <span class="toc-text">VRoid Studio使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E"><span class="toc-number">1.2.</span> <span class="toc-text">导入虚幻引擎</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91%E5%8A%A8%E7%94%BB"><span class="toc-number">1.3.</span> <span class="toc-text">重定向动画</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%93%E5%8C%85%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.4.</span> <span class="toc-text">打包的问题</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/12/07/%E3%80%90Games101%E3%80%91%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" title="【Games101】辐射度量学与光线追踪"><img src="/img/ComputerGraphics.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Games101】辐射度量学与光线追踪"/></a><div class="content"><a class="title" href="/2025/12/07/%E3%80%90Games101%E3%80%91%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" title="【Games101】辐射度量学与光线追踪">【Games101】辐射度量学与光线追踪</a><time datetime="2025-12-06T16:00:00.000Z" title="发表于 2025-12-07 00:00:00">2025-12-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/06/%E3%80%90%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98%E3%80%91%E5%9F%BA%E7%A1%80%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" title="【算法刷题】排序算法总结"><img src="/img/Algorithm.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【算法刷题】排序算法总结"/></a><div class="content"><a class="title" href="/2025/12/06/%E3%80%90%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98%E3%80%91%E5%9F%BA%E7%A1%80%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" title="【算法刷题】排序算法总结">【算法刷题】排序算法总结</a><time datetime="2025-12-05T16:00:00.000Z" title="发表于 2025-12-06 00:00:00">2025-12-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/04/%E3%80%90Games101%E3%80%91%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AARay-Tracing/" title="【Games101】光线追踪Ray Tracing"><img src="/img/ComputerGraphics.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Games101】光线追踪Ray Tracing"/></a><div class="content"><a class="title" href="/2025/12/04/%E3%80%90Games101%E3%80%91%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AARay-Tracing/" title="【Games101】光线追踪Ray Tracing">【Games101】光线追踪Ray Tracing</a><time datetime="2025-12-03T16:00:00.000Z" title="发表于 2025-12-04 00:00:00">2025-12-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Hexo%E6%B7%BB%E5%8A%A0-Github-alerts-%E6%94%AF%E6%8C%81/" title="【博客魔改】Hexo添加 Github alerts 支持"><img src="/img/BlogMakeover.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【博客魔改】Hexo添加 Github alerts 支持"/></a><div class="content"><a class="title" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Hexo%E6%B7%BB%E5%8A%A0-Github-alerts-%E6%94%AF%E6%8C%81/" title="【博客魔改】Hexo添加 Github alerts 支持">【博客魔改】Hexo添加 Github alerts 支持</a><time datetime="2025-12-02T16:00:00.000Z" title="发表于 2025-12-03 00:00:00">2025-12-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Butterfly-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE-Giscus-%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="【博客魔改】Butterfly 主题配置 Giscus 评论系统"><img src="/img/BlogMakeover.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【博客魔改】Butterfly 主题配置 Giscus 评论系统"/></a><div class="content"><a class="title" href="/2025/12/03/%E3%80%90%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9%E3%80%91Butterfly-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE-Giscus-%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="【博客魔改】Butterfly 主题配置 Giscus 评论系统">【博客魔改】Butterfly 主题配置 Giscus 评论系统</a><time datetime="2025-12-02T16:00:00.000Z" title="发表于 2025-12-03 00:00:00">2025-12-03</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2025 By Ethan Hu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'forest' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'TingDongHu/my-blog-comments',
+      'data-repo-id': 'R_kgDOQhh56g',
+      'data-category-id': 'DIC_kwDOQhh56s4CzU4H',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","meta[property=\"og:description\"]","link[rel=\"canonical\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      false 
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
