@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】变换基础概念 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="计算机图形学通过缩放、镜像、错切和旋转等基本变换矩阵，描述物体在二维空间中的位置、大小和方向变化。" />
+<meta name="keywords" content="图形学,渲染,GAMES课程,线性代数">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】变换基础概念">
+  <meta property="og:description" content="计算机图形学通过缩放、镜像、错切和旋转等基本变换矩阵，描述物体在二维空间中的位置、大小和方向变化。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-06-27T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-06-27T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="渲染">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="线性代数">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】变换基础概念">
+  <meta name="twitter:description" content="计算机图形学通过缩放、镜像、错切和旋转等基本变换矩阵，描述物体在二维空间中的位置、大小和方向变化。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】变换基础概念">
+  <meta itemprop="description" content="计算机图形学通过缩放、镜像、错切和旋转等基本变换矩阵，描述物体在二维空间中的位置、大小和方向变化。">
+  <meta itemprop="datePublished" content="2025-06-27T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-06-27T00:00:00+08:00">
+  <meta itemprop="wordCount" content="1146">
+  <meta itemprop="keywords" content="图形学,渲染,GAMES课程,线性代数">
+
+      <header>
+        <h1 itemprop="headline">【Games101】变换基础概念</h1>
+        <p class="text-sm">
+          
+            Friday, Jun 27, 2025
+          
+
+          | <span>6 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Friday, Jun 27, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e5%8f%98%e6%8d%a2%e5%9f%ba%e7%a1%80%e6%a6%82%e5%bf%b5&amp;url=http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e5%8f%98%e6%8d%a2%e5%9f%ba%e7%a1%80%e6%a6%82%e5%bf%b5%20http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>计算机图形学中的基本变换包括缩放、镜像、错切和旋转，每种变换都可通过特定的数学矩阵来描述物体在二维空间中的位置、大小和方向变化。</p>
+<p><strong>变换Transformation</strong>是计算机图形学中的基础概念，用于描述和操作物体在二维或三维空间中的位置、方向和大小。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626180918517.png" 
+       alt="image-20250626180918517" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626180918517
+    </figcaption>
+  
+</figure></p>
+<h2 id="基本变换类型">基本变换类型</h2>
+<h3 id="缩放变换scale">缩放变换（Scale）</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626181358791.png" 
+       alt="image-20250626181358791" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626181358791
+    </figcaption>
+  
+</figure></p>
+<h1 id="endbmatrix">如图所示的坐标轴内物体缩放，其数学变换公式为:
+$$
+\begin{aligned}
+x' &= s \cdot x \\
+y' &= s \cdot y
+\end{aligned}
+$$
+矩阵格式表述为:
+$$
+\begin{bmatrix}
+x&rsquo; \
+y&rsquo;
+\end{bmatrix}</h1>
+<p>\begin{bmatrix}
+s &amp; 0 \
+0 &amp; s
+\end{bmatrix}
+\begin{bmatrix}
+x \
+y
+\end{bmatrix}
+$$
+而以此推广为非对称缩放变化:</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626182118627.png" 
+       alt="image-20250626182118627" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626182118627
+    </figcaption>
+  
+</figure></p>
+<h1 id="endbmatrix-1">此处的矩阵表述如下所示:
+$$
+S =
+\begin{bmatrix}
+s_x &amp; 0 \
+0 &amp; s_y
+\end{bmatrix}</h1>
+<p>\begin{bmatrix}
+0.5 &amp; 0 \
+0 &amp; 1.0
+\end{bmatrix}
+$$</p>
+<h1 id="endarrayright">$$
+\left[\begin{array}{l}
+x^{\prime} \
+y^{\prime}
+\end{array}\right]</h1>
+<p>\left[\begin{array}{cc}
+s_{x} &amp; 0 \
+0 &amp; s_{y}
+\end{array}\right]
+\left[\begin{array}{l}
+x \
+y
+\end{array}\right]
+$$</p>
+<h3 id="镜像变换reflection">镜像变换（Reflection）</h3>
+<p>如下图所示，对于镜像变换，也是直接修改x,y的值就好</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626182617520.png" 
+       alt="image-20250626182617520" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626182617520
+    </figcaption>
+  
+</figure></p>
+<p>其数学变换与矩阵表达如下所示:
+</p>
+$$
+\begin{cases}
+x' = -x \\
+y' = y
+\end{cases}
+$$<h1 id="endarrayright-1">$$
+\left[\begin{array}{l}
+x^{\prime} \
+y^{\prime}
+\end{array}\right]</h1>
+<p>\left[\begin{array}{cc}
+-1 &amp; 0 \
+0 &amp; 1
+\end{array}\right]
+\left[\begin{array}{l}
+x \
+y
+\end{array}\right]
+$$</p>
+<h3 id="错切变换shear">错切变换（Shear）</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626184056089.png" 
+       alt="image-20250626184056089" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626184056089
+    </figcaption>
+  
+</figure></p>
+<h1 id="endarrayright-2">如上图所示：变换后的图形每个点的y坐标都没变，对于左上角的点来说变化应该是0+a，对于右上角的点来说变化应该是1+a，对于左边中间的点来说变化应该是0+a/2，所以每个点的变化应该是:
+$$
+x' = x + a y
+$$
+其矩阵表达为：
+$$
+\left[\begin{array}{l}
+x^{\prime} \
+y^{\prime}
+\end{array}\right]</h1>
+<p>\left[\begin{array}{ll}
+1 &amp; a \
+0 &amp; 1
+\end{array}\right]
+\left[\begin{array}{l}
+x \
+y
+\end{array}\right]
+$$</p>
+<h3 id="旋转变换rotation">旋转变换（Rotation）</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626235525832.png" 
+       alt="image-20250626235525832" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626235525832
+    </figcaption>
+  
+</figure></p>
+<p>我们假设旋转角为</p>
+<p>以原来的原点、x轴点、y轴点为例进行观察</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250626235829319.png" 
+       alt="image-20250626235829319" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250626235829319
+    </figcaption>
+  
+</figure></p>
+<h1 id="endarrayright-3">原本的x轴点从（x,0）变为（ x* cosθ, x* sinθ）,而原本的y轴点由（0,y）变为（-y*sinθ，y * cosθ）.
+$$
+\begin{cases}
+x' = a x + b y \\
+y' = c x + d y
+\end{cases}
+$$
+这里我们假设原本的坐标向量（x,y）乘以一个旋转矩阵向量R从而得到了现在的坐标向量(x&rsquo;,y&rsquo;)
+$$
+\left[\begin{array}{c}
+x&rsquo; \
+y&rsquo;
+\end{array}\right]</h1>
+<p>\left[\begin{array}{cc}
+a &amp; b \
+c &amp; d
+\end{array}\right]
+\left[\begin{array}{c}
+x \
+y
+\end{array}\right]
+$$
+其公式推导如下:</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627000807847.png" 
+       alt="image-20250627000807847" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627000807847
+    </figcaption>
+  
+</figure></p>
+<p>得到的推导结果:
+</p>
+$$
+R_\theta = 
+\begin{bmatrix}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{bmatrix}
+$$<p>
+</p>
+$$
+\mathbf{x}' = \mathbf{M}\mathbf{x}
+\quad \text{其中} \quad
+\mathbf{M} = \begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}
+$$
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>以上的变换统称线性变换，线性变换在矩阵中的定义是可以通过一次乘法直接得到结果的运算</p>
+  </blockquote>
+
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627001505910.png" 
+       alt="image-20250627001505910" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627001505910
+    </figcaption>
+  
+</figure></p>
+<h3 id="平移变换translation">平移变换（Translation）</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627001640000.png" 
+       alt="image-20250627001640000" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627001640000
+    </figcaption>
+  
+</figure></p>
+<h1 id="endarrayright-4">而平移变换看似简单，却无法用线性变换矩阵来表示，其数学表达如下:
+$$
+\begin{cases}
+x' = x + t_x \\
+y' = y + t_y
+\end{cases}
+$$
+其写为矩阵表达如下:
+$$
+\left[\begin{array}{l}
+x^{\prime} \
+y^{\prime}
+\end{array}\right]</h1>
+<h1 id="endarrayright-5">\left[\begin{array}{ll}
+a &amp; b \
+c &amp; d
+\end{array}\right]
+\left[\begin{array}{l}
+x \
+y
+\end{array}\right]
++
+\left[\begin{array}{l}
+t_{x} \
+t_{y}
+\end{array}\right]
+$$
+人类总是犯懒的，最想做的事就是一步到位而不要这么多繁琐的操作，为了解决这个问题，引入齐次坐标的概念（所谓齐次坐标暂且可以先理解为加了一个坐标轴，用于将平移变换统一到我们的一般变换中），齐次后的矩阵表达式如下所示:
+$$
+\left(\begin{array}{c}
+x^{\prime} \
+y^{\prime} \
+w^{\prime}
+\end{array}\right)</h1>
+<h1 id="endarrayright-6">\left(\begin{array}{ccc}
+1 &amp; 0 &amp; t_{x} \
+0 &amp; 1 &amp; t_{y} \
+0 &amp; 0 &amp; 1
+\end{array}\right)
+\cdot
+\left(\begin{array}{l}
+x \
+y \
+1
+\end{array}\right)</h1>
+<p>\left(\begin{array}{c}
+x + t_{x} \
+y + t_{y} \
+1
+\end{array}\right)
+$$
+而之前的所有变换操作在齐次坐标下仍然可用:</p>
+<p><strong>Scale</strong>:
+</p>
+$$
+\mathbf{S}(s_x, s_y) = 
+\begin{pmatrix}
+s_x & 0 & 0 \\
+0 & s_y & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+$$<p>
+<strong>Rotation</strong>:
+</p>
+$$
+\mathbf{R}(\alpha) = 
+\begin{pmatrix}
+\cos \alpha & -\sin \alpha & 0 \\
+\sin \alpha & \cos \alpha & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+$$<p>
+<strong>Translation</strong>:
+</p>
+$$
+\mathbf{T}(t_x, t_y) = 
+\begin{pmatrix}
+1 & 0 & t_x \\
+0 & 1 & t_y \\
+0 & 0 & 1
+\end{pmatrix}
+$$
+
+
+  <blockquote class="dream-alert caution">
+    <p class="heading">
+      <ion-icon name="alert-circle-outline"></ion-icon>Caution</p>
+    <p>当图像进行多个变换时，其复合表达式应该从右往左写，并且乘法交换率在矩阵中并不适用</p>
+  </blockquote>
+
+$$
+\mathbf{M} = \mathbf{T}(t_x,t_y) \cdot \mathbf{R}(\alpha) \cdot \mathbf{S}(s_x,s_y)
+$$<p>如上式，表示的是某图像先缩放，然后旋转，最后后再平移。</p>
+<h2 id="3d变换">3D变换</h2>
+<p>3D变换相对于2D变换来说只是多增加了一个维度，可由2D变换举一反三得来：</p>
+<p><strong>Scale</strong>:
+</p>
+$$
+\mathbf{S}(s_x, s_y, s_z) = 
+\left(\begin{array}{cccc}
+s_x & 0 & 0 & 0 \\
+0 & s_y & 0 & 0 \\
+0 & 0 & s_z & 0 \\
+0 & 0 & 0 & 1
+\end{array}\right)
+$$<p>
+<strong>Translation:</strong>
+</p>
+$$
+\mathbf{T}(t_x, t_y, t_z) = 
+\left(\begin{array}{cccc}
+1 & 0 & 0 & t_x \\
+0 & 1 & 0 & t_y \\
+0 & 0 & 1 & t_z \\
+0 & 0 & 0 & 1
+\end{array}\right)
+$$<h3 id="3d旋转">3D旋转</h3>
+<p>3D旋转与2D旋转也基本一直，观察如下矩阵表示可以感受其几何意义：绕X轴旋转则x相关坐标无变化，所以x除对角线外的元素均为0，其余两个轴同理.
+</p>
+$$
+\begin{array}{c}
+\mathbf{R}_{x}(\alpha)=\begin{pmatrix}
+1 &0&0&0\\
+0 &\cos\alpha &-\sin\alpha &0\\
+0 &\sin\alpha &\cos\alpha &0\\
+0 &0&0&1
+\end{pmatrix}\\
+\mathbf{R}_{y}(\alpha)=\begin{pmatrix}
+\cos\alpha &0&\sin\alpha &0\\
+0 &1&0&0\\
+-\sin\alpha &0&\cos\alpha &0\\
+0 &0&0&1
+\end{pmatrix}\\
+\mathbf{R}_{z}(\alpha)=\begin{pmatrix}
+\cos\alpha &-\sin\alpha &0&0\\
+\sin\alpha &\cos\alpha &0&0\\
+0 &0&1&0\\
+0 &0&0&1
+\end{pmatrix}
+\end{array}
+$$<p>
+而绕y轴旋转有一点特殊，他在旋转之外进行了一个转置，这样做的原因是源于向量的叉乘：</p>
+$$
+\begin{aligned}
+\mathbf{X} \times \mathbf{Y} &= \mathbf{Z} \\
+\mathbf{Y} \times \mathbf{Z} &= \mathbf{X} \\
+\mathbf{X} \times \mathbf{Z} &= -\mathbf{Y}
+\end{aligned}
+$$<h3 id="罗德里格斯旋转公式"><strong>罗德里格斯旋转公式</strong></h3>
+<h2 id="观测变换viewing-transformation">观测变换（Viewing transformation）</h2>
+<h3 id="视图相机变换viewcamera-transformation">视图/相机变换（View/Camera transformation）</h3>
+<p>图形学的最终目的是为了将三维中的物体渲染成二维里的图像，在现实生活中如何照一张照片？</p>
+<ul>
+<li>
+<p>找个好地方摆pose（Model变换）</p>
+</li>
+<li>
+<p>把相机放个好角度（View变换）</p>
+</li>
+<li>
+<p>按快门（投影Projection变换）</p>
+</li>
+</ul>
+<p>简称MVP🤭</p>
+<p>视图View变换&ndash;如何摆放相机的角度</p>
+<ul>
+<li>
+<p>决定相机的位置</p>
+</li>
+<li>
+<p>决定相机看向的方向</p>
+</li>
+<li>
+<p>决定相机头朝上的方向</p>
+</li>
+</ul>
+<p>考虑到我们要实现下面一种情况：一个无限大的场景中，相机和要拍摄的物体随意移动，只要相机对于某物体的相对变换（位置、朝向、缩放）相同，那么在相机拍摄出的画面中，该物体永远相同（不考虑光照）。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627180437412.png" 
+       alt="image-20250627180437412" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627180437412
+    </figcaption>
+  
+</figure></p>
+<p>为了简化计算，一般将相机的位置永远规定在（0，0，0），并且其朝向永远和-Z轴相同，视为一个计算机图形学中的约定。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627181859652.png" 
+       alt="image-20250627181859652" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627181859652
+    </figcaption>
+  
+</figure></p>
+<p>如上图所示，要把摄像机归到原点分三步</p>
+<ul>
+<li>平移摄像机至（0，0，0）对原本的坐标点做平移变换</li>
+</ul>
+$$
+T_{\text{view}} = 
+\begin{bmatrix}
+1 & 0 & 0 & -x_{e} \\
+0 & 1 & 0 & -y_{e} \\
+0 & 0 & 1 & -z_{e} \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$<ul>
+<li>将相机lookat的方向旋转到-Z，旋转相机头朝上的方向到Y
+$$
+  R_{\text{view}} = 
+  \begin{bmatrix}
+  x_{\hat{g} \times \hat{t}} & y_{\hat{g} \times \hat{t}} & z_{\hat{g} \times \hat{t}} & 0 \\
+  x_{\hat{t}} & y_{\hat{t}} & z_{\hat{t}} & 0 \\
+  x_{-\hat{g}} & y_{-\hat{g}} & z_{-\hat{g}} & 0 \\
+  0 & 0 & 0 & 1
+  \end{bmatrix}
+  $$</li>
+</ul>
+<p>得到变换矩阵
+</p>
+$$
+M_{\text{view}} = R_{\text{view}} \cdot T_{\text{view}} = 
+\begin{bmatrix}
+x_{\hat{g} \times \hat{t}} & y_{\hat{g} \times \hat{t}} & z_{\hat{g} \times \hat{t}} & -\vec{e} \cdot (\hat{g} \times \hat{t}) \\
+x_{\hat{t}} & y_{\hat{t}} & z_{\hat{t}} & -\vec{e} \cdot \hat{t} \\
+x_{-\hat{g}} & y_{-\hat{g}} & z_{-\hat{g}} & \vec{e} \cdot \hat{g} \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$<p>
+</p>
+$$
+\text{（其中 } \vec{e} = (x_e, y_e, z_e) \text{ 是相机位置）}
+$$<p>将Mview应用到相机，相机归零，同时也需要将Mview应用到其他所有物体，让物体和相机的相对位置保持不变</p>
+<h2 id="投影变换">投影变换</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627183609000.png" 
+       alt="image-20250627183609000" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627183609000
+    </figcaption>
+  
+</figure></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627183629247.png" 
+       alt="image-20250627183629247" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627183629247
+    </figcaption>
+  
+</figure></p>
+<p>投影变换分为两种，一种是正交投影，一种是透视投影。其最核心的区别在于：透视投影会造成一个“近大远小”的现象，用一个梗来解释就是“道理我都懂，但是鸽子为什么这么大”🙂</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/c57f-hxhyiun5536644.jpg" 
+       alt="“道理我都懂，但是这个鸽子怎么这么大？”|鸽子|道理_新浪新闻" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      “道理我都懂，但是这个鸽子怎么这么大？”|鸽子|道理_新浪新闻
+    </figcaption>
+  
+</figure></p>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>在现代游戏开发中，很多2D游戏是使用3D引擎去做的开发，然而其视图仍然能保持2D的感觉，使用的投影方式就正交投影。</p>
+  </blockquote>
+
+<h3 id="正交投影">正交投影</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627185154209.png" 
+       alt="image-20250627185154209" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627185154209
+    </figcaption>
+  
+</figure></p>
+<p>如上图所示，我们延续之前相机坐标归于原点的思想，可以得到下面的思维链条：</p>
+<ul>
+<li>
+<p>先将相机归零，并lookat -Z轴</p>
+</li>
+<li>
+<p>直接把Z轴坐标舍弃，就能得到物体在xy平面上的投影</p>
+</li>
+<li>
+<p>把得到的图像平移并且缩放到[-1,1]²中，方便之后的计算</p>
+</li>
+</ul>
+<p>但在计算机图形学的实际过程中，有着更简化的计算方式，如下图所示</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627185415063.png" 
+       alt="image-20250627185415063" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627185415063
+    </figcaption>
+  
+</figure></p>
+<p>视口是个（l,r）（b,t）（f,n）的长方体,想让他变成[-1,1]³中只需要</p>
+<ul>
+<li>先将立方体的中心平移到原点</li>
+<li>在将立方体缩放到[-1,1]³中</li>
+</ul>
+$$
+M_{\text{ortho}} = 
+\begin{bmatrix}
+\frac{2}{r-l} & 0 & 0 & 0 \\
+0 & \frac{2}{t-b} & 0 & 0 \\
+0 & 0 & \frac{2}{n-f} & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+1 & 0 & 0 & -\frac{r+l}{2} \\
+0 & 1 & 0 & -\frac{t+b}{2} \\
+0 & 0 & 1 & -\frac{n+f}{2} \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$<h3 id="透视投影">透视投影</h3>
+<p>透视投影是使用最广泛的投影方法</p>
+<p>传统的欧式几何是在同一平面内生效的法则，对于不同平面就会造成照片中近大远小的情况</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627190007409.png" 
+       alt="image-20250627190007409" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627190007409
+    </figcaption>
+  
+</figure></p>
+<p>对于一个使用透视投影的绘制，应该怎样进行呢，如下图所示：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627222505168.png" 
+       alt="image-20250627222505168" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627222505168
+    </figcaption>
+  
+</figure></p>
+<p>老师的方法是，先将Frustum远平面及远平面到近平面之间的所有平面挤压到近平面大小，</p>
+<p>变成Cuboid的样子，然后做一次正交投影。</p>
+<p>怎样做挤压？</p>
+<ul>
+<li>对于除近平面外的任意一个点，通过挤压后该点的高度y要变成和近平面一样的y’</li>
+<li>从侧面看Frustum的话，如下图，可以形成两个相似三角形，即可得出y‘=(n/z)y</li>
+<li>同理x&rsquo;=(n/z)x</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250627222713496.png" 
+       alt="image-20250627222713496" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250627222713496
+    </figcaption>
+  
+</figure></p>
+<h1 id="endpmatrix">可以得到以下数学表达:
+$$
+\begin{aligned}
+x' &= \frac{n}{z} x \\
+y' &= \frac{n}{z} y \quad \text{(similar to } x')
+\end{aligned}
+$$
+将其表示为齐次坐标的形式:
+$$
+\begin{pmatrix}
+x \\ y \\ z \\ 1
+\end{pmatrix}
+\Rightarrow
+\begin{pmatrix}
+nx/z \\ ny/z \\ \text{unknown} \\ 1
+\end{pmatrix}
+\xrightarrow{\text{mult. }z}
+\begin{pmatrix}
+nx \\ ny \\ \text{still unknown} \\ z
+\end{pmatrix}
+$$
+现在我们对于投影的变换（挤压部分）有如下表达:
+$$
+M_{\text{persp}\rightarrow\text{ortho}}^{(4\times4)}
+\begin{pmatrix}
+x \ y \ z \ 1
+\end{pmatrix}</h1>
+<p>\begin{pmatrix}
+nx \ ny \ \text{unknown} \ z
+\end{pmatrix}
+</p>
+$$
+显而易见可以推理出M的部分值
+$$<p>
+M_{\text{persp}\rightarrow\text{ortho}} =
+\begin{pmatrix}
+n &amp; 0 &amp; 0 &amp; 0 \
+0 &amp; n &amp; 0 &amp; 0 \
+? &amp; ? &amp; ? &amp; ? \
+0 &amp; 0 &amp; 1 &amp; 0
+\end{pmatrix}
+$$
+<figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/image-20250628012456253.png" 
+       alt="image-20250628012456253" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250628012456253
+    </figcaption>
+  
+</figure></p>
+<p>想补全这个矩阵，需要用到两条已知的性质</p>
+<ol>
+<li>近平面的点坐标（x,y,z）都不会发生变化</li>
+<li>远平面的点z的值不会发生变化（因为我们采用的方法是先压缩后正交）</li>
+</ol>
+<h1 id="endpmatrix-1">代入第一条性质（z值代为n）
+$$
+\begin{pmatrix}
+x \
+y \
+n \
+1
+\end{pmatrix}
+\Rightarrow
+\begin{pmatrix}
+x \
+y \
+n \
+1
+\end{pmatrix}</h1>
+<h1 id="endpmatrix-2">\begin{pmatrix}
+n x \
+n y \
+n^{2} \
+n
+\end{pmatrix}
+$$
+显然发现第三行的计算结果n方与x,y均无关系，故设第三行为 (0,0,*A*,*B*)，则其满足
+$$
+\begin{pmatrix}
+0 &amp; 0 &amp; A &amp; B
+\end{pmatrix}
+\begin{pmatrix}
+x \
+y \
+n \
+1
+\end{pmatrix}
+= n^2
+$$
+将其展开推导:
+$$
+An + B = n^{2}
+$$
+显然该式有无穷多解，现在结合上面第二条性质的特殊点--即远平面上的中心点压缩后仍然是原来的位置，我们设其坐标为（0，0，f），带入数学表达式，并写为统一格式。
+$$
+\begin{pmatrix}
+0 \
+0 \
+f \
+1
+\end{pmatrix}
+\Rightarrow
+\begin{pmatrix}
+0 \
+0 \
+f \
+1
+\end{pmatrix}</h1>
+<p>\begin{pmatrix}
+0 \
+0 \
+f^2 \
+f
+\end{pmatrix}
+</p>
+$$
+展开得到:
+$$<p>
+Af + B = f^{2}
+</p>
+$$
+联立两式解得:
+$$<p>
+\begin{cases}
+An + B = n^{2} \
+Af + B = f^{2}
+\end{cases}
+\quad \longrightarrow \quad
+\begin{cases}
+A = n + f \
+B = -nf
+\end{cases}
+</p>
+$$
+至此解得了完整的压缩变换矩阵：
+$$<p>
+M_{\text{persp}\rightarrow\text{ortho}} =
+\begin{pmatrix}
+n &amp; 0 &amp; 0 &amp; 0 \
+0 &amp; n &amp; 0 &amp; 0 \
+0 &amp; 0 &amp; n+f &amp; -nf \
+0 &amp; 0 &amp; 1 &amp; 0
+\end{pmatrix}
+</p>
+$$
+对压缩结果再进行一步正交投影即可得到最终结果
+$$<p>
+M_{\text{persp}} = M_{\text{ortho}} \cdot M_{\text{persp}\rightarrow\text{ortho}}
+$$</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

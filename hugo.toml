@@ -1,0 +1,80 @@
+baseURL = 'https://tingdonghu.github.io/' # 部署时记得改回你的域名
+languageCode = 'zh-cn'
+title = '古月月仔的博客'
+theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  series = "series"
+
+[params]
+  math = true  # 开启主题内置的数学公式渲染支持
+  # --- 1. 核心显示配置 (由 LoveIt 的 profile 迁移而来) ---
+  author = "古月月仔"
+  headerTitle = "古月月仔的博客"
+  motto = "计算机在校生 || 游戏程序员\n记录从基础到进阶的每一份思考。" # 对应 LoveIt 的 subtitle + description
+  avatar = "/img/ChipDog.jpg" # 确保文件在 static/img/ChipDog.jpg
+  
+  # --- 2. 主题皮肤配置 ---
+  # Dream 使用 DaisyUI 颜色体系，可选: emerald, forest, cupcake, lo-fi 等
+  lightTheme = "emerald"
+  darkTheme = "forest"
+
+  # --- 3. 社交链接 (Dream 直接在 params 下定义) ---
+  email = "2680957536@qq.com"
+  github = "TingDongHu"
+  zhihu = "lin-chu-xin-44-90"
+  # bilibili 在某些 Dream 版本中需自定义，若不显示可放 header 或 footer
+  # bilibili = "473408368" 
+
+  # --- 4. 站点选项 ---
+  siteStartYear = 2021
+  # 如果不想在首页卡片显示默认占位图，取消下面注释
+  # noDefaultSummaryCover = true 
+
+# --- 5. 菜单配置 (注意：Dream 的图标处理方式与 LoveIt 不同) ---
+# LoveIt 用 pre 写 HTML，Dream 建议直接在 menu 结构中配置
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "文章"
+    url = "/posts/"
+    weight = 1
+  [[menu.main]]
+    identifier = "categories"
+    name = "分类"
+    url = "/categories/"
+    weight = 3
+  [[menu.main]]
+    identifier = "tags"
+    name = "标签"
+    url = "/tags/"
+    weight = 4
+[markup]
+  [markup.goldmark.renderer]
+      unsafe = true  # 允许在 Markdown 中直接使用 HTML 标签
+  [markup.goldmark]
+    [markup.goldmark.extensions.passthrough]
+      enable = true
+      [markup.goldmark.extensions.passthrough.delimiters]
+        block = [['$$', '$$'], ['\\[', '\\]']]
+        inline = [['$', '$'], ['\\(', '\\)']]
+
+
+[module]
+  [[module.mounts]]
+    source = "content"
+    target = "static"
+  [[module.mounts]]
+    source = "static"
+    target = "static"
+  [[module.mounts]]
+    source = "layouts"
+    target = "layouts"
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+  [[module.mounts]]
+    source = "archetypes"
+    target = "archetypes"

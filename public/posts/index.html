@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="" />
+<meta name="keywords" content="">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="Posts">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Posts">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+     
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+
+<div class="mt-8 lg:mt-12 px-4">
+  <div class="mx-auto prose dark:prose-invert">
+    <h1 class="text-3xl">
+      Posts
+    </h1>
+    
+  </div>
+
+  <div class="max-w-[65ch] mx-auto mt-8 lg:mt-12">
+    <ul class="timeline timeline-vertical">
+      
+      
+      <li class="[--timeline-col-start:64px]">
+        <hr class="dark:bg-base-content" />
+        <div class="timeline-start justify-self-start!">
+          <div class="text-lg font-semibold">2025</div>
+        </div>
+        <div class="timeline-middle flex items-center mx-8 my-2">
+          <ion-icon name="time"></ion-icon>
+        </div>
+        <div class="timeline-end timeline-box dark:border-base-content/60 prose dark:prose-invert my-8 text-sm">
+          <ul>
+            
+            <li>
+              <a href="/posts/games101%E5%8A%A8%E7%94%BB%E5%9F%BA%E7%A1%80/">【Games101】动画基础</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/">【Games101】颜色与感知(Color and Perception)</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/">【Games101】相机与透镜</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/">【Games101】高级光线传播与复杂外观建模</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/">【Games101】材质与外观</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/">【Games101】光线追踪与蒙特卡洛路径追踪</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/">【Games101】辐射度量学与全局光照</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98%E5%9F%BA%E7%A1%80%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">【算法刷题】排序算法总结</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/">【Games101】光线追踪基础Ray-Tracing</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9hexo%E6%B7%BB%E5%8A%A0-github-alerts-%E6%94%AF%E6%8C%81/">【博客魔改】Hexo添加 Github alerts 支持</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9butterfly-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE-giscus-%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">【博客魔改】Butterfly 主题配置 Giscus 评论系统</a>
+            </li>
+            
+            <li>
+              <a href="/posts/c&#43;&#43;%E7%BB%84%E5%90%88%E7%BB%A7%E6%89%BF%E5%92%8C%E5%A4%9A%E6%80%81/">【C&#43;&#43;】组合、继承和多态</a>
+            </li>
+            
+            <li>
+              <a href="/posts/c&#43;&#43;%E5%A4%8D%E6%95%B0%E7%B1%BB%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB/">【C&#43;&#43;】复数类与字符串类</a>
+            </li>
+            
+            <li>
+              <a href="/posts/c&#43;&#43;%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">【C&#43;&#43;】变量的作用域与内存管理</a>
+            </li>
+            
+            <li>
+              <a href="/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/">【ComfyUI】批量生成自动化</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BBviewdiff%E5%9F%BA%E4%BA%8E%E6%96%87%E7%94%9F%E5%9B%BE%E6%A8%A1%E5%9E%8B%E7%9A%843d%E4%B8%80%E8%87%B4%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90%E6%8A%80%E6%9C%AF/">【论文阅读】ViewDiff：基于文生图模型的3D一致图像生成技术</a>
+            </li>
+            
+            <li>
+              <a href="/posts/aigc%E7%94%9F%E5%9B%BE%E6%A8%A1%E5%9E%8B%E6%A6%82%E5%BF%B5%E6%A8%A1%E5%9D%97%E5%AE%97%E8%BF%B0/">【AIGC】生图模型概念&amp;模块宗述</a>
+            </li>
+            
+            <li>
+              <a href="/posts/llm%E6%8A%80%E6%9C%AFtransformer%E6%9E%B6%E6%9E%84%E5%AE%97%E8%BF%B0/">【LLM技术】Transformer架构宗述</a>
+            </li>
+            
+            <li>
+              <a href="/posts/llm%E6%8A%80%E6%9C%AFn8n%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%8E%A5%E5%85%A5notion%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E5%85%B7/">【LLM技术】N8N搭建一个接入Notion的自动化工具</a>
+            </li>
+            
+            <li>
+              <a href="/posts/llm%E6%8A%80%E6%9C%AFmcp%E6%98%AF%E4%BB%80%E4%B9%88%E5%AE%97%E8%BF%B0%E5%92%8C%E6%A6%82%E5%BF%B5%E6%A2%B3%E7%90%86/">【LLM技术】MCP是什么？宗述和概念梳理</a>
+            </li>
+            
+            <li>
+              <a href="/posts/llm%E6%8A%80%E6%9C%AFrag%E6%98%AF%E4%BB%80%E4%B9%88%E5%AE%97%E8%BF%B0%E4%B8%8E%E8%AF%A6%E8%A7%A3/">【LLM技术】RAG是什么？宗述与详解</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E5%87%A0%E4%BD%95%E8%A1%A8%E8%BE%BE%E4%B8%8E%E7%BB%98%E5%88%B6/">【Games101】几何表达与绘制</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%E4%B8%8E%E7%9D%80%E8%89%B2/">【Games101】纹理映射与着色</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E7%9D%80%E8%89%B2%E5%9F%BA%E7%A1%80/">【Games101】着色基础</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E5%85%89%E6%A0%85%E5%8C%96%E5%9F%BA%E7%A1%80/">【Games101】光栅化基础</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E5%8F%98%E6%8D%A2%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">【Games101】变换基础概念</a>
+            </li>
+            
+            <li>
+              <a href="/posts/games101%E5%9B%BE%E5%BD%A2%E5%AD%A6%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">【Games101】图形学概述与数学基础</a>
+            </li>
+            
+            <li>
+              <a href="/posts/c&#43;&#43;c&#43;&#43;%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">【C&#43;&#43;】C&#43;&#43;中的设计模式</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%B8%B8%E8%A7%81%E7%9A%84%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0/">【深度学习】常见的激活函数</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%B8%8E%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/">【机器学习】梯度下降与损失函数</a>
+            </li>
+            
+          </ul>
+        </div>
+        <hr class="dark:bg-base-content" />
+      </li>
+      
+      <li class="[--timeline-col-start:64px]">
+        <hr class="dark:bg-base-content" />
+        <div class="timeline-start justify-self-start!">
+          <div class="text-lg font-semibold">2024</div>
+        </div>
+        <div class="timeline-middle flex items-center mx-8 my-2">
+          <ion-icon name="time"></ion-icon>
+        </div>
+        <div class="timeline-end timeline-box dark:border-base-content/60 prose dark:prose-invert my-8 text-sm">
+          <ul>
+            
+            <li>
+              <a href="/posts/openpcdetpointpillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/">【OpenPCDet】PointPillar算法思路</a>
+            </li>
+            
+            <li>
+              <a href="/posts/openpcdet%E5%85%B3%E4%BA%8Espconv%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">【OpenPCDet】关于spconv的一些问题解决方案</a>
+            </li>
+            
+            <li>
+              <a href="/posts/openpcdet%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E9%87%87%E6%A0%B7%E8%AE%AD%E7%BB%83/">【OpenPCDet】模型的数据采样训练</a>
+            </li>
+            
+            <li>
+              <a href="/posts/openpcdetuncertainty-estimation%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/">【OpenPCDet】Uncertainty Estimation学习笔记（一）</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9Ccnn%E7%9A%84%E8%AF%A6%E7%BB%86%E5%8E%9F%E7%90%86/">卷积神经网络(CNN)的原理</a>
+            </li>
+            
+            <li>
+              <a href="/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/">【OpenPCDet】详细部署与复现</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8Egamemode%E5%92%8Cgamesate/">【虚幻引擎】GameMode和GameSate</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%99%9A%E5%B9%BB5.1uuserwidget%E4%B8%8D%E5%86%8D%E5%8C%85%E5%90%ABonlevelremovedfromworld%E7%9A%84%E9%97%AE%E9%A2%98/">【虚幻引擎】虚幻5.1UUserWidget不再包含OnLevelRemovedFromWorld的问题</a>
+            </li>
+            
+            <li>
+              <a href="/posts/multiplayercourse%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/">【MultiplayerCourse】创建多人联机插件</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/">【虚幻引擎】委托(Delegates)与回调(Callbacks)</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8Euc&#43;&#43;%E7%9A%84%E5%AE%8F%E5%AE%9A%E4%B9%89%E8%AF%AD%E6%B3%95/">【虚幻引擎】UC&#43;&#43;的宏定义语法</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E6%B8%B8%E6%88%8F%E8%AE%BE%E8%AE%A1%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E4%B8%ADai/">【游戏设计】游戏开发中AI</a>
+            </li>
+            
+            <li>
+              <a href="/posts/c&#43;&#43;-.%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E7%9A%84%E6%84%8F%E4%B9%89%E5%92%8C%E7%94%A8%E6%B3%95%E5%8C%BA%E5%88%86/">【C&#43;&#43;】::|-&gt;|.|*特殊字符的意义和用法区分</a>
+            </li>
+            
+            <li>
+              <a href="/posts/javaweb%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96/">【JavaWeb】前端工程化</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8Euc&#43;&#43;%E4%B8%8E%E6%A0%87%E5%87%86c&#43;&#43;%E7%9A%84%E5%8C%BA%E5%88%AB/">【虚幻引擎】UC&#43;&#43;与标准C&#43;&#43;的区别</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E6%B8%B8%E6%88%8F%E8%AE%BE%E8%AE%A1%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E8%B7%B3%E8%B7%83%E8%AE%BE%E8%AE%A1/">【游戏设计】游戏开发中的跳跃设计</a>
+            </li>
+            
+            <li>
+              <a href="/posts/openpcdet%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E8%A7%A3%E8%AF%BB/">【OpenPCDet】模型预测结果解读</a>
+            </li>
+            
+          </ul>
+        </div>
+        <hr class="dark:bg-base-content" />
+      </li>
+      
+      <li class="[--timeline-col-start:64px]">
+        <hr class="dark:bg-base-content" />
+        <div class="timeline-start justify-self-start!">
+          <div class="text-lg font-semibold">2023</div>
+        </div>
+        <div class="timeline-middle flex items-center mx-8 my-2">
+          <ion-icon name="time"></ion-icon>
+        </div>
+        <div class="timeline-end timeline-box dark:border-base-content/60 prose dark:prose-invert my-8 text-sm">
+          <ul>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/">【虚幻引擎】设置UI自适应屏幕大小</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8Evriod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/">【虚幻引擎】VRiod的二次元角色导入</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%80%BB%E7%BB%93/">【机器学习】基础知识总结</a>
+            </li>
+            
+            <li>
+              <a href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AE%E5%8F%8C%E4%BA%BA%E5%88%86%E5%B1%8F/">【虚幻引擎】设置双人分屏</a>
+            </li>
+            
+          </ul>
+        </div>
+        <hr class="dark:bg-base-content" />
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+     
+
+    
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>欧拉公式 on 古月月仔的博客</title>
+    <link>http://localhost:1313/tags/%E6%AC%A7%E6%8B%89%E5%85%AC%E5%BC%8F/</link>
+    <description>Recent content in 欧拉公式 on 古月月仔的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 19 Dec 2025 00:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E6%AC%A7%E6%8B%89%E5%85%AC%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>【Games101】动画基础</title>
+      <link>http://localhost:1313/posts/games101%E5%8A%A8%E7%94%BB%E5%9F%BA%E7%A1%80/</link>
+      <pubDate>Fri, 19 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/games101%E5%8A%A8%E7%94%BB%E5%9F%BA%E7%A1%80/</guid>
+      <description>&lt;p&gt;动画通过连续图像产生运动感，其发展从手绘到数字时代。关键帧动画是基础技术，通过定义关键姿态并由计算机插值生成中间帧，数学本质是参数空间的插值过程。&lt;/p&gt;&#xA;&lt;h1 id=&#34;动画概念&#34;&gt;动画概念&lt;/h1&gt;&#xA;&lt;h2 id=&#34;动画概述与历史&#34;&gt;动画概述与历史&lt;/h2&gt;&#xA;&lt;p&gt;动画的本质是“赋予生命”，通俗来说就是通过随时间变化的场景模型，输出一系列连续图像，利用人眼的视觉暂留产生运动感 ，基于对人眼感知的能力，动画的帧数一般为以下的标准：&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;帧率标准&lt;/strong&gt;：电影通常为 &lt;strong&gt;24 fps&lt;/strong&gt;，一般视频为 &lt;strong&gt;30 fps&lt;/strong&gt;，而虚拟现实（VR）则需要高达 &lt;strong&gt;90 fps&lt;/strong&gt; 来保证流畅度 。&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E5%8A%A8%E7%94%BB%E5%9F%BA%E7%A1%80/image-20251219213410718.png&#34; &#xA;       alt=&#34;image-20251219213410718&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251219213410718&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;一些重要动画的发展史&lt;/strong&gt;：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;早期尝试&lt;/strong&gt;：公元前 3200 年伊朗的陶器彩绘被认为是最早的动画原型 ；1831 年出现了诡盘（Phenakistoscope） 。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;电影诞生&lt;/strong&gt;：1878 年埃德沃德·迈布里奇拍摄的《萨莉·加德纳》是第一部电影，最初用于科学研究 。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;手绘巅峰&lt;/strong&gt;：1937 年迪士尼推出了首部长篇手绘动画《白雪公主与七个小矮人》 。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;数字时代&lt;/strong&gt;：1963 年 Ivan Sutherland 的 &lt;strong&gt;Sketchpad&lt;/strong&gt; 开启了数字计算机生成动画的先河 ；1995 年《玩具总动员》成为首部全 CG 长篇电影 。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;关键帧动画-keyframe-animation&#34;&gt;关键帧动画 (Keyframe Animation)&lt;/h2&gt;&#xA;&lt;p&gt;这是最传统也是最基础的动画技术 。关键帧动画的核心在于将动画序列分解为由核心动作组成的“关键点” 。&#xA;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E5%8A%A8%E7%94%BB%E5%9F%BA%E7%A1%80/image-20251219213455017.png&#34; &#xA;       alt=&#34;image-20251219213455017&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251219213455017&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

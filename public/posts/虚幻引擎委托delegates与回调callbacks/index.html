@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【虚幻引擎】委托(Delegates)与回调(Callbacks) | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="虚幻引擎委托机制是一种类型安全的事件通知系统，支持动态绑定和多播功能，适用于观察者模式和回调实现。主要包括单播、多播、动态委托及事件等类型。" />
+<meta name="keywords" content="UnrealEngine,委托,回调,事件通信">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【虚幻引擎】委托(Delegates)与回调(Callbacks)">
+  <meta property="og:description" content="虚幻引擎委托机制是一种类型安全的事件通知系统，支持动态绑定和多播功能，适用于观察者模式和回调实现。主要包括单播、多播、动态委托及事件等类型。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-04-15T00:00:00+08:00">
+    <meta property="article:modified_time" content="2024-04-15T00:00:00+08:00">
+    <meta property="article:tag" content="UnrealEngine">
+    <meta property="article:tag" content="委托">
+    <meta property="article:tag" content="回调">
+    <meta property="article:tag" content="事件通信">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【虚幻引擎】委托(Delegates)与回调(Callbacks)">
+  <meta name="twitter:description" content="虚幻引擎委托机制是一种类型安全的事件通知系统，支持动态绑定和多播功能，适用于观察者模式和回调实现。主要包括单播、多播、动态委托及事件等类型。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【虚幻引擎】委托(Delegates)与回调(Callbacks)">
+  <meta itemprop="description" content="虚幻引擎委托机制是一种类型安全的事件通知系统，支持动态绑定和多播功能，适用于观察者模式和回调实现。主要包括单播、多播、动态委托及事件等类型。">
+  <meta itemprop="datePublished" content="2024-04-15T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2024-04-15T00:00:00+08:00">
+  <meta itemprop="wordCount" content="546">
+  <meta itemprop="keywords" content="UnrealEngine,委托,回调,事件通信">
+
+      <header>
+        <h1 itemprop="headline">【虚幻引擎】委托(Delegates)与回调(Callbacks)</h1>
+        <p class="text-sm">
+          
+            Monday, Apr 15, 2024
+          
+
+          | <span>3 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Monday, Apr 15, 2024
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90%e8%99%9a%e5%b9%bb%e5%bc%95%e6%93%8e%e3%80%91%e5%a7%94%e6%89%98%28Delegates%29%e4%b8%8e%e5%9b%9e%e8%b0%83%28Callbacks%29&amp;url=http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90%e8%99%9a%e5%b9%bb%e5%bc%95%e6%93%8e%e3%80%91%e5%a7%94%e6%89%98%28Delegates%29%e4%b8%8e%e5%9b%9e%e8%b0%83%28Callbacks%29%20http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>虚幻引擎的委托机制是一种类型安全的事件通知系统，支持动态绑定和多播功能，适用于观察者模式和回调实现。主要包括单播、多播、动态委托及事件等类型，并提供基本使用示例。</p>
+<h1 id="unreal-engine-中的-delegates委托详解">Unreal Engine 中的 Delegates（委托）详解</h1>
+<p>Delegates（委托）是 Unreal Engine 中一种强大的事件通知机制，它允许开发者在不直接引用类的情况下调用成员函数。本质上，委托是一种类型安全的函数指针，特别适合用于实现观察者模式、事件系统和回调机制。</p>
+<h2 id="基本概念">基本概念</h2>
+<h3 id="核心特点">核心特点</h3>
+<ul>
+<li><strong>类型安全</strong>：编译时会检查函数签名匹配</li>
+<li><strong>动态绑定</strong>：可以在运行时绑定/解绑函数</li>
+<li><strong>多播能力</strong>：可以同时通知多个接收者（Multicast Delegates）</li>
+<li><strong>序列化支持</strong>：部分委托类型支持蓝图序列化</li>
+</ul>
+<h2 id="委托类型">委托类型</h2>
+<p>Unreal Engine 提供了几种主要的委托类型：</p>
+<h3 id="1-单播委托-singlecast-delegates">1. 单播委托 (Singlecast Delegates)</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_DELEGATE(MyDelegate); <span style="color:#75715e">// 无参数
+</span></span></span><span style="display:flex;"><span>DECLARE_DELEGATE_OneParam(MyParamDelegate, FString); <span style="color:#75715e">// 单参数
+</span></span></span><span style="display:flex;"><span>DECLARE_DELEGATE_TwoParams(MyTwoParamDelegate, int32, <span style="color:#66d9ef">bool</span>); <span style="color:#75715e">// 双参数
+</span></span></span></code></pre></div><h3 id="2-多播委托-multicast-delegates">2. 多播委托 (Multicast Delegates)</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_MULTICAST_DELEGATE(MyMulticastDelegate);
+</span></span><span style="display:flex;"><span>DECLARE_MULTICAST_DELEGATE_OneParam(MyMulticastParamDelegate, <span style="color:#66d9ef">float</span>);
+</span></span></code></pre></div><h3 id="3-动态委托-dynamic-delegates">3. 动态委托 (Dynamic Delegates)</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_DYNAMIC_DELEGATE(FMyDynamicDelegate);
+</span></span><span style="display:flex;"><span>DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMyDynamicMulticastDelegate);
+</span></span></code></pre></div><h3 id="4-事件-events">4. 事件 (Events)</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_EVENT(MyOwnerClass, MyEvent);
+</span></span></code></pre></div><h2 id="使用示例">使用示例</h2>
+<h3 id="单播委托示例">单播委托示例</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 声明一个带有一个参数(int32)的单播委托类型，命名为FScoreChangedDelegate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 该委托用于在分数变化时通知订阅者
+</span></span></span><span style="display:flex;"><span>DECLARE_DELEGATE_OneParam(FScoreChangedDelegate, int32);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 定义一个继承自AActor的类AMyActor
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AMyActor</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> AActor
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 声明一个FScoreChangedDelegate类型的委托实例OnScoreChanged
+</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 这个委托将用于在分数更新时通知所有绑定的函数
+</span></span></span><span style="display:flex;"><span>    FScoreChangedDelegate OnScoreChanged;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 更新分数的方法
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">UpdateScore</span>(int32 NewScore)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 执行委托，通知所有绑定的函数
+</span></span></span><span style="display:flex;"><span>        <span style="color:#75715e">// ExecuteIfBound是安全执行方法，只有在有绑定时才会实际调用
+</span></span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 参数NewScore将传递给所有绑定的函数
+</span></span></span><span style="display:flex;"><span>        OnScoreChanged.ExecuteIfBound(NewScore);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 定义一个监听分数变化的类AMyListener
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AMyListener</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 绑定到分数变化委托的方法
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> BindToScoreChange(AMyActor<span style="color:#f92672">*</span> Actor)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 使用BindUObject将当前对象(this)的HandleScoreChanged方法绑定到Actor的OnScoreChanged委托
+</span></span></span><span style="display:flex;"><span>        <span style="color:#75715e">// BindUObject专门用于绑定UObject成员函数，会自动处理对象生命周期
+</span></span></span><span style="display:flex;"><span>        Actor<span style="color:#f92672">-&gt;</span>OnScoreChanged.BindUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>AMyListener<span style="color:#f92672">::</span>HandleScoreChanged);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 处理分数变化的回调函数
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">HandleScoreChanged</span>(int32 NewScore)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 当分数变化时，记录日志显示新分数
+</span></span></span><span style="display:flex;"><span>        <span style="color:#75715e">// %d将被NewScore的值替换
+</span></span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;Score changed to %d&#34;</span>), NewScore);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h4 id="执行流程">执行流程</h4>
+<pre class="mermaid">
+  sequenceDiagram
+    participant 调用方 as 调用方(AMyActor)
+    participant 委托系统 as 委托系统(OnScoreChanged)
+    participant 监听方 as 监听方(AMyListener)
+
+    Note over 监听方: 初始化阶段
+    监听方-&gt;&gt;委托系统: BindUObject(this, &amp;AMyListener::HandleScoreChanged)
+    Note right of 委托系统: 存储绑定信息：&lt;br/&gt;- 目标对象(this)&lt;br/&gt;- 函数指针(HandleScoreChanged)
+
+    Note over 调用方: 执行阶段
+    调用方-&gt;&gt;委托系统: ExecuteIfBound(NewScore)
+    委托系统-&gt;&gt;监听方: 检查目标对象有效性
+    alt 对象有效
+        监听方--&gt;&gt;委托系统: 确认可调用
+        委托系统-&gt;&gt;监听方: 调用HandleScoreChanged(NewScore)
+        监听方-&gt;&gt;监听方: 执行日志输出 UE_LOG(...)
+    else 对象无效
+        委托系统--x 监听方: 跳过执行（自动清理绑定）
+    end
+</pre>
+
+<p>流程图有时候网页上无法基于代码绘制显示，再附一张截图</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/%E3%80%90%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E3%80%91%E5%A7%94%E6%89%98delegates%E4%B8%8E%E5%9B%9E%E8%B0%83callbacks/image-20250419190556262.png" 
+       alt="image-20250419190556262" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20250419190556262
+    </figcaption>
+  
+</figure></p>
+<h3 id="播委托示例">播委托示例</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_MULTICAST_DELEGATE(FDeathDelegate);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AMyCharacter</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    FDeathDelegate OnDeath;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Die</span>()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 广播给所有绑定者
+</span></span></span><span style="display:flex;"><span>        OnDeath.Broadcast();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 多个类可以绑定到同一个委托
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AListener1</span> { <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">HandleDeath</span>() { <span style="color:#75715e">/*...*/</span> } };
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AListener2</span> { <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">HandleDeath</span>() { <span style="color:#75715e">/*...*/</span> } };
+</span></span></code></pre></div><h3 id="动态委托可用于蓝图">动态委托（可用于蓝图）</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_DYNAMIC_DELEGATE_OneParam(FBlueprintDelegate, FString, Message);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>UCLASS()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UMyBlueprintCallableObject</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> UObject
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    GENERATED_BODY()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    UFUNCTION(BlueprintCallable)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> SetupDelegate(FBlueprintDelegate Delegate)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        MyDelegate <span style="color:#f92672">=</span> Delegate;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">TriggerDelegate</span>(FString Message)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        MyDelegate.ExecuteIfBound(Message);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    FBlueprintDelegate MyDelegate;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h2 id="绑定方式">绑定方式</h2>
+<p>Unreal 提供了多种绑定方法：</p>
+<table>
+  <thead>
+      <tr>
+          <th>绑定方法</th>
+          <th>描述</th>
+          <th>示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>BindUObject</code></td>
+          <td>绑定到UObject成员函数</td>
+          <td><code>Delegate.BindUObject(this, &amp;MyClass::Func)</code></td>
+      </tr>
+      <tr>
+          <td><code>BindStatic</code></td>
+          <td>绑定静态函数</td>
+          <td><code>Delegate.BindStatic(&amp;MyStaticFunc)</code></td>
+      </tr>
+      <tr>
+          <td><code>BindRaw</code></td>
+          <td>绑定原始C++对象</td>
+          <td><code>Delegate.BindRaw(RawPtr, &amp;RawClass::Func)</code></td>
+      </tr>
+      <tr>
+          <td><code>BindLambda</code></td>
+          <td>绑定Lambda表达式</td>
+          <td><code>Delegate.BindLambda([](){ /*...*/ })</code></td>
+      </tr>
+      <tr>
+          <td><code>BindSP</code></td>
+          <td>绑定共享指针对象</td>
+          <td><code>Delegate.BindSP(SharedPtr, &amp;MyClass::Func)</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="最佳实践">最佳实践</h2>
+<ol>
+<li><strong>选择合适的委托类型</strong>：
+<ul>
+<li>1对1通知 → 单播委托</li>
+<li>1对多通知 → 多播委托</li>
+<li>需要蓝图支持 → 动态委托</li>
+</ul>
+</li>
+<li><strong>内存管理</strong>：
+<ul>
+<li>使用<code>BindUObject</code>或<code>BindSP</code>而不是<code>BindRaw</code>，以避免悬空指针</li>
+<li>在对象销毁前调用<code>Unbind()</code>或<code>RemoveAll()</code></li>
+</ul>
+</li>
+<li><strong>性能考虑</strong>：
+<ul>
+<li>动态委托比普通委托慢</li>
+<li>高频触发的委托避免使用多播</li>
+</ul>
+</li>
+<li><strong>调试技巧</strong>：
+<ul>
+<li>使用<code>ExecuteIfBound</code>而不是<code>Execute</code>来避免崩溃</li>
+<li>使用<code>IsBound()</code>检查是否有绑定</li>
+</ul>
+</li>
+</ol>
+<h2 id="与蓝图交互">与蓝图交互</h2>
+<p>动态委托特别适合与蓝图交互：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, <span style="color:#66d9ef">float</span>, NewHealth);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>UCLASS()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UHealthComponent</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> UActorComponent
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    GENERATED_BODY()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    UPROPERTY(BlueprintAssignable)
+</span></span><span style="display:flex;"><span>    FOnHealthChanged OnHealthChanged;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">TakeDamage</span>(<span style="color:#66d9ef">float</span> Amount)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Health <span style="color:#f92672">-=</span> Amount;
+</span></span><span style="display:flex;"><span>        OnHealthChanged.Broadcast(Health);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>在蓝图中，你可以直接为这个委托添加事件：</p>
+<ol>
+<li>创建HealthComponent变量</li>
+<li>拖出变量引脚 → &ldquo;Assign OnHealthChanged&rdquo;</li>
+<li>连接自定义事件</li>
+</ol>
+<h1 id="unreal-engine-中的-callbacks回调的作用以及与委托的关系">Unreal Engine 中的 Callbacks（回调）的作用以及与委托的关系</h1>
+<p>在 Unreal Engine（虚幻引擎）中，<strong>委托（Delegates）和回调（Callbacks）</strong> 是紧密相关的概念，但它们的设计目的、实现方式和应用场景存在关键差异。以下是两者的深度对比和关系解析：</p>
+<hr>
+<h3 id="1-核心定义"><strong>1. 核心定义</strong></h3>
+<table>
+  <thead>
+      <tr>
+          <th><strong>概念</strong></th>
+          <th><strong>委托（Delegates）</strong></th>
+          <th><strong>回调（Callbacks）</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>本质</strong></td>
+          <td>类型安全的函数包装器，支持多播和动态绑定</td>
+          <td>通常是函数指针或简单函数对象</td>
+      </tr>
+      <tr>
+          <td><strong>Unreal中的实现</strong></td>
+          <td>通过<code>DECLARE_DELEGATE</code>等宏定义</td>
+          <td>原生C++函数指针或<code>std::function</code></td>
+      </tr>
+      <tr>
+          <td><strong>典型用途</strong></td>
+          <td>事件系统、跨模块通信、蓝图交互</td>
+          <td>底层API响应、异步操作完成通知</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="2-关键关系"><strong>2. 关键关系</strong></h3>
+<h4 id="委托是回调的增强版"><strong>委托是回调的增强版</strong></h4>
+<h4 id="共同点"><strong>共同点</strong></h4>
+<ul>
+<li>都用于<strong>解耦调用方和被调用方</strong></li>
+<li>都遵循**&ldquo;订阅-通知&rdquo;**模式</li>
+<li>都能处理<strong>异步操作完成事件</strong></li>
+</ul>
+<h4 id="核心差异"><strong>核心差异</strong></h4>
+<table>
+  <thead>
+      <tr>
+          <th><strong>特性</strong></th>
+          <th><strong>委托</strong></th>
+          <th><strong>回调</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>绑定方式</td>
+          <td>支持UObject成员函数、Lambda等</td>
+          <td>通常仅限静态函数或裸函数指针</td>
+      </tr>
+      <tr>
+          <td>线程安全</td>
+          <td>可配置（<code>ESPMode::ThreadSafe</code>）</td>
+          <td>需手动实现</td>
+      </tr>
+      <tr>
+          <td>多播支持</td>
+          <td>原生支持（<code>DECLARE_MULTICAST_DELEGATE</code>）</td>
+          <td>需自行维护列表</td>
+      </tr>
+      <tr>
+          <td>生命周期管理</td>
+          <td>自动处理UObject有效性</td>
+          <td>需手动检查对象存活</td>
+      </tr>
+      <tr>
+          <td>蓝图集成</td>
+          <td>动态委托可直接暴露给蓝图</td>
+          <td>无法直接使用</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="3-unreal-engine-中的典型场景"><strong>3. Unreal Engine 中的典型场景</strong></h3>
+<h4 id="委托的适用场景"><strong>委托的适用场景</strong></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 角色死亡事件（多播委托）
+</span></span></span><span style="display:flex;"><span>DECLARE_MULTICAST_DELEGATE(FOnCharacterDied);
+</span></span><span style="display:flex;"><span>FOnCharacterDied OnDeath;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 多个系统订阅
+</span></span></span><span style="display:flex;"><span>HealthComponent<span style="color:#f92672">-&gt;</span>OnDeath.AddUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>AAchievementSystem<span style="color:#f92672">::</span>HandleDeath);
+</span></span><span style="display:flex;"><span>UIWidget<span style="color:#f92672">-&gt;</span>OnDeath.AddLambda([](){ ShowGameOverScreen(); });
+</span></span></code></pre></div><h4 id="回调的适用场景"><strong>回调的适用场景</strong></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 文件异步加载完成回调
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">LoadFile</span>(<span style="color:#66d9ef">const</span> FString<span style="color:#f92672">&amp;</span> Path, TFunction<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">void</span>(<span style="color:#66d9ef">bool</span>)<span style="color:#f92672">&gt;</span> Callback)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    AsyncTask([Path, Callback](){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">bool</span> bSuccess <span style="color:#f92672">=</span> FFileHelper<span style="color:#f92672">::</span>LoadFileToArray(...);
+</span></span><span style="display:flex;"><span>        Callback(bSuccess); <span style="color:#75715e">// 简单回调
+</span></span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 使用示例
+</span></span></span><span style="display:flex;"><span>LoadFile(<span style="color:#e6db74">&#34;Save.dat&#34;</span>, [](<span style="color:#66d9ef">bool</span> bSuccess){
+</span></span><span style="display:flex;"><span>    UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;Load result: %d&#34;</span>), bSuccess);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><hr>
+<h3 id="4-性能与内存对比"><strong>4. 性能与内存对比</strong></h3>
+<table>
+  <thead>
+      <tr>
+          <th><strong>指标</strong></th>
+          <th><strong>委托</strong></th>
+          <th><strong>回调</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>调用开销</td>
+          <td>较高（虚函数+安全性检查）</td>
+          <td>较低（直接调用）</td>
+      </tr>
+      <tr>
+          <td>内存占用</td>
+          <td>较大（存储绑定信息）</td>
+          <td>较小（仅存储函数指针）</td>
+      </tr>
+      <tr>
+          <td>适用频率</td>
+          <td>推荐用于高频事件（如每帧更新）</td>
+          <td>适合低频一次性操作</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="5-相互转换与协作"><strong>5. 相互转换与协作</strong></h3>
+<h4 id="将回调封装为委托"><strong>将回调封装为委托</strong></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 第三方库的回调适配为Unreal委托
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">ThirdPartyLib_SetCallback</span>(<span style="color:#66d9ef">void</span>(<span style="color:#f92672">*</span>Callback)(int32))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 第三方库的C风格回调
+</span></span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 适配层
+</span></span></span><span style="display:flex;"><span>DECLARE_DELEGATE_OneParam(FMyDelegate, int32);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">SetupAdapter</span>(FMyDelegate<span style="color:#f92672">&amp;</span> Delegate)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    ThirdPartyLib_SetCallback([](int32 Val){
+</span></span><span style="display:flex;"><span>        Delegate.ExecuteIfBound(Val); <span style="color:#75715e">// 桥接回调到委托
+</span></span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="委托降级为回调"><strong>委托降级为回调</strong></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 需要C接口时转换
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> FMyDelegate StaticDelegate;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">extern</span> <span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">void</span> RegisterCallback(<span style="color:#66d9ef">void</span>(<span style="color:#f92672">*</span>Callback)(int32))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    StaticDelegate.BindStatic(Callback); <span style="color:#75715e">// 委托绑定静态函数
+</span></span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 触发时
+</span></span></span><span style="display:flex;"><span>StaticDelegate.Broadcast(<span style="color:#ae81ff">42</span>); <span style="color:#75715e">// 调用C回调
+</span></span></span></code></pre></div><hr>
+<h3 id="6-设计选择指南"><strong>6. 设计选择指南</strong></h3>
+<table>
+  <thead>
+      <tr>
+          <th><strong>选择委托</strong> 当&hellip;</th>
+          <th><strong>选择回调</strong> 当&hellip;</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>需要多播通知</td>
+          <td>仅需单次响应</td>
+      </tr>
+      <tr>
+          <td>要与蓝图交互</td>
+          <td>纯C++模块内部使用</td>
+      </tr>
+      <tr>
+          <td>涉及UObject生命周期</td>
+          <td>处理底层API或第三方库集成</td>
+      </tr>
+      <tr>
+          <td>需要线程安全保证</td>
+          <td>性能敏感且无需复杂功能</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="7-底层实现窥探"><strong>7. 底层实现窥探</strong></h3>
+<h4 id="委托的内存结构简化"><strong>委托的内存结构（简化）</strong></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">FDelegateInstance</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> ObjectPtr;        <span style="color:#75715e">// 目标对象（UObject*或裸指针）
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> FunctionPtr;      <span style="color:#75715e">// 函数地址
+</span></span></span><span style="display:flex;"><span>    FDelegateHandle Handle; <span style="color:#75715e">// 唯一标识符
+</span></span></span><span style="display:flex;"><span>    ESPMode ThreadSafety;   <span style="color:#75715e">// 线程模式
+</span></span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h4 id="回调的典型实现"><strong>回调的典型实现</strong></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Unreal中回调的常见形式
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">typedef</span> TFunction<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">void</span>(int32)<span style="color:#f92672">&gt;</span> FSimpleCallback;
+</span></span><span style="display:flex;"><span>TArray<span style="color:#f92672">&lt;</span>FSimpleCallback<span style="color:#f92672">&gt;</span> CallbackList; <span style="color:#75715e">// 回调列表
+</span></span></span></code></pre></div><hr>
+<h3 id="总结"><strong>总结</strong></h3>
+<p>在Unreal Engine中：</p>
+<ul>
+<li><strong>委托</strong> 是引擎层面对回调概念的<strong>高级封装</strong>，提供类型安全、多播、蓝图集成等特性</li>
+<li><strong>回调</strong> 更接近原生C++实现，适合<strong>轻量级、高性能</strong>场景</li>
+<li>两者可相互配合，构建从底层到高层的完整事件系统</li>
+</ul>
+<p>正确选择的标准：
+​<strong>优先使用委托处理游戏逻辑事件，仅在需要与底层API交互或极端性能优化时使用原生回调。​</strong></p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+      </script>
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

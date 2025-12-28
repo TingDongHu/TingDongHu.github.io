@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解决bug记录 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/categories/%E8%A7%A3%E5%86%B3bug%E8%AE%B0%E5%BD%95/" />
+
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="" />
+
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+
+<meta property="og:url" content="http://localhost:1313/categories/%E8%A7%A3%E5%86%B3bug%E8%AE%B0%E5%BD%95/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="解决bug记录">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="解决bug记录">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+
+     
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+
+
+<div class="flex flex-col md:flex-row mt-4">
+
+  <div class="md:basis-[200px] lg:basis-[300px] p-4 prose dark:prose-invert">
+    <h1 class="text-2xl">解决bug记录</h1>
+    <p class="text-sm">1 article</p>
+    <div class="flex flex-wrap gap-4 mt-6">
+      
+
+      
+      
+      <a href="/categories/3dcomputervison/" class="badge h-6 no-underline hover:badge-primary">
+        3DComputerVison
+      </a>
+      
+      
+      
+      <a href="/categories/c&#43;&#43;/" class="badge h-6 no-underline hover:badge-primary">
+        C&#43;&#43;
+      </a>
+      
+      
+      
+      <a href="/categories/comfyui/" class="badge h-6 no-underline hover:badge-primary">
+        ComfyUI
+      </a>
+      
+      
+      
+      <a href="/categories/games101%E7%AC%94%E8%AE%B0/" class="badge h-6 no-underline hover:badge-primary">
+        Games101笔记
+      </a>
+      
+      
+      
+      <a href="/categories/hexo%E5%8D%9A%E5%AE%A2/" class="badge h-6 no-underline hover:badge-primary">
+        Hexo博客
+      </a>
+      
+      
+      
+      <a href="/categories/java/" class="badge h-6 no-underline hover:badge-primary">
+        Java
+      </a>
+      
+      
+      
+      <a href="/categories/llm/" class="badge h-6 no-underline hover:badge-primary">
+        LLM
+      </a>
+      
+      
+      
+      <a href="/categories/multiplayercourse/" class="badge h-6 no-underline hover:badge-primary">
+        MultiplayerCourse
+      </a>
+      
+      
+      
+      <a href="/categories/%E4%BE%AF%E6%8D%B7%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="badge h-6 no-underline hover:badge-primary">
+        侯捷面向对象
+      </a>
+      
+      
+      
+      <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" class="badge h-6 no-underline hover:badge-primary">
+        机器学习
+      </a>
+      
+      
+      
+      <a href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/" class="badge h-6 no-underline hover:badge-primary">
+        游戏开发
+      </a>
+      
+      
+      
+      <a href="/categories/%E6%B8%B8%E6%88%8F%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/" class="badge h-6 no-underline hover:badge-primary">
+        游戏设计思想
+      </a>
+      
+      
+      
+      <a href="/categories/%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98/" class="badge h-6 no-underline hover:badge-primary">
+        算法刷题
+      </a>
+      
+      
+      
+      <a href="/categories/%E8%99%9A%E5%B9%BB%E5%8A%9F%E8%83%BD%E8%AE%B0%E5%BD%95/" class="badge h-6 no-underline hover:badge-primary">
+        虚幻功能记录
+      </a>
+      
+      
+      
+      <span class="badge h-6 badge-primary">
+        解决bug记录
+      </span>
+      
+      
+    </div>
+  </div>
+  
+  <div class="divider divider-vertical md:divider-horizontal px-4 md:px-0"></div>
+  
+  <div class="flex-1">
+    
+
+    
+      <div class="dream-grid">
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%99%9A%E5%B9%BB5.1uuserwidget%E4%B8%8D%E5%86%8D%E5%8C%85%E5%90%ABonlevelremovedfromworld%E7%9A%84%E9%97%AE%E9%A2%98/">
+  
+  <figure>
+    
+    <img src="/img/unrealengine.png" alt="【虚幻引擎】虚幻5.1UUserWidget不再包含OnLevelRemovedFromWorld的问题" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【虚幻引擎】虚幻5.1UUserWidget不再包含OnLevelRemovedFromWorld的问题</h2>
+
+    <p class="date text-base-content/60">
+    
+      Saturday, Apr 20, 2024
+    
+    </p>
+
+    虚幻引擎5.1移除了`OnLevelRemovedFromWorld`函数，导致编译错误。解决方案是重写`NativeDestruct`函数来实现资源清理逻辑，从而成功编译。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>1 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+      </div>
+    
+
+    
+  </div>
+</div>
+
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+
+    
+
+
+
+
+
+    
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

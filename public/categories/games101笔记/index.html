@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games101笔记 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/categories/games101%E7%AC%94%E8%AE%B0/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="" />
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/categories/games101%E7%AC%94%E8%AE%B0/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="Games101笔记">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Games101笔记">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+     
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+
+
+<div class="flex flex-col md:flex-row mt-4">
+
+  <div class="md:basis-[200px] lg:basis-[300px] p-4 prose dark:prose-invert">
+    <h1 class="text-2xl">Games101笔记</h1>
+    <p class="text-sm">14 articles</p>
+    <div class="flex flex-wrap gap-4 mt-6">
+      
+
+      
+      
+      <a href="/categories/3dcomputervison/" class="badge h-6 no-underline hover:badge-primary">
+        3DComputerVison
+      </a>
+      
+      
+      
+      <a href="/categories/c&#43;&#43;/" class="badge h-6 no-underline hover:badge-primary">
+        C&#43;&#43;
+      </a>
+      
+      
+      
+      <a href="/categories/comfyui/" class="badge h-6 no-underline hover:badge-primary">
+        ComfyUI
+      </a>
+      
+      
+      
+      <span class="badge h-6 badge-primary">
+        Games101笔记
+      </span>
+      
+      
+      
+      <a href="/categories/hexo%E5%8D%9A%E5%AE%A2/" class="badge h-6 no-underline hover:badge-primary">
+        Hexo博客
+      </a>
+      
+      
+      
+      <a href="/categories/java/" class="badge h-6 no-underline hover:badge-primary">
+        Java
+      </a>
+      
+      
+      
+      <a href="/categories/llm/" class="badge h-6 no-underline hover:badge-primary">
+        LLM
+      </a>
+      
+      
+      
+      <a href="/categories/multiplayercourse/" class="badge h-6 no-underline hover:badge-primary">
+        MultiplayerCourse
+      </a>
+      
+      
+      
+      <a href="/categories/%E4%BE%AF%E6%8D%B7%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="badge h-6 no-underline hover:badge-primary">
+        侯捷面向对象
+      </a>
+      
+      
+      
+      <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" class="badge h-6 no-underline hover:badge-primary">
+        机器学习
+      </a>
+      
+      
+      
+      <a href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/" class="badge h-6 no-underline hover:badge-primary">
+        游戏开发
+      </a>
+      
+      
+      
+      <a href="/categories/%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98/" class="badge h-6 no-underline hover:badge-primary">
+        算法刷题
+      </a>
+      
+      
+      
+      <a href="/categories/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E/" class="badge h-6 no-underline hover:badge-primary">
+        虚幻引擎
+      </a>
+      
+      
+    </div>
+  </div>
+  
+  <div class="divider divider-vertical md:divider-horizontal px-4 md:px-0"></div>
+  
+  <div class="flex-1">
+    
+
+    
+      <div class="dream-grid">
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E5%8A%A8%E7%94%BB%E5%9F%BA%E7%A1%80/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】动画基础" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】动画基础</h2>
+
+    <p class="date text-base-content/60">
+    
+      Friday, Dec 19, 2025
+    
+    </p>
+
+    动画通过连续图像产生运动感，其发展从手绘到数字时代。关键帧动画是基础技术，通过定义关键姿态并由计算机插值生成中间帧，数学本质是参数空间的插值过程。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】颜色与感知(Color and Perception)" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】颜色与感知(Color and Perception)</h2>
+
+    <p class="date text-base-content/60">
+    
+      Thursday, Dec 18, 2025
+    
+    </p>
+
+    颜色是光线与感光系统互动的结果。人眼通过三种视锥细胞将连续光谱转换为三个神经信号，这解释了为何三原色能模拟色彩，并产生了同色异谱现象。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>1 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】相机与透镜" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】相机与透镜</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Dec 16, 2025
+    
+    </p>
+
+    成像包含合成与捕捉。针孔相机清晰但进光量不足，透镜提升亮度却引入景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>4 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】高级光线传播与复杂外观建模" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】高级光线传播与复杂外观建模</h2>
+
+    <p class="date text-base-content/60">
+    
+      Monday, Dec 15, 2025
+    
+    </p>
+
+    文章对比了无偏与有偏渲染方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种高级光线传播技术的原理、适用场景及优缺点。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】材质与外观" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】材质与外观</h2>
+
+    <p class="date text-base-content/60">
+    
+      Thursday, Dec 11, 2025
+    
+    </p>
+
+    在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>2 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】光线追踪与蒙特卡洛路径追踪" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】光线追踪与蒙特卡洛路径追踪</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Dec 9, 2025
+    
+    </p>
+
+    蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】辐射度量学与全局光照" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】辐射度量学与全局光照</h2>
+
+    <p class="date text-base-content/60">
+    
+      Sunday, Dec 7, 2025
+    
+    </p>
+
+    辐射度量学为计算机图形学提供物理正确光照计算的基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>2 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】光线追踪基础Ray-Tracing" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】光线追踪基础Ray-Tracing</h2>
+
+    <p class="date text-base-content/60">
+    
+      Thursday, Dec 4, 2025
+    
+    </p>
+
+    阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>4 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E5%87%A0%E4%BD%95%E8%A1%A8%E8%BE%BE%E4%B8%8E%E7%BB%98%E5%88%B6/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】几何表达与绘制" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】几何表达与绘制</h2>
+
+    <p class="date text-base-content/60">
+    
+      Saturday, Jul 5, 2025
+    
+    </p>
+
+    几何是计算机图形学三维建模与渲染的基础，应用于物体建模、几何变换和碰撞检测。其表示方法主要分为隐式表示（如代数曲面、水平集）和显式表示（如点云），用于描述不同复杂度的形状。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>4 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+          <div class="w-full md:w-1/2 lg:w-1/3 p-4 dream-column">
+            <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/games101%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84%E4%B8%8E%E7%9D%80%E8%89%B2/">
+  
+  <figure>
+    
+    <img src="/img/ComputerGraphics.png" alt="【Games101】纹理映射与着色" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【Games101】纹理映射与着色</h2>
+
+    <p class="date text-base-content/60">
+    
+      Thursday, Jul 3, 2025
+    
+    </p>
+
+    纹理是计算机图形学中用于增强模型表面细节的二维图像或数据贴图。通过纹理映射技术，结合UV坐标系和重心坐标插值，可将纹理贴合到三维模型表面，提供颜色、法线等丰富信息，提升视觉真实感。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>2 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+          </div>
+        
+      </div>
+    
+
+    
+    <div class="flex justify-center pt-8">
+      <div class="join grid grid-cols-2">
+  
+  <button class="join-item btn btn-outline btn-sm" disabled>
+    Previous page
+  </button>
+  
+  
+  <a href="/categories/games101%E7%AC%94%E8%AE%B0/page/2/" title="Next page" class="join-item btn btn-outline btn-sm">
+    Next page
+  </a>
+  
+</div>
+
+    </div>
+    
+  </div>
+</div>
+
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+    
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

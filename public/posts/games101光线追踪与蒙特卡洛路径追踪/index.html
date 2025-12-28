@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】光线追踪与蒙特卡洛路径追踪 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。" />
+<meta name="keywords" content="图形学,GAMES课程,光线追踪,路径追踪,概率论,蒙特卡洛方法">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】光线追踪与蒙特卡洛路径追踪">
+  <meta property="og:description" content="蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-09T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-09T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="光线追踪">
+    <meta property="article:tag" content="路径追踪">
+    <meta property="article:tag" content="概率论">
+    <meta property="article:tag" content="蒙特卡洛方法">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】光线追踪与蒙特卡洛路径追踪">
+  <meta name="twitter:description" content="蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】光线追踪与蒙特卡洛路径追踪">
+  <meta itemprop="description" content="蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。">
+  <meta itemprop="datePublished" content="2025-12-09T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-09T00:00:00+08:00">
+  <meta itemprop="wordCount" content="601">
+  <meta itemprop="keywords" content="图形学,GAMES课程,光线追踪,路径追踪,概率论,蒙特卡洛方法">
+
+      <header>
+        <h1 itemprop="headline">【Games101】光线追踪与蒙特卡洛路径追踪</h1>
+        <p class="text-sm">
+          
+            Tuesday, Dec 9, 2025
+          
+
+          | <span>3 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Tuesday, Dec 9, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e5%85%89%e7%ba%bf%e8%bf%bd%e8%b8%aa%e4%b8%8e%e8%92%99%e7%89%b9%e5%8d%a1%e6%b4%9b%e8%b7%af%e5%be%84%e8%bf%bd%e8%b8%aa&amp;url=http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e5%85%89%e7%ba%bf%e8%bf%bd%e8%b8%aa%e4%b8%8e%e8%92%99%e7%89%b9%e5%8d%a1%e6%b4%9b%e8%b7%af%e5%be%84%e8%bf%bd%e8%b8%aa%20http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>在图形学中，我们经常遇到无法算出解析解的积分（比如上一节课的渲染方程，需要对半球面上所有光线积分）。</p>
+<p><strong>解决思路</strong>：既然算不准，那我就随机取样。 比如我想知道一个广场上所有人的平均身高，我不需要真的去量几万个人的身高（求积分），我只需要随机抓 100 个人量一下（采样），算个平均值（期望），就能大概估算出结果。这就是概率论在渲染中的核心作用。</p>
+  </blockquote>
+
+<p>蒙特卡洛积分是一种基于随机采样的方法，而概率论是它的理论基石。</p>
+<h2 id="概率论基础">概率论基础</h2>
+<h3 id="随机变量-random-variables">随机变量 (Random Variables)</h3>
+<p><strong>定义</strong>：随机变量 $X$ 是一个变量，它的值是不确定的，代表了一个随机过程的潜在结果 。</p>
+<p><strong>例子</strong>：掷骰子。$X$ 可能取的值是 $\{1, 2, 3, 4, 5, 6\}$ 。</p>
+<h4 id="离散情况-discrete-case--以掷骰子为例">离散情况 (Discrete Case) —— 以“掷骰子”为例</h4>
+<p>如果 $X$ 是离散的，它取第 $i$ 个值 $x_i$ 的可能性记为 $p_i$ 。这里的$p_i$有两个硬性条件 ：</p>
+<ol>
+<li><strong>非负性</strong>：$p_i \ge 0$（概率不能是负数）。</li>
+<li><strong>归一化</strong>：$\sum_{i=1}^{n} p_i = 1$（所有可能性的概率加起来必须等于 1，也就是必然会发生某件事）。</li>
+</ol>
+<p>则对于掷骰子来说，每个面朝上的概率是相等的，即 $p_i = 1/6$</p>
+<h4 id="期望-expected-value">期望 (Expected Value)</h4>
+<p>期望可以理解为<strong>平均值</strong>。如果你不断地从分布中抽取样本，最终得到的平均结果就是期望 。
+</p>
+$$
+E[X] = \sum_{i=1}^{n} x_i p_i
+$$<p>
+即：（结果1 $\times$ 概率1）+（结果2 $\times$ 概率2）&hellip;</p>
+<p>则在例子掷骰子中会发生这种情况：虽然骰子只有整数点数，但其期望是：
+</p>
+$$
+E[X] = 1 \cdot \frac{1}{6} + 2 \cdot \frac{1}{6} + \dots + 6 \cdot \frac{1}{6} = 3.5
+$$<p>
+虽然你永远掷不出 3.5 这个点数，但“3.5”代表了掷很多次后的平均结果。</p>
+<h3 id="连续情况-continuous-case">连续情况 (Continuous Case)</h3>
+<p>在图形学中，光线的方向、位置等都是连续的，所以我们不能用离散模型，必须进阶到连续模型。</p>
+<p><strong>概率密度函数 (PDF, Probability Density Function)</strong></p>
+<p>对于连续变量 $X$，我们无法说“取某个特定值 $x$ 的概率是多少”（因为特定一点的概率在数学上是 0）。我们用 <strong>概率密度函数 $p(x)$</strong> 来描述在某个值附近的<strong>相对可能性</strong> 。</p>
+<p>PDF 必须满足的条件：</p>
+<ol>
+<li><strong>非负性</strong>：$p(x) \ge 0$ 。</li>
+<li><strong>归一化</strong>：函数曲线下的总面积为 1，即 $\int p(x) dx = 1$ 。</li>
+</ol>
+<p>则对于连续变量的期望值，就可以将离散的求和 ($\sum$) 替换为积分 ($\int$)：
+</p>
+$$
+E[X] = \int x \cdot p(x) dx
+$$<h4 id="随机变量的函数-function-of-a-random-variable">随机变量的函数 (Function of a Random Variable)</h4>
+<p>这是直接对应渲染方程的关键概念。在渲染中，我们<strong>随机采样的是方向</strong>（$X$），但我们要计算的是<strong>该方向上的光照贡献</strong>（$Y = f(X)$）。</p>
+<ul>
+<li>
+<p><strong>概念</strong>：如果 $X$ 是一个随机变量，那么它的函数 $Y = f(X)$ 也是一个随机变量 。</p>
+</li>
+<li>
+<p>如何求期望：</p>
+<p>我们要计算的是函数值 $f(X)$ 的期望，利用 $X$ 的 PDF 即可计算：</p>
+</li>
+</ul>
+$$
+E[Y] = E[f(X)] = \int f(x) \cdot p(x) dx
+$$<p>为了方便区分，我们将其换个变量名，写作:
+</p>
+$$
+E[g(X)] = \int g(x) p(x) dx
+$$<p>
+这个公式告诉我们：如果你有一个随机变量 $X$，它的概率密度是 $p(x)$，那么函数 $g(X)$ 的平均值（期望），等于 $g(x) \cdot p(x)$ 的积分。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209215013001.png" 
+       alt="image-20251209215013001" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209215013001
+    </figcaption>
+  
+</figure></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209215047771.png" 
+       alt="image-20251209215047771" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209215047771
+    </figcaption>
+  
+</figure></p>
+<h2 id="蒙特卡洛法">蒙特卡洛法</h2>
+<p>在上一节课（Lecture 15），我们推导出了渲染方程：
+</p>
+$$
+L_o(p, \omega_o) = L_e + \int_{\Omega} L_i(p, \omega_i) f_r \cos\theta d\omega_i
+$$<p>
+这是一个包含积分的方程。然而，场景里的光照太复杂，这个积分我们根本算不出解析解（无法直接用公式算出结果）。</p>
+<p>怎么办？ 我们只能借助上一节课复习的概率论，用数值方法去“猜”出这个积分的值。</p>
+<p><strong>问题</strong>：我们需要计算定积分 $\int_a^b f(x)dx$，但 $f(x)$ 可能非常复杂，很难求出解析解 。</p>
+<p><strong>方法</strong>：通过随机采样来估算。在积分域内随机取 $N$ 个样本 $X_i$，计算函数值并取平均。</p>
+<p>其公式为：
+</p>
+$$
+F_N = \frac{1}{N} \sum_{i=1}^{N} \frac{f(X_i)}{p(X_i)}
+$$<p>
+其中 $p(X_i)$ 是样本的概率密度函数 (PDF) 。</p>
+<p><strong>特性</strong>：采样点越多（$N$ 越大），结果越接近真实值，噪声（方差）越小 。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>这里给一个类比的通俗解释：“广场平均身高”</p>
+<p>你想知道广场上几万人的平均身高（积分），但你不可能把每个人都量一遍。</p>
+<ul>
+<li><strong>做法</strong>：你闭着眼随机抓 100 个人（采样 $N=100$）。</li>
+<li><strong>计算</strong>：把这 100 个人的身高加起来除以 100。</li>
+<li><strong>原理</strong>：只要你抓的人够随机、够多，算出来的这个平均值，就约等于全广场人的平均身高。</li>
+<li><strong>关于 $p(x)$</strong>：如果你是在“姚明篮球俱乐部”门口抓人（$p(x)$ 不均匀），那你算出来的均值肯定偏高。所以你需要除以 $p(x)$（权重）来修正这个偏差。</li>
+</ul>
+  </blockquote>
+
+<h3 id="蒙特卡洛法推导来源">蒙特卡洛法推导来源</h3>
+<ul>
+<li><strong>我们的目标</strong>是求积分： $I = \int f(x) dx$</li>
+<li><strong>我们的工具</strong>是期望： $E = \int g(x) p(x) dx$</li>
+</ul>
+<p><strong>蒙特卡洛积分的精髓就在于：</strong> 我们能不能构造一个特殊的函数 $g(x)$，使得它的期望值 $E$ 刚好等于我们想求的积分 $I$？</p>
+<p>数学推导（Why it works）：</p>
+<p>假设我们在积分域内通过某个概率密度函数 $p(x)$ 随机采样得到 $X$。我们构造一个“估算函数” $g(X) = \frac{f(X)}{p(X)}$。现在，我们把这个构造好的 $g(X)$ 代入 期望公式里算一下：
+</p>
+$$
+\begin{aligned} E[g(X)] &= \int g(x) \cdot p(x) dx \\ &= \int \frac{f(x)}{p(x)} \cdot p(x) dx \quad \text{(把 g(x) 替换掉)} \\ &= \int f(x) dx \quad \text{(p(x) 约分消掉了！)} \end{aligned}
+$$<p>
+<strong>结论</strong>：原来，如果我们每次采样得到 $X_i$ 后，算一下 $\frac{f(X_i)}{p(X_i)}$，这个值的<strong>数学期望</strong>（平均值）就是我们要算的积分结果！</p>
+<p>于是我们得到了蒙特卡洛积分公式：
+</p>
+$$
+F_N = \frac{1}{N} \sum_{i=1}^{N} \frac{f(X_i)}{p(X_i)}
+$$<ul>
+<li>$\frac{1}{N} \sum$ 就是在算样本的平均值（逼近期望）。</li>
+<li>$\frac{f(X_i)}{p(X_i)}$ 就是我们构造的那个随机变量。</li>
+</ul>
+<h2 id="算法演进">算法演进</h2>
+<h3 id="直接光照-direct-illumination">直接光照 (Direct Illumination)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214037569-1765287639609-8.png" 
+       alt="image-20251209214037569" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214037569
+    </figcaption>
+  
+</figure></p>
+<p>我们先解决最简单的情况：<strong>光线打到物体，直接反射到眼睛</strong>（没有反弹）。</p>
+<p>将渲染方程中的积分直接套用蒙特卡洛公式：</p>
+<ol>
+<li>
+<p><strong>采样</strong>：在半球面上随机选 $N$ 个入射方向 $\omega_i$。</p>
+</li>
+<li>
+<p><strong>PDF</strong>：如果是均匀采样，半球面积是 $2\pi$，所以 $p(\omega_i) = 1/2\pi$</p>
+</li>
+<li>
+<p>计算：
+</p>
+$$
+   L_o \approx \frac{1}{N} \sum \frac{L_i \cdot f_r \cdot \cos\theta}{1/2\pi}
+   $$<p>
+这里只有当光线 $\omega_i$ 击中光源时，$L_i$ 才有值，否则为 0 4。</p>
+</li>
+</ol>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209213905962.png" 
+       alt="image-20251209213905962" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209213905962
+    </figcaption>
+  
+</figure></p>
+<p>然而这种方法存在指数爆炸的问题：</p>
+<p>如果光线没打中光源，而是打中了一堵墙 $Q$，怎么办？逻辑：墙 $Q$ 反射的光，就是点 $P$ 的入射光。我们需要算出 $Q$ 的 $L_o$，这就变成了递归 。</p>
+<p>设想：我们在 $P$ 点采样 100 根光线。这 100 根光线打到周围物体上，每个物体又采样 100 根去寻找光&hellip;</p>
+<p>后果：</p>
+<ul>
+<li>1 次弹射：100 根</li>
+<li>2 次弹射：10,000 根</li>
+<li>3 次弹射：1,000,000 根</li>
+</ul>
+<p>计算量呈指数级爆炸，计算机瞬间死机 。</p>
+<h3 id="path-tracing">Path Tracing</h3>
+<p>为了不让光线爆炸，我们强制规定 <strong>$N=1$</strong>。</p>
+<p><strong>做法</strong>：每次弹射，<strong>只随机选 1 个方向</strong>往下走 。</p>
+<ul>
+<li>这样光线数量永远是 $1 \to 1 \to 1 \dots$，永远不会爆炸。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214151110-1765287712548-10.png" 
+       alt="image-20251209214151110" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214151110
+    </figcaption>
+  
+</figure></p>
+<p><strong>噪点问题</strong>：只选 1 根光线，结果肯定充满了噪点。</p>
+<p><strong>解决方案</strong>：我们不对“一次弹射”做多次采样，而是对<strong>每个像素</strong>做多次采样（Ray Generation 循环）。只要一个像素发出的光线（Path）足够多，取平均后画面就干净了 。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p><strong>“侦察兵”类比</strong></p>
+<ul>
+<li><strong>Whitted-Style</strong>：像是一个将军，遇到分岔路口就派出所有分身去探路。路口越多，分身越多，最后累死。</li>
+<li><strong>Path Tracing</strong>：像是派出 1000 个<strong>独立的侦察兵</strong>（对应一个像素的 SPP）。
+<ul>
+<li>每个侦察兵遇到路口，只<strong>随机选一条路</strong>走到底（N=1）。</li>
+<li>有的侦察兵找到了宝藏（光源），有的撞了墙。</li>
+<li>最后将军听取这 1000 个人的汇报，取个平均值，就得到了最准确的地图。</li>
+</ul>
+</li>
+</ul>
+  </blockquote>
+
+<h3 id="俄罗斯轮盘赌-russian-rouletterr">俄罗斯轮盘赌 (Russian Roulette，RR)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214319863.png" 
+       alt="image-20251209214319863" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214319863
+    </figcaption>
+  
+</figure></p>
+<p><strong>问题</strong>：光线在物理世界会反弹无数次，递归什么时候停？</p>
+<ul>
+<li>如果强制设为 3 次停止，能量就会损失（少了 3 次以后的光），画面会变暗（Biased）。</li>
+<li>如果不亦步亦趋，程序会死循环。</li>
+</ul>
+<p>我们引入俄罗斯轮盘赌 (RR) 来决定光线是否“死亡”。设定一个存活概率 $P$（例如 0.8）。</p>
+<p>每次递归前，扔个骰子：</p>
+<ul>
+<li>
+<p>存活 ($P$)：继续发射光线，但要把计算结果除以 $P$（$L_o / P$）。</p>
+</li>
+<li>
+<p>死亡 ($1-P$)：停止递归，返回 0 。</p>
+</li>
+</ul>
+$$
+E = P \times \frac{L_o}{P} + (1-P) \times 0 = L_o
+$$<p>妙处：虽然每条光线的命运是随机的，但从数学期望（平均值）上看，我们没有损失任何能量，结果是无偏的 (Unbiased) 。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>这里的俄罗斯赌轮盘和深度学习中的MC_Dropout思想几乎一模一样啊哈哈😄其实是同一个公式在不同领域的应用</p>
+  </blockquote>
+
+<p>无论是 Path Tracing 还是 MC Dropout，它们的核心公式都是蒙特卡洛积分公式：
+</p>
+$$
+E[f(x)] \approx \frac{1}{N} \sum_{i=1}^{N} f(x_i)
+$$<p>
+即：<strong>用 $N$ 次随机采样的平均值，来逼近一个复杂的期望值（积分）。</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th><strong>步骤</strong></th>
+          <th><strong>Path Tracing (图形学)</strong></th>
+          <th><strong>MC Dropout (深度学习)</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>问题</strong></td>
+          <td>场景的光照太复杂，无法直接算出像素颜色。</td>
+          <td>神经网络的参数分布太复杂（贝叶斯网络），无法直接算出预测分布。</td>
+      </tr>
+      <tr>
+          <td><strong>随机性来源</strong></td>
+          <td><strong>随机光线方向</strong>：每次弹射选不同的路。</td>
+          <td><strong>随机神经元掩码 (Mask)</strong>：每次前向传播随机关掉不同的神经元。</td>
+      </tr>
+      <tr>
+          <td><strong>单次采样</strong></td>
+          <td>发射 <strong>1 条光线</strong> (Sample 1 path)，得到一个充满噪点的颜色值。</td>
+          <td>进行 <strong>1 次前向传播</strong> (Forward pass)，得到一个不确定的预测结果。</td>
+      </tr>
+      <tr>
+          <td><strong>多次采样</strong></td>
+          <td>对同一个像素，发射 <strong>N 条光线</strong> (SPP)。</td>
+          <td>对同一个输入，进行 <strong>N 次前向传播</strong> (开启 Dropout)。</td>
+      </tr>
+      <tr>
+          <td><strong>最终结果</strong></td>
+          <td><strong>取平均值</strong>：得到平滑、无噪点的像素颜色。</td>
+          <td><strong>取平均值</strong>：得到模型对该输入的最终预测（贝叶斯近似）。</td>
+      </tr>
+      <tr>
+          <td><strong>副产品</strong></td>
+          <td><strong>方差 (Variance)</strong>：表现为画面噪点。方差大说明光照复杂，需要更多采样。</td>
+          <td><strong>方差 (Uncertainty)</strong>：表现为模型的不确定性。方差大说明模型对这个输入“心里没底”。</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="对光源采样">对光源采样</h3>
+<p>虽然我们现在的算法能得到基本正确的结果，但效率极低，“光线浪费”现象很严重。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214412300.png" 
+       alt="image-20251209214412300" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214412300
+    </figcaption>
+  
+</figure></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214459930.png" 
+       alt="image-20251209214459930" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214459930
+    </figcaption>
+  
+</figure></p>
+<p>如上图所示，我们在半球面上瞎蒙（均匀采样）。如果光源很小（比如天上的星星），随机选方向打中它的概率微乎其微。大量光线因为打不中光源而返回 0，导致画面全是噪点 。</p>
+<p>为了解决该问题，提出了一种方法：<strong>直接在光源上采样</strong>。既然我们只想知道“光源有没有照亮这里”，不如直接把采样点移到<strong>光源表面</strong>上。</p>
+<h4 id="数学变换">数学变换</h4>
+<p>蒙特卡洛积分要求采样域和积分域一致。我们把积分域从“立体角 $d\omega$”变换到“光源面积 $dA$”。</p>
+<p>关系式如下：
+</p>
+$$
+d\omega = \frac{dA \cdot \cos\theta'}{dist^2}
+$$<p>
+其中 $\theta'$ 是光源法线与光线的夹角，$dist$ 是距离 。</p>
+<p>新的重写方程：
+</p>
+$$
+L_o = \int_{A} L_i f_r \cos\theta \frac{\cos\theta'}{dist^2} dA
+$$<p>
+最终算法逻辑则是将将光照拆成两部分分别计算 ：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214838458.png" 
+       alt="image-20251209214838458" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214838458
+    </figcaption>
+  
+</figure></p>
+<p><strong>直接光照 (Direct Illumination)</strong>：</p>
+<ul>
+<li><strong>方法</strong>：直接在光源面积上采样（无噪声）。</li>
+<li><strong>注意</strong>：要发射一条 <strong>Shadow Ray</strong> 检查光源和点之间有没有障碍物 。</li>
+</ul>
+<p><strong>间接光照 (Indirect Illumination)</strong>：</p>
+<ul>
+<li><strong>方法</strong>：依然对半球采样 + 俄罗斯轮盘赌。</li>
+<li><strong>注意</strong>：如果射出的光线打到了<strong>光源</strong>，这部分必须<strong>扔掉</strong>（因为直接光照已经在第 1 步算过了，不能重复算</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E4%B8%8E%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E8%B7%AF%E5%BE%84%E8%BF%BD%E8%B8%AA/image-20251209214536522.png" 
+       alt="image-20251209214536522" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209214536522
+    </figcaption>
+  
+</figure></p>
+<p>经过了对光源采样，可以看到光线追踪全局光照得到的绘制结果已经非常接近物理光线了。</p>
+
+
+
+  <blockquote class="dream-alert caution">
+    <p class="heading">
+      <ion-icon name="alert-circle-outline"></ion-icon>Caution</p>
+    <p>一句话总结一下Path Tracing:</p>
+<p>在每个像素发射多条光线，光线每次弹射只随机走一个方向（N=1），利用俄罗斯轮盘赌决定停止，同时为了减少噪点，我们将直接光照单独拿出来，直接在光源面积上进行采样。</p>
+  </blockquote>
+
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

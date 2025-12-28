@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【虚幻引擎】设置UI自适应屏幕大小 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="锚点是虚幻引擎UI布局的核心工具，通过将控件锚定在父物体或屏幕的特定点，确保界面在不同屏幕分辨率下能自适应缩放并保持稳定的相对位置关系。" />
+<meta name="keywords" content="UnrealEngine,游戏开发">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【虚幻引擎】设置UI自适应屏幕大小">
+  <meta property="og:description" content="锚点是虚幻引擎UI布局的核心工具，通过将控件锚定在父物体或屏幕的特定点，确保界面在不同屏幕分辨率下能自适应缩放并保持稳定的相对位置关系。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-11-30T00:00:00+08:00">
+    <meta property="article:modified_time" content="2023-11-30T00:00:00+08:00">
+    <meta property="article:tag" content="UnrealEngine">
+    <meta property="article:tag" content="游戏开发">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【虚幻引擎】设置UI自适应屏幕大小">
+  <meta name="twitter:description" content="锚点是虚幻引擎UI布局的核心工具，通过将控件锚定在父物体或屏幕的特定点，确保界面在不同屏幕分辨率下能自适应缩放并保持稳定的相对位置关系。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【虚幻引擎】设置UI自适应屏幕大小">
+  <meta itemprop="description" content="锚点是虚幻引擎UI布局的核心工具，通过将控件锚定在父物体或屏幕的特定点，确保界面在不同屏幕分辨率下能自适应缩放并保持稳定的相对位置关系。">
+  <meta itemprop="datePublished" content="2023-11-30T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2023-11-30T00:00:00+08:00">
+  <meta itemprop="wordCount" content="20">
+  <meta itemprop="keywords" content="UnrealEngine,游戏开发">
+
+      <header>
+        <h1 itemprop="headline">【虚幻引擎】设置UI自适应屏幕大小</h1>
+        <p class="text-sm">
+          
+            Thursday, Nov 30, 2023
+          
+
+          | <span>1 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Thursday, Nov 30, 2023
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90%e8%99%9a%e5%b9%bb%e5%bc%95%e6%93%8e%e3%80%91%e8%ae%be%e7%bd%aeUI%e8%87%aa%e9%80%82%e5%ba%94%e5%b1%8f%e5%b9%95%e5%a4%a7%e5%b0%8f&amp;url=http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90%e8%99%9a%e5%b9%bb%e5%bc%95%e6%93%8e%e3%80%91%e8%ae%be%e7%bd%aeUI%e8%87%aa%e9%80%82%e5%ba%94%e5%b1%8f%e5%b9%95%e5%a4%a7%e5%b0%8f%20http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>锚点是虚幻引擎UI布局的核心工具，通过将控件锚定在父物体或屏幕的特定点，确保界面在不同屏幕分辨率下能自适应缩放并保持稳定的相对位置关系。</p>
+<p>在游戏中，如果想实现不同分辨率下，都可以支持当前的UI界面布局，都需要用到锚点功能。
+‌<a href="https://www.baidu.com/s?sa=re_dqa_generate&amp;wd=%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E&amp;rsv_pq=ca8de6dd007d16af&amp;oq=%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8Eui%E9%94%9A%E7%82%B9%E6%98%AF%E4%BB%80%E4%B9%88&amp;rsv_t=51d7gQl1KDGIFZHot4xxk8eoDFmMyx2fKF46n5XUr4N9FLnLgEu0uIVIDyzrutkjPI9DBew&amp;tn=15007414_12_dg&amp;ie=utf-8" target="_blank">虚幻引擎</a>
+中的UI锚点（Anchor）是指控件在屏幕或父物体上的固定点，用于确定控件的位置和布局。‌ 锚点的作用是确保UI元素在屏幕缩放或形变时保持相对位置不变。</p>
+<p>在虚幻引擎中，锚点可以理解为将子物体“挂”在父物体上的点。当父物体的位置或大小发生变化时，子物体的位置会相应地调整，保持它们之间的相对关系不变。锚点的位置可以在屏幕的任意角落，通常用于自适应屏幕尺寸和保持布局的稳定性‌。
+具体来说，锚点有以下几种情况：</p>
+<ul>
+<li>当锚点与父物体的某个顶点重合时，子物体在该点的位置不会改变，只有当父物体该点位置改变时，子物体才会跟着移动。</li>
+<li>如果锚点不重合，子物体在父物体变形时会跟着缩放，保持与父物体各顶点的距离不变‌。</li>
+</ul>
+<h3 id="具体实现">具体实现：</h3>
+<p>错误的UI锚点设置方法如下：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/e6bab021dbbf44a2bbaae6670b646233.png" 
+       alt="img" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      img
+    </figcaption>
+  
+</figure></p>
+<p>如上图为锚点设置不准确，导致缩放时出现屏幕空缺</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/2f3cb2f4e5604e1e857b11dfb50526b0.png" 
+       alt="img" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      img
+    </figcaption>
+  
+</figure></p>
+<p>将锚点修改为下图所示：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/30e978c4df3241b3a9a83f106c50451b.png" 
+       alt="img" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      img
+    </figcaption>
+  
+</figure></p>
+<p>如果想保持UI中内容部件和画布等比缩放，需要将锚点拉伸至和部件相同大小</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/8900c9b717c6428e8837c8e212cc1eef.png" 
+       alt="img" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      img
+    </figcaption>
+  
+</figure></p>
+<p>全部修改后现实正确：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AEui%E8%87%AA%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95%E5%A4%A7%E5%B0%8F/e460f240274b4481a183756a5862cc15.png" 
+       alt="img" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      img
+    </figcaption>
+  
+</figure></p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

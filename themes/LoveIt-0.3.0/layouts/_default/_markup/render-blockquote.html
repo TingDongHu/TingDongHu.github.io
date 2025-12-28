@@ -1,0 +1,28 @@
+{{- /* 1. 获取渲染后的 HTML 内容 */ -}}
+{{- $content := .Text | safeHTML -}}
+
+{{- /* 2. 定义正则：在内容中搜索 [!TYPE] 标记 */ -}}
+{{- /* 这个正则会寻找任何位置的 [!NOTE] 等标记 */ -}}
+{{- $typeRegex := `(?i)\[!(NOTE|WARNING|TIP|IMPORTANT|CAUTION|INFO|SUCCESS|ERROR)\]` -}}
+{{- $match := findRE $typeRegex $content 1 -}}
+
+{{- if $match -}}
+    {{- /* 3. 提取具体的类型并转为小写 */ -}}
+    {{- $type := (index $match 0 | replaceRE `(?i)\[!(.*)\]` "$1") | lower -}}
+    
+    {{- /* 4. 清理正文：删掉 [!TYPE] 标记以及它后面可能跟着的冒号或空白 */ -}}
+    {{- $cleanContent := replaceRE `(?i)\[!(NOTE|WARNING|TIP|IMPORTANT|CAUTION|INFO|SUCCESS|ERROR)\][\s:：-]*` "" $content -}}
+    
+    {{- /* 5. 特殊处理：如果你在标记后空了一行，Goldmark 会留下一个空的 <p></p>，我们也把它删掉 */ -}}
+    {{- $cleanContent = replaceRE `^<p>\s*</p>` "" $cleanContent -}}
+
+    {{- /* 6. 渲染成 GitHub 风格的 Alert */ -}}
+    <blockquote class="alert alert-{{ $type }}">
+        {{ $cleanContent | safeHTML }}
+    </blockquote>
+{{- else -}}
+    {{- /* 7. 普通引用：原样输出 */ -}}
+    <blockquote {{ with .Attributes }}{{ range $k, $v := . }} {{ $k }}="{{ $v }}"{{ end }}{{ end }}>
+        {{ .Text | safeHTML }}
+    </blockquote>
+{{- end -}}

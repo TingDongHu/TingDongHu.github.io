@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】辐射度量学与全局光照 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="辐射度量学为计算机图形学提供物理正确光照计算的基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。" />
+<meta name="keywords" content="图形学,GAMES课程,光线追踪,辐射度量学,物理概念,全局光照">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】辐射度量学与全局光照">
+  <meta property="og:description" content="辐射度量学为计算机图形学提供物理正确光照计算的基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-07T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-07T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="光线追踪">
+    <meta property="article:tag" content="辐射度量学">
+    <meta property="article:tag" content="物理概念">
+    <meta property="article:tag" content="全局光照">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】辐射度量学与全局光照">
+  <meta name="twitter:description" content="辐射度量学为计算机图形学提供物理正确光照计算的基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】辐射度量学与全局光照">
+  <meta itemprop="description" content="辐射度量学为计算机图形学提供物理正确光照计算的基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。">
+  <meta itemprop="datePublished" content="2025-12-07T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-07T00:00:00+08:00">
+  <meta itemprop="wordCount" content="420">
+  <meta itemprop="keywords" content="图形学,GAMES课程,光线追踪,辐射度量学,物理概念,全局光照">
+
+      <header>
+        <h1 itemprop="headline">【Games101】辐射度量学与全局光照</h1>
+        <p class="text-sm">
+          
+            Sunday, Dec 7, 2025
+          
+
+          | <span>2 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Sunday, Dec 7, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e8%be%90%e5%b0%84%e5%ba%a6%e9%87%8f%e5%ad%a6%e4%b8%8e%e5%85%a8%e5%b1%80%e5%85%89%e7%85%a7&amp;url=http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e8%be%90%e5%b0%84%e5%ba%a6%e9%87%8f%e5%ad%a6%e4%b8%8e%e5%85%a8%e5%b1%80%e5%85%89%e7%85%a7%20http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>辐射度量学为计算机图形学提供物理正确的光照计算基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。</p>
+<h2 id="先导">先导</h2>
+
+
+
+  <blockquote>
+    <p>“光到底是什么？”</p>
+
+  </blockquote>
+
+<p>这是为了回答一个你在写 Blinn-Phong 模型代码时可能产生的终极疑问：<strong>“我的光照强度设为 10，但这个 10 到底是什么单位？是 10 个灯泡？还是 10 个太阳？”</strong></p>
+<p>如果没有这套物理系统，Whitted-style 光线追踪的结果永远只是“看起来像”，而不是“物理正确” 。</p>
+<h3 id="为什么要学辐射度量学-radiometry">为什么要学辐射度量学 (Radiometry)？</h3>
+<p>辐射度量学是一套精确测量电磁辐射（包括光）空间属性的系统。它引入了一系列物理量（如辐射通量、强度、辐照度、辐射亮度），让我们能够以物理正确的方式进行光照计算 。</p>
+
+
+
+  <blockquote>
+    <p>在此之前的渲染器就像是在画画，颜色深浅全凭感觉调参数（比如 <code>float intensity = 10.0</code>）。 学完这部分后，你的渲染器将变成一台<strong>照相机</strong>。每一个像素的颜色值，都对应着真实物理世界中打到底片上的能量数值。这是通往<strong>路径追踪 (Path Tracing)</strong> 的必经之路 。</p>
+
+  </blockquote>
+
+<h2 id="基础概念">基础概念</h2>
+<h3 id="能量与通量">能量与通量</h3>
+<p>**辐射能量 (Radiant Energy, $Q$)**定义为：电磁辐射的能量。其单位是焦耳 (Joule, $J$) 。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>说人话：就像水池里蓄的总水量。但在图形学中我们很少直接用它，因为光通常是持续不断的。</p>
+  </blockquote>
+
+<p>**辐射通量 / 功率 (Radiant Flux / Power, $\Phi$)**定义为：单位时间内发射、反射、传输或接收的能量 。其公式表达为：
+</p>
+$$
+\Phi \equiv \frac{dQ}{dt}
+$$<p>
+其单位为：瓦特 (Watt, $W$) 或 流明 (Lumen, $lm$)</p>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>上述两个概念可以通俗理解为：光子流。想象光是水流。能量 ($Q$) 是这一盆水有多少。通量 ($\Phi$) 是水龙头的流速。单位时间流出来的光子越多，这盏灯就越“亮”。比如一个 60W 的灯泡，这个“瓦数”描述的就是它的 Flux（虽然电功率和光功率有转换效率问题，但概念类似）。</p>
+  </blockquote>
+
+<h3 id="立体角-solid-angle">立体角 (Solid Angle，$\Omega$)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209175146602-1765273927742-1.png" 
+       alt="image-20251209175146602" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209175146602
+    </figcaption>
+  
+</figure></p>
+<p>在定义更复杂的物理量之前，我们需要先复习一下几何。因为光线是在三维空间中向四面八方发射的，我们不能只用平面角度。</p>
+<p><strong>平面角度回顾</strong>：弧长除以半径，$\theta = l/r$。圆的总角度是 $2\pi$ 。</p>
+<p><strong>立体角定义</strong>：球面上的面积除以半径的平方。其公式为：
+</p>
+$$
+\Omega = \frac{A}{r^2}
+$$<p>
+其单位为：球面度 (steradian, $sr$)。带入整个球面值计算可以得到：球的表面积是 $4\pi r^2$，所以整个球面的立体角是 $4\pi$ 。</p>
+<p><strong>微分立体角</strong></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209184628604-1765277190381-11.png" 
+       alt="image-20251209184628604" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209184628604
+    </figcaption>
+  
+</figure></p>
+<p>在球坐标系下：$d\omega = \sin\theta d\theta d\phi$ 。这就好比在球面上切了一块极其微小的长方形面积，用来积分光线方向。</p>
+<h3 id="辐射强度-radiant-intensity-">辐射强度 (Radiant Intensity, $I$)</h3>
+<p>这是本节课介绍的第三个核心概念，专门用来描述点光源。</p>
+<p>辐射强度 (Radiant Intensity）定义为：点光源在单位立体角内发射的功率 。其公式：
+</p>
+$$
+I(\omega) \equiv \frac{d\Phi}{d\omega}
+$$<p>
+单位：坎德拉 (Candela, $cd$)，即 $W/sr$ 或 $lm/sr$ 。</p>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>这个概念可以通俗理解为“激光笔” vs “灯泡”。假设你有两个光源，Flux（总功率）都是 10W。灯泡：光线向四面八方散开（$4\pi$），每个方向分到的能量很少，所以不刺眼。激光笔：把这 10W 的能量集中在一个极小的立体角方向发射出去。虽然它们的总能量流速（Flux）一样，但激光笔在那个特定方向上的Intensity（强度） 极高，甚至能亮瞎眼。</p>
+  </blockquote>
+
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209174856711-1765273932361-3.png" 
+       alt="image-20251209174856711" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209174856711
+    </figcaption>
+  
+</figure></p>
+<p><strong>各向同性点光源 (Isotropic Point Source)</strong>：如果一个点光源向所有方向发射的光都是一样的（比如理想的灯泡），则其总通量 可以表示为：
+</p>
+$$
+\Phi = \int I d\omega = I \times 4\pi
+$$<p>
+反之，已知总通量求平均的方向强度则可以表达为：
+</p>
+$$
+I = \frac{\Phi}{4\pi}
+$$<p>
+举个生活的栗子解释一下：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209175312628-1765273995035-5.png" 
+       alt="image-20251209175312628" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209175312628
+    </figcaption>
+  
+</figure></p>
+<p><strong>包装上写着</strong>：Brightness 815 Lumens。这就是 <strong>Flux ($\Phi$)</strong>，表示这灯泡每秒发出的总光能。</p>
+<p><strong>问题</strong>：它的辐射强度 (Intensity) 是多少？</p>
+<p><strong>计算得</strong>：假设它向四面八方均匀发光（各向同性）。球面立体角 = $4\pi \approx 12.57$。强度 $I = 815 / 12.57 \approx 65$ Candelas。</p>
+<h3 id="辐照度-irradiance-">辐照度 (Irradiance, $E$)</h3>
+<p><strong>定义</strong>：单位面积上接收到的辐射通量（功率）。可以用公式表示为：
+</p>
+$$
+E(x) \equiv \frac{d\Phi(x)}{dA}
+$$<p>
+<strong>单位</strong>：$W/m^2$ 或 Lux。</p>
+<p><strong>Lambert&rsquo;s Cosine Law</strong>：接收到的能量与光线入射角的余弦值 ($\cos \theta$) 成正比 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209183729170-1765276651236-7.png" 
+       alt="image-20251209183729170" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209183729170
+    </figcaption>
+  
+</figure></p>
+<p>这里的概念可以通俗的做一个**“太阳能板”类比**，想象你手里拿一块太阳能板（单位面积 $dA$）。<strong>Irradiance</strong> 就是这块板子一共充进去多少电。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209183823947-1765276706141-9.png" 
+       alt="image-20251209183823947" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209183823947
+    </figcaption>
+  
+</figure></p>
+<p><strong>为什么有 Cosine Law？</strong></p>
+<p>如果太阳直射（$\theta=0$），光束垂直打在板子上，接收能量最大。如果板子倾斜了（$\theta$ 变大），同样粗细的一束光，现在要铺在更大的面积上，能量密度就稀释了。这解释了为什么地球有四季：冬天太阳斜射，单位面积接收的热量（Irradiance）变少了 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209185018370-1765277419893-13.png" 
+       alt="image-20251209185018370" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209185018370
+    </figcaption>
+  
+</figure></p>
+<p>光线能量衰减：离灯越远越暗，因为光能量铺在了更大的球面上，Irradiance 随距离平方衰减 ($1/r^2$) 。</p>
+<h3 id="辐射亮度-radiance-">辐射亮度 (Radiance, $L$)</h3>
+<p>辐射亮度 (Radiance, $L$)定义为：单位立体角、单位投影面积 (Projected Unit Area) 上的功率 。可以用公式表示为
+</p>
+$$
+L(p, \omega) \equiv \frac{d^2\Phi(p, \omega)}{d\omega dA \cos \theta}
+$$
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>Radiance 是光线追踪中，光线 (Ray) 身上携带的那个量。渲染算出来的像素颜色，本质上就是 Radiance 。</p>
+  </blockquote>
+
+<p>这个物理概念仍然可以做一个通俗**“细水管”类比**,</p>
+<ul>
+<li><strong>Irradiance</strong> 是整个地面（$dA$）被淋湿的总水量。它不关心水是从哪来的，只关心收到了多少。</li>
+<li><strong>Radiance</strong> 是<strong>某一根特定的细水管</strong>（$d\omega$方向），喷到地面<strong>投影区域</strong>上的水量。</li>
+</ul>
+<p><strong>为什么要除以 $\cos \theta$（投影面积）？</strong></p>
+<ul>
+<li>这就好比你从侧面看电脑屏幕，虽然屏幕实际面积没变，但你看到的“有效面积”变扁了。Radiance 描述的是<strong>你眼里看到的亮度</strong>，所以必须基于你看到的那个“投影面积”来算。</li>
+</ul>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p><strong>一句话总结</strong>：</p>
+<ul>
+<li>光打在物体上，我们要算 <strong>Irradiance</strong>（接收了多少能量）。</li>
+<li>光从物体反射到相机里，我们要算 <strong>Radiance</strong>（看起来有多亮）。</li>
+</ul>
+  </blockquote>
+
+<h2 id="brdf-">BRDF ($f_r$)</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209185434193.png" 
+       alt="image-20251209185434193" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209185434193
+    </figcaption>
+  
+</figure></p>
+<p>BRDF是材质的灵魂，决定了高光、粗糙度、颜色吸收等视觉属性。其全称是：双向反射分布函数 (Bidirectional Reflectance Distribution Function)。定义材质的光学特性，描述<strong>入射光如何被表面反射为出射光</strong>。即：入射的微分 Irradiance ($dE$) 转化为了多少出射的微分 Radiance ($dL_r$) 。可以用公式表述为：
+</p>
+$$
+f_r(\omega_i \to \omega_r) = \frac{dL_r(\omega_r)}{L_i(\omega_i) \cos \theta_i d\omega_i}
+$$
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>BRDF 是光线与表面碰撞时的“反弹规则”。</p>
+<ul>
+<li>光线打到物体上，就像一把球扔到地上。BRDF 就是地面的<strong>反弹规则</strong>。</li>
+<li><strong>镜面 (Mirror)</strong>：球扔下来，BRDF 规定它们必须整整齐齐地向一个方向弹走。</li>
+<li><strong>漫反射 (Diffuse)</strong>：球扔下来，BRDF 规定它们要向四面八方随机乱弹。</li>
+<li><strong>深色物体</strong>：BRDF 规定“这一把球扔下来，我吃掉 90%，只弹走 10%”。</li>
+</ul>
+  </blockquote>
+
+<h2 id="渲染方程-the-rendering-equation">渲染方程 (The Rendering Equation)</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209185621370-1765277782647-15.png" 
+       alt="image-20251209185621370" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209185621370
+    </figcaption>
+  
+</figure></p>
+<p>基于以上提到的概念，整个光线的轨迹就可以得到一个的终极方程：
+</p>
+$$
+L_o(p, \omega_o) = L_e(p, \omega_o) + \int_{\Omega+} L_i(p, \omega_i) f_r(p, \omega_i, \omega_o) (n \cdot \omega_i) d\omega_i
+$$<ul>
+<li>
+<p><strong>$L_o$ (出射光)</strong>：我想算的像素颜色。</p>
+</li>
+<li>
+<p><strong>$L_e$ (自发光)</strong>：如果物体自己发光（比如灯泡），这一项不为0 。</p>
+</li>
+<li>
+<p><strong>$\int_{\Omega+}$ (积分)</strong>：我们需要把半球面上<strong>所有</strong>四面八方来的光都加起来。</p>
+</li>
+<li>
+<p><strong>$L_i$ (入射光)</strong>：从某个方向飞来的光。</p>
+</li>
+<li>
+<p><strong>$f_r$ (BRDF)</strong>：材质决定反射多少。</p>
+</li>
+<li>
+<p><strong>$n \cdot \omega_i$ (Cosine项)</strong>：就是 $\cos \theta$，接收能量的衰减 。</p>
+</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209190050720-1765278052183-17.png" 
+       alt="image-20251209190050720" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209190050720
+    </figcaption>
+  
+</figure></p>
+<p>渲染方程描述的计算步骤是：</p>
+<ol>
+<li>
+<p>先看我自己发不发光？（$L_e$）</p>
+</li>
+<li>
+<p>如果不发光，通过 BRDF 收集周围的光。</p>
+</li>
+</ol>
+<p><strong>麻烦来了（递归求解）</strong>：</p>
+<ul>
+<li>我想知道点 A 的颜色，必须知道点 B 射给 A 的光 ($L_i$)。</li>
+<li>但点 B 射出的光，又是点 B 的反射光 ($L_o$)。</li>
+<li>点 B 的反射光，又取决于点 C 射给 B 的光&hellip; <strong>这意味着光线在场景里无限反弹！</strong></li>
+</ul>
+<h2 id="全局光照-global-illumination">全局光照 (Global Illumination)</h2>
+<p>现在用数学级数来理解光线的反弹，把渲染方程简写为线性算子形式：
+</p>
+$$
+L = E + KL
+$$<p>
+通过二项式定理展开，可以得到级数：
+</p>
+$$
+L = E + KE + K^2E + K^3E + ...
+$$<p>
+这是一场**“光的接力赛”**</p>
+<ul>
+<li>
+<p>$E$：光源本身（你是灯泡，你直接亮）。</p>
+<p>$KE$ (Direct Illumination)：光 $\to$ 物体 $\to$ 眼睛。这是传统光栅化做的（直接光照）。</p>
+</li>
+<li>
+<p><strong>$K^2E$ (Indirect, 1-bounce)</strong>：光 $\to$ 墙 $\to$ 物体 $\to$ 眼睛。比如红墙把旁边的白球映红了（Color Bleeding）。</p>
+</li>
+<li>
+<p>$K^nE$：光弹了 n 次才进眼睛。</p>
+</li>
+</ul>
+<p>全局光照 (GI)：就是要把这无穷无尽的项都加起来！光线追踪之所以拟真能力非常强，就是因为它在尝试计算这些后面复杂的项 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA/image-20251209191054266-1765278656219-19.png" 
+       alt="image-20251209191054266" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251209191054266
+    </figcaption>
+  
+</figure></p>
+<p>如上图所示，在计算初次光线反射时，仅包含光源的直接照射，因此建筑天花板及墙面背光侧因无光照而完全暗沉，缺乏细节。而当计算中引入第一次光线折射后，光线得以在场景中反弹，间接照亮了原本不可见的区域，使天花板及背光墙面开始显现结构细节。</p>
+<p>门中部的玻璃灯具效果则更为复杂，其透射光的显现需计算至第四次折射时才被捕捉。这是由于从太阳发出的光线需先穿过透明灯体，经折射后抵达相机，完整路径至少涉及两次透射过程。</p>
+<p>进一步观察可发现，当折射计算从第八次增加至第十六次时，画面差异已非常细微，肉眼难以直接察觉，表明结果已趋于收敛。值得注意的是，多次折射并未导致画面整体亮度异常增加——因为每帧计算中光线初始能量固定，每次反射或折射均伴随能量衰减，后续折射对最终画面的贡献已逐渐减弱，不会产生类似相机长曝光般的过曝现象。</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

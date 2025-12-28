@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SRGB on 古月月仔的博客</title>
+    <link>http://localhost:1313/tags/srgb/</link>
+    <description>Recent content in SRGB on 古月月仔的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 18 Dec 2025 00:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/srgb/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>【Games101】颜色与感知(Color and Perception)</title>
+      <link>http://localhost:1313/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/</link>
+      <pubDate>Thu, 18 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/</guid>
+      <description>&lt;p&gt;颜色是光线与感光系统互动的结果。人眼通过三种视锥细胞将连续光谱转换为三个神经信号，这解释了为何三原色能模拟色彩，并产生了同色异谱现象。&lt;/p&gt;&#xA;&lt;h2 id=&#34;光谱分布-spd&#34;&gt;光谱分布 (SPD)&lt;/h2&gt;&#xA;&lt;p&gt;颜色并不是物体自带的属性，而是光线与感光系统互动的产物 。&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/image-20251218213216865.png&#34; &#xA;       alt=&#34;image-20251218213216865&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251218213216865&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;可见光谱 (Visible Spectrum)&lt;/strong&gt;：电磁波中波长在 &lt;strong&gt;400nm - 700nm&lt;/strong&gt; 之间的部分 。一般在游戏、影视渲染中，也只需要渲染这部分的波长的光线即可。&lt;/p&gt;&#xA;&lt;p&gt;**光谱功率分布 (SPD)：**衡量光的基础属性，描述了光在每一个波长（$\lambda$）上携带了多少能量 。&lt;/p&gt;&#xA;&#xA;&#xA;&#xA;  &lt;blockquote class=&#34;dream-alert tip&#34;&gt;&#xA;    &lt;p class=&#34;heading&#34;&gt;&#xA;      &lt;ion-icon name=&#34;bulb-outline&#34;&gt;&lt;/ion-icon&gt;Tip&lt;/p&gt;&#xA;    &lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/image-20251218213408973.png&#34; &#xA;       alt=&#34;image-20251218213408973&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251218213408973&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&lt;p&gt;SPD 就像是光的“成分配方表”。日光的配方比较均匀，而白炽灯的配方里“长波（红色）”比例更高 。&lt;/p&gt;&#xA;  &lt;/blockquote&gt;&#xA;&#xA;&lt;p&gt;&lt;strong&gt;光线还具有线性性质&lt;/strong&gt;：光的能量是线性叠加的。两束光合在一起，它们的 SPD 直接相加 。&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E9%A2%9C%E8%89%B2%E4%B8%8E%E6%84%9F%E7%9F%A5color-and-perception/image-20251218213458997.png&#34; &#xA;       alt=&#34;image-20251218213458997&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251218213458997&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

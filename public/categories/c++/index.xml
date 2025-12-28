@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43; on 古月月仔的博客</title>
+    <link>http://localhost:1313/categories/c&#43;&#43;/</link>
+    <description>Recent content in C&#43;&#43; on 古月月仔的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 01 May 2025 00:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/c++/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>【C&#43;&#43;】C&#43;&#43;中的设计模式</title>
+      <link>http://localhost:1313/posts/c&#43;&#43;c&#43;&#43;%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</link>
+      <pubDate>Thu, 01 May 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/c&#43;&#43;c&#43;&#43;%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</guid>
+      <description>&lt;p&gt;设计模式是针对软件设计中反复出现问题的通用解决方案，其核心在于提升代码复用性，避免重复劳动。&lt;/p&gt;&#xA;&lt;h2 id=&#34;什么是设计模式&#34;&gt;什么是设计模式&lt;/h2&gt;&#xA;&lt;p&gt;引用**克里斯托弗·亚历山大（Christopher Alexander）**在1977年的著作《&lt;strong&gt;A Pattern Language: Towns, Buildings, Construction&lt;/strong&gt;》中提出了关于设计模式的经典定义。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;英文原版&lt;/strong&gt;：&lt;/p&gt;&#xA;&#xA;&#xA;&#xA;  &lt;blockquote&gt;&#xA;    &lt;p&gt;&lt;em&gt;&amp;ldquo;Each pattern describes a problem which occurs over and over again in our environment, and then describes the core of the solution to that problem, in such a way that you can use this solution a million times over, without ever doing it the same way twice.&amp;rdquo;&lt;/em&gt;&#xA;— Christopher Alexander, &lt;em&gt;A Pattern Language&lt;/em&gt;, 1977&lt;/p&gt;&#xA;&#xA;  &lt;/blockquote&gt;&#xA;&#xA;&lt;p&gt;&lt;strong&gt;中文翻译&lt;/strong&gt;：&lt;/p&gt;&#xA;&#xA;&#xA;&#xA;  &lt;blockquote&gt;&#xA;    &lt;p&gt;“每一个模式描述了一个在我们环境中反复出现的问题，并描述了该问题解决方案的核心。通过这种方式，你可以无数次地使用该解决方案，而无需以相同的方式重复两次。”&lt;/p&gt;&#xA;&#xA;  &lt;/blockquote&gt;&#xA;&#xA;&lt;p&gt;说人话就是:&lt;code&gt;不需要重复造轮子&lt;/code&gt;&lt;/p&gt;&#xA;&lt;p&gt;推荐一本历史性著作《设计模式:可复用面相对象软件的基础》&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/c&amp;#43;&amp;#43;c&amp;#43;&amp;#43;%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E3%80%90c&amp;#43;&amp;#43;%E3%80%91c&amp;#43;&amp;#43;%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%AD%E6%96%87%E7%89%88%E5%B0%81%E9%9D%A2.jpg&#34; &#xA;       alt=&#34;undefined&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      undefined&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

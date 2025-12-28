@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="" />
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="古月月仔的博客">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="古月月仔的博客">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+     
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+
+
+
+
+<div class="dream-grid opacity-0">
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/%E5%8D%9A%E5%AE%A2%E9%AD%94%E6%94%B9hexo%E6%B7%BB%E5%8A%A0-github-alerts-%E6%94%AF%E6%8C%81/">
+  
+  <figure>
+    
+    <img src="/img/BlogMakeover.png" alt="【博客魔改】Hexo添加 Github alerts 支持" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【博客魔改】Hexo添加 Github alerts 支持</h2>
+
+    <p class="date text-base-content/60">
+    
+      Wednesday, Dec 3, 2025
+    
+    </p>
+
+    在Hexo博客中，通过更换Markdown渲染器为markdown-it并添加自定义解析脚本，即可便捷地使用类似[!NOTE]的语法创建GitHub风格的Alerts提示框。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/c&#43;&#43;%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">
+  
+  <figure>
+    
+    <img src="/img/cpp.png" alt="【C&#43;&#43;】变量的作用域与内存管理" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【C&#43;&#43;】变量的作用域与内存管理</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Dec 2, 2025
+    
+    </p>
+
+    C&#43;&#43;内存管理涵盖栈、堆和全局/静态存储区。栈内存自动管理，用于局部变量；堆内存需手动分配释放，适合动态对象；全局/静态区存放全局和静态变量。对象生命周期因存储区而异，栈对象随作用域结束销毁，静态对象持续至程序结束，堆对象由程序员控制。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>2 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/c&#43;&#43;%E5%A4%8D%E6%95%B0%E7%B1%BB%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB/">
+  
+  <figure>
+    
+    <img src="/img/cpp.png" alt="【C&#43;&#43;】复数类与字符串类" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【C&#43;&#43;】复数类与字符串类</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Dec 2, 2025
+    
+    </p>
+
+    本文以Complex类为例，讲解了C&#43;&#43;程序的基本结构，包括头文件与实现文件的分离、防御性声明、命名空间的使用、inline函数的定义方式以及访问级别关键字的作用。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>4 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/c&#43;&#43;%E7%BB%84%E5%90%88%E7%BB%A7%E6%89%BF%E5%92%8C%E5%A4%9A%E6%80%81/">
+  
+  <figure>
+    
+    <img src="/img/cpp.png" alt="【C&#43;&#43;】组合、继承和多态" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【C&#43;&#43;】组合、继承和多态</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Dec 2, 2025
+    
+    </p>
+
+    请提供需要撰写摘要的文章内容。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>0 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/">
+  
+  <figure>
+    
+    <img src="/img/ArtificialIntelligence.png" alt="【ComfyUI】批量生成自动化" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【ComfyUI】批量生成自动化</h2>
+
+    <p class="date text-base-content/60">
+    
+      Monday, Dec 1, 2025
+    
+    </p>
+
+    为解决YOLO项目数据不足问题，作者通过ComfyUI导出工作流API并编写Python脚本，实现了本地批量图片的自动化增强，高效生成了一一对应的训练图像数据。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BBviewdiff%E5%9F%BA%E4%BA%8E%E6%96%87%E7%94%9F%E5%9B%BE%E6%A8%A1%E5%9E%8B%E7%9A%843d%E4%B8%80%E8%87%B4%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90%E6%8A%80%E6%9C%AF/">
+  
+  <figure>
+    
+    <img src="/img/ArtificialIntelligence.png" alt="【论文阅读】ViewDiff：基于文生图模型的3D一致图像生成技术" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【论文阅读】ViewDiff：基于文生图模型的3D一致图像生成技术</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Nov 4, 2025
+    
+    </p>
+
+    ViewDiff利用预训练文生图扩散模型生成高质量、多视角一致的3D图像，解决了现有方法在真实感和视角一致性上的不足。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/aigc%E7%94%9F%E5%9B%BE%E6%A8%A1%E5%9E%8B%E6%A6%82%E5%BF%B5%E6%A8%A1%E5%9D%97%E5%AE%97%E8%BF%B0/">
+  
+  <figure>
+    
+    <img src="/img/ArtificialIntelligence.png" alt="【AIGC】生图模型概念&amp;模块宗述" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【AIGC】生图模型概念&amp;模块宗述</h2>
+
+    <p class="date text-base-content/60">
+    
+      Wednesday, Oct 22, 2025
+    
+    </p>
+
+    生成式AI视觉内容技术从早期算法、VAE/GAN演进至当前主流的扩散模型，正向更高分辨率、更丰富内容与更强可控性发展。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>1 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/llm%E6%8A%80%E6%9C%AFn8n%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%8E%A5%E5%85%A5notion%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E5%85%B7/">
+  
+  <figure>
+    
+    <img src="/img/ArtificialIntelligence.png" alt="【LLM技术】N8N搭建一个接入Notion的自动化工具" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【LLM技术】N8N搭建一个接入Notion的自动化工具</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Sep 30, 2025
+    
+    </p>
+
+    Notion API上传小文件的官方文档和视频教程链接，用于将文件附加到数据库页面。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>1 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/llm%E6%8A%80%E6%9C%AFtransformer%E6%9E%B6%E6%9E%84%E5%AE%97%E8%BF%B0/">
+  
+  <figure>
+    
+    <img src="/img/ArtificialIntelligence.png" alt="【LLM技术】Transformer架构宗述" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【LLM技术】Transformer架构宗述</h2>
+
+    <p class="date text-base-content/60">
+    
+      Tuesday, Sep 30, 2025
+    
+    </p>
+
+    NLP技术从传统统计方法演进至神经网络，Transformer凭借自注意力机制实现突破，成为里程碑，并催生了BERT、GPT等变革性模型。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>3 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+      <a class="card bg-base-100 hover:bg-base-content/10 shadow-xl cursor-pointer dark:border dark:border-base-content/30" href="/posts/llm%E6%8A%80%E6%9C%AFmcp%E6%98%AF%E4%BB%80%E4%B9%88%E5%AE%97%E8%BF%B0%E5%92%8C%E6%A6%82%E5%BF%B5%E6%A2%B3%E7%90%86/">
+  
+  <figure>
+    
+    <img src="/img/ArtificialIntelligence.png" alt="【LLM技术】MCP是什么？宗述和概念梳理" />
+    
+  </figure>
+  
+
+  <div class="card-body">
+    <h2 class="card-title">【LLM技术】MCP是什么？宗述和概念梳理</h2>
+
+    <p class="date text-base-content/60">
+    
+      Monday, Sep 15, 2025
+    
+    </p>
+
+    MCP是一种标准化协议，为大型语言模型提供安全可控的接口，使其能可靠访问外部工具和数据源。它基于客户端-服务器架构，通过标准化交互提升AI系统的集成能力与可靠性。
+
+    
+    <div class="card-actions justify-between items-center mt-4">
+      
+        <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+      
+
+      <div class="flex items-center">
+        <ion-icon name="time" class="mr-1"></ion-icon>
+        <span>2 minute read</span>
+      </div>
+    </div>
+  </div>
+</a>
+
+    </div>
+  
+</div>
+
+
+
+<div class="flex justify-center mt-8">
+  <div class="join grid grid-cols-2">
+  
+  <a href="/" title=Previous&#32;page class="join-item btn btn-outline btn-sm">
+    Previous page
+  </a>
+  
+  
+  <a href="/page/3/" title="Next page" class="join-item btn btn-outline btn-sm">
+    Next page
+  </a>
+  
+</div>
+
+</div>
+
+
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+    
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

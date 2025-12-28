@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【ComfyUI】批量生成自动化 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="为解决YOLO项目数据不足问题，作者通过ComfyUI导出工作流API并编写Python脚本，实现了本地批量图片的自动化增强，高效生成了一一对应的训练图像数据。" />
+<meta name="keywords" content="Diffusion,AIGC,AI绘画,Python,ComfyUI,AP">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【ComfyUI】批量生成自动化">
+  <meta property="og:description" content="为解决YOLO项目数据不足问题，作者通过ComfyUI导出工作流API并编写Python脚本，实现了本地批量图片的自动化增强，高效生成了一一对应的训练图像数据。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-01T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-01T00:00:00+08:00">
+    <meta property="article:tag" content="Diffusion">
+    <meta property="article:tag" content="AIGC">
+    <meta property="article:tag" content="AI绘画">
+    <meta property="article:tag" content="Python">
+    <meta property="article:tag" content="ComfyUI">
+    <meta property="article:tag" content="AP">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【ComfyUI】批量生成自动化">
+  <meta name="twitter:description" content="为解决YOLO项目数据不足问题，作者通过ComfyUI导出工作流API并编写Python脚本，实现了本地批量图片的自动化增强，高效生成了一一对应的训练图像数据。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【ComfyUI】批量生成自动化">
+  <meta itemprop="description" content="为解决YOLO项目数据不足问题，作者通过ComfyUI导出工作流API并编写Python脚本，实现了本地批量图片的自动化增强，高效生成了一一对应的训练图像数据。">
+  <meta itemprop="datePublished" content="2025-12-01T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-01T00:00:00+08:00">
+  <meta itemprop="wordCount" content="432">
+  <meta itemprop="keywords" content="Diffusion,AIGC,AI绘画,Python,ComfyUI,AP">
+
+      <header>
+        <h1 itemprop="headline">【ComfyUI】批量生成自动化</h1>
+        <p class="text-sm">
+          
+            Monday, Dec 1, 2025
+          
+
+          | <span>3 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Monday, Dec 1, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90ComfyUI%e3%80%91%e6%89%b9%e9%87%8f%e7%94%9f%e6%88%90%e8%87%aa%e5%8a%a8%e5%8c%96&amp;url=http://localhost:1313/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90ComfyUI%e3%80%91%e6%89%b9%e9%87%8f%e7%94%9f%e6%88%90%e8%87%aa%e5%8a%a8%e5%8c%96%20http://localhost:1313/posts/comfyuii2i%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>作者针对YOLO项目数据不足的问题，利用ComfyUI进行数据增强。由于官方批量功能不适用，他通过导出工作流API并编写Python脚本，实现了本地批量图片的自动化处理，高效生成训练所需的一对一对应图像数据。</p>
+<p>之前玩一个yolo项目的时候碰上了数据不足训练结果很差的问题，刚好现在AI生图这么发达，而自己之前有摸索过一点使用ComfyUI生图的工作流，索性开始用ComfyUI开始造数据。ComfyUI本身是支持多批次生成功能的。设置次数后可以反复运行该工作流，但是官方提供的这个更多是面向同一提示词、不同随机种子抽卡情况的。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/c/users/hu/appdata/roaming/typora/typora-user-images/image-20251201204323062.png" 
+       alt="image-20251201204323062" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251201204323062
+    </figcaption>
+  
+</figure></p>
+<p>我造数据需要的工况则是：</p>
+
+
+
+  <blockquote>
+    <p>N张图片经过工作流处理生成N张图片,每对图片一一对应</p>
+
+  </blockquote>
+
+<p>显然和官方提供的方法不太匹配，中间也找了几篇博客，有的是提供了批量加载图片节点，配合工作流的一个循环（LoopStart和LoopEnd）去实现的，个人尝试了一下发现其限制很大，每次限制加载100张，而且循环的逻辑很难用，还会出现重复加载的问题，只能算是面向非程序人员的解决方案了。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="https://uinodes.com/_next/image?url=%2Fimg%2Fplugins%2FComfyUI-Easy-Use%2Fcompressed%2FLGQn8E9iXbgQMmp3dnQx5Y.webp&amp;w=3840&amp;q=75" 
+       alt="Load Images For Loop文章图片" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      Load Images For Loop文章图片
+    </figcaption>
+  
+</figure></p>
+<p>还有些方法就是使用第三方的平台或者插件等调用API，该方法的解决问题是很不错的。这里留一个链接方便以后查找<a href="https://doc.51easyai.com/getting-started/quickstart" target="_blank">快速开始 - EasyAI在线文档</a>
+。但是感觉我就很简单一个需求，完全没必要用这么复杂的东西，索性自己配合GPT整理了一个脚本，用于本地的Image2Image的工作流批量运行.</p>
+<h3 id="comfyui导出工作流为api">ComfyUI导出工作流为API</h3>
+<p>要注意在保存导出为API之前，工作流中的预览图片节点要尽量去除，节省算力，同时要保证该工作流是确实可用的，可以运行出图的。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/c/users/hu/appdata/roaming/typora/typora-user-images/image-20251201210839690.png" 
+       alt="image-20251201210839690" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251201210839690
+    </figcaption>
+  
+</figure></p>
+<p>导出后可以得到一个.json后缀的文件，就是可以用于python脚本中API调用的文件了。</p>
+<h3 id="配置脚本运行">配置脚本运行</h3>
+<p>脚本如下，其本质上是一个&quot;ComfyUI远程控制器&quot;，省去了自己一个一个配置参数的麻烦。</p>
+<p>使用的时候只需要程序头部的输入输出路径进行配置，把导出的comfyUI工作流配置好即可，程序就可以自动的对输入路径的全部照片进行处理，如果你的显存足够大，觉得同时跑多批次也没问题，那推荐再开一个多线程加载。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">ComfyUI 极简批量图片处理脚本
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">将工作流JSON和所有配置参数集中在代码头部，开箱即用
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> glob
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pathlib <span style="color:#f92672">import</span> Path
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ===================== 用户配置区域 =====================</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 注意：所有路径建议使用原始字符串（前面加r）避免转义问题</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 输入输出设置</span>
+</span></span><span style="display:flex;"><span>INPUT_FOLDER <span style="color:#f92672">=</span> <span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;D:\CutRes\buzzer&#34;</span>       <span style="color:#75715e"># 输入图片文件夹路径</span>
+</span></span><span style="display:flex;"><span>OUTPUT_FOLDER <span style="color:#f92672">=</span> <span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;D:\inCutRes\buzzer&#34;</span>    <span style="color:#75715e"># 输出文件夹路径</span>
+</span></span><span style="display:flex;"><span>WORKFLOW_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;api_workflow.json&#34;</span>      <span style="color:#75715e"># ComfyUI导出的工作流JSON文件</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. ComfyUI服务器设置</span>
+</span></span><span style="display:flex;"><span>COMFYUI_SERVER <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://127.0.0.1:8188&#34;</span> <span style="color:#75715e"># ComfyUI服务器地址</span>
+</span></span><span style="display:flex;"><span>TIMEOUT <span style="color:#f92672">=</span> <span style="color:#ae81ff">60</span>                             <span style="color:#75715e"># 单张图片最大处理等待时间(秒)</span>
+</span></span><span style="display:flex;"><span>RETRY_TIMES <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>                          <span style="color:#75715e"># 失败重试次数</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 图片处理设置</span>
+</span></span><span style="display:flex;"><span>IMAGE_EXTENSIONS <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#39;.png&#39;</span>, <span style="color:#e6db74">&#39;.jpg&#39;</span>, <span style="color:#e6db74">&#39;.jpeg&#39;</span>, <span style="color:#e6db74">&#39;.webp&#39;</span>)  <span style="color:#75715e"># 支持的图片格式</span>
+</span></span><span style="display:flex;"><span>OVERWRITE_EXISTING <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>               <span style="color:#75715e"># 是否覆盖已存在的输出文件</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 动态参数设置 (根据你的工作流节点参数调整)</span>
+</span></span><span style="display:flex;"><span>CUSTOM_PARAMETERS <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 示例参数（根据你的工作流实际参数名修改）：</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># &#34;denoise&#34;: 0.7,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># &#34;steps&#34;: 20,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># &#34;cfg_scale&#34;: 7.5,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># &#34;seed&#34;: -1,</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ===================== 主程序 =====================</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 初始化检查</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;ComfyUI 批量图片处理器&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;输入目录: </span><span style="color:#e6db74">{</span>INPUT_FOLDER<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;输出目录: </span><span style="color:#e6db74">{</span>OUTPUT_FOLDER<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 检查文件夹是否存在</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isdir(INPUT_FOLDER):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;错误：输入文件夹不存在 </span><span style="color:#e6db74">{</span>INPUT_FOLDER<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 确保输出文件夹存在</span>
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>makedirs(OUTPUT_FOLDER, exist_ok<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 加载工作流</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(WORKFLOW_FILE, <span style="color:#e6db74">&#39;r&#39;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            workflow <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>load(f)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;✅ 成功加载工作流文件: </span><span style="color:#e6db74">{</span>WORKFLOW_FILE<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 加载工作流文件失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 获取图片列表</span>
+</span></span><span style="display:flex;"><span>    image_files <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        f <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> glob<span style="color:#f92672">.</span>glob(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(INPUT_FOLDER, <span style="color:#e6db74">&#34;*.*&#34;</span>)) 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> f<span style="color:#f92672">.</span>lower()<span style="color:#f92672">.</span>endswith(IMAGE_EXTENSIONS)
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> image_files:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;⚠️ 没有找到支持的图片文件（扩展名: </span><span style="color:#e6db74">{</span>IMAGE_EXTENSIONS<span style="color:#e6db74">}</span><span style="color:#e6db74">）&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;找到 </span><span style="color:#e6db74">{</span>len(image_files)<span style="color:#e6db74">}</span><span style="color:#e6db74"> 张待处理图片&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 处理每张图片</span>
+</span></span><span style="display:flex;"><span>    success_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i, img_path <span style="color:#f92672">in</span> enumerate(image_files, <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>        img_name <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(img_path)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>len(image_files)<span style="color:#e6db74">}</span><span style="color:#e6db74">] 正在处理: </span><span style="color:#e6db74">{</span>img_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 检查输出是否已存在</span>
+</span></span><span style="display:flex;"><span>        output_exists <span style="color:#f92672">=</span> any(glob<span style="color:#f92672">.</span>glob(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(OUTPUT_FOLDER, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;*</span><span style="color:#e6db74">{</span>os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>splitext(img_name)[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">*&#34;</span>)))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> output_exists <span style="color:#f92672">and</span> <span style="color:#f92672">not</span> OVERWRITE_EXISTING:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;⏩ 跳过（输出文件已存在）&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 带重试机制的图片处理</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> attempt <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, RETRY_TIMES <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 上传图片</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">with</span> open(img_path, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>                    files <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;image&#39;</span>: (img_name, f, <span style="color:#e6db74">&#39;image/png&#39;</span>)}
+</span></span><span style="display:flex;"><span>                    upload_response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>COMFYUI_SERVER<span style="color:#e6db74">}</span><span style="color:#e6db74">/upload/image&#34;</span>, 
+</span></span><span style="display:flex;"><span>                        files<span style="color:#f92672">=</span>files,
+</span></span><span style="display:flex;"><span>                        timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                    )
+</span></span><span style="display:flex;"><span>                    upload_response<span style="color:#f92672">.</span>raise_for_status()
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 准备工作流</span>
+</span></span><span style="display:flex;"><span>                current_workflow <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(json<span style="color:#f92672">.</span>dumps(workflow))  <span style="color:#75715e"># 深拷贝</span>
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 替换图片文件名</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> node_id, node <span style="color:#f92672">in</span> current_workflow<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> node<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;class_type&#34;</span>) <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;LoadImage&#34;</span>:
+</span></span><span style="display:flex;"><span>                        current_workflow[node_id][<span style="color:#e6db74">&#34;inputs&#34;</span>][<span style="color:#e6db74">&#34;image&#34;</span>] <span style="color:#f92672">=</span> img_name
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 替换自定义参数</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> param_name, param_value <span style="color:#f92672">in</span> CUSTOM_PARAMETERS<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> node_id, node <span style="color:#f92672">in</span> current_workflow<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> param_name <span style="color:#f92672">in</span> node<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;inputs&#34;</span>, {}):
+</span></span><span style="display:flex;"><span>                            current_workflow[node_id][<span style="color:#e6db74">&#34;inputs&#34;</span>][param_name] <span style="color:#f92672">=</span> param_value
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 提交任务</span>
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>COMFYUI_SERVER<span style="color:#e6db74">}</span><span style="color:#e6db74">/prompt&#34;</span>, 
+</span></span><span style="display:flex;"><span>                    json<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;prompt&#34;</span>: current_workflow},
+</span></span><span style="display:flex;"><span>                    timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                )
+</span></span><span style="display:flex;"><span>                response<span style="color:#f92672">.</span>raise_for_status()
+</span></span><span style="display:flex;"><span>                prompt_id <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>json()[<span style="color:#e6db74">&#34;prompt_id&#34;</span>]
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 等待处理完成</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> wait_time <span style="color:#f92672">in</span> range(TIMEOUT):
+</span></span><span style="display:flex;"><span>                    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>                    
+</span></span><span style="display:flex;"><span>                    history <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>COMFYUI_SERVER<span style="color:#e6db74">}</span><span style="color:#e6db74">/history/</span><span style="color:#e6db74">{</span>prompt_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>,
+</span></span><span style="display:flex;"><span>                        timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                    )<span style="color:#f92672">.</span>json()
+</span></span><span style="display:flex;"><span>                    
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> prompt_id <span style="color:#f92672">in</span> history:
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e"># 保存输出图片</span>
+</span></span><span style="display:flex;"><span>                        outputs <span style="color:#f92672">=</span> history[prompt_id]<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;outputs&#34;</span>, {})
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">for</span> node_output <span style="color:#f92672">in</span> outputs<span style="color:#f92672">.</span>values():
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;images&#34;</span> <span style="color:#f92672">in</span> node_output:
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">for</span> img <span style="color:#f92672">in</span> node_output[<span style="color:#e6db74">&#34;images&#34;</span>]:
+</span></span><span style="display:flex;"><span>                                    output_filename <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>splitext(img_name)[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">_</span><span style="color:#e6db74">{</span>img[<span style="color:#e6db74">&#39;filename&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>                                    output_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(OUTPUT_FOLDER, output_filename)
+</span></span><span style="display:flex;"><span>                                    
+</span></span><span style="display:flex;"><span>                                    image_data <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(
+</span></span><span style="display:flex;"><span>                                        <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>COMFYUI_SERVER<span style="color:#e6db74">}</span><span style="color:#e6db74">/view&#34;</span>,
+</span></span><span style="display:flex;"><span>                                        params<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">&#34;filename&#34;</span>: img[<span style="color:#e6db74">&#34;filename&#34;</span>],
+</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">&#34;subfolder&#34;</span>: img<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;subfolder&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>),
+</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">&#34;type&#34;</span>: img<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;type&#34;</span>, <span style="color:#e6db74">&#34;output&#34;</span>)
+</span></span><span style="display:flex;"><span>                                        },
+</span></span><span style="display:flex;"><span>                                        timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                                    )<span style="color:#f92672">.</span>content
+</span></span><span style="display:flex;"><span>                                    
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">with</span> open(output_path, <span style="color:#e6db74">&#34;wb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>                                        f<span style="color:#f92672">.</span>write(image_data)
+</span></span><span style="display:flex;"><span>                                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;✅ 保存: </span><span style="color:#e6db74">{</span>output_filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                        
+</span></span><span style="display:flex;"><span>                        success_count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;⚠️ 处理超时（</span><span style="color:#e6db74">{</span>TIMEOUT<span style="color:#e6db74">}</span><span style="color:#e6db74">秒）&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>  <span style="color:#75715e"># 处理成功，跳出重试循环</span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;⚠️ 尝试 </span><span style="color:#e6db74">{</span>attempt<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>RETRY_TIMES<span style="color:#e6db74">}</span><span style="color:#e6db74"> 失败: </span><span style="color:#e6db74">{</span>str(e)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> attempt <span style="color:#f92672">==</span> RETRY_TIMES:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 放弃处理: </span><span style="color:#e6db74">{</span>img_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 打印摘要</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;处理完成！成功 </span><span style="color:#e6db74">{</span>success_count<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>len(image_files)<span style="color:#e6db74">}</span><span style="color:#e6db74"> 张图片&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;输出目录: </span><span style="color:#e6db74">{</span>OUTPUT_FOLDER<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div>
+
+
+  <blockquote class="dream-alert important">
+    <p class="heading">
+      <ion-icon name="sparkles-outline"></ion-icon>Important</p>
+    <p>要注意使用的时候需要确保：</p>
+<ul>
+<li>
+<p>ComfyUI正在运行且可访问，因为该进程将直接作为服务端</p>
+</li>
+<li>
+<p>地址端口正确（默认127.0.0.1:8188）</p>
+</li>
+<li>
+<p>没有其他任务在排队</p>
+</li>
+</ul>
+  </blockquote>
+
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/c/users/hu/appdata/roaming/typora/typora-user-images/image-20251201210952597.png" 
+       alt="image-20251201210952597" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251201210952597
+    </figcaption>
+  
+</figure></p>
+<p>如此就可以交给该脚本线性的处理我配置文件夹中所有的图片且不会出现加载重复的问题了，而我本人就可以安心睡大觉去了!</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

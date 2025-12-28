@@ -1,0 +1,18 @@
+/* 针对文章正文中的所有图片进行居中处理 */
+.post-content img, 
+.dream-single-aside img,
+article img {
+    display: block;
+    margin: 0 auto !important; /* 水平居中 */
+    max-width: 100%;           /* 防止溢出 */
+    height: auto;
+}
+
+/* 如果有图片描述 (alt 文字)，也让它居中 */
+.post-content figcaption,
+article figcaption {
+    text-align: center;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 8px;
+}

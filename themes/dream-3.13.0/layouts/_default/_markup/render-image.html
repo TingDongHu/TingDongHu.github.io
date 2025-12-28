@@ -1,0 +1,22 @@
+{{- $dest := .Destination -}}
+{{- $isRelative := not (or (hasPrefix $dest "http") (hasPrefix $dest "/")) -}}
+
+{{- if $isRelative -}}
+  {{- $parentDir := path.Dir .Page.File.Path -}}
+  {{- $dest = printf "/%s/%s" $parentDir .Destination | urlize | absURL -}}
+{{- end -}}
+
+<figure style="text-align: center; margin: 1.5rem auto;">
+  {{/* 注意：移除了外层的 <a> 标签，因为 Medium Zoom 不需要链接跳转 */}}
+  <img src="{{ $dest }}" 
+       alt="{{ .Text }}" 
+       {{ with .Title }} title="{{ . }}" {{ end }}
+       class="zoomable" {{/* 添加这个类名 */}}
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  {{ with .Text }}
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      {{ . }}
+    </figcaption>
+  {{ end }}
+</figure>

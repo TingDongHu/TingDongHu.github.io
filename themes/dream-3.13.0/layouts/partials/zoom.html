@@ -1,0 +1,23 @@
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+  /* 确保缩放时的背景色符合主题（暗色/亮色适配） */
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // 初始化所有带有 .zoomable 类名的图片
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          // 缩放后距离屏幕边缘的间距
+      background: '#000',  // 遮罩层背景色（如果 CSS 不生效则用这个）
+      scrollOffset: 40,    // 滚动多少像素后自动关闭
+    });
+  });
+</script>

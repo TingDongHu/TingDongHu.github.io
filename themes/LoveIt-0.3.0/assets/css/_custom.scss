@@ -1,0 +1,154 @@
+// ==============================
+// Custom style
+// 自定义样式
+// ==============================
+/* 文章内图片居中样式 */
+.post-content, .content {
+    img {
+        display: block;      /* 变为块级元素 */
+        margin: 1.5rem auto; /* 上下留空，左右自动居中 */
+        max-width: 100%;     /* 防止图片超出容器 */
+        height: auto;        /* 保持比例 */
+        border-radius: 8px;  
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    }
+
+    /* 如果图片带标题（alt文字），也让标题居中 */
+    img + em, img + span {
+        display: block;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #777;
+        margin-top: -1rem;
+        margin-bottom: 1.5rem;
+    }
+}
+/* GitHub Alerts 样式增强版 */
+.single .content {
+    blockquote.alert {
+        position: relative;
+        padding: 0.8rem 1rem !important;
+        padding-top: 2.4rem !important; /* 给顶部的图标和标题留出空间 */
+        margin: 1.5rem 0;
+        border-left: 0.25rem solid #d0d7de;
+        border-radius: 6px;
+        background: transparent !important;
+        font-style: normal; // 去掉引用块默认的斜体
+        
+        // 去除 LoveIt 默认的左边框阴影
+        &::before {
+            box-shadow: none !important;
+        }
+
+        // 统一图标和标题的共有样式
+        &::before,
+        &::after {
+            position: absolute;
+            top: 1.2rem;
+            transform: translateY(-50%);
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        // 图标基础样式
+        &::before {
+            content: "";
+            left: 1rem;
+            width: 16px;
+            height: 16px;
+            background-color: currentColor;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+
+        // 标题文字基础样式
+        &::after {
+            left: calc(1rem + 24px);
+        }
+
+        p {
+            margin: 0 !important;
+            color: var(--font-color, inherit);
+            text-align: left; // 确保文字不跟图片一起居中
+        }
+    }
+
+    /* --- 不同类型的区分逻辑 --- */
+    
+    // Note
+    blockquote.alert-note { 
+        border-left-color: #0969da !important; 
+        color: #0969da; 
+        &::after { content: "Note"; }
+        &::before {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+    }
+
+    // Tip
+    blockquote.alert-tip { 
+        border-left-color: #1a7f37 !important; 
+        color: #1a7f37; 
+        &::after { content: "Tip"; }
+        &::before {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5c-2.363 0-4.5 1.937-4.5 4.5 0 1.307.44 2.503 1.186 3.461 1.02 1.311 1.314 1.539 1.314 2.539h4c0-1 .294-1.228 1.314-2.539.746-.958 1.186-2.154 1.186-3.461 0-2.563-2.137-4.5-4.5-4.5ZM8 0c3.344 0 6 2.703 6 6 0 1.625-.561 3.12-1.503 4.309-1.01 1.298-1.497 1.913-1.497 2.691h.25a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5h.25c0-.778-.487-1.393-1.497-2.691A5.981 5.981 0 0 1 2 6c0-3.297 2.656-6 6-6ZM5.41 15.29A.75.75 0 0 1 6 15h4a.75.75 0 0 1 .59 1.21l-1.32 1.707a.75.75 0 0 1-1.18 0L5.41 16.21a.75.75 0 0 1 0-.92Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+    }
+
+    // Warning
+    blockquote.alert-warning { 
+        border-left-color: #9a6700 !important; 
+        color: #9a6700; 
+        &::after { content: "Warning"; }
+        &::before {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.03 11.315a1.75 1.75 0 0 1-1.543 2.571H1.97a1.75 1.75 0 0 1-1.543-2.571Zm1.109 1.18a.25.25 0 0 0-.44 0L1.096 13.541a.25.25 0 0 0 .22.367H14.685a.25.25 0 0 0 .22-.367ZM8 5c.414 0 .75.336.75.75v3.5a.75.75 0 0 1-1.5 0v-3.5C7.25 5.336 7.586 5 8 5Zm0.75 7a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+    }
+}
+
+/* KaTeX 公式显示优化 */
+.post-content .katex-display {
+    overflow-x: auto;      /* 手机端公式过长时可左右滑动 */
+    overflow-y: hidden;
+    padding: 1rem 0;
+    text-align: center;    /* 强制块级公式居中 */
+    
+    // 消除之前可能对公式内 img 的全局样式干扰
+    img {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+}
+
+/* 隐藏主页文章摘要内容 */
+.home .summary .content {
+    display: none !important;
+}
+
+/* 隐藏“阅读更多”按钮 */
+.home .summary .post-footer {
+    display: none !important;
+}
+
+/* 优化纯标题模式下的卡片样式 */
+.home .summary {
+    padding: 1.2rem 1.5rem !important; /* 缩小内边距 */
+    margin-bottom: 1.2rem !important;  /* 缩小文章之间的间距 */
+    border-radius: 8px;
+    
+    .post-title {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .post-meta {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #a9a9b3;
+    }
+}

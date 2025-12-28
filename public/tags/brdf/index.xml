@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>BRDF on 古月月仔的博客</title>
+    <link>http://localhost:1313/tags/brdf/</link>
+    <description>Recent content in BRDF on 古月月仔的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 11 Dec 2025 00:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/brdf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>【Games101】材质与外观</title>
+      <link>http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/</link>
+      <pubDate>Thu, 11 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/</guid>
+      <description>&lt;p&gt;在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。&lt;/p&gt;&#xA;&lt;p&gt;在计算机图形学中，我们如何定义和区分不同的材料？&lt;/p&gt;&#xA;&lt;p&gt;例如，一个3D咖啡杯模型，通过赋予不同的表面属性，它可以呈现出陶瓷、金属或塑料的质感。&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215205054966.png&#34; &#xA;       alt=&#34;image-20251215205054966&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251215205054966&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&lt;p&gt;答案是：&lt;strong&gt;材料的视觉外观完全由其与光线的相互作用方式决定&lt;/strong&gt;。这种相互作用在图形学中通过一个称为&lt;strong&gt;BRDF（双向反射分布函数）&lt;/strong&gt; 的数学模型来精确描述。因此，一个核心等式被确立：&lt;strong&gt;Material == BRDF&lt;/strong&gt;。这意味着，改变一个物体的材质，本质上就是改变它的BRDF。&lt;/p&gt;&#xA;&lt;h3 id=&#34;brdf-的物理性质&#34;&gt;BRDF 的物理性质&lt;/h3&gt;&#xA;&lt;p&gt;BRDF（双向反射分布函数）作为一个描述材质物理属性的函数，必须遵循以下几条核心的物理定律。这些性质保证了渲染结果在物理上的真实性和可信度。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;非负性 (Non-negativity)&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;这是最基本的性质。因为 BRDF 描述的是光能量的分布比例，而光能量不可能是负数，所以 BRDF 函数的值必须永远大于等于零 。&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;公式：&#xA;$$&#xD;&#xA;  f_{r}(\omega_{i}\rightarrow\omega_{r})\ge0&#xD;&#xA;  $$&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;strong&gt;线性 (Linearity)&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;p&gt;材质对光照的反应是线性的。这意味着，如果你有两个光源照亮物体，物体反射的总光线等于这两个光源分别照射时反射光线的总和 。&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215213822499.png&#34; &#xA;       alt=&#34;image-20251215213822499&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20251215213822499&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;物理意义&lt;/strong&gt;：这一性质允许我们将场景中所有光源的影响（通过积分）累加起来，计算出最终的出射辐射亮度（Radiance）。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;公式：&#xA;&lt;/p&gt;&#xA;$$&#xD;&#xA;  L_{r}(p,\omega_{r})=\int_{H^{2}}f_{r}(p,\omega_{i}\rightarrow\omega_{r})L_{i}(p,\omega_{i})\cos\theta_{i}d\omega_{i}&#xD;&#xA;  $$&lt;p&gt;&#xA;这个积分公式体现了所有入射光 $L_i$ 对出射光 $L_r$ 的线性贡献 。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

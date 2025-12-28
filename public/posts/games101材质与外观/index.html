@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】材质与外观 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。" />
+<meta name="keywords" content="图形学,GAMES课程,材质,BRDF">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】材质与外观">
+  <meta property="og:description" content="在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-11T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-11T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="材质">
+    <meta property="article:tag" content="BRDF">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】材质与外观">
+  <meta name="twitter:description" content="在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】材质与外观">
+  <meta itemprop="description" content="在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。">
+  <meta itemprop="datePublished" content="2025-12-11T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-11T00:00:00+08:00">
+  <meta itemprop="wordCount" content="304">
+  <meta itemprop="keywords" content="图形学,GAMES课程,材质,BRDF">
+
+      <header>
+        <h1 itemprop="headline">【Games101】材质与外观</h1>
+        <p class="text-sm">
+          
+            Thursday, Dec 11, 2025
+          
+
+          | <span>2 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Thursday, Dec 11, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e6%9d%90%e8%b4%a8%e4%b8%8e%e5%a4%96%e8%a7%82&amp;url=http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e6%9d%90%e8%b4%a8%e4%b8%8e%e5%a4%96%e8%a7%82%20http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。</p>
+<p>在计算机图形学中，我们如何定义和区分不同的材料？</p>
+<p>例如，一个3D咖啡杯模型，通过赋予不同的表面属性，它可以呈现出陶瓷、金属或塑料的质感。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215205054966.png" 
+       alt="image-20251215205054966" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215205054966
+    </figcaption>
+  
+</figure></p>
+<p>答案是：<strong>材料的视觉外观完全由其与光线的相互作用方式决定</strong>。这种相互作用在图形学中通过一个称为<strong>BRDF（双向反射分布函数）</strong> 的数学模型来精确描述。因此，一个核心等式被确立：<strong>Material == BRDF</strong>。这意味着，改变一个物体的材质，本质上就是改变它的BRDF。</p>
+<h3 id="brdf-的物理性质">BRDF 的物理性质</h3>
+<p>BRDF（双向反射分布函数）作为一个描述材质物理属性的函数，必须遵循以下几条核心的物理定律。这些性质保证了渲染结果在物理上的真实性和可信度。</p>
+<p><strong>非负性 (Non-negativity)</strong></p>
+<p>这是最基本的性质。因为 BRDF 描述的是光能量的分布比例，而光能量不可能是负数，所以 BRDF 函数的值必须永远大于等于零 。</p>
+<ul>
+<li>公式：
+$$
+  f_{r}(\omega_{i}\rightarrow\omega_{r})\ge0
+  $$</li>
+</ul>
+<p><strong>线性 (Linearity)</strong></p>
+<p>材质对光照的反应是线性的。这意味着，如果你有两个光源照亮物体，物体反射的总光线等于这两个光源分别照射时反射光线的总和 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215213822499.png" 
+       alt="image-20251215213822499" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215213822499
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>
+<p><strong>物理意义</strong>：这一性质允许我们将场景中所有光源的影响（通过积分）累加起来，计算出最终的出射辐射亮度（Radiance）。</p>
+</li>
+<li>
+<p>公式：
+</p>
+$$
+  L_{r}(p,\omega_{r})=\int_{H^{2}}f_{r}(p,\omega_{i}\rightarrow\omega_{r})L_{i}(p,\omega_{i})\cos\theta_{i}d\omega_{i}
+  $$<p>
+这个积分公式体现了所有入射光 $L_i$ 对出射光 $L_r$ 的线性贡献 。</p>
+</li>
+</ul>
+<p><strong>可逆性 (Reciprocity Principle)</strong></p>
+<p>这是一条非常有趣的物理性质，也被称为“赫姆霍兹互惠原理”（Helmholtz Reciprocity）。</p>
+<ul>
+<li><strong>定义</strong>：如果你交换光源入射的方向 ($\omega_i$) 和摄像机观察的方向 ($\omega_r$)，测得的 BRDF 值应该是一模一样的 。</li>
+<li><strong>通俗解释</strong>：如果你能通过镜子看到对方的眼睛，对方也一定能通过镜子看到你的眼睛。光路是可逆的。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215213845983.png" 
+       alt="image-20251215213845983" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215213845983
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>公式：
+$$
+  f_{r}(\omega_{r}\rightarrow\omega_{i})=f_{r}(\omega_{i}\rightarrow\omega_{r})
+  $$</li>
+</ul>
+<p><strong>能量守恒 (Energy Conservation)</strong></p>
+<p>这是物理世界最铁的定律。物体表面只是反射光线，如果不自身发光，它反射出去的总能量绝对不可能超过接收到的总能量 。</p>
+<ul>
+<li>
+<p><strong>物理意义</strong>：对于任何一个入射方向，BRDF 在整个半球面上对所有出射方向的积分值必须小于等于 1。</p>
+<ul>
+<li>如果等于 1，说明是理想的全反射（如完美的镜子或绝对白的漫反射）。</li>
+<li>如果小于 1，说明部分光线被物体吸收并转化为热能了。</li>
+</ul>
+</li>
+<li>
+<p>公式：
+</p>
+$$
+  \forall\omega_{r}\int_{H^{2}}f_{r}(\omega_{i}\rightarrow\omega_{r})\cos\theta_{i}d\omega_{i}\le1
+  $$</li>
+</ul>
+<p><strong>各向同性与各向异性 (Isotropic vs. Anisotropic)</strong></p>
+<p>虽然这不是所有 BRDF 必须遵守的限制，但它是区分材质物理特性的重要分类。</p>
+<ul>
+<li><strong>各向同性 (Isotropic)</strong>：
+<ul>
+<li><strong>定义</strong>：表面的微观结构没有方向性。BRDF 的值只取决于入射光和反射光的<strong>相对</strong>方位角差 ($\phi_r - \phi_i$)，而与绝对方位角无关 。</li>
+<li><strong>推论</strong>：根据可逆性，各向同性材质的 BRDF 可以进一步简化为只依赖三个变量：入射角 $\theta_i$、出射角 $\theta_r$ 以及它们的相对方位角 $|\phi_r - \phi_i|$ 。</li>
+<li><strong>现象</strong>：旋转物体（不改变视角和光照），高光形状不变。</li>
+</ul>
+</li>
+<li><strong>各向异性 (Anisotropic)</strong>：
+<ul>
+<li><strong>定义</strong>：反射性质随表面的绝对方位角变化。</li>
+<li><strong>现象</strong>：如拉丝金属，其微观结构（划痕）有特定方向，导致高光形状随物体旋转而改变。</li>
+</ul>
+</li>
+</ul>
+<h3 id="基础材质模型">基础材质模型</h3>
+<h4 id="漫反射材质兰伯特定律">漫反射材质（兰伯特定律）</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215204842606.png" 
+       alt="image-20251215204842606" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215204842606
+    </figcaption>
+  
+</figure></p>
+<p>这是最简单也是最基础的材质模型。理想漫反射表面将入射光线均匀地散射到所有方向，因此表面不会出现任何镜面高光，看起来非常柔和。粉笔、哑光墙面是典型的例子。</p>
+<ul>
+<li><strong>光学特性</strong>：光线在微观表面经过多次反射、折射后被均匀散射，出射亮度与观察角度无关。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215204931413.png" 
+       alt="image-20251215204931413" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215204931413
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li><strong>BRDF公式推导</strong>：假设场景光照均匀，可以推导出出射辐亮度 Lo与入射辐亮度 Li的关系：</li>
+</ul>
+$$
+L_{o}(\omega_{o})=\int_{H^{2}}f_{r}L_{i}(\omega_{i})\cos\theta_{i}d\omega_{i}=f_{r}L_{i}\int_{H^{2}}\cos\theta_{i}d\omega_{i}=\pi f_{r}L_{i}
+$$<ul>
+<li>为了使材质反射的能量守恒（即反射光不超过入射光），BRDF被定义为:</li>
+</ul>
+$$
+f_r = \frac{\rho}{\pi}
+$$<p>其中，<strong>ρ称为反照率</strong>，它是一个介于0到1之间的值（或三维向量），决定了材质的基色。通过使用纹理贴图来定义每个点的 ρ，我们就可以实现丰富多彩的漫反射纹理表面。</p>
+<h4 id="光泽材质与理想镜面反射折射">光泽材质与理想镜面反射/折射</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215204605965.png" 
+       alt="image-20251215204605965" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215204605965
+    </figcaption>
+  
+</figure></p>
+<p><strong>光泽材质</strong>（如抛光铜、铝）的 BRDF 特性介于漫反射和理想镜面之间 。它们的光线反射具有方向性，会在镜面反射方向周围形成一个较宽的高光瓣（Lobe），这通常是因为表面微观上不够平整导致的 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215204229220.png" 
+       alt="image-20251215204229220" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215204229220
+    </figcaption>
+  
+</figure></p>
+<p>理想镜面反射/折射材质则涉及更精确的物理现象，通常用 BSDF 来描述 。</p>
+<ul>
+<li><strong>镜面反射 (Specular Reflection)</strong>：遵循“入射角等于反射角”的定律（$\theta_o = \theta_i$）。其反射方向 $\omega_o$ 可由入射方向 $\omega_i$ 和法线 $\vec{n}$ 精确计算得出 ：</li>
+</ul>
+$$
+\omega_{o}=-\omega_{i}+2(\omega_{i}\cdot\vec{n})\vec{n}
+$$<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215205606410.png" 
+       alt="image-20251215205606410" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215205606410
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>
+<p><strong>折射 (Refraction)</strong>：光线穿过不同介质界面（如空气进入水或玻璃）时会发生弯曲，遵循斯涅尔定律（Snell&rsquo;s Law）：
+</p>
+$$
+  \eta_{i}\sin\theta_{i}=\eta_{t}\sin\theta_{t}
+  $$<p>
+其中 $\eta$ 是物质的折射率（IOR），例如水约为1.33，玻璃约为1.5 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215205648360.png" 
+       alt="image-20251215205648360" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215205648360
+    </figcaption>
+  
+</figure></p>
+</li>
+<li>
+<p><strong>全内反射 (Total Internal Reflection)</strong>：一个关键的光学现象。当光从光密介质（折射率高）射向光疏介质（折射率低），即 $\frac{\eta_{i}}{\eta_{t}}>1$ 时，如果入射角足够大，光线将无法折射出去，而是全部反射回原介质 。这一现象解释了水下观察水面时为何会出现像镜子一样的“斯涅尔窗”边缘 。</p>
+</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215205748093.png" 
+       alt="image-20251215205748093" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215205748093
+    </figcaption>
+  
+</figure></p>
+<h3 id="菲涅尔效应-fresnel-term">菲涅尔效应 (Fresnel Term)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215210117956.png" 
+       alt="image-20251215210117956" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215210117956
+    </figcaption>
+  
+</figure></p>
+<p>在现实世界中，物体的反射率并不是一个固定的常数，它会随着<strong>视线与表面的夹角</strong>发生剧烈变化。</p>
+<ul>
+<li><strong>垂直观察</strong>：当你垂直看向物体表面时（如低头看脚下的水面），反射通常较弱，你会更多地看到折射进去的光（水底的石头）。</li>
+<li><strong>掠射角观察 (Grazing Angle)</strong>：当你视线几乎与表面平行时（如看向远处的湖面），水面会变得像镜子一样，反射率急剧增加甚至接近 100% 。</li>
+</ul>
+<p><strong>不同材质的表现</strong>：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215210205577.png" 
+       alt="image-20251215210205577" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215210205577
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li><strong>绝缘体 (Dielectrics)</strong>：如玻璃、塑料、水。在垂直入射时反射率很低（通常约 4%），大部分光线发生折射；但在掠射角，反射率会迅速上升至 1.0 。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215210319342.png" 
+       alt="image-20251215210319342" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215210319342
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>
+<p><strong>导体/金属 (Conductors)</strong>：如金、铜、铝。金属原本的反射率就很高（60%-90%），并且带有颜色（如金色的反射）。在掠射角，它们的反射率也会最终达到 1.0 。</p>
+</li>
+<li>
+<p>计算公式 (Schlick&rsquo;s Approximation)：</p>
+<p>精确的菲涅尔方程计算非常复杂且依赖于光的偏振 。在图形学实践中，我们通常使用 Schlick 近似 来高效模拟这一现象 ：
+</p>
+$$
+  R(\theta)=R_{0}+(1-R_{0})(1-\cos\theta)^{5}
+  $$<ul>
+<li>$R_0$：基础反射率（垂直入射时的反射率），对于水或玻璃等绝缘体，它是通过折射率计算得出的 。</li>
+<li>$\theta$：视线与法线的夹角。</li>
+</ul>
+</li>
+</ul>
+<h3 id="微表面模型-microfacet-material">微表面模型 (Microfacet Material)</h3>
+<p>这是基于物理的渲染 (PBR) 的理论核心。它解释了为什么有的表面看起来粗糙，有的看起来光滑，以及“高光”究竟是怎么形成的。</p>
+
+
+
+  <blockquote>
+    <p>核心理论：宏观上平坦的表面，在微观层面上其实是凹凸不平的。</p>
+
+  </blockquote>
+
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215210747761.png" 
+       alt="image-20251215210747761" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215210747761
+    </figcaption>
+  
+</figure></p>
+<p>我们假设表面由无数个微小的、像镜子一样的<strong>微平面 (Microfacets)</strong> 组成 。</p>
+<ul>
+<li>
+<p>每个微平面都遵循完美的镜面反射定律，拥有自己的法线方向 。</p>
+</li>
+<li>
+<p>粗糙度与高光：</p>
+</li>
+</ul>
+<p>材质的“粗糙度”本质上就是微平面法线的统计分布 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215211025209.png" 
+       alt="image-20251215211025209" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215211025209
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li><strong>光滑表面 (Glossy)</strong>：微平面的法线非常集中，大部分都朝向同一个方向。因此光线反射方向一致，形成锐利、明亮的高光。</li>
+<li><strong>粗糙表面 (Diffuse)</strong>：微平面乱七八糟地朝向各个方向（Spread）。光线被反射到四面八方，视觉上高光就“糊”开了，甚至变成了漫反射。</li>
+</ul>
+<p>微表面 BRDF 公式：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215211239198.png" 
+       alt="image-20251215211239198" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215211239198
+    </figcaption>
+  
+</figure></p>
+<p>基于微表面理论，BRDF 被定义为以下三个核心项的乘积 ：
+</p>
+$$
+f(i,o)=\frac{F(i,h)G(i,o,h)D(h)}{4(n \cdot i)(n \cdot o)}
+$$<p>
+<strong>F (Fresnel Term)</strong>：<strong>菲涅尔项</strong>。决定了光线撞击到微平面上时，有多少能量被反射，有多少被折射（吸收）。</p>
+<p><strong>D (Normal Distribution Function, NDF)</strong>：<strong>法线分布函数</strong>。这是决定高光形状的关键。它统计了有多少微平面的法线正好指向“半程向量 $h$”的方向（即正好能把光从入射方向 $i$ 反射到观察方向 $o$）。</p>
+<p><strong>G (Geometry Term / Shadowing-Masking)</strong>：<strong>几何遮挡项</strong>。在粗糙表面上，微平面之间会发生相互遮挡。</p>
+<ul>
+<li><strong>Shadowing</strong>：光线还没照到微平面就被挡住了。</li>
+<li><strong>Masking</strong>：光线反射出来后，被前面的微平面挡住了。</li>
+<li>这一项在掠射角特别重要，防止边缘过亮。</li>
+</ul>
+<p>微表面材质部分还有一个特殊的类型，就是纤维材质、</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215214334641.png" 
+       alt="image-20251215214334641" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215214334641
+    </figcaption>
+  
+</figure></p>
+<p>如上图所示，表面带有毛发的材质可能会随着人的摆弄而产生不同的光学性质，这部分的建模比较复杂，留到下节课进行讨论。</p>
+<h3 id="材质的方向性各向同性-vs-各向异性">材质的方向性：各向同性 vs 各向异性</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215211743333.png" 
+       alt="image-20251215211743333" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215211743333
+    </figcaption>
+  
+</figure></p>
+<p>如上图所示，生活中，我们常常观察到有金属关泽的茶壶和发出彩色光泽的光盘，这些物体的高光既像是镜面反射，又与完全镜面反射有一定的区别，其主要原因是因为其材质具有方向性。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E6%9D%90%E8%B4%A8%E4%B8%8E%E5%A4%96%E8%A7%82/image-20251215211541474.png" 
+       alt="image-20251215211541474" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251215211541474
+    </figcaption>
+  
+</figure></p>
+<p><strong>各向同性 (Isotropic)</strong>： 表面的微观结构没有特定方向。无论你如何旋转物体（保持视角不变），反射的高光形状和强度基本不变 。大部分常见的塑料、陶瓷属于此类。</p>
+<p>各向同性（Isotropic）的定义公式：
+</p>
+$$
+f_{r}(\theta_{i},\phi_{i};\theta_{r},\phi_{r})=f_{r}(\theta_{i},\theta_{r},\phi_{r}-\phi_{i})
+$$<p>
+对于绝大多数普通材质（各向同性），BRDF 的值只取决于 $\phi_r - \phi_i$（相对方位角）。这意味着只要相对角度不变，旋转物体不会改变反射外观。进一步推导可得：$f_{r}(\theta_{i},\theta_{r},|\phi_{r}-\phi_{i}|)$ 。</p>
+<p><strong>各向异性 (Anisotropic)</strong>： 表面的微观结构具有方向性（例如有平行的划痕或纤维）。当你旋转物体时，高光的形状会随之改变 。</p>
+<ul>
+<li><strong>典型例子</strong>：<strong>拉丝金属</strong>（Brushed Metal）、尼龙、天鹅绒 。</li>
+<li><strong>视觉特征</strong>：拉丝金属的高光通常会被拉伸成条状，且方向垂直于纹理的划痕方向 。</li>
+</ul>
+<p>各向异性（Anisotropic）的定义公式：
+</p>
+$$
+f_{r}(\theta_{i},\phi_{i};\theta_{r},\phi_{r})\ne f_{r}(\theta_{i},\theta_{r},\phi_{r}-\phi_{i})
+$$<p>
+这个不等式意味着：<strong>反射不仅取决于入射光和反射光之间的相对角度，还取决于它们在表面上的绝对“方位角”（Azimuthal Angle）</strong>。换句话说，如果你保持视线和光源不动，仅仅在平面上旋转物体，各向异性材质的反射效果（BRDF值）是<strong>会发生改变</strong>的。</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

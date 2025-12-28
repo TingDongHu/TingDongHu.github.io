@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】高级光线传播与复杂外观建模 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="文章对比了无偏与有偏渲染方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种高级光线传播技术的原理、适用场景及优缺点。" />
+<meta name="keywords" content="图形学,GAMES课程,毛发建模,复杂光线传播">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】高级光线传播与复杂外观建模">
+  <meta property="og:description" content="文章对比了无偏与有偏渲染方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种高级光线传播技术的原理、适用场景及优缺点。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-15T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-15T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="毛发建模">
+    <meta property="article:tag" content="复杂光线传播">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】高级光线传播与复杂外观建模">
+  <meta name="twitter:description" content="文章对比了无偏与有偏渲染方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种高级光线传播技术的原理、适用场景及优缺点。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】高级光线传播与复杂外观建模">
+  <meta itemprop="description" content="文章对比了无偏与有偏渲染方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种高级光线传播技术的原理、适用场景及优缺点。">
+  <meta itemprop="datePublished" content="2025-12-15T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-15T00:00:00+08:00">
+  <meta itemprop="wordCount" content="435">
+  <meta itemprop="keywords" content="图形学,GAMES课程,毛发建模,复杂光线传播">
+
+      <header>
+        <h1 itemprop="headline">【Games101】高级光线传播与复杂外观建模</h1>
+        <p class="text-sm">
+          
+            Monday, Dec 15, 2025
+          
+
+          | <span>3 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Monday, Dec 15, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e9%ab%98%e7%ba%a7%e5%85%89%e7%ba%bf%e4%bc%a0%e6%92%ad%e4%b8%8e%e5%a4%8d%e6%9d%82%e5%a4%96%e8%a7%82%e5%bb%ba%e6%a8%a1&amp;url=http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e9%ab%98%e7%ba%a7%e5%85%89%e7%ba%bf%e4%bc%a0%e6%92%ad%e4%b8%8e%e5%a4%8d%e6%9d%82%e5%a4%96%e8%a7%82%e5%bb%ba%e6%a8%a1%20http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>高级光线传播技术旨在提升复杂光照下的渲染效率与质量。文章对比了无偏与有偏方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种策略的原理、适用场景及优缺点。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>这节课可以当作一个小综述，大致了解就好。</p>
+  </blockquote>
+
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>前的课程我们学习了路径追踪（Path Tracing），它是现代渲染的“黄金标准”。但是，它并非万能。在面对“光路特别复杂”或者“材质特别复杂”的情况时，标准路径追踪会产生巨大的噪点，或者效率极低。这节课就是为了解决这两个难题：</p>
+<ol>
+<li><strong>高级光线传播</strong>：怎么在复杂光照下算得更准、更快？</li>
+<li><strong>高级外观建模</strong>：怎么渲染那些不是简单平面的物体（如头发、雾气、皮肤）？</li>
+</ol>
+  </blockquote>
+
+<h1 id="高级光线传播-advanced-light-transport">高级光线传播 (Advanced Light Transport)</h1>
+<p>这部分的核心在于解决标准 Path Tracing 收敛慢、噪点多的问题。</p>
+<h3 id="无偏与有偏-unbiased-vs-biased">无偏与有偏 (Unbiased vs. Biased)</h3>
+<p>在深入算法之前，我们需要先建立一个评价标准：</p>
+<p><strong>无偏 (Unbiased)<strong>定义为：蒙特卡洛估计的期望值</strong>始终等于</strong>真实值。其特点为：样本少时会有噪点（Noise），但只要样本够多，结果一定是对的。之前学过的Path Tracing就是一个无偏的方法。</p>
+<p><strong>有偏 (Biased)<strong>定义为：估计值的期望与真实值有系统性偏差。其特点为：样本少时，结果通常是</strong>模糊 (Blurry)</strong> 的，而不是噪点。<strong>一致性 (Consistent)</strong>：这是有偏方法中好的那一类。如果样本数趋向于无穷大时，误差能收敛到0，就叫“一致”。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p><strong>通俗理解</strong>：无偏 = 画面有噪点但准确；有偏 = 画面平滑但可能模糊（看起来像把噪点抹平了）。</p>
+  </blockquote>
+
+<h2 id="解决光路难找的几种高级策略">解决“光路难找”的几种高级策略</h2>
+<p>当光源被遮挡，或者光线需要经过多次反弹才能进入眼睛时（例如：光线打到墙上，墙漫反射到玻璃球，玻璃球折射聚焦到地板，我们看地板上的亮斑），标准 Path Tracing 很难随机“碰”到这种路径。</p>
+<h3 id="双向路径追踪-bdpt---bidirectional-path-tracing">双向路径追踪 (BDPT - Bidirectional Path Tracing)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216173414432.png" 
+       alt="image-20251216173414432" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216173414432
+    </figcaption>
+  
+</figure></p>
+<p><strong>原理</strong>：既然只从摄像机发射光线（Path Tracing）很难找到光源，那不如<strong>同时从摄像机和光源</strong>各发射一条半路径，然后把中间的端点连起来 。</p>
+<p><strong>适用场景</strong>：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216173454445.png" 
+       alt="image-20251216173454445" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216173454445
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>光源主要是间接光的情况（如：灯罩里的灯照亮天花板，天花板照亮书）。</li>
+</ul>
+<p><strong>优缺点</strong>：效果很好，但这是一种<strong>无偏</strong>的方法，实现极其复杂，且速度较慢 。</p>
+<h3 id="梅特罗波利斯光线传播-mlt---metropolis-light-transport">梅特罗波利斯光线传播 (MLT - Metropolis Light Transport)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216173630204.png" 
+       alt="image-20251216173630204" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216173630204
+    </figcaption>
+  
+</figure></p>
+<p>这是一种“聪明的”采样方法。这就好比你在找路，一旦你发现了一条能通向光源的缝隙，MLT 就会在这个缝隙周围<strong>反复采样</strong>，因为它猜测这附近大概率还有其他通路，而不是像 Path Tracing 那样傻傻地随机乱撞 。</p>
+<p><strong>原理</strong>：利用马尔可夫链蒙特卡洛 (MCMC) 方法，根据当前样本生成下一个样本（局部扰动）。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>虽然原理都是马尔科夫链，但是在扩散模型中，随机种子是<strong>旅程的起点</strong>，旅程本身（去噪）相对直接，目的是到达一个具体的终点（图片）。</p>
+<p>在MLT中，当前光线是<strong>随机游走的当前位置</strong>，游走本身是高度随机和探索性的，目的是用整个游走历史来绘制地图（计算积分），所以才会出现闪帧的问题。</p>
+  </blockquote>
+
+<table>
+  <thead>
+      <tr>
+          <th>层次</th>
+          <th>扩散模型</th>
+          <th>Metropolis Light Transport</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>状态定义</strong></td>
+          <td>一张<strong>去噪过程中的中间图像</strong> $x_t$</td>
+          <td>一条<strong>完整的光线路径</strong> $\bar{x}$</td>
+      </tr>
+      <tr>
+          <td><strong>马尔可夫链</strong></td>
+          <td>反向去噪链 $x_T→x_{T−1}→...→x_0$</td>
+          <td>路径状态链$xˉ0→xˉ1→...$</td>
+      </tr>
+      <tr>
+          <td><strong>“种子”对应物</strong></td>
+          <td>链的<strong>初始状态</strong>：纯噪声 $x_T$</td>
+          <td>链的<strong>初始状态</strong>：一条随机生成的光线路径</td>
+      </tr>
+      <tr>
+          <td><strong>转移算子</strong></td>
+          <td>学得的去噪分布 $p_θ(x_{t−1}∥x_t)$</td>
+          <td>提议分布 + Metropolis-Hastings 接受准则</td>
+      </tr>
+      <tr>
+          <td><strong>目标分布</strong></td>
+          <td><strong>没有明确的“目标分布”</strong>，链的目的是产生一个样本（图片）</td>
+          <td><strong>明确的目标分布</strong>：路径的贡献函数 $f(\bar{x})$</td>
+      </tr>
+      <tr>
+          <td><strong>我们关心的输出</strong></td>
+          <td>链的<strong>最终状态</strong> $x_0$（生成的图片）</td>
+          <td>链的<strong>所有状态的统计平均</strong>（积分的估计）</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>优缺点</strong>：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216174125805.png" 
+       alt="image-20251216174125805" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216174125805
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li><strong>神技</strong>：非常擅长处理极其困难的光路（如 SDS 路径：Specular-Diffuse-Specular，例如游泳池底的焦散）。</li>
+<li><strong>硬伤</strong>：因为它是“局部探索”，会导致画面收敛速度不均匀，看起来<strong>很脏 (Dirty)</strong>。因此几乎<strong>无法用于动画</strong>，因为帧与帧之间会闪烁 。</li>
+</ul>
+<h3 id="光子映射-photon-mapping">光子映射 (Photon Mapping)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216175028771.png" 
+       alt="image-20251216175028771" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216175028771
+    </figcaption>
+  
+</figure></p>
+<p>这是一种专门用来做<strong>焦散 (Caustics)</strong> 的神技（例如阳光透过装水的玻璃杯在桌上形成的亮斑）。它是一种<strong>有偏但一致 (Biased but Consistent)</strong> 的两阶段方法 。</p>
+<p><strong>步骤通解</strong>：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216175445657.png" 
+       alt="image-20251216175445657" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216175445657
+    </figcaption>
+  
+</figure></p>
+<ol>
+<li><strong>光子发射 (Photon Tracing)</strong>：从光源发射出无数个“光子”，让它们在场景里弹射，停在漫反射表面上。</li>
+<li><strong>光子收集 (Photon Collection)</strong>：从摄像机发射光线，打到物体表面后，看看这个点周围<strong>N 个最近的光子</strong>有多密。</li>
+</ol>
+<p><strong>为什么有偏？</strong>：因为它是通过统计周围一圈光子的密度来估算当前点的亮度，这本质上是一种<strong>密度估计 (Density Estimation)</strong>。这相当于把周围的光子“抹平”或者是“模糊”了，所以是有偏的。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216175751655.png" 
+       alt="image-20251216175751655" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216175751655
+    </figcaption>
+  
+</figure></p>
+<p><strong>直观表现</strong>：N 取小了，会有噪点；N 取大了，画面会变糊（Bias 变大）。</p>
+<h3 id="顶点连接与合并-vcm与实时辐射度-instant-radiosity">顶点连接与合并 (VCM)与实时辐射度 (Instant Radiosity)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216175930636.png" 
+       alt="image-20251216175930636" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216175930636
+    </figcaption>
+  
+</figure></p>
+<p><strong>VCM</strong>：把 BDPT 和光子映射结合起来，集百家之长 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216175954589.png" 
+       alt="image-20251216175954589" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216175954589
+    </figcaption>
+  
+</figure></p>
+<p><strong>Instant Radiosity (VPL)</strong>：把被光照亮的表面点，都当成一个个新的微型光源 (Virtual Point Lights)。如果你想快速照亮一个漫反射场景，这个方法很快，但在缝隙处容易产生奇怪的发光点 (Spikes) 。</p>
+<h1 id="高级外观建模-advanced-appearance-modeling">高级外观建模 (Advanced Appearance Modeling)</h1>
+<p>解决了“光怎么跑”的问题，接下来要解决“光打到了什么”的问题。现实中很多物体不是简单的表面（如塑料），而是极其复杂的结构。</p>
+<h2 id="非表面模型-non-surface-models">非表面模型 (Non-Surface Models)</h2>
+<p>这类物体没有清晰的“壳”，光线是和整个“体积”发生作用。</p>
+<h3 id="参与介质-participating-media">参与介质 (Participating Media)</h3>
+<p><strong>如</strong> 雾、云、烟、混浊的水。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216180227843.png" 
+       alt="image-20251216180227843" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216180227843
+    </figcaption>
+  
+</figure></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216180331336.png" 
+       alt="image-20251216180331336" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216180331336
+    </figcaption>
+  
+</figure></p>
+<p>光线进入介质后，会不断撞击微小的粒子（如水滴、尘埃）,产生区别于表面模型的吸收和散射现象。</p>
+<p><strong>吸收 (Absorption)：</strong> 光子撞上粒子，能量消失了（变成了热能）。这决定了介质的<strong>颜色</strong>（比如烟是黑的，说明吸收强）。</p>
+<p><strong>散射 (Scattering)：</strong> 光子撞上粒子，被弹到了另一个方向。这决定了介质的<strong>浑浊感</strong>。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216180753202.png" 
+       alt="image-20251216180753202" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216180753202
+    </figcaption>
+  
+</figure></p>
+<p><strong>相位函数 (Phase Function)</strong></p>
+<p>这是体积渲染里的“BRDF”。它描述了光撞到粒子后，更喜欢往哪儿飞？</p>
+<p>各向同性 (Isotropic)： 往四面八方飞的概率一样（比如稀薄的雾）。</p>
+<p>前向散射 (Forward Scattering)： 喜欢顺着原来的方向飞（比如云，所以逆光看云边缘非常亮，叫“银边”）。</p>
+<p>后向散射 (Backward Scattering)： 喜欢弹回来。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216180829631.png" 
+       alt="image-20251216180829631" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216180829631
+    </figcaption>
+  
+</figure></p>
+<p>这类模型渲染计算量很大， 光线可能在云里弹射几百次才出来，计算量巨大。</p>
+<h3 id="毛发-hair--fur">毛发 (Hair &amp; Fur)</h3>
+<p>人的头发、动物皮毛。 <em>这是一段从“作弊”到“硬核物理”的进化史。</em></p>
+<h4 id="kajiya-kay-模型-早期简易">Kajiya-Kay 模型 (早期/简易)</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216181214997.png" 
+       alt="image-20251216181214997" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216181214997
+    </figcaption>
+  
+</figure></p>
+<p>其原理是： 把头发看成不透明的圆柱体。 只是简单地把原本是一个面的光照，压缩到一条线上算。渲染效果像塑料丝，只有简单的亮斑，做不出头发那种通透感。主要用于旧时代的网游、为了性能牺牲画质的手游。</p>
+<h4 id="marschner-模型-现代标准迪士尼">Marschner 模型 (现代标准/迪士尼)</h4>
+<p>其原理是把头发看成<strong>透明</strong>的玻璃圆柱体（角蛋白）。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216181852719.png" 
+       alt="image-20251216181852719" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216181852719
+    </figcaption>
+  
+</figure></p>
+<p><strong>光路分解 (最重要的三个分量)：</strong></p>
+<p><strong>R (Reflection)：</strong> 光打到头发表面直接反射。</p>
+<ul>
+<li><em>视觉效果：</em> 它是<strong>白色</strong>的（没有进入头发内部），形成了头发上最亮的那一圈光环。</li>
+</ul>
+<p><strong>TT (Transmit-Transmit)：</strong> 光穿进头发，穿过中间，从另一边出来。</p>
+<ul>
+<li><em>视觉效果：</em> 它是<strong>有颜色</strong>的（被头发吸收过），这让背光下的头发看起来金灿灿的。</li>
+</ul>
+<p><strong>TRT (Transmit-Reflect-Transmit)：</strong> 光穿进去，撞到内壁反弹一下，再穿出来。</p>
+<ul>
+<li><em>视觉效果：</em> 它是<strong>有颜色</strong>的。因为头发表面像叠瓦片一样不平整，这束光通常会偏离主高光，形成头发上特有的“第二高光”（天使环）。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216181957137.png" 
+       alt="image-20251216181957137" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216181957137
+    </figcaption>
+  
+</figure></p>
+<h4 id="double-cylinder-模型-动物专用">Double Cylinder 模型 (动物专用)</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216182721909.png" 
+       alt="image-20251216182721909" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216182721909
+    </figcaption>
+  
+</figure></p>
+<p><strong>背景：</strong> 闫令琪老师团队发现，用 Marschner 模型渲染动物（如狼）不管怎么调参数都不像。</p>
+<p>研究生物蛋白结构发现： 动物毛发比人发粗，中间有一根充满散射颗粒的<strong>髓质 (Medulla)</strong>。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216182808241.png" 
+       alt="image-20251216182808241" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216182808241
+    </figcaption>
+  
+</figure></p>
+<p>其团队做了如下改进： 在 Marschner 的玻璃圆柱里，再套一个小圆柱（髓质），专门负责散射光线 (S 分量)。这让动物毛发看起来更“厚实”且有杂色。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216183035761.png" 
+       alt="image-20251216183035761" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216183035761
+    </figcaption>
+  
+</figure></p>
+<p>该技术被用在了电影金刚和狮子王中，并获得了2018和2019奥斯卡最佳视觉提名</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216183328826.png" 
+       alt="image-20251216183328826" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216183328826
+    </figcaption>
+  
+</figure></p>
+<h3 id="颗粒材质-granular-material">颗粒材质 (Granular Material)</h3>
+<p>如：沙丘、一碗米饭、盐堆</p>
+<p><strong>难点：</strong> 几亿颗沙子，没法建模。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216183726951.png" 
+       alt="image-20251216183726951" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216183726951
+    </figcaption>
+  
+</figure></p>
+<p><strong>方案：</strong> 既不把它们当单独的几何体，也不当成简单的体积。而是用程序化定义它们的排列密度，动态计算光在颗粒缝隙间的弹射。</p>
+<h2 id="表面模型-surface-models">表面模型 (Surface Models)</h2>
+<p>这类物体有表面，但光线在表面附近的行为很复杂。</p>
+<h3 id="次表面散射-subsurface-scattering--bssrdf">次表面散射 (Subsurface Scattering / BSSRDF)</h3>
+<p>如： 皮肤、玉石、蜡烛、牛奶、葡萄。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216184545833.png" 
+       alt="image-20251216184545833" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216184545833
+    </figcaption>
+  
+</figure></p>
+<p>BRDF 的局限性：标准 BRDF 假设光线打到物体表面的 $x$ 点，必须立刻从同一个 $x$ 点反射出来。这对于金属、镜子是成立的。</p>
+<p>而真实世界的情况是：对于半透明物体（Translucent），光线打到 $x_i$ 点后，会钻进物体内部，经过多次散射（Bounce），最后从完全不同的 $x_o$ 点射出。</p>
+
+
+
+  <blockquote>
+    <p><em>生活案例</em>：在暗室里把手电筒紧贴手指，你会看到手指边缘发出<strong>红光</strong>。这是因为白光射入肉里，被血液吸收了其他颜色（留下了红色），然后在内部乱跑，最后从手指侧面跑了出来。</p>
+
+  </blockquote>
+
+<p>为了描述这种现象，我们把 BRDF 升级为 <strong>BSSRDF</strong> (Bidirectional Scattering-Surface Reflectance Distribution Function)。</p>
+<p><strong>公式变化</strong>：</p>
+<ul>
+<li>BRDF: $f_r(x, \omega_i, \omega_o)$ —— 输入是一个点、入光方向、出光方向。</li>
+<li>BSSRDF: $S(x_i, \omega_i, x_o, \omega_o)$ —— 输入变成了<strong>两个点</strong>（入点、出点）和两个方向。</li>
+</ul>
+<p><strong>渲染代价</strong>：极其昂贵。因为对于每一个要渲染的像素（出点），你都要去计算物体表面<strong>所有</strong>可能的入点对它的贡献。这相当于做了一个全表面的积分。</p>
+<p><strong>工业界解法:偶极子近似 (Dipole Approximation)：</strong></p>
+<p>既然光在物体内部是经过高度散射的（像墨水滴入水中扩散），我们可以不模拟每一条光路，而是模拟<strong>扩散的结果</strong>。</p>
+<p>完整计算 BSSRDF 太慢了。Jensen 发明了一个神技：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216184306059.png" 
+       alt="image-20251216184306059" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216184306059
+    </figcaption>
+  
+</figure></p>
+<p>为了模拟光在表面下的扩散光斑，他在物体表面上方放一个<strong>正光源</strong>，在表面下方放一个<strong>负光源</strong>。这两个虚拟光源的共同作用，恰好能形成一个类似于真实次表面散射的“衰减光斑”。把复杂的物理积分，简化成了简单的数学公式。这让实时渲染皮肤成为可能。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216184622860.png" 
+       alt="image-20251216184622860" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216184622860
+    </figcaption>
+  
+</figure></p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>如上图所示，从渲染的角度解释，你化妆卡粉的原因是脸部太干了，所以以后先敷个面膜再上底妆🤭</p>
+  </blockquote>
+
+<h3 id="布料-cloth">布料 (Cloth)</h3>
+<p><strong>核心问题</strong>：布料是固体表面吗？还是体积？</p>
+<p>布料的渲染难点在于它的<strong>多层级结构</strong>：纤维 (Fiber) $\to$ 股 (Ply) $\to$ 线 (Yarn) $\to$ 布 (Cloth)。根据观察距离的远近，图形学发展出了三套完全不同的渲染逻辑。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216184951472.png" 
+       alt="image-20251216184951472" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216184951472
+    </figcaption>
+  
+</figure></p>
+<p><strong>作为表面 (As Surface)</strong></p>
+<p>远距离观察的情况下，或者像丝绸这样编织极密的布料。可以通过直接修改 BRDF进行模拟。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216185549836.png" 
+       alt="image-20251216185549836" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216185549836
+    </figcaption>
+  
+</figure></p>
+<p>经典案例：天鹅绒 (Velvet)</p>
+<ul>
+<li>普通的布料是漫反射（Lambert），中间亮，边缘暗。</li>
+<li>天鹅绒恰恰相反，<strong>边缘最亮 (Rim Light)</strong>。</li>
+<li><em>原因</em>：天鹅绒表面竖立着无数细小的绒毛。当视线与表面平行时（看边缘），视线穿过的绒毛路径最长，更容易看到绒毛散射的光。</li>
+</ul>
+<p><strong>作为参与介质 (As Participating Media)</strong></p>
+<p>适用场景：厚实的毛织物（如羊毛大衣、地毯）。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216185713793.png" 
+       alt="image-20251216185713793" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216185713793
+    </figcaption>
+  
+</figure></p>
+<p>通过体积渲染 (Volume Rendering)的方式，把布料当成一层厚厚的“云”。光线在布料纤维之间反复散射（就像光在云层里一样）。这类方法能渲染出布料的厚重感和毛茸茸的质感，比单纯的面片更真实。</p>
+<p><strong>作为纤维 (As Fibers)</strong></p>
+<p><strong>适用场景</strong>：电影级特写（如《冰雪奇缘》里艾莎的衣服）。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216185815788.png" 
+       alt="image-20251216185815788" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216185815788
+    </figcaption>
+  
+</figure></p>
+<p>直接暴力计算，真的在计算机里把每一根线、每一根纤维都建出来。光线射过来时，去计算它和每一根微小圆柱体的相交。计算量是天文数字，但效果是照片级的。</p>
+<h3 id="细节外观-detailed-appearance">细节外观 (Detailed Appearance)</h3>
+<p><strong>核心问题</strong>：为什么游戏里的金属地面远看像塑料，近看才有细节？</p>
+<p>问题根源为：完美的法线分布</p>
+<p>在微表面模型（Microfacet Theory）中，我们通常假设在一个像素范围内，微表面的法线分布（NDF）是一个<strong>平滑的统计分布</strong>（比如高斯分布/贝克曼分布）。</p>
+<p><strong>这带来的后果：<strong>当你离物体很远，一个像素覆盖了物体表面很大一块区域（比如这块区域里有几千个微小的划痕）。传统的 Mipmap 技术会把这几千个划痕的法线</strong>平均</strong>一下。<strong>平均的结果就是平滑</strong>。原本波光粼粼的海面，远看变成了一滩死水；原本有拉丝质感的金属，远看变成了光滑塑料。</p>
+<h4 id="p-ndf-pixel-ndf">P-NDF (Pixel-NDF)</h4>
+<p><strong>核心思想</strong>：不要平均！我们要保留细节的<strong>方差</strong>。</p>
+<p>在这个像素覆盖的范围内，具体的法线分布可能非常杂乱（比如有两个尖峰，或者是一堆锯齿）。我们需要去查询这个具体的、不规则的分布，而不是用一个平滑的高斯函数来替代它。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216191341093.png" 
+       alt="image-20251216191341093" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216191341093
+    </figcaption>
+  
+</figure></p>
+<p><strong>视觉效果</strong>：实现了<strong>Glints (闪烁)</strong>。随着视角微小的移动，高光会剧烈跳动，这完美复现了远处看海面波光粼粼，或者在阳光下看金属漆面的那种颗粒感。</p>
+<h4 id="波动光学-wave-optics">波动光学 (Wave Optics)</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216190609563.png" 
+       alt="image-20251216190609563" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216190609563
+    </figcaption>
+  
+</figure></p>
+<p>当表面的微观结构小到和光波的波长（微米级）差不多时（例如全息防伪标、昆虫甲壳、光盘背面），几何光学的“反射/折射”就失效了。</p>
+<p>这时必须考虑<strong>衍射 (Diffraction)</strong> 和 <strong>干涉 (Interference)</strong>，这属于更前沿的物理渲染领域。</p>
+<h3 id="程序化外观-procedural-appearance">程序化外观 (Procedural Appearance)</h3>
+<p><strong>核心问题</strong>：如果物体要做无限大，纹理贴图存不下怎么办？</p>
+<p>传统的材质是“查表”（Texture Mapping），程序化材质是“计算”（Function）。</p>
+<p><strong>公式</strong>：$Color(x, y, z) = f(x, y, z)$</p>
+<p>你给我空间中任意一个点的坐标，我当场算出来这个点的颜色是什么。</p>
+<p><strong>噪声函数 (Noise Function)</strong>：</p>
+<p>Perlin Noise：最著名的噪声。它生成的纹理是连续的、自然的，看起来像云层、山脉或大理石纹路。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E9%AB%98%E7%BA%A7%E5%85%89%E7%BA%BF%E4%BC%A0%E6%92%AD%E4%B8%8E%E5%A4%8D%E6%9D%82%E5%A4%96%E8%A7%82%E5%BB%BA%E6%A8%A1/image-20251216191007918.png" 
+       alt="image-20251216191007918" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216191007918
+    </figcaption>
+  
+</figure></p>
+<p><strong>3D 噪声 (Solid Noise) 的威力</strong>：</p>
+<p><strong>体积感</strong>：如果我给一个立方体应用 3D 噪声，它不仅仅是表面有纹理，而是<strong>整个实心体内</strong>都有纹理。</p>
+<p><strong>动态切割</strong>：你在游戏中砍断一根程序化生成的木头，断口处会自动显示出原本隐藏在内部的年轮。因为年轮是根据 $(x,y,z)$ 算出来的，断口有了新的面，自然就算出了对应的纹理。这是贴图完全做不到的。</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

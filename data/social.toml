@@ -1,0 +1,22 @@
+# 配置文件：data/socials.toml
+# 图标名称可以在 https://ionic.io/ionicons 查找
+
+[[socials]]
+  href = "https://github.com/TingDongHu"
+  icon = "logo-github"
+  target = "_blank"
+  title = "GitHub"
+
+
+[[socials]]
+  href = "2680957536@qq.com"
+  icon = "mail-outline"
+  target = "_blank"
+  title = "Email"
+
+[[socials]]
+  # Bilibili 在 Ionicons 中没有原生图标，通常建议用 'tv-outline' 或 'play-circle-outline'
+  href = "https://space.bilibili.com/473408368"
+  icon = "tv-outline"
+  target = "_blank"
+  title = "Bilibili"

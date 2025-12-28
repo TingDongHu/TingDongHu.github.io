@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>用户控件 on 古月月仔的博客</title>
+    <link>http://localhost:1313/tags/%E7%94%A8%E6%88%B7%E6%8E%A7%E4%BB%B6/</link>
+    <description>Recent content in 用户控件 on 古月月仔的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 11 Aug 2023 00:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E7%94%A8%E6%88%B7%E6%8E%A7%E4%BB%B6/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>【虚幻引擎】设置双人分屏</title>
+      <link>http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AE%E5%8F%8C%E4%BA%BA%E5%88%86%E5%B1%8F/</link>
+      <pubDate>Fri, 11 Aug 2023 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AE%E5%8F%8C%E4%BA%BA%E5%88%86%E5%B1%8F/</guid>
+      <description>&lt;p&gt;本文记录了在项目中实现本地分屏联机功能的过程，包括在项目设置中启用分屏模式、配置游戏模式，并详细解析了用于动态生成玩家角色的蓝图核心逻辑与关键节点。&lt;/p&gt;&#xA;&lt;p&gt;在开发项目的时候想添加一个本地联机功能,使用分屏功能实现,查了一些资料做此记录博客.&lt;/p&gt;&#xA;&lt;h2 id=&#34;项目设置&#34;&gt;项目设置&lt;/h2&gt;&#xA;&lt;p&gt;在项目设置中&lt;code&gt;Local Multiplayer&lt;/code&gt;目录下打开使用分屏功能,可以选择垂直/水平分屏,一般像双人成行那样选择垂直模式.&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AE%E5%8F%8C%E4%BA%BA%E5%88%86%E5%B1%8F/image-20250425120633628.png&#34; &#xA;       alt=&#34;image-20250425120633628&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      image-20250425120633628&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&#xA;&#xA;&#xA;  &lt;blockquote&gt;&#xA;    &lt;p&gt;⚠Warning !&lt;/p&gt;&#xA;&lt;p&gt;注意此处要跳过将手柄指定到玩家1选项.,因为我们想实现一个玩家1使用键鼠操作,后续玩家使用手柄操作的模式&lt;/p&gt;&#xA;&#xA;  &lt;/blockquote&gt;&#xA;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AE%E5%8F%8C%E4%BA%BA%E5%88%86%E5%B1%8F/51d8c8a72e89a298328920c8855a6207.png&#34; &#xA;       alt=&#34;img&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      img&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;游戏模式设置&#34;&gt;游戏模式设置&lt;/h2&gt;&#xA;&lt;p&gt;打开项目设置后就可以修改我们的游戏模式.&lt;/p&gt;&#xA;&lt;p&gt;&lt;figure style=&#34;text-align: center; margin: 1.5rem auto;&#34;&gt;&#xA;  &#xA;  &lt;img src=&#34;http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E%E8%AE%BE%E7%BD%AE%E5%8F%8C%E4%BA%BA%E5%88%86%E5%B1%8F/0cd310daba03794899369a39b83d0450.png&#34; &#xA;       alt=&#34;img&#34; &#xA;       &#xA;       class=&#34;zoomable&#34; &#xA;       style=&#34;max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;&#34;&#xA;       loading=&#34;lazy&#34; /&gt;&#xA;  &#xA;    &lt;figcaption style=&#34;margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;&#34;&gt;&#xA;      img&#xA;    &lt;/figcaption&gt;&#xA;  &#xA;&lt;/figure&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

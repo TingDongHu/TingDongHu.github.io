@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【OpenPCDet】PointPillar算法思路 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/openpcdetpointpillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="PointPillar是一种高效的激光雷达点云3D检测模型，通过将点云划分为柱体并编码为伪图像，在保持高精度的同时实现了显著的实时检测速度优势。" />
+<meta name="keywords" content="视觉算法,自动驾驶,目标检测">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/openpcdetpointpillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【OpenPCDet】PointPillar算法思路">
+  <meta property="og:description" content="PointPillar是一种高效的激光雷达点云3D检测模型，通过将点云划分为柱体并编码为伪图像，在保持高精度的同时实现了显著的实时检测速度优势。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-31T00:00:00+08:00">
+    <meta property="article:modified_time" content="2024-12-31T00:00:00+08:00">
+    <meta property="article:tag" content="视觉算法">
+    <meta property="article:tag" content="自动驾驶">
+    <meta property="article:tag" content="目标检测">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【OpenPCDet】PointPillar算法思路">
+  <meta name="twitter:description" content="PointPillar是一种高效的激光雷达点云3D检测模型，通过将点云划分为柱体并编码为伪图像，在保持高精度的同时实现了显著的实时检测速度优势。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【OpenPCDet】PointPillar算法思路">
+  <meta itemprop="description" content="PointPillar是一种高效的激光雷达点云3D检测模型，通过将点云划分为柱体并编码为伪图像，在保持高精度的同时实现了显著的实时检测速度优势。">
+  <meta itemprop="datePublished" content="2024-12-31T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2024-12-31T00:00:00+08:00">
+  <meta itemprop="wordCount" content="91">
+  <meta itemprop="keywords" content="视觉算法,自动驾驶,目标检测">
+
+      <header>
+        <h1 itemprop="headline">【OpenPCDet】PointPillar算法思路</h1>
+        <p class="text-sm">
+          
+            Tuesday, Dec 31, 2024
+          
+
+          | <span>1 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Tuesday, Dec 31, 2024
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90OpenPCDet%e3%80%91PointPillar%e7%ae%97%e6%b3%95%e6%80%9d%e8%b7%af&amp;url=http://localhost:1313/posts/openpcdetpointpillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/openpcdetpointpillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90OpenPCDet%e3%80%91PointPillar%e7%ae%97%e6%b3%95%e6%80%9d%e8%b7%af%20http://localhost:1313/posts/openpcdetpointpillar%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>PointPillar 是一种用于三维物体检测的深度学习模型，尤其适用于激光雷达点云数据的处理。它的设计思想相对简洁，并且在保持高效性的同时能获得较高的精度。
+<a href="https://arxiv.org/abs/1812.05784" target="_blank">论文地址</a>
+
+<a href="https://link.zhihu.com/?target=https%3A//github.com/SmallMunich/nutonomy_pointpillars" target="_blank">代码地址</a>
+</p>
+<h2 id="前言">前言</h2>
+<p>本文要解析的模型叫做<a href="https://zhida.zhihu.com/search?content_id=167602095&amp;content_type=Article&amp;match_order=1&amp;q=PointPillars&amp;zhida_source=entity" target="_blank">PointPillars</a>
+，是2019年出自工业界的一篇Paper。
+该模型最主要的特点是<strong>检测速度和精度的平衡</strong>。该模型的平均检测速度达到了62Hz，最快速度达到了105Hz，确实遥遥领先了其他的模型。这里我们引入<a href="https://zhida.zhihu.com/search?content_id=167602095&amp;content_type=Article&amp;match_order=1&amp;q=CIA-SSD&amp;zhida_source=entity" target="_blank">CIA-SSD</a>
+<strong>模型中的精度-速度图</strong>，具体对比如下所示。
+<figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="https://github.com/user-attachments/assets/2b4acd80-8c42-4b92-a8ee-34f9be41f0b4" 
+       alt="Image" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      Image
+    </figcaption>
+  
+</figure>
+截止CIA-SSD论文发表前，PointPillars的检测速度都是遥遥领先的，而且精度也不低。
+现有的一些研究喜欢将不规则、稀疏的点云数据按照以下两种方式进行处理，然后引入RPN层进行3D Bbox Proposal，这两种方法为：</p>
+<ul>
+<li>一种是将点云数据划纳入一个个<strong>体素（Voxel）<strong>中，构成规则的、密集分布的体素集。常见的有</strong>VoxelNet</strong>和<strong>SECOND</strong>；</li>
+<li>另一种从<strong>俯视角度</strong>将点云数据进行处理，获得一个个<strong>伪图片</strong>的数据。常见的模型有<strong>MV3D和AVOD</strong>。
+PointPillar模型采用了一种不同于上述两种思路的点云建模方法。从模型的名称PointPillars可以看出，该方法将Point转化成一个个的<strong>Pillar（柱体）</strong>，从而构成了<strong>伪图片</strong>的数据。
+然后对伪图片数据进行<strong>BBox Proposal</strong>就很简单了，作者采用了<strong>SSD</strong>的网络结构进行了Proposal。</li>
+</ul>
+<h2 id="数据处理">数据处理</h2>
+<p>PointPillar的一大亮点是将点云划分为一个个的Pillar，从而构成了伪图片的数据。
+如何构成这个伪图片呢？作者在论文中是给出了这样的图，如下。
+<figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="https://github.com/user-attachments/assets/24ae971c-0384-4019-897b-37a988259979" 
+       alt="Image" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      Image
+    </figcaption>
+  
+</figure>
+具体实现步骤如下：</p>
+<ul>
+<li>按照点云数据所在的X，Y轴（不考虑Z轴）将点云数据划分为<strong>一个个的网格</strong>，凡是落入到一个网格的点云数据被视为其处在<strong>一个pillar</strong>里，或者理解为它们构成了一个Pillar。</li>
+<li>每个点云用一个 $ D=9$ 维的向量表示，分别为 $(x,y,z,r,x_c,y_c,z_c,x_p,y_p)$。其中 $(x,y,z,r)$ 为该点云的真实坐标信息（三维）和反射强度（注在openpcdet的代码实现中是10维，多了一个zp，也就是该点在z轴上与该点所处pillar的z轴中心的偏移量）. $(x_c,y_c,z_c)$ 为该点云所处Pillar中所有点的几何中心; $x_p$ , $y_p$ 为 $x-x_c$ , $y-y_c$ ,反应了点与几何中心的<strong>相对位置</strong>。</li>
+<li>假设每个样本中有 $P$ 个非空的pillars，每个pillar中有 $N$ 个点云数据，那么这个样本就可以用一个 $(D,P,N)$ 张量表示。
+那么可能就有人问了，怎么保证每个pillar中有 $N$ 个点云数据呢？
+如果每个pillar中的点云数据数据超过 $N$ 个，那么我们就随机采样至 $N$ 个；如果每个pillar中的点云数据数据少于 $N$ 个，少于的部分我们就填充为0；这样就实现了点云数据的张量化，具体过程如下图所示</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="https://github.com/user-attachments/assets/d66b3bbb-0681-4947-b1a6-a997bd14ed40" 
+       alt="Image" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      Image
+    </figcaption>
+  
+</figure>
+实现张量化后，作者利用简化版本的PointNet对张量化的点云数据进行处理和特征提取。
+特征提取可以理解为对点云的维度进行处理，原来的点云维度为  $D=9$  ,处理后的维度为 $C$ ,那么我们就获得了一个 $(C,P,N)$ 的张量。
+接着，我们按照Pillar所在维度进行Max Pooling操作，即获得了 $(C,P)$ 维度的特征图。
+为了获得伪图片特征，作者将 $ P$ 转换为 $(H,W)$ ,即 $P->H*W$ .那么我们就获得了形如 $(C,H,W)$ 的伪图片了。具体过程如下：
+<figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="https://github.com/user-attachments/assets/5d8d4957-d83a-43b1-8a67-7b45fd05fb12" 
+       alt="Image" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      Image
+    </figcaption>
+  
+</figure></p>
+<h2 id="网络结构">网络结构</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="https://github.com/user-attachments/assets/4976b9ce-37d2-40f8-bad5-fc8508496d1e" 
+       alt="Image" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      Image
+    </figcaption>
+  
+</figure>
+伪图片作者2D CNN的输入，用来进一步提取图片特征。
+从图中可以看出，该2D CNN采用了两个网络。其中一个网络<strong>不断缩小特征图的分辨率</strong>，同时提升特征图的维度，因此获得了<strong>三个不同分辨率的特征图</strong>。
+另一个网络对三个特征图进行上采样至相同大小，然后进行concatenation。
+之所以选择这样架构，是因为不同分辨率的特征图负责不同大小物体的检测。比如分辨率大的特征图往往感受野较小，适合捕捉小物体（在[KITTI]中就是行人）。</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】光线追踪基础Ray-Tracing | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。" />
+<meta name="keywords" content="图形学,GAMES课程,光线追踪,光栅化">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】光线追踪基础Ray-Tracing">
+  <meta property="og:description" content="阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-04T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-04T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="光线追踪">
+    <meta property="article:tag" content="光栅化">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】光线追踪基础Ray-Tracing">
+  <meta name="twitter:description" content="阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】光线追踪基础Ray-Tracing">
+  <meta itemprop="description" content="阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。">
+  <meta itemprop="datePublished" content="2025-12-04T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-04T00:00:00+08:00">
+  <meta itemprop="wordCount" content="651">
+  <meta itemprop="keywords" content="图形学,GAMES课程,光线追踪,光栅化">
+
+      <header>
+        <h1 itemprop="headline">【Games101】光线追踪基础Ray-Tracing</h1>
+        <p class="text-sm">
+          
+            Thursday, Dec 4, 2025
+          
+
+          | <span>4 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Thursday, Dec 4, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e5%85%89%e7%ba%bf%e8%bf%bd%e8%b8%aa%e5%9f%ba%e7%a1%80Ray-Tracing&amp;url=http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e5%85%89%e7%ba%bf%e8%bf%bd%e8%b8%aa%e5%9f%ba%e7%a1%80Ray-Tracing%20http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。</p>
+<p>要讲述光线追踪，首先需要先引入之前的光栅化中的一个内容&ndash;阴影贴图</p>
+<h1 id="先导">先导</h1>
+<h2 id="阴影贴图-shadow-mapping">阴影贴图 (Shadow Mapping)</h2>
+<h3 id="为什么需要-shadow-mapping"><strong>为什么需要 Shadow Mapping？</strong></h3>
+<p>在光栅化渲染中，我们通常是一个三角形一个三角形地画，很难直接知道“谁挡住了谁”从而产生阴影 。为了解决这个问题，我们引入了 <strong>Shadow Mapping</strong>。</p>
+<ul>
+<li><strong>定位</strong>：这是目前最主流的阴影生成技术，从早期的《玩具总动员》到《塞尔达传说：荒野之息》、《超级马里奥：奥德赛》等现代游戏都在使用 。</li>
+<li><strong>本质</strong>：它是一种<strong>图像空间 (Image-space)</strong> 的算法 。这意味着它依赖生成的图像（深度图）来计算，而不需要一直纠缠于复杂的场景几何数据。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204170440998.png" 
+       alt="image-20251204170440998" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204170440998
+    </figcaption>
+  
+</figure></p>
+<p>Shadow Mapping 的核心思想非常朴素，只有一句话：</p>
+
+
+
+  <blockquote>
+    <p><strong>如果一个点不在阴影里，那么它必须能同时被“摄像机”和“光源”看到。</strong></p>
+
+  </blockquote>
+
+<p>如果不被阴影覆盖（也就是被照亮），说明那个点既能被你的眼睛（相机）看见，也能被头顶的太阳（光源）直接照射到。如果那个点被太阳“看不见”（中间有障碍物挡住了），那它就在阴影里。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/%E5%9B%BE%E7%89%877-1764840093756-2.png" 
+       alt="图片7" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      图片7
+    </figcaption>
+  
+</figure></p>
+<h3 id="算法流程经典的两步走-2-pass"><strong>算法流程：经典的“两步走” (2-Pass)</strong></h3>
+<p>Shadow Mapping 之所以叫 Mapping，就是因为它需要生成一张图（Map）。整个过程分为两次渲染：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/%E5%9B%BE%E7%89%878.png" 
+       alt="图片8" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      图片8
+    </figcaption>
+  
+</figure></p>
+<p><strong>第一步：光源视角的“彩排” (Pass 1: Render from Light)</strong></p>
+<ul>
+<li><strong>做什么</strong>：把摄像机挪到光源的位置，看向场景，进行一次渲染 。</li>
+<li><strong>记什么</strong>：我们不关心颜色，只关心<strong>深度 (Depth)</strong>。生成的这张图叫 <strong>Shadow Map</strong>（阴影贴图/深度图）。</li>
+<li><strong>意义</strong>：这张图记录了<strong>从光源出发，在这个方向上能看到的最远的物体离光源有多近</strong>。换句话说，任何比这个距离更远的东西，都会被挡住。</li>
+</ul>
+<p><strong>第二步：相机视角的“实拍” (Pass 2: Render from Eye)</strong></p>
+<ul>
+<li><strong>做什么</strong>：把摄像机放回正常的观察位置，开始渲染画面 。</li>
+<li><strong>怎么算</strong>：对于画面上的每一个可见点（Pixel），我们做一个“灵魂拷问”——<strong>“光源能看见你吗？”</strong>
+<ul>
+<li><strong>操作</strong>：把这个点投影回光源的视角 。</li>
+<li><strong>对比 (Compare)</strong>：
+<ol>
+<li>测量 <strong>“当前点到光源的实际距离”</strong>。</li>
+<li>查看 Shadow Map 上对应位置记录的 <strong>“光源能看到的最近距离”</strong>。</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>判定结果 (The Verdict)</strong>：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/%E5%9B%BE%E7%89%879.png" 
+       alt="图片9" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      图片9
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>✅ <strong>被照亮 (Lit)</strong>：如果 <strong>实际距离 $\approx$ 记录的最近距离</strong>。说明中间没有障碍物，光源直接照到了它（上图中显示为绿色区域）。</li>
+<li>🚫 <strong>在阴影中 (Shadow)</strong>：如果 <strong>实际距离 $>$ 记录的最近距离</strong>。说明光源在更近的地方遇到了障碍物，当前点躲在了障碍物后面（上图中非绿色区域）。</li>
+</ul>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>可以总结为一句口诀：先从光源看一遍（记深度），再从相机看一遍（比深度）。</p>
+  </blockquote>
+
+<h3 id="shadow-mapping-的痛点与局限"><strong>Shadow Mapping 的“痛点”与局限</strong></h3>
+<p>虽然这个算法很强，但它并不完美。主要有以下三个问题 ：</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204174328014.png" 
+       alt="image-20251204174328014" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204174328014
+    </figcaption>
+  
+</figure></p>
+<p><strong>硬阴影 (Hard Shadows)</strong></p>
+<p>表现为阴影边缘非常锋利，像刀切一样。其原因是Shadow Mapping 假设光源是一个<strong>点光源 (Point Light)</strong>。而在现实中光源（如太阳）是有体积的，会产生 <strong>本影 (Umbra)</strong> 和 <strong>半影 (Penumbra)</strong>，从而形成边缘柔和的软阴影（Soft Shadows）。Shadow Mapping 原生做不到这一点。</p>
+<p><strong>分辨率依赖 (Resolution / Aliasing)</strong></p>
+<p>如果你离阴影很近，会看到阴影边缘有锯齿（马赛克）。shadow Map 本质上是一张图片（位图）。如果这张图的分辨率不够高，放大后自然会有像素感。这被称为图像空间算法的通病 。</p>
+<p><strong>浮点精度问题 (Z-fighting / Bias)</strong></p>
+<p>有时候受光面会莫名其妙出现一些黑色的斑点（脏脏的感觉）。因为我们在对比距离时，是在比较浮点数。由于计算机精度的误差，或者采样位置的微小偏差，导致“实际距离”和“记录距离”虽然理论上相等，但数值上略有差异（例如 $10.00001 > 10.00000$），导致系统误判为阴影。实际使用的过程中通常需要引入一个容差值（Tolerance 或 Bias），允许一点点误差。</p>
+<h1 id="光线追踪">光线追踪</h1>
+<h2 id="为什么要引入光线追踪-why-ray-tracing">为什么要引入光线追踪？ (Why Ray Tracing?)</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204180531767.png" 
+       alt="image-20251204180531767" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204180531767
+    </figcaption>
+  
+</figure></p>
+<p>在之前的课程中，我们一直在学光栅化（Rasterization）。它很快，是实时渲染（如游戏）的霸主，但它有一个致命弱点：<strong>它太“局限”了</strong>。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>实际上在算力极大提升的2025年，光栅化主要占据的生态位是移动端游戏和低性能PC端或主机端。</p>
+  </blockquote>
+
+<ul>
+<li><strong>光栅化的局限</strong>：它在处理全局效果时非常笨拙。例如，想要画出完美的<strong>软阴影</strong>（Soft Shadows）、<strong>光泽反射</strong>（Glossy Reflection）或者<strong>间接光照</strong>（Indirect Illumination，光线弹射多次），光栅化需要各种复杂的 hack 技巧 。</li>
+<li><strong>光线追踪的优势</strong>：它符合物理直觉，能生成极其逼真的图像（如《疯狂动物城》），代价就是<strong>慢</strong> 。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204180738637-1764842864287-6.png" 
+       alt="image-20251204180738637" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204180738637
+    </figcaption>
+  
+</figure></p>
+<h2 id="光线追踪基础算法">光线追踪基础算法</h2>
+<h3 id="光线投射-ray-casting--光线追踪的雏形">光线投射 (Ray Casting) —— 光线追踪的雏形</h3>
+<p>这是最早期的光线追踪算法（Appel 1968），它的核心思想基于<strong>光路可逆性</strong>：与其从光源发出亿万条光线去碰运气看哪条进入眼睛，不如<strong>从眼睛发出光线</strong>去逆向追踪光路 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204181604681.png" 
+       alt="image-20251204181604681" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204181604681
+    </figcaption>
+  
+</figure></p>
+<p><strong>生成光线 (Generation)</strong>： 假设摄像机是一个针孔相机，我们将眼睛作为起点，通过成像平面上的每一个<strong>像素 (Pixel)</strong> 发射一条射线，这条射线叫 <strong>Eye Ray</strong> 。</p>
+<p><strong>求交 (Intersection)</strong>： 计算这条光线与场景中所有物体的交点，并找到<strong>距离眼睛最近</strong>的那个交点（因为远的会被近的挡住） 。</p>
+<p><strong>着色与阴影 (Shading &amp; Shadow)</strong>： 在最近的交点处，我们需要计算颜色。</p>
+<ul>
+<li><strong>判定阴影</strong>：从该交点向<strong>光源</strong>发射一条射线（Shadow Ray）。如果这条射线中间没有被其他物体阻挡，说明该点能被照亮；如果被阻挡，则该点处于阴影中 。</li>
+<li><strong>计算颜色</strong>：结合材质属性（如法线方向）和光照模型（如 Blinn-Phong），算出该像素的颜色 。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204182834879.png" 
+       alt="image-20251204182834879" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204182834879
+    </figcaption>
+  
+</figure></p>
+<h3 id="whitted-style-光线追踪-recursive-ray-tracing--让光线弹起来">Whitted-Style 光线追踪 (Recursive Ray Tracing) —— 让光线“弹”起来</h3>
+<p>Ray Casting 只考虑了光线直接击中物体的效果，而 1980 年提出的 Whitted-Style 光线追踪引入了<strong>递归 (Recursion)</strong>，让光线可以在物体之间反弹，从而模拟反射和折射 。</p>
+<p><strong>主光线 (Primary Ray)</strong>： 和 Ray Casting 一样，从眼睛发出光线，找到最近的交点 。</p>
+<p><strong>次级光线 (Secondary Rays)</strong>： 在这个交点处，根据物体的材质，光线会发生分支：</p>
+<ul>
+<li><strong>反射光线 (Reflection Ray)</strong>：如果是镜面，光线会发生镜面反射 。</li>
+<li><strong>折射光线 (Refraction Ray)</strong>：如果是玻璃或水，光线会发生折射（透射） 。</li>
+<li><strong>阴影光线 (Shadow Ray)</strong>：依然需要向光源发射光线来检测阴影 。</li>
+</ul>
+<p><strong>递归计算</strong>： 反射和折射出去的新光线，会继续向前飞行，撞击下一个物体，再次产生新的反射/折射光线。这个过程会一直递归下去（直到达到设定的最大深度或光线能量衰减到忽略不计）。</p>
+<p><strong>颜色叠加</strong>： 最终像素的颜色 = <strong>本色 + 反射回来的颜色 + 折射回来的颜色</strong>。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251204182553871.png" 
+       alt="image-20251204182553871" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251204182553871
+    </figcaption>
+  
+</figure></p>
+<h3 id="光线与表面求交-ray-surface-intersection--数学基础">光线与表面求交 (Ray-Surface Intersection) —— 数学基础</h3>
+<p>为了实现上述算法，计算机必须能算出“光线在哪里撞到了物体”。这需要解数学方程。</p>
+<p><strong>1. 光线方程 (Ray Equation)</strong></p>
+<p>首先，我们需要用数学语言描述“光线”是什么。 在图形学中，光线被定义为从一点发出的<strong>射线</strong>。我们在数学上将光线定义为一条射线，由起点 (Origin, $o$) 和方向 (Direction, $d$) 决定。任意时刻 $t$ 的位置为：
+</p>
+$$
+r(t) = o + t d \quad (0 \le t < \infty)
+$$<ul>
+<li>$r(t)$：光线在 t 时刻到达的位置。</li>
+<li>$t$：可以理解为“时间”或者“距离”</li>
+</ul>
+<p><strong>约束</strong>：$0 \le t < \infty$ 。</p>
+<ul>
+<li>$t=0$ 时，光线在起点 $o$。</li>
+<li>$t$ 必须是正数，因为光线只向前跑，不会向后跑。</li>
+</ul>
+<p><strong>2. 隐式表面求交 (Implicit Surfaces)</strong></p>
+<p>隐式曲面是用数学方程 $f(p)=0$ 定义的表面,以<strong>球体</strong>为例，球的方程是 $(p-c)^2 - R^2 = 0$（$p$是球上一点，$c$是球心，$R$是半径）。</p>
+<ul>
+<li>
+<p>求交逻辑：如果光线上的某个点 $r(t)$ 也在球上，那么把光线方程代入球的方程必须成立。
+</p>
+$$
+  (o + td - c)^2 - R^2 = 0
+  $$</li>
+<li>
+<p>求解：</p>
+<p>这个方程展开后，本质上是一个关于未知数 $t$ 的一元二次方程 ($at^2 + bt + c = 0$) 。</p>
+<ul>
+<li>利用求根公式 $t=\frac{-b\pm\sqrt{b^{2}-4ac}}{2a}$ 求解 。</li>
+<li><strong>判定</strong>：
+<ul>
+<li>如果有两个实根，说明穿过球体（两个交点）。</li>
+<li>如果有一个实根，说明相切。</li>
+<li>无实根，说明没打中。</li>
+</ul>
+</li>
+<li><strong>注意</strong>：我们需要找到<strong>最小的正实数解 $t$</strong>，这才是光线接触到的第一个点。</li>
+</ul>
+</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251205004556047.png" 
+       alt="image-20251205004556047" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251205004556047
+    </figcaption>
+  
+</figure></p>
+<p><strong>3. 显式表面求交 (Triangle Mesh)</strong></p>
+<p>这是图形学中最重要的情况，因为绝大多数模型（如牛、建筑、角色）都是由<strong>三角形</strong>组成的</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251205011756248.png" 
+       alt="image-20251205011756248" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251205011756248
+    </figcaption>
+  
+</figure></p>
+<p><strong>思路一：笨办法 (Ray-Plane Intersection)</strong></p>
+<p>把三角形视为无限大平面的一个子集。</p>
+<ol>
+<li><strong>第一步</strong>：求光线与三角形所在的<strong>无限大平面</strong>的交点 。
+<ul>
+<li>平面方程定义为：$(p - p') \cdot N = 0$，其中 $N$ 是法线，$p'$ 是平面上任意一点 。</li>
+<li>代入光线方程求解 $t$：$t = \frac{(p' - o) \cdot N}{d \cdot N}$ 。</li>
+</ul>
+</li>
+<li><strong>第二步</strong>：判断这个交点是否在<strong>三角形内部</strong> 。
+<ul>
+<li>这通常利用叉积（Cross Product）来判断点是否在三条边的同一侧。</li>
+</ul>
+</li>
+</ol>
+<p><strong>思路二：Möller-Trumbore 算法 (工业界标准)</strong></p>
+<p>这是一种更快速、更直接的方法，不需要先算平面交点 。</p>
+<p>核心思想是：利用重心坐标 (Barycentric Coordinates)。</p>
+<p>三角形内的任意一点 $P$ 可以表示为三个顶点的加权和：
+</p>
+$$
+P = (1 - b_1 - b_2)P_0 + b_1 P_1 + b_2 P_2
+$$<p>
+且满足 $b_1 \ge 0, b_2 \ge 0, 1-b_1-b_2 \ge 0$ 。</p>
+<p>联立方程，让光线上的点等于三角形内的点：
+</p>
+$$
+O + tD = (1 - b_1 - b_2)P_0 + b_1 P_1 + b_2 P_2
+$$<p>
+求解：这是一个包含三个未知数 ($t, b_1, b_2$) 的线性方程组。利用克莱姆法则 (Cramer&rsquo;s Rule) 可以直接推导出求解公式 。</p>
+<p><strong>判定</strong>：如果算出的 $t > 0$ 且 $b_1, b_2$ 符合重心坐标的范围约束，则判定为相交。</p>
+<h2 id="光线追踪计算加速">光线追踪计算加速</h2>
+<p>光线追踪的瓶颈在于，对于场景中的每一根光线，都要判断它是否与场景中的<strong>所有</strong>三角形相交。如果不加干预，复杂度是线性的 $O(N)$。加速结构的目标是构建一种层级化的数据结构，通过预处理将场景组织起来，使得光线查询的复杂度降低到对数级 $O(\log N)$ 。</p>
+
+
+
+  <blockquote>
+    <p>想象你在图书馆找一本书（光线找三角形）。</p>
+<p><strong>没有加速结构</strong>：你需要从第一个书架的第一本书开始，一本一本检查书名，直到找到为止。如果有 100 万本书，你会累死。</p>
+<p><strong>有加速结构</strong>：你利用<strong>索引</strong>。先看“区号”（包围盒），发现书不在A区，那A区里的一万本书直接不用看了。这就是AABB 测试，快速排除无关区域。</p>
+
+  </blockquote>
+
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251205011822013.png" 
+       alt="image-20251205011822013" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251205011822013
+    </figcaption>
+  
+</figure></p>
+<h3 id="光线与包围盒求交-bounding-volumes--aabb">光线与包围盒求交 (Bounding Volumes / AABB)</h3>
+<p>为了加速光线追踪，我们需要先判断光线是否碰到<strong>轴对齐包围盒 (AABB)</strong>。这一步的数学推导非常巧妙。</p>
+<p><strong>理解 AABB (Slabs Method)</strong></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251205011843923.png" 
+       alt="image-20251205011843923" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251205011843923
+    </figcaption>
+  
+</figure></p>
+<ul>
+<li>
+<p>AABB 可以被理解为三对<strong>无限大的板子 (Slabs)</strong> 的交集 。</p>
+<ul>
+<li>一对垂直于 x 轴的板子（形成了 x 轴范围 $x_{min}, x_{max}$）。</li>
+<li>一对垂直于 y 轴的板子。</li>
+<li>一对垂直于 z 轴的板子。</li>
+</ul>
+</li>
+<li>
+<p>光线进入与离开：</p>
+<p>光线 $r(t) = o + td$ 穿过一对板子（例如 x 轴方向）时，会有两个时刻：</p>
+<ul>
+<li>$t_{min} = (x_{min} - o_x) / d_x$</li>
+<li>$t_{max} = (x_{max} - o_x) / d_x$</li>
+<li>注意：如果 $d_x$ 是负数，需要交换 $t_{min}$ 和 $t_{max}$ 确保小的值在前 。</li>
+</ul>
+</li>
+</ul>
+<p><strong>核心求交逻辑</strong></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251205011928377.png" 
+       alt="image-20251205011928377" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251205011928377
+    </figcaption>
+  
+</figure></p>
+<p>对于三维盒子，光线必须<strong>都处于三对板子中间</strong>，才算在盒子里 。</p>
+<ol>
+<li>
+<p>进入时间 ($t_{enter}$)：光线必须进入了所有三对板子，才算真正进入盒子。就像木桶效应的反面，必须等最晚的那个。
+</p>
+$$
+   t_{enter} = \max(t_{min\_x}, t_{min\_y}, t_{min\_z})
+   $$</li>
+<li>
+<p>离开时间 ($t_{exit}$)：光线只要离开了任意一对板子，就算离开了盒子。
+</p>
+$$
+   t_{exit} = \min(t_{max\_x}, t_{max\_y}, t_{max\_z})
+   $$</li>
+</ol>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>简单来说这里就是，在三对两两对应的板子中，取出进入最晚、出去最早的值。</p>
+  </blockquote>
+
+<p><strong>最终判定条件</strong></p>
+<p>光线与 AABB 相交，当且仅当满足以下数学条件 ：</p>
+$$t_{enter} < t_{exit} \quad \text{且} \quad t_{exit} \ge 0$$<ul>
+<li><strong>$t_{enter} < t_{exit}$</strong>：表示光线在盒子里待了一段时间（如果进入时间比离开时间还晚，说明没进去过）。</li>
+<li><strong>$t_{exit} \ge 0$</strong>：表示盒子不在光线的<strong>正后方</strong>（即使光线反向延长线穿过盒子，也不算相交，因为光线只向前射）。</li>
+</ul>
+<h3 id="网格优化">网格优化</h3>
+<p>不管是 Whitted-style 还是后续的 Path Tracing，如果不加优化，我们需要把每一根光线和场景里<strong>所有</strong>的三角形都做一遍求交测试 。 想象一下，如果场景里有 1000 万个三角形，一根光线就要算 1000 万次，这根本不可能实时渲染，为了解决这个问题，图形学中提出了一些加速方法。</p>
+<p>上述方法中我们已经掌握了如何快速判断<strong>光线是否击中一个包围盒（AABB）</strong>，现在将上节课学习的**原子操作（AABB 求交）<strong>整合进</strong>宏观架构（加速结构）**中。</p>
+<h4 id="均匀网格-uniform-grids">均匀网格 (Uniform Grids)</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251206203829092-1765024714727-1.png" 
+       alt="image-20251206203829092" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251206203829092
+    </figcaption>
+  
+</figure></p>
+<p>在预处理阶段，找到场景的包围盒，将其划分为分辨率相同的、规则的网格单元（Cells）。每个单元格内存储了与该单元格重叠的物体引用。光线追踪时，光线按照 3D DDA 算法（类似画直线的算法）依序遍历其穿过的网格 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251206203154279.png" 
+       alt="image-20251206203154279" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251206203154279
+    </figcaption>
+  
+</figure></p>
+<p>如果场景里的物体分布很均匀（比如这满屏幕的草地），这招快得飞起 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251206203439087.png" 
+       alt="image-20251206203439087" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251206203439087
+    </figcaption>
+  
+</figure></p>
+<p>然而对于经典的**“体育场里的茶壶” (Teapot in a stadium)** 问题。如果场景极其空旷，只有中间放个茶壶，光线会在空气中空转几万次格子检测才能碰到茶壶，效率极低 。</p>
+<h4 id="空间划分kd-tree-spatial-partitions">空间划分：KD-Tree (Spatial Partitions)</h4>
+<p>为了解决“格子太死板”的问题，我们引入了自适应的划分。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251206205340720.png" 
+       alt="image-20251206205340720" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251206205340720
+    </figcaption>
+  
+</figure></p>
+<p>KD-Tree 是一种将空间递归二分的树形结构。</p>
+<ul>
+<li><strong>划分方式</strong>：交替沿着 x、y、z 轴，将当前的空间（节点）一分为二。</li>
+<li><strong>存储规则</strong>：<strong>中间节点</strong>只存“我在哪里切了一刀”（划分轴和位置），<strong>叶子节点</strong>才存储具体的物体列表 。</li>
+<li><strong>性质</strong>：子空间之间是<strong>互不重叠</strong>的（Disjoint）。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251206212037335-1765027242043-3.png" 
+       alt="image-20251206212037335" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251206212037335
+    </figcaption>
+  
+</figure></p>
+<p><strong>“切蛋糕”策略</strong>。<strong>切分</strong>：看着整个房间，物体哪里密，就在哪里多切几刀。比如桌子上东西多，就在桌子周围疯狂切分空间；天花板没东西，就留一大块空间。<strong>寻路</strong>：光线射进来，利用上节课学的 $t_{enter}/t_{exit}$，判断它是先穿过“左半边蛋糕”还是“右半边蛋糕”。</p>
+<p><strong>“被切坏的三角形”</strong>。 因为你切的是<strong>空间</strong>（蛋糕），如果有一把刀刚好切在了桌子中间，桌子（物体）就被切成了两半。 这导致同一个物体必须在“左边空间”的名单里写一次，又在“右边空间”的名单里写一次。这让数据维护变得非常恶心 。</p>
+<h3 id="物体划分bvh-object-partitions--工业界主流">物体划分：BVH (Object Partitions) —— 工业界主流</h3>
+<p>为了不把物体切坏，我们换一种思路：不切空间，而是<strong>分组</strong>。</p>
+<p>Bounding Volume Hierarchy (BVH) 是基于对象的划分。</p>
+<p><strong>划分方式</strong>：将物体集合划分为两个子集，然后为每个子集重新计算一个紧凑的 AABB 包围盒。</p>
+<p><strong>性质</strong>：一个物体只属于一个节点，但不同节点的<strong>包围盒在空间上允许重叠</strong> 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AAray-tracing/image-20251207003423239.png" 
+       alt="image-20251207003423239" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251207003423239
+    </figcaption>
+  
+</figure></p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p><strong>【通俗理解】</strong></p>
+<p><strong>“收纳箱”策略</strong>。 既然切蛋糕会切坏东西，那我们改用<strong>收纳</strong>。</p>
+<ul>
+<li><strong>分组</strong>：把房间里的东西分成两堆。一堆是“家具”，一堆是“散落的玩具”。</li>
+<li><strong>打包</strong>：给“家具”套一个大箱子（AABB），给“玩具”套一个小箱子（AABB）。</li>
+<li><strong>特点</strong>：家具箱子和玩具箱子可能会<strong>堆叠在一起</strong>（空间重叠），但这没关系！关键是一个玩具绝对不会同时在两个箱子里（物体完整）。</li>
+</ul>
+  </blockquote>
+
+<table>
+  <thead>
+      <tr>
+          <th><strong>策略</strong></th>
+          <th><strong>比喻</strong></th>
+          <th><strong>核心特点</strong></th>
+          <th>(tenter/texit) 用在哪？</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>均匀网格</strong></td>
+          <td>跳房子</td>
+          <td>空间等分，容易在空地空转</td>
+          <td>每进一个新格子，判断是否击中格子范围</td>
+      </tr>
+      <tr>
+          <td><strong>KD-Tree</strong></td>
+          <td>切蛋糕</td>
+          <td>空间二分，物体会被切碎</td>
+          <td>判断光线先进入切分面的左边还是右边</td>
+      </tr>
+      <tr>
+          <td><strong>BVH (主流)</strong></td>
+          <td><strong>收纳箱</strong></td>
+          <td><strong>物体分组，箱子可重叠</strong></td>
+          <td><strong>这是核心！没击中箱子就不开箱，极大减少计算</strong></td>
+      </tr>
+  </tbody>
+</table>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

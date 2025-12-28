@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Games101】相机与透镜 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="成像包含合成与捕捉。针孔相机清晰但进光量不足，透镜提升亮度却引入景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。" />
+<meta name="keywords" content="图形学,GAMES课程,透视原理,相机成像">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【Games101】相机与透镜">
+  <meta property="og:description" content="成像包含合成与捕捉。针孔相机清晰但进光量不足，透镜提升亮度却引入景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-16T00:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-16T00:00:00+08:00">
+    <meta property="article:tag" content="图形学">
+    <meta property="article:tag" content="GAMES课程">
+    <meta property="article:tag" content="透视原理">
+    <meta property="article:tag" content="相机成像">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【Games101】相机与透镜">
+  <meta name="twitter:description" content="成像包含合成与捕捉。针孔相机清晰但进光量不足，透镜提升亮度却引入景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【Games101】相机与透镜">
+  <meta itemprop="description" content="成像包含合成与捕捉。针孔相机清晰但进光量不足，透镜提升亮度却引入景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。">
+  <meta itemprop="datePublished" content="2025-12-16T00:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-16T00:00:00+08:00">
+  <meta itemprop="wordCount" content="851">
+  <meta itemprop="keywords" content="图形学,GAMES课程,透视原理,相机成像">
+
+      <header>
+        <h1 itemprop="headline">【Games101】相机与透镜</h1>
+        <p class="text-sm">
+          
+            Tuesday, Dec 16, 2025
+          
+
+          | <span>4 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Tuesday, Dec 16, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90Games101%e3%80%91%e7%9b%b8%e6%9c%ba%e4%b8%8e%e9%80%8f%e9%95%9c&amp;url=http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90Games101%e3%80%91%e7%9b%b8%e6%9c%ba%e4%b8%8e%e9%80%8f%e9%95%9c%20http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <p>成像包含合成与捕捉两个环节。针孔相机虽能实现清晰成像，但进光量不足；引入透镜可提升亮度，却带来了景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。</p>
+<p>我们在之前的课程里（光栅化、光线追踪）一直在忙着计算“光线是怎么传播的”。但这只是故事的一半。</p>
+<p><strong>Synthesis (合成)</strong>：我们在之前的课程里做的光栅化、光线追踪，是在计算场景中光线的传播。</p>
+<p><strong>Capture (捕捉)</strong>：这节课讲的是，如何用一个虚拟的“设备”（相机）把这些光线记录下来变成图像。
+</p>
+$$
+\mathrm{Imaging} = \mathrm{Synthesis} + \mathrm{Capture}
+$$<h2 id="针孔与透镜">针孔与透镜</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216205130244.png" 
+       alt="image-20251216205130244" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216205130244
+    </figcaption>
+  
+</figure></p>
+<p>最原始的相机是<strong>针孔相机 (Pinhole Camera)</strong>。它很简单，却道出了成像的本质。利用小孔成像原理，强制让光线“各行其道”。因为孔极小，物体上一点发出的光，只能通过这唯一的孔打在传感器的一个点上。其优点在于：无限景深。无论远近，所有物体都是清晰的（没有虚焦概念）。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216205459106.png" 
+       alt="image-20251216205459106" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216205459106
+    </figcaption>
+  
+</figure></p>
+<p><strong>致命缺陷</strong>：<strong>太暗了</strong>。因为孔太小，进光量微乎其微。要想拍出亮的照片，曝光时间得按小时算。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>如果把孔弄大点呢？</p>
+<p>后果：光线会乱。物体上一点发出的光会打在传感器的一片区域上，图像就糊了（Blur）。</p>
+  </blockquote>
+
+<p>为了解决“暗”的问题，我们需要把孔弄大（光圈）。但为了解决孔大导致的“糊”的问题，我们引入了<strong>透镜</strong>。</p>
+<p><strong>透镜的作用</strong>：它能把从物体上同一点发出、射向不同方向的光线，重新<strong>汇聚</strong>到传感器上的同一个点。</p>
+<p><strong>代价</strong>：<strong>焦距 (Focus)</strong> 的产生。</p>
+<ul>
+<li>透镜只能让特定距离的物体完美汇聚。</li>
+<li>比这个距离远或近的物体，汇聚点就不在传感器上了，结果就是<strong>模糊 (Defocus Blur)</strong>。</li>
+</ul>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p><strong>TA 划重点</strong>： 这一权衡告诉我们，<strong>景深 (Depth of Field)</strong> 不是为了艺术特意加的滤镜，而是为了“让画面变亮”所付出的物理代价。</p>
+  </blockquote>
+
+<h2 id="视场角-field-of-view-fov">视场角 (Field of View, FOV)</h2>
+<p>这是在游戏引擎摄像机组件中最常见的参数之一。它决定了你能看到多少东西。</p>
+<p><strong>定义</strong>：相机能看到的视野范围角度。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211235272.png" 
+       alt="image-20251216211235272" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211235272
+    </figcaption>
+  
+</figure></p>
+<p>决定因素：FOV 由 传感器大小 (Sensor Size, $h$) 和 焦距 (Focal Length, $f$) 共同决定。</p>
+<p>公式推导：想象一个等腰三角形，底边是传感器高度 $h$，高是焦距 $f$。
+</p>
+$$
+FOV = 2 \arctan\left(\frac{h}{2f}\right)
+$$<p>
+<figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211124285.png" 
+       alt="image-20251216211124285" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211124285
+    </figcaption>
+  
+</figure></p>
+<p>焦距越短，FOV 越大（广角镜头，如 17mm $\approx 104^\circ$）。焦距越长，FOV 越小（长焦镜头，如 200mm $\approx 12^\circ$）。传感器越大，FOV 越大（前提是焦距不变）这也是为什么全画幅相机的视野比截幅相机广的原因 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211347053.png" 
+       alt="image-20251216211347053" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211347053
+    </figcaption>
+  
+</figure></p>
+<h2 id="曝光-exposure摄影三要素">曝光 (Exposure):摄影三要素</h2>
+<p>照片的亮度不仅仅取决于场景里的 Radiance（光线追踪算出来的），还取决于相机接收了多少能量。</p>
+<p><strong>物理公式</strong>：$H = T \times E$</p>
+<ul>
+<li><strong>Exposure (曝光量)</strong> = <strong>Time (时间)</strong> $\times$ <strong>Irradiance (照度)</strong>。</li>
+</ul>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211609328.png" 
+       alt="image-20251216211609328" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211609328
+    </figcaption>
+  
+</figure></p>
+<h3 id="光圈-aperture---控制-irradiance-">光圈 (Aperture) - 控制 Irradiance ($E$)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216213638744.png" 
+       alt="image-20251216213638744" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216213638744
+    </figcaption>
+  
+</figure></p>
+<p>F-Stop (光圈值)：写作 $F/N$（如 F1.4, F8）。</p>
+<p>定义：$N = f / D$（焦距除以光圈直径）。</p>
+<p>反直觉特性：F-Number 越小，光圈越大，进光量越多 。</p>
+<p>光圈越大（F值越小），景深越浅（背景越虚化）</p>
+<h3 id="快门速度-shutter-speed---控制时间-">快门速度 (Shutter Speed) - 控制时间 ($T$)</h3>
+<p>定义为：传感器感光的持续时间（如 1/60秒，1/1000秒）。快门时间越长，物体运动产生的拖影越严重。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211846187.png" 
+       alt="image-20251216211846187" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211846187
+    </figcaption>
+  
+</figure></p>
+<p><strong>渲染中的应用</strong>：有时候我们故意需要这种模糊来体现速度感或进行抗锯齿 (Temporal Anti-Aliasing 的思路来源之一) 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211919334.png" 
+       alt="image-20251216211919334" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211919334
+    </figcaption>
+  
+</figure></p>
+<p><strong>卷帘快门 (Rolling Shutter)</strong>：对于高速运动物体，如果传感器是逐行扫描读取的，物体会发生扭曲（如飞机的螺旋桨）。</p>
+<h3 id="感光度-iso---后期增益">感光度 (ISO) - 后期增益</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211716326.png" 
+       alt="image-20251216211716326" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211716326
+    </figcaption>
+  
+</figure></p>
+<p><strong>定义</strong>：对传感器信号的放大倍率（Gain）。</p>
+<p><strong>噪点 (Noise)</strong>：ISO 越高,对信号的采样敏感度越高，图像越亮，噪点也越多 。</p>
+<p>这引出了摄影中经典的**“曝光三角”**，它们在图形学中对应着三种不同的渲染副作用：</p>
+<table>
+  <thead>
+      <tr>
+          <th><strong>物理参数</strong></th>
+          <th><strong>控制变量</strong></th>
+          <th><strong>渲染副作用 (Artifacts)</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>光圈 (Aperture)</strong></td>
+          <td>照度 $E$ (进光口的面积)</td>
+          <td><strong>景深 (Depth of Field)</strong>：光圈越大，背景越虚。</td>
+      </tr>
+      <tr>
+          <td><strong>快门 (Shutter)</strong></td>
+          <td>时间 $T$ (进光的时间长短)</td>
+          <td><strong>运动模糊 (Motion Blur)</strong>：时间越长，运动物体拖影越严重 。</td>
+      </tr>
+      <tr>
+          <td><strong>感光度 (ISO)</strong></td>
+          <td>后期增益 (Gain)</td>
+          <td><strong>噪点 (Noise)</strong>：ISO 越高，信号放大越多，噪点越多。</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="薄透镜近似-thin-lens-approximation">薄透镜近似 (Thin Lens Approximation)</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216211439879.png" 
+       alt="image-20251216211439879" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216211439879
+    </figcaption>
+  
+</figure></p>
+<p>真实的摄像机/手机镜头组由多片玻璃组成，极其复杂。在图形学中，我们假设透镜是“理想的薄透镜”，以此简化计算。</p>
+<h3 id="三条核心定律">三条核心定律</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216213856853.png" 
+       alt="image-20251216213856853" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216213856853
+    </figcaption>
+  
+</figure></p>
+<p><strong>平行光穿过焦点</strong>：所有平行于主轴的光线，穿过透镜后汇聚于焦点。</p>
+<p><strong>过光心不折射</strong>：穿过透镜中心的光线路径不改变。</p>
+<p><strong>光路可逆</strong>：光线倒着射回来，路径一模一样。</p>
+<h3 id="高斯成像公式-the-gaussian-lens-equation">高斯成像公式 (The Gaussian Lens Equation)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216213927242.png" 
+       alt="image-20251216213927242" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216213927242
+    </figcaption>
+  
+</figure></p>
+<p>这是一个神圣法则的公式，描述了物体距离 ($z_o$)、像距 ($z_i$) 和焦距 ($f$) 之间的关系：
+</p>
+$$
+\frac{1}{f} = \frac{1}{z_i} + \frac{1}{z_o}
+$$<ul>
+<li>
+<p>$f$：焦距（透镜的固有属性）。</p>
+</li>
+<li>
+<p>$z_o$：物距（物体离透镜多远）。</p>
+</li>
+<li>
+<p>$z_i$：像距（成像在透镜后多远）。</p>
+</li>
+</ul>
+<p>对于一个特定的焦距 $f$，物体离透镜的距离 $z_o$ 决定了它的像会在 $z_i$ 处清晰成像。如果传感器正好放在 $z_i$ 处，这个物体就是清晰的。</p>
+<h2 id="景深-depth-of-field-的物理原理">景深 (Depth of Field) 的物理原理</h2>
+<p>为什么我们会有“焦内清晰，焦外模糊”的效果？</p>
+<h3 id="弥散圆-circle-of-confusion-coc">弥散圆 (Circle of Confusion, CoC)</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216214030366.png" 
+       alt="image-20251216214030366" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216214030366
+    </figcaption>
+  
+</figure></p>
+<p>如果传感器没放在理想像距 $z_i$ 上（或者物体移动了导致 $z_i$ 变了），原本汇聚成“一个点”的光线，在传感器上就会扩散成“一个光斑”。这个光斑就叫<strong>弥散圆 (CoC)</strong> 。</p>
+<p><strong>CoC 大小计算</strong>：
+</p>
+$$
+C = A \frac{|z_s - z_i|}{z_i}
+$$<p>
+其中 $A$ 是光圈直径，$z_s$ 是传感器距离透镜的距离，$z_i$ 是物体的理想像距。</p>
+<p><strong>结论</strong>：光圈 ($A$) 越大，CoC 越大，模糊越严重，景深越浅 17。这就是为什么拍人像虚化背景要用大光圈（如 F1.4）。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216214133946.png" 
+       alt="image-20251216214133946" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216214133946
+    </figcaption>
+  
+</figure></p>
+<h3 id="如何在-ray-tracing-中实现景深">如何在 Ray Tracing 中实现景深？</h3>
+<p>要在光线追踪渲染器中实现真实的物理景深，不能只从针孔发射光线，需要模拟透镜成像过程</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251216214213196.png" 
+       alt="image-20251216214213196" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251216214213196
+    </figcaption>
+  
+</figure></p>
+<p><strong>定义参数</strong>：选定焦距、光圈大小、以及<strong>对焦距离 (Focal Distance)</strong>。</p>
+<p><strong>确定焦平面</strong>：根据对焦距离，计算出场景中哪个平面是绝对清晰的。</p>
+<p><strong>采样透镜</strong>：</p>
+<ul>
+<li>对于屏幕上的每个像素，不再是从相机中心发射一条光线。</li>
+<li>而是从<strong>透镜圆盘上随机采样一个点 ($x''$)</strong>。</li>
+<li>连接这个采样点与焦平面上的对应点 ($x'''$)，形成光线。</li>
+</ul>
+<p><strong>平均结果</strong>：对这些光线的 Radiance 取平均值。如果物体在焦平面上，所有光线汇聚于一点（清晰）；如果不在，光线会散开（模糊）。</p>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p><strong>Shader 中的 DoF</strong>：在实时渲染（光栅化）中，我们通常通过 Post-Processing（后处理）来模拟这个过程。我们会根据深度图 (Depth Buffer) 计算每个像素的 CoC 大小，然后进行不同程度的高斯模糊。</p>
+<p><strong>Path Tracing 中的 DoF</strong>：如上所述，通过在相机镜头上抖动射线的起点（Lens Sampling）来物理地实现，这是最准确但计算成本最高的方法。</p>
+<p><strong>F-Stop 的数学意义</strong>：$N = f/A$。记住这个反比关系，对调节渲染器的相机参数非常重要。</p>
+  </blockquote>
+
+<h2 id="光场-light-field">光场 (Light Field)</h2>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251218212546324.png" 
+       alt="image-20251218212546324" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251218212546324
+    </figcaption>
+  
+</figure></p>
+<p><strong>全光函数 (Plenoptic Function)</strong>：这是一个“上帝视角”的函数。它认为如果你能记录下空间中<strong>任何位置</strong> 、<strong>任何方向</strong> 、<strong>任何时间</strong> 、<strong>任何波长</strong> 的光线，你就捕捉了整个视觉现实 。</p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/image-20251218212456621.png" 
+       alt="image-20251218212456621" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      image-20251218212456621
+    </figcaption>
+  
+</figure></p>
+<p><strong>光场相机的工作原理</strong>：普通相机记录的是光线的<strong>位置</strong>（ irradiance），而光场相机通过在传感器前放置<strong>微透镜阵列 (MLA)</strong> ，把每一个像素位置的光线按<strong>方向</strong>拆解开来记录 。</p>
+<p><strong>先拍照后聚焦</strong>：因为记录了方向信息，我们可以通过软件提取特定方向的光线，实现<strong>计算重聚焦</strong> 。</p>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>这就像是在后期做“虚拟摄影”，你可以随意调整焦点和光圈，因为你已经把空间中所有的光线数据都“打包”带回家了 。</p>
+  </blockquote>
+
+<h2 id="后话非上课内容">后话(非上课内容)</h2>
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p><strong>主要是一些自己看课程时候的头脑风暴和具体的相机参数是怎样对应成像原理的</strong></p>
+  </blockquote>
+
+<h3 id="延时摄影与快门速度的关系">延时摄影与快门速度的关系</h3>
+<p>首先我们要把两个容易混淆的时间概念拆开：</p>
+<p><strong>拍摄间隔 (Interval)</strong>：决定了<strong>时间的流速</strong>。</p>
+<ul>
+<li>比如每 5 秒拍一张，播放时 30fps，那么现实中的 5 秒就被压缩成了视频里的 1/30 秒。这决定了云彩跑得有多快。</li>
+</ul>
+<p><strong>快门速度 (Shutter Speed)</strong>：决定了<strong>单帧的质感</strong>。</p>
+<ul>
+<li>在这 1/30 秒的一瞬间里，物体是“凝固”的还是“拖影”的。快门控制了传感器感光的持续时间 ，直接决定了运动模糊的程度。</li>
+</ul>
+<h4 id="决定画面的流畅度-temporal-continuity">决定画面的“流畅度” (Temporal Continuity)</h4>
+<p>这是两者最核心的关系。快门速度决定了延时摄影看起来是“卡顿的定格动画”还是“丝滑的流体运动”。</p>
+<p><strong>A. 高速快门 (Fast Shutter) = 频闪/跳跃感</strong></p>
+<p><strong>设置</strong>：快门速度远小于拍摄间隔（例如：间隔 5秒，快门 1/1000秒）。</p>
+<p><strong>效果</strong>：每一帧都是绝对清晰的瞬间。</p>
+<p><strong>视觉感受</strong>：物体（如行人、车流）会像瞬移一样跳跃。</p>
+<p>这相当于在时间轴上进行了极窄的采样，完全没有<strong>时间抗锯齿 (Temporal Anti-Aliasing)</strong>，导致了严重的时间混叠（Temporal Aliasing），视觉上就是“卡顿”。</p>
+<p><strong>B. 慢速快门 (Slow Shutter) = 丝滑/拖影感</strong></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/oip.webp" 
+       alt="延时摄影集|Photography|image post-production|yzq0909_Original作品-站酷ZCOOL" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      延时摄影集|Photography|image post-production|yzq0909_Original作品-站酷ZCOOL
+    </figcaption>
+  
+</figure></p>
+<p><strong>设置</strong>：快门速度接近拍摄间隔（例如：间隔 5秒，快门 2.5秒）。</p>
+<p><strong>效果</strong>：每一帧都包含了物体在一段时间内的运动轨迹（Motion Blur）。</p>
+<p><strong>视觉感受</strong>：车流变成了连贯的光带，人群变成了流动的雾气。</p>
+<p>利用<strong>运动模糊 (Motion Blur)</strong> 将帧与帧之间的空隙“填补”起来，欺骗人眼，让不连续的采样看起来像连续的流体。</p>
+<h4 id="物理限制-the-physical-constraint">物理限制 (The Physical Constraint)</h4>
+<p>这是一个硬性的逻辑限制，在设置相机参数时必须遵守。公式：
+</p>
+$$
+T_{shutter} < T_{interval}
+$$<p>
+<strong>快门时间</strong>必须小于<strong>拍摄间隔</strong>。如果你设置相机每 <strong>2秒</strong> 拍一张照片（间隔），你就绝对不能把快门设置为 <strong>5秒</strong>。</p>
+<p><strong>后果</strong>：相机会由“延时模式”变成“连拍模式”，或者直接报错，因为上一张还没曝光完，下一张的拍摄指令就来了。</p>
+<h4 id="进阶应用180度快门角原则-the-180-shutter-rule">进阶应用：180度快门角原则 (The 180° Shutter Rule)</h4>
+<p>在电影摄影中，为了让运动看起来自然，有一个黄金法则，在延时摄影中同样适用。</p>
+<p>即：<strong>快门速度应该是帧间隔的一半。</strong>
+</p>
+$$
+\\text{Shutter Speed} \approx \frac{1}{2} \times \text{Interval}
+$$<p>
+<strong>举例</strong>：如果你每 <strong>4秒</strong> 拍一张，为了获得电影般自然的流动感，最佳快门速度应设为 <strong>2秒</strong> 左右。</p>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p><strong>TA 视角</strong>：这本质上是在做<strong>时间域上的信号重建</strong>。用 50% 的时间占空比来模糊高频信号，防止视觉上的频闪效应。</p>
+  </blockquote>
+
+
+
+
+  <blockquote class="dream-alert tip">
+    <p class="heading">
+      <ion-icon name="bulb-outline"></ion-icon>Tip</p>
+    <p>想拍<strong>云卷云舒、车水马龙</strong>（流体感） $\rightarrow$ <strong>加滤镜（ND镜），强行降低快门速度</strong>，让它变慢。</p>
+<p>想拍<strong>花开花落、建筑施工</strong>（定格感） $\rightarrow$ <strong>提高快门速度</strong>，保证每帧清晰。</p>
+  </blockquote>
+
+<h3 id="曝光补偿是和成像原理">曝光补偿是和成像原理</h3>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/oip-c.webp" 
+       alt="摄影理论基础&ndash;“曝光补偿” - 哔哩哔哩" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      摄影理论基础&ndash;“曝光补偿” - 哔哩哔哩
+    </figcaption>
+  
+</figure></p>
+<h4 id="ev-就是对--的对数描述">EV 就是对 $H$ 的对数描述</h4>
+<p>本节课给出的最核心曝光公式是 ：
+</p>
+$$
+H = T \times E
+$$<ul>
+<li><strong>$H$ (Exposure)</strong>：总曝光量（照片有多亮）。</li>
+<li><strong>$T$ (Time)</strong>：快门时间（Shutter Speed）。</li>
+<li><strong>$E$ (Irradiance)</strong>：传感器接收到的功率密度，由光圈（Aperture）控制。</li>
+</ul>
+<p><strong>EV (Exposure Value)</strong> 其实就是 $H$ 的一种<strong>对数表达形式</strong>（以 2 为底）。</p>
+<ul>
+<li>在摄影和渲染中，<strong>+1 EV</strong> 意味着总曝光量 $H$ <strong>翻倍</strong>。</li>
+<li><strong>-1 EV</strong> 意味着总曝光量 $H$ <strong>减半</strong>。</li>
+</ul>
+<h4 id="曝光补偿-vs-本节课的副作用">曝光补偿 vs. 本节课的“副作用”</h4>
+<p>当你调节 EV 曝光补偿（Exposure Compensation） 时，你本质上是在告诉相机（或渲染引擎的自动曝光系统）：“<strong>我不喜欢现在的亮度，请帮我把画面调亮/调暗。</strong>”为了达到这个目的，系统必须通过改变本节课讲到的“曝光三要素”来实现。而这正是本节课的重点——改变参数会带来副作用 (Artifacts) 。</p>
+<p>假设你要 <strong>+1 EV</strong>（让画面变亮 1 倍），系统有三种物理手段，分别对应本节课的三个知识点：</p>
+<p><strong>手段 A：开大光圈 (Change Aperture)</strong></p>
+<p>减小 F-Number（例如从 F2.8 变为 F2.0），增加 $E$ 。这会改变 <strong>CoC (弥散圆)</strong> 的大小。会导致<strong>景深变浅 (Shallower Depth of Field)</strong>。背景会变得更模糊 。</p>
+<p><strong>手段 B：延长快门 (Change Shutter Speed)</strong></p>
+<p>增加 $T$（例如从 1/60s 变为 1/30s）。增加了传感器收集光线的时间。副作用：会产生运动模糊 (Motion Blur)。如果场景里有东西在动，拖影会变长 。</p>
+<p><strong>手段 C：提高感光度 (Change ISO)</strong></p>
+<p>后期放大信号（Gain） 。这不属于光线光学的范畴，属于电子信号处理。可能会导致<strong>噪点 (Noise)</strong> 增加 。</p>
+<h4 id="在渲染引擎-ta-视角-中的应用">在渲染引擎 (TA 视角) 中的应用</h4>
+<p>在游戏引擎（如 Unreal Engine）中，<code>Exposure Compensation</code> 通常有两种工作模式，对应本节课的不同理解层面：</p>
+<p><strong>物理相机模式 (Physical Camera Mode)</strong>：</p>
+<ul>
+<li>当你调节 EV 时，引擎会真的去调整虚拟相机的<strong>光圈</strong>或<strong>快门</strong>参数。</li>
+<li>结果：你不仅调亮了画面，你的景深（DoF）和动态模糊效果也会随之改变。这完全符合 Lecture 19 的物理描述。</li>
+</ul>
+<p><strong>纯后处理模式 (Post-Process Only)</strong>：</p>
+<ul>
+<li>
+<p>引擎不改物理参数，直接把渲染出来的 Radiance 乘上一个倍数（$2^{EV}$）。</p>
+</li>
+<li>
+<p><strong>结果</strong>：画面变亮了，但景深和动态模糊没变。这相当于仅仅做了 ISO 增益，或者是 Tone Mapping 之前的乘法操作。</p>
+</li>
+<li>
+<p>现代图形学和计算摄影中在该模式下可能还会使用一些平滑采样算法，以减少ISO增强后的噪点，</p>
+</li>
+</ul>
+
+
+
+  <blockquote class="dream-alert caution">
+    <p class="heading">
+      <ion-icon name="alert-circle-outline"></ion-icon>Caution</p>
+    <p>总结一下：<strong>“EV 曝光补偿”是目的，而 Lecture 19 讲的是手段和代价。</strong></p>
+<p><strong>本节课的内容</strong>告诉你：如果你想获得正确的<strong>曝光 ($H$)</strong>，你可以调整光圈 ($A$) 或快门 ($T$)。</p>
+<p><strong>EV 补偿</strong>告诉你：无论你调整哪个，每调整一档（EV $\pm 1$），能量 $H$ 就翻倍或减半。</p>
+<p><strong>核心权衡</strong>：你为了获得正确的 EV（亮度），必须在<strong>景深</strong>（光圈决定）和<strong>模糊</strong>（快门决定）之间做权衡——这就是摄影和拟真渲染的艺术所在。</p>
+  </blockquote>
+
+<p>既然提到了降噪算法,索性刨根问底了解一下：</p>
+<h3 id="计算摄影与现代降噪算法">计算摄影与现代降噪算法</h3>
+<h4 id="核心思路用多采样对抗随机性">核心思路：用“多采样”对抗“随机性”</h4>
+<p>根据统计学原理，噪点（Noise）通常是随机分布的，而信号（Signal，即真实的图像细节）是固定的。</p>
+<p>如果我们能获得同一个像素的多次采样值并取平均，随机的噪点就会相互抵消，而真实的信号会保留下来。</p>
+<p>公式：信噪比（SNR）与采样次数（$N$）的平方根成正比。
+</p>
+$$
+SNR\propto \sqrt{N}
+$$<p>
+采样 4 次，噪点减半；采样 16 次，噪点变为 1/4。</p>
+<h4 id="计算摄影中的应用-手机相机">计算摄影中的应用 (手机/相机)</h4>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/1362-iqfqmat9554656.jpg" 
+       alt="苹果iPhone夜间模式摄影大赛获奖作品公布 教你夜拍_手机新浪网" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      苹果iPhone夜间模式摄影大赛获奖作品公布 教你夜拍_手机新浪网
+    </figcaption>
+  
+</figure></p>
+<p>当你用手机在夜景模式（Night Mode）拍摄时，ISO 往往很高，但照片却很纯净。这是因为手机在后台默默做了以下几件事：</p>
+<p><strong>A. 多帧降噪 (Multi-Frame Noise Reduction, MFNR) —— 时间上的平滑</strong></p>
+<p>原理：当你按下快门的一瞬间，手机其实连续拍了 6-10 张短曝光（高 ISO）的照片。</p>
+<p>算法步骤：</p>
+<ul>
+<li>对齐 (Alignment)：利用陀螺仪和图像特征，计算手抖带来的位移，把这几张照片“对齐”。</li>
+<li>堆栈 (Stacking)：将对齐后的像素值进行加权平均。</li>
+</ul>
+<p>效果：虽然每一张单帧都是高噪点的（符合 Lecture 19 的物理规律），但合成后的结果相当于一张“长曝光、低 ISO”的照片。这相当于在时间维度上增加了采样数。</p>
+<p><strong>B. 像素合并 (Pixel Binning) —— 空间上的平滑</strong></p>
+<p>原理：很多现代传感器（如 4800万、1亿像素）支持将相邻的 4 个像素（2x2）甚至 9 个像素（3x3）合并成一个“大像素”来用。</p>
+<p>效果：牺牲分辨率：48MP 变成 12MP。</p>
+<p>换取信噪比：单个“大像素”的受光面积翻了 4 倍，感光能力大大增强，从而物理上减少了对 ISO 增益的需求。</p>
+<p>这相当于在空间维度上进行了平均采样。</p>
+<h4 id="实时渲染中的应用-光线追踪">实时渲染中的应用 (光线追踪)</h4>
+<p>在游戏的光线追踪（Ray Tracing）中，我们面临同样的问题：为了保证 60FPS，每像素只能发射极少的光线（Low SPP），导致画面全是噪点。</p>
+<p>现代图形学通过以下算法解决(其实和计算摄影很像)：</p>
+<p><strong>A. 时域累积 (Temporal Accumulation)</strong></p>
+<p>逻辑：既然这一帧的采样不够，那就“借用”上一帧的结果。</p>
+<p>TAA (Temporal Anti-Aliasing) 的进化：利用 运动向量 (Motion Vector)，找到当前像素在上一帧的位置。将上一帧的颜色与当前帧的颜色进行混合（通常是 90% 历史 + 10% 新采样）。</p>
+<p>代价：鬼影 (Ghosting)。如果运动预测失败（如光影变化太快），会有拖影。</p>
+<p><strong>B. SVGF (Spatiotemporal Variance-Guided Filtering)</strong></p>
+<p><a href="https://zhuanlan.zhihu.com/p/699706592" target="_blank">一文搞懂Spatiotemporal Variance-Guided Filter（SVGF）算法及其实现细节 - 知乎</a>
+</p>
+<p>这是目前工业界（如 NVIDIA RTX）最主流的降噪算法框架之一。</p>
+<p>时空联合：时域 (Temporal)：先做时间上的累积。</p>
+<p>空域 (Spatial)：如果时间累积后还是有噪点（比如刚出现的物体，没有历史帧），就在当前帧的周围找相似的像素借用信息（做模糊）。</p>
+<p>方差引导 (Variance-Guided)：算法会计算每个像素的“方差”（即噪点程度）。</p>
+<p>聪明地模糊：只在方差大（噪点多）的地方多模糊一点，在方差小（细节多）的地方少模糊，从而保留边缘细节。</p>
+<p><strong>C. 深度学习降噪 (AI Denoising / DLSS)</strong></p>
+<p><figure style="text-align: center; margin: 1.5rem auto;">
+  
+  <img src="http://localhost:1313/posts/games101%E7%9B%B8%E6%9C%BA%E4%B8%8E%E9%80%8F%E9%95%9C/f3f5c4a488ec4cfcaeabcf66c839c487.jpeg" 
+       alt="DLSSTweaks带来工具：为支持DLSS的游戏启用DLAA，让画面更加精致 - 数码前沿 数码之家" 
+       
+       class="zoomable" 
+       style="max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in;"
+       loading="lazy" />
+  
+    <figcaption style="margin-top: 8px; font-size: 0.85em; color: #888; font-style: italic;">
+      DLSSTweaks带来工具：为支持DLSS的游戏启用DLAA，让画面更加精致 - 数码前沿 数码之家
+    </figcaption>
+  
+</figure></p>
+<p>原理：不再用传统的数学公式（高斯模糊、双边滤波）来平滑，而是训练一个神经网络。</p>
+<p>输入：噪点图 + 辅助信息（Albedo 贴图、法线 Normal 贴图、深度 Depth 贴图）。</p>
+<p>输出：AI 猜出来的“干净图像”。</p>
+<p>代表技术：NVIDIA DLSS (Ray Reconstruction)。它甚至能补全因为采样不足而丢失的高频细节。</p>
+<h4 id="dlss就是深度学习插帧吗">DLSS就是深度学习插帧吗？</h4>
+<p>答案是：<strong>不完全是，这是对它功能的一种片面理解（主要受 DLSS 3.0 营销影响），它的核心定义其实是“超分辨率”技术。</strong></p>
+<p>DLSS 的全称是 <strong>Deep Learning Super Sampling</strong>，中文直译为 <strong>“深度学习超级采样”</strong>。</p>
+<p><strong>它是“放大镜”，不是“补帧机”</strong></p>
+<p>从名字 <strong>Super Sampling (超级采样)</strong> 就能看出，DLSS 的老本行是 <strong>“空间上的分辨率提升”</strong>，而不是“时间上的帧数插入”。</p>
+<p><strong>原理 (DLSS 1.0 / 2.0)</strong>：</p>
+<ul>
+<li><strong>输入</strong>：显卡只渲染一张<strong>低分辨率</strong>的小图（比如 1080P），这很省力，帧数自然就高。</li>
+<li><strong>处理</strong>：AI 神经网络分析这张小图，结合<strong>多帧时域信息（Temporal Accumulation）和运动向量（Motion Vector）</strong>，把它“脑补”放大成一张<strong>高分辨率</strong>的大图（比如 4K）。</li>
+<li><strong>输出</strong>：你看到的是清晰的 4K 画面，但显卡只需要干 1080P 的活。</li>
+</ul>
+<p>在 DLSS 3.0 发布之前，DLSS <strong>完全没有插帧功能</strong>，它纯粹是画质放大技术（Upscaling）。</p>
+<p><strong>为什么你会觉得它是“插帧”？——因为 DLSS 3</strong></p>
+<p>你之所以会有“它是插帧技术”的印象，是因为 NVIDIA 在 <strong>DLSS 3.0</strong> 中引入了一个新功能，叫 <strong>Frame Generation (帧生成)</strong>。</p>
+<p>DLSS 3 的构成：
+</p>
+$$
+DLSS\ 3 = DLSS\ 2\ (超级采样) + Reflex\ (低延迟) + \textbf{Frame Generation\ (帧生成)}
+$$<p><strong>帧生成 (插帧) 的原理</strong>：</p>
+<ul>
+<li>显卡渲染了第 1 帧和第 2 帧。</li>
+<li>AI 分析这两帧的<strong>光流场 (Optical Flow Field)</strong>（还记得 Lecture 19 提到的运动信息吗？），计算出像素是怎么移动的。</li>
+<li>AI 直接在两帧中间**生成（插入）**一个新的帧（第 1.5 帧）。</li>
+<li><strong>结果</strong>：这一帧完全没经过渲染管线，是 AI 算出来的。帧数瞬间翻倍。</li>
+</ul>
+<table>
+  <thead>
+      <tr>
+          <th><strong>技术版本</strong></th>
+          <th><strong>核心功能</strong></th>
+          <th><strong>空间维度 (分辨率)</strong></th>
+          <th><strong>时间维度 (帧率)</strong></th>
+          <th><strong>是否插帧？</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>DLSS 1 / 2</strong></td>
+          <td><strong>超分辨率 (Super Resolution)</strong></td>
+          <td>把 1080P 变成 4K</td>
+          <td>间接提升（因为渲染负荷低了）</td>
+          <td><strong>否</strong></td>
+      </tr>
+      <tr>
+          <td><strong>DLSS 3</strong></td>
+          <td><strong>帧生成 (Frame Gen)</strong></td>
+          <td>把 1080P 变成 4K</td>
+          <td><strong>直接翻倍</strong>（插入假帧）</td>
+          <td><strong>是</strong></td>
+      </tr>
+      <tr>
+          <td><strong>DLSS 3.5</strong></td>
+          <td><strong>光线重建 (Ray Reconstruction)</strong></td>
+          <td>修复光追噪点</td>
+          <td>提升画质</td>
+          <td><strong>否</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>DLSS 的全称是深度学习超级采样，它的本体是画质放大技术；但DLSS 3 确实包含了深度学习插帧技术作为其功能的一部分。</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2025 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

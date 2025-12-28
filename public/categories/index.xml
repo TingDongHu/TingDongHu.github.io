@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on 古月月仔的博客</title>
+    <link>http://localhost:1313/categories/</link>
+    <description>Recent content in Categories on 古月月仔的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 19 Dec 2025 00:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Games101笔记</title>
+      <link>http://localhost:1313/categories/games101%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Fri, 19 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/games101%E7%AC%94%E8%AE%B0/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>算法刷题</title>
+      <link>http://localhost:1313/categories/%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98/</link>
+      <pubDate>Sat, 06 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Hexo博客</title>
+      <link>http://localhost:1313/categories/hexo%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Wed, 03 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/hexo%E5%8D%9A%E5%AE%A2/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>侯捷面向对象</title>
+      <link>http://localhost:1313/categories/%E4%BE%AF%E6%8D%B7%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/</link>
+      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/%E4%BE%AF%E6%8D%B7%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ComfyUI</title>
+      <link>http://localhost:1313/categories/comfyui/</link>
+      <pubDate>Mon, 01 Dec 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/comfyui/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>LLM</title>
+      <link>http://localhost:1313/categories/llm/</link>
+      <pubDate>Tue, 30 Sep 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/llm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>http://localhost:1313/categories/c&#43;&#43;/</link>
+      <pubDate>Thu, 01 May 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>机器学习</title>
+      <link>http://localhost:1313/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/</link>
+      <pubDate>Thu, 30 Jan 2025 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>3DComputerVison</title>
+      <link>http://localhost:1313/categories/3dcomputervison/</link>
+      <pubDate>Tue, 31 Dec 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/3dcomputervison/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>虚幻引擎</title>
+      <link>http://localhost:1313/categories/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E/</link>
+      <pubDate>Sun, 21 Apr 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>MultiplayerCourse</title>
+      <link>http://localhost:1313/categories/multiplayercourse/</link>
+      <pubDate>Fri, 19 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/multiplayercourse/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>游戏开发</title>
+      <link>http://localhost:1313/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/</link>
+      <pubDate>Sat, 06 Apr 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Java</title>
+      <link>http://localhost:1313/categories/java/</link>
+      <pubDate>Mon, 25 Mar 2024 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/categories/java/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
