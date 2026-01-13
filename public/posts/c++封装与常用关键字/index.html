@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-cn"
+  x-data
+  :class="$store.darkMode.class()"
+  :data-theme="$store.darkMode.theme()">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【C&#43;&#43;】封装与常用关键字 | 古月月仔的博客</title>
+
+    
+
+<link rel="canonical" href="http://localhost:1313/posts/c&#43;&#43;%E5%B0%81%E8%A3%85%E4%B8%8E%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97/" />
+
+
+<meta name="author" content="古月月仔" />
+<meta name="description" content="组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C&#43;&#43;中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。" />
+<meta name="keywords" content="面相对象,C&#43;&#43;,封装,内存管理">
+
+
+<meta name="generator" content="Hugo 0.153.1">
+
+<meta property="og:url" content="http://localhost:1313/posts/c&#43;&#43;%E5%B0%81%E8%A3%85%E4%B8%8E%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97/">
+  <meta property="og:site_name" content="古月月仔的博客">
+  <meta property="og:title" content="【C&#43;&#43;】封装与常用关键字">
+  <meta property="og:description" content="组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C&#43;&#43;中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-15T12:00:00+08:00">
+    <meta property="article:modified_time" content="2025-12-15T12:00:00+08:00">
+    <meta property="article:tag" content="面相对象">
+    <meta property="article:tag" content="C&#43;&#43;">
+    <meta property="article:tag" content="封装">
+    <meta property="article:tag" content="内存管理">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【C&#43;&#43;】封装与常用关键字">
+  <meta name="twitter:description" content="组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C&#43;&#43;中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。">
+
+
+
+
+<link rel="stylesheet" href="/css/output.css" />
+
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+
+    
+
+
+<style>
+  pre {
+    padding: 1em;
+    overflow: auto;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+    
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" integrity="sha256-4EHxtjnR5rL8JzbY12OKQJr81ESm7JBEb49ORPo29AY=" crossorigin="anonymous"></script>
+  </head>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+
+<style>
+   
+  .medium-zoom-overlay {
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  .medium-zoom-image--opened {
+    z-index: 101;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    const zoom = mediumZoom('.zoomable', {
+      margin: 24,          
+      background: '#000',  
+      scrollOffset: 40,    
+    });
+  });
+</script>
+  <body x-data="{
+    flip: false,
+  }">
+    
+    <div id="dream-global-bg"></div>
+
+    
+<nav class="mt-4 lg:mt-8 py-4">
+
+  
+  <div class="container flex justify-between px-4">
+  
+    <section class="flex items-center gap-4">
+      <div class="avatar cursor-pointer hover:avatar-online" @click="flip = !flip" title="Flip it!">
+        <div class="h-10 rounded-full">
+          <img src="/img/ChipDog.jpg" alt="古月月仔的博客" />
+        </div>
+      </div>
+
+      
+      <div>
+        
+        <a href="http://localhost:1313/" class="text-lg font-semibold cursor-pointer">
+          古月月仔的博客
+        </a>
+        
+        
+        <div class="text-base-content/60 text-sm">计算机在校生 || 游戏程序员
+记录从基础到进阶的每一份思考。</div>
+        
+      </div>
+      
+    </section>
+
+    
+    
+
+    <div class="dropdown dropdown-end sm:hidden">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-square" aria-label="Select an option">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu w-36 bg-base-100 rounded-box z-1 shadow-md">
+        
+
+
+
+
+
+
+
+<li>
+  <div role="link" tabindex="0" class="inline-flex items-center p-2 cursor-pointer" @click="flip = !flip" title="About">
+    <ion-icon name="information-circle"></ion-icon>About</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/posts" title="Archives">
+    <ion-icon name="archive"></ion-icon>
+    Archives
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/categories" title="All Categories">
+    <ion-icon name="grid"></ion-icon>
+    All Categories
+  </a>
+</li>
+
+
+
+
+<li>
+  <a class="inline-flex items-center p-2 cursor-pointer" href="/tags" title="All Tags">
+    <ion-icon name="pricetags"></ion-icon>
+    All Tags
+  </a>
+</li>
+
+
+
+
+
+
+      </ul>
+    </div>
+    <section class="hidden sm:flex sm:items-center sm:gap-2 md:gap-4">
+      
+
+      
+      
+
+
+
+
+<div role="link" tabindex="0" class="text-sm font-semibold cursor-pointer hover:underline" @click="flip = !flip" title="About">About</div>
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+
+
+
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/posts" title="Archives">
+  <ion-icon class="group-hover:text-primary-content" name="archive"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/categories" title="All Categories">
+  <ion-icon class="group-hover:text-primary-content" name="grid"></ion-icon>
+</a>
+
+
+      
+      
+<a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary" href="/tags" title="All Tags">
+  <ion-icon class="group-hover:text-primary-content" name="pricetags"></ion-icon>
+</a>
+
+
+      
+
+      
+
+      
+    </section>
+  </div>
+</nav>
+
+
+    <div class="flip-container" :class="{ 'flip-it': flip }">
+      <div class="flipper">
+        <div class="front">
+          <div class="container">
+            
+<div class="lg:grid lg:grid-cols-4 gap-4 mt-4 px-4">
+  <div class="hidden lg:block">
+    
+  </div>
+
+  <div class="lg:col-span-2">
+    <article class="mx-auto prose prose-quoteless dark:prose-invert" id="dream-single-post-main" itemscope itemtype="http://schema.org/Article">
+      
+  <meta itemprop="name" content="【C&#43;&#43;】封装与常用关键字">
+  <meta itemprop="description" content="组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C&#43;&#43;中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。">
+  <meta itemprop="datePublished" content="2025-12-15T12:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-12-15T12:00:00+08:00">
+  <meta itemprop="wordCount" content="385">
+  <meta itemprop="keywords" content="面相对象,C&#43;&#43;,封装,内存管理">
+
+      <header>
+        <h1 itemprop="headline">【C&#43;&#43;】封装与常用关键字</h1>
+        <p class="text-sm">
+          
+            Monday, Dec 15, 2025
+          
+
+          | <span>2 minute read</span>
+
+          
+          | <span>Updated at
+            
+              Monday, Dec 15, 2025
+            </span>
+          
+        </p>
+
+        
+        <div class="flex justify-between">
+          
+            <div class="flex items-center">
+  
+  <span>@</span>
+  
+
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+  
+    <span itemprop="name">古月月仔</span>
+  
+  </span>
+</div>
+
+          
+
+          <div class="flex items-center gap-2">
+  
+  
+
+  
+  
+  
+  
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://x.com/intent/post?text=%e3%80%90C&#43;&#43;%e3%80%91%e5%b0%81%e8%a3%85%e4%b8%8e%e5%b8%b8%e7%94%a8%e5%85%b3%e9%94%ae%e5%ad%97&amp;url=http://localhost:1313/posts/c&#43;&#43;%E5%B0%81%E8%A3%85%E4%B8%8E%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97/" target="_blank" rel="noopener noreferrer"
+      title="Share on X">
+      <ion-icon class="group-hover:text-primary-content" name="logo-x"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://facebook.com/sharer/sharer.php?u=http://localhost:1313/posts/c&#43;&#43;%E5%B0%81%E8%A3%85%E4%B8%8E%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97/" target="_blank" rel="noopener noreferrer"
+      title="Share on Facebook">
+      <ion-icon class="group-hover:text-primary-content" name="logo-facebook"></ion-icon>
+    </a>
+  
+    <a class="group inline-flex items-center p-2 rounded-full cursor-pointer hover:bg-primary"
+      href="https://wa.me/?text=%e3%80%90C&#43;&#43;%e3%80%91%e5%b0%81%e8%a3%85%e4%b8%8e%e5%b8%b8%e7%94%a8%e5%85%b3%e9%94%ae%e5%ad%97%20http://localhost:1313/posts/c&#43;&#43;%E5%B0%81%E8%A3%85%E4%B8%8E%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97/" target="_blank" rel="noopener noreferrer"
+      title="Share on WhatsApp">
+      <ion-icon class="group-hover:text-primary-content" name="logo-whatsapp"></ion-icon>
+    </a>
+  
+
+  
+  
+</div>
+
+        </div>
+      </header>
+
+      <section id="dream-single-post-content" itemprop="articleBody">
+        
+
+        <h2 id="基本概念">基本概念</h2>
+<h3 id="封装的概念">封装的概念</h3>
+<p><strong>封装（Encapsulation）</strong> 是面向对象编程（OOP）的三大特性之一，简单来说，封装就是将**数据（属性）<strong>和</strong>操作数据的函数（行为）**绑定在一起，形成一个名为“类（Class）”的单位，并对外部隐藏内部实现的细节。</p>
+<p>封装的核心思想是**“对外提供接口，对内隐藏实现”**。它的好处包括：</p>
+<ul>
+<li><strong>安全性（数据隐藏）：</strong> 防止外部代码随意修改对象内部的关键数据，避免程序进入非法状态。</li>
+<li><strong>易维护性：</strong> 如果内部逻辑需要修改，只要外部接口（函数名、参数）不变，调用者的代码就不需要改动。</li>
+<li><strong>模块化：</strong> 代码结构更清晰，每个类负责自己的逻辑。</li>
+</ul>
+<h3 id="访问修饰符">访问修饰符</h3>
+<p>C++ 通过三个关键字来控制成员的访问权限。它们是实现封装的关键工具：</p>
+<table>
+  <thead>
+      <tr>
+          <th><strong>关键字</strong></th>
+          <th><strong>访问权限说明</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong><code>public</code></strong></td>
+          <td><strong>公有</strong>：类内部和类外部都可以直接访问。通常用于存放成员函数。</td>
+      </tr>
+      <tr>
+          <td><strong><code>private</code></strong></td>
+          <td><strong>私有</strong>：<strong>（默认）</strong> 只有类内部的函数可以访问，外部无法直接访问。通常用于存放成员变量。</td>
+      </tr>
+      <tr>
+          <td><strong><code>protected</code></strong></td>
+          <td><strong>保护</strong>：类内部及**派生类（子类）**可以访问，但类外部无法直接访问。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong><code>this</code> 指针</strong>：是一个指向当前对象实例的指针。常用于在成员函数中区分“成员变量”和“同名参数”。</p>
+<p><code>class</code> 的成员默认是 <code>private</code>，而 <code>struct</code> 的成员默认是 <code>public</code>。通常建议用 <code>class</code> 实现复杂的逻辑封装。</p>
+<p><strong><code>friend</code>（友元）</strong>：如果你希望某个外部函数或类能访问当前类的 <code>private</code> 成员，可以用 <code>friend</code> 声明。它会打破封装，所以要谨慎使用。</p>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p><code>friend</code>：破坏封装还是增强封装？</p>
+<p><code>friend</code> 允许特定的类或函数访问私有成员。</p>
+<ul>
+<li><strong>视角一</strong>：它破坏了封装，因为它打开了后门。</li>
+<li><strong>视角二（更深层）</strong>：它<strong>增强了封装</strong>。通过将紧密耦合的工具类设为友元，可以避免为了让外部访问而被迫将成员声明为 <code>public</code>，从而将权限精确控制在最小范围内。</li>
+</ul>
+  </blockquote>
+
+<p><strong><code>const</code></strong>：在封装中，常用于修饰不修改成员变量的函数（如 <code>getBalance() const</code>），这被称为<strong>常成员函数</strong>，能提高代码的安全性和可读性。</p>
+<h3 id="example">Example</h3>
+<p>来一个银行账户的栗子：我们不希望别人直接修改我们的余额（<code>balance</code>），而是必须通过存款或取款函数来操作。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BankAccount</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 私有成员：外部无法直接访问
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> balance;
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string ownerName;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 构造函数：初始化数据
+</span></span></span><span style="display:flex;"><span>    BankAccount(std<span style="color:#f92672">::</span>string name, <span style="color:#66d9ef">double</span> initialBalance) {
+</span></span><span style="display:flex;"><span>        ownerName <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (initialBalance <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">=</span> initialBalance;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 公有成员函数：提供受控的访问接口（Getter）
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> <span style="color:#a6e22e">getBalance</span>() <span style="color:#66d9ef">const</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> balance;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 公有成员函数：存款（Setter/Action）
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">deposit</span>(<span style="color:#66d9ef">double</span> amount) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (amount <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">+=</span> amount;
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;存入: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> amount <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 元&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 公有成员函数：取款
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">withdraw</span>(<span style="color:#66d9ef">double</span> amount) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (amount <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> amount <span style="color:#f92672">&lt;=</span> balance) {
+</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">-=</span> amount;
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;取出: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> amount <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 元&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;余额不足或金额非法！&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    BankAccount myAccount(<span style="color:#e6db74">&#34;张三&#34;</span>, <span style="color:#ae81ff">1000.0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// myAccount.balance = 1000000; // 错误！编译会报错，因为 balance 是 private 的
+</span></span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    myAccount.deposit(<span style="color:#ae81ff">500</span>);       <span style="color:#75715e">// 正确：通过公有接口操作
+</span></span></span><span style="display:flex;"><span>    myAccount.withdraw(<span style="color:#ae81ff">200</span>);      <span style="color:#75715e">// 正确：通过公有接口操作
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;当前余额: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> myAccount.getBalance() <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 元&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="进阶部分">进阶部分</h2>
+<h3 id="访问控制的边界与编译时检查">访问控制的边界与编译时检查</h3>
+<p>在 C++ 中，封装不仅仅是“隐藏变量”，它是<strong>一种编译器层面的协议</strong>。</p>
+<p><strong>编译时 vs 运行时</strong></p>
+<ul>
+<li><strong>编译时约束</strong>：<code>private</code> 和 <code>protected</code> 的限制仅存在于<strong>编译阶段</strong>。编译器会检查你的代码是否违背了访问规则。</li>
+<li><strong>运行时透明</strong>：一旦程序编译完成，生成的机器码中并没有“私有”的概念。通过**指针算术（Pointer Arithmetic）**或偏移量，理论上你可以访问任何内存位置。</li>
+</ul>
+
+
+
+  <blockquote class="dream-alert note">
+    <p class="heading">
+      <ion-icon name="information-circle-outline"></ion-icon>Note</p>
+    <p>封装是 C++ 提供的<strong>静态类型安全保障</strong>，而非内存防火墙。</p>
+  </blockquote>
+
+<h3 id="pimpl-指子pointer-to-implementation">Pimpl 指子（Pointer to Implementation）</h3>
+<p>传统的封装在头文件中暴露了私有成员变量。如果你修改了一个私有变量的类型，所有引用该头文件的源文件都需要<strong>重新编译</strong>。</p>
+<p>为了实现<strong>完全的解耦</strong>，资深开发者会使用 <strong>Pimpl 模式</strong>（也叫编译防火墙）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// MyClass.h
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;memory&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    MyClass();
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">~</span>MyClass();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">doSomething</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Impl</span>;           <span style="color:#75715e">// 前向声明
+</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>unique_ptr<span style="color:#f92672">&lt;</span>Impl<span style="color:#f92672">&gt;</span> pImpl; <span style="color:#75715e">// 真正的私有数据和实现都在 Impl 里
+</span></span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h3 id="对象模型与内存对齐">对象模型与内存对齐</h3>
+<p>从内存布局（Memory Layout）看封装：</p>
+<p><strong>布局顺序</strong>：C++ 保证在同一个访问块（例如同一个 <code>public</code> 块）内的成员在内存中是连续的。</p>
+<p><strong>Padding（填充）</strong>：由于内存对齐，类的大小并不总是成员大小之和。</p>
+<p><strong>Vtable 指针</strong>：如果类有虚函数，编译器会在对象最前端（通常）插入一个指向虚函数表的指针。</p>
+<p>如果你有两个连续的 <code>public</code> 和 <code>private</code> 块，编译器并不强制要求这两块在内存中是连续的，虽然大多数编译器会这么做。这意味着<strong>封装并不保证物理连续性</strong>。</p>
+<h3 id="explicit-与-mutable">explicit 与 mutable</h3>
+<h4 id="explicit-语义严谨性的安全阀">explicit &ndash;语义严谨性的“安全阀”</h4>
+<p><code>explicit</code> 主要用于修饰类中的构造函数（尤其是单参数构造函数）或类型转换运算符。</p>
+<p>它的核心功能是彻底封锁编译器的隐式转换路径。在默认情况下，C++ 编译器为了灵活性，会自动尝试将基本类型或其他兼容类型隐式转换为类对象，而一旦标记了 <code>explicit</code>，这种“擅自操作”将被禁止。开发者必须通过显式的构造语法（如直接初始化）来创建对象，否则代码在编译阶段就会报错。</p>
+<p>这主要是为了防止由于语义歧义而引发的隐式 Bug。</p>
+<p>在大型工程中，隐式转换往往会产生令人困惑的行为。例如，一个本意是“设置缓冲区大小”的整型参数，可能会被编译器误解为“将整数隐式转换为缓冲区对象”，从而在函数传参时触发昂贵的内存分配或错误的逻辑操作。</p>
+<p>通过使用 <code>explicit</code>，C++ 强制要求开发者必须显式地表达意图，从而实现了更严谨的接口封装，确保“所写即所得”，提升了代码的安全性与可读性。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SmartPtr</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">explicit</span> <span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">bool</span>() <span style="color:#66d9ef">const</span> { <span style="color:#66d9ef">return</span> ptr <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>; }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> ptr;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SmartPtr p;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (p) { ... }        <span style="color:#75715e">// OK：在 if 语句中会自动尝试转换为 bool（上下文转换）
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// int x = p + 10;    // 编译报错！防止了意外的算术运算
+</span></span></span></code></pre></div><h4 id="mutable物理与逻辑的柔性窗口">mutable&ndash;物理与逻辑的“柔性窗口”</h4>
+<p><code>mutable</code> 是 C++ 访问控制权限中的一个特殊例外，它作用于类的非静态成员变量。</p>
+<p>它的直接功能是赋予该变量“突破 <code>const</code> 约束”的权力：即在一个被声明为 <code>const</code> 的成员函数内部，依然可以合法地修改被 <code>mutable</code> 修饰的变量。即便对象本身被定义为常量对象，其内部的 <code>mutable</code> 成员也依然保持可变性</p>
+<p>源于 C++ 对“逻辑常量性”与“物理常量性”的深刻区分。</p>
+<p>在封装逻辑中，物理常量性要求内存字节绝对不动，但有时为了维持逻辑上的常量性，内部实现必须做出调整。典型的例子是“缓存机制”和“多线程互斥锁”：为了加速查询，<code>const</code> 接口可能需要修改内部的缓存计数器；为了保证并发安全，<code>const</code> 接口必须操作互斥锁来改变其锁定状态。</p>
+<p>在这些场景下，外部用户感知不到对象状态的变化，但内部却必须进行必要的读写。<code>mutable</code> 的存在，让开发者能够在不破坏对象对外承诺（<code>const</code> 契约）的前提下，灵活地处理这些底层实现细节。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SharedData</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> data;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">mutable</span> std<span style="color:#f92672">::</span>mutex mtx; <span style="color:#75715e">// 必须是 mutable
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> getData() <span style="color:#66d9ef">const</span> {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>lock_guard<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>mutex<span style="color:#f92672">&gt;</span> lock(mtx); <span style="color:#75715e">// 修改了 mtx 的内部状态
+</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>在多线程环境下，即使是 <code>const</code> 的只读操作（如 <code>getValue()</code>），也需要加锁来保证并发安全。但 <code>std::mutex::lock()</code> 本身会修改锁的状态。如果没有 <code>mutable</code>，你无法在 <code>const</code> 函数里加锁。这里<code>mutable</code> 告诉编译器：“这个变量不参与对象的常量语义检查，请在 <code>const</code> 函数中对它网开一面。”</p>
+
+
+        
+      </section>
+
+      
+
+      
+    </article>
+  </div>
+
+  <div
+    x-data="tocHighlighter()"
+    @scroll.window="debouncedScroll"
+    class="hidden lg:flex lg:flex-col lg:items-end lg:self-start"
+  >
+    
+  </div>
+</div>
+
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2026 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+        <div class="back">
+          <div class="container">
+            
+            <div class="dream-grid dream-grid-about">
+  
+  
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">关于我</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>我是<strong>古月月仔</strong></li>
+<li><strong>Ethan Hu</strong></li>
+<li>分享技术学习笔记与生活点滴</li>
+<li><strong>现居</strong>： 上海 中国</li>
+<li><strong>家乡</strong>： 平遥 山西</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">在用的学习工具</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>📝 <a href="https://typora.io/" target="_blank">Typora</a>
+ —— 极致简洁的 Markdown 编辑器，助力沉浸式文档撰写与知识记录。</li>
+<li>📓 <a href="https://www.notion.so/" target="_blank">Notion</a>
+ —— 一站式工作空间，用于搭建个人知识库、项目管理与深度协作。</li>
+<li>🔗 <a href="https://n8n.io/" target="_blank">N8N</a>
+ —— 强大的基于节点的自动化工作流工具，轻松实现不同应用间的逻辑联动。</li>
+<li>🤖 <a href="https://gemini.google.com/" target="_blank">Gemini</a>
+ —— 智能 AI 助手，在代码辅助、创意激发与信息检索中提供强力支撑。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">我的爱好</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🚀 喜欢折腾各种好玩的技术</li>
+<li>📸 业余摄影爱好者</li>
+<li>🎮 各类游戏玩家</li>
+<li>💻 数码产品折腾爱好者</li>
+<li>📚 阅读：赫尔曼·黑塞 &amp; 阿尔贝·加缪</li>
+<li>🎞️ 追番中：《电锯人：蕾塞篇》</li>
+<li>🎬 经典重温：《命运石之门》</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 dream-column">
+    <article
+      class="card bg-base-100 hover:bg-base-content/10 shadow-xl dark:border dark:border-base-content/30"
+    >
+      <div class="card-body">
+        <div class="card-title">最近正在学</div>
+
+        <div class="prose dark:prose-invert">
+          <ul>
+<li>🎨 <a href="https://games104.boomingtech.com/" target="_blank">GAMES104</a>
+ —— 现代游戏引擎入门。</li>
+<li>🏔️ <a href="https://www.sidefx.com/learn/" target="_blank">Houdini 基础</a>
+ —— 学习程序化建模与特效。</li>
+<li>🤗 <a href="https://huggingface.co/learn" target="_blank">Hugging Face</a>
+ —— 探索开源 AI 社区。</li>
+</ul>
+
+        </div>
+      </div>
+    </article>
+  </div>
+  
+  
+
+  
+
+  
+</div>
+
+            
+
+            
+<footer class="flex justify-between items-center gap-2 px-4 py-12">
+
+  <div>
+  
+  <p>
+    © 2021 - 2026 古月月仔的博客
+  </p>
+  
+
+  
+  <p class="text-sm">
+    🌱
+    <span class="text-base-content/60">
+      Powered by <a class="hover:underline" href="https://gohugo.io/" target="_blank">Hugo</a> with theme
+      <a class="hover:underline" href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</span
+    >
+  </p>
+  
+</div>
+
+  <div
+  x-data="{ icons: [
+    { name: 'sunny', status: 'n' },
+    { name: 'moon', status: 'y' },
+    { name: 'desktop', status: 'auto' }
+  ] }"
+  class="flex items-center gap-2 h-[32px] px-2 bg-base-100 border border-base-content/30 rounded-full"
+>
+  <template x-for="icon in icons">
+    <div
+      role="button"
+      tabindex="0"
+      :aria-label="'Select ' + icon.name + ' mode'"
+      class="group inline-flex justify-center items-center p-1 rounded-full cursor-pointer hover:bg-primary"
+      :class="$store.darkMode.icon() === icon.name && 'bg-primary'"
+      @click="$store.darkMode.toggle(icon.status)"
+    >
+      <ion-icon
+        :name="`${icon.name}-outline`"
+        class="group-hover:text-primary-content"
+        :class="$store.darkMode.icon() === icon.name && 'text-primary-content'"
+      >
+      </ion-icon>
+    </div>
+  </template>
+</div>
+
+</footer>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  window.lightTheme = "emerald"
+  window.darkTheme = "forest"
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+  
+  
+  <script src="/js/grid.js"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+    
+
+
+
+
+
+
+
+<script src="/js/toc.js"></script>
+
+
+
+
+  
+
+
+
+
+    
+
+    
+      <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [
+        ['\\[', '\\]'],
+        ['$$', '$$'],
+      ], 
+      inlineMath: [
+        ['\\(', '\\)'],
+        ['$', '$'],
+      ], 
+    },
+  }
+</script>
+
+    
+
+    
+
+    
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js" integrity="sha256-/IFmi82bIhdYWctu0UddSlJqpnzWm7Vh2C4CM32wF/k=" crossorigin="anonymous"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js" integrity="sha256-mr7eJMX3VC3F7G32mk4oWp1C6a2tlMYxUdptfT7uKI8=" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -6,8 +6,71 @@
     <description>Recent content in Tags on 古月月仔的博客</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 19 Dec 2025 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 05 Jan 2026 00:00:00 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>http://localhost:1313/tags/c&#43;&#43;/</link>
+      <pubDate>Mon, 05 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>多态</title>
+      <link>http://localhost:1313/tags/%E5%A4%9A%E6%80%81/</link>
+      <pubDate>Mon, 05 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E5%A4%9A%E6%80%81/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>继承</title>
+      <link>http://localhost:1313/tags/%E7%BB%A7%E6%89%BF/</link>
+      <pubDate>Mon, 05 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E7%BB%A7%E6%89%BF/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>虚函数</title>
+      <link>http://localhost:1313/tags/%E8%99%9A%E5%87%BD%E6%95%B0/</link>
+      <pubDate>Mon, 05 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E8%99%9A%E5%87%BD%E6%95%B0/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>面相对象</title>
+      <link>http://localhost:1313/tags/%E9%9D%A2%E7%9B%B8%E5%AF%B9%E8%B1%A1/</link>
+      <pubDate>Mon, 05 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E9%9D%A2%E7%9B%B8%E5%AF%B9%E8%B1%A1/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>内存管理</title>
+      <link>http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</link>
+      <pubDate>Fri, 02 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>堆</title>
+      <link>http://localhost:1313/tags/%E5%A0%86/</link>
+      <pubDate>Fri, 02 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E5%A0%86/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>栈</title>
+      <link>http://localhost:1313/tags/%E6%A0%88/</link>
+      <pubDate>Fri, 02 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E6%A0%88/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>语法</title>
+      <link>http://localhost:1313/tags/%E8%AF%AD%E6%B3%95/</link>
+      <pubDate>Thu, 01 Jan 2026 00:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E8%AF%AD%E6%B3%95/</guid>
+      <description></description>
+    </item>
     <item>
       <title>GAMES课程</title>
       <link>http://localhost:1313/tags/games%E8%AF%BE%E7%A8%8B/</link>
@@ -90,6 +153,13 @@
       <link>http://localhost:1313/tags/%E9%80%8F%E8%A7%86%E5%8E%9F%E7%90%86/</link>
       <pubDate>Tue, 16 Dec 2025 00:00:00 +0800</pubDate>
       <guid>http://localhost:1313/tags/%E9%80%8F%E8%A7%86%E5%8E%9F%E7%90%86/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>封装</title>
+      <link>http://localhost:1313/tags/%E5%B0%81%E8%A3%85/</link>
+      <pubDate>Mon, 15 Dec 2025 12:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/tags/%E5%B0%81%E8%A3%85/</guid>
       <description></description>
     </item>
     <item>
@@ -279,69 +349,6 @@
       <link>http://localhost:1313/tags/markdown/</link>
       <pubDate>Wed, 03 Dec 2025 00:00:00 +0800</pubDate>
       <guid>http://localhost:1313/tags/markdown/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>C&#43;&#43;</title>
-      <link>http://localhost:1313/tags/c&#43;&#43;/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/c&#43;&#43;/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>内存管理</title>
-      <link>http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>堆</title>
-      <link>http://localhost:1313/tags/%E5%A0%86/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E5%A0%86/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>多态</title>
-      <link>http://localhost:1313/tags/%E5%A4%9A%E6%80%81/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E5%A4%9A%E6%80%81/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>栈</title>
-      <link>http://localhost:1313/tags/%E6%A0%88/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E6%A0%88/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>继承</title>
-      <link>http://localhost:1313/tags/%E7%BB%A7%E6%89%BF/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E7%BB%A7%E6%89%BF/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>虚函数</title>
-      <link>http://localhost:1313/tags/%E8%99%9A%E5%87%BD%E6%95%B0/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E8%99%9A%E5%87%BD%E6%95%B0/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>语法</title>
-      <link>http://localhost:1313/tags/%E8%AF%AD%E6%B3%95/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E8%AF%AD%E6%B3%95/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>面相对象</title>
-      <link>http://localhost:1313/tags/%E9%9D%A2%E7%9B%B8%E5%AF%B9%E8%B1%A1/</link>
-      <pubDate>Tue, 02 Dec 2025 00:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/tags/%E9%9D%A2%E7%9B%B8%E5%AF%B9%E8%B1%A1/</guid>
       <description></description>
     </item>
     <item>

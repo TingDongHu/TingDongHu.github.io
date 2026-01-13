@@ -1,4 +1,4 @@
---- 
+---
 title: 【C++】C++中的设计模式
 date: 2025-05-01T00:00:00+08:00
 categories: ["C++"]
@@ -7,11 +7,9 @@ description: "设计模式是针对软件设计中常见问题的通用解决方
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"
 math: true
---- 
+---
 
 设计模式是针对软件设计中反复出现问题的通用解决方案，其核心在于提升代码复用性，避免重复劳动。 
-
-
 
 ## 什么是设计模式
 
@@ -30,7 +28,7 @@ math: true
 
 推荐一本历史性著作《设计模式:可复用面相对象软件的基础》
 
-![undefined](【C++】C++中的设计模式/%E3%80%90C++%E3%80%91C++%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%AD%E6%96%87%E7%89%88%E5%B0%81%E9%9D%A2.jpg)
+![undefined](%E3%80%90C++%E3%80%91C++%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%AD%E6%96%87%E7%89%88%E5%B0%81%E9%9D%A2.jpg)
 
 > [!TIP]
 >
