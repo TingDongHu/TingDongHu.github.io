@@ -47,6 +47,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -279,7 +281,7 @@
   <meta itemprop="description" content="文章分析了Ajax的兼容性、SEO和调试问题，推荐使用基于Promise的Axios简化HTTP请求。同时介绍了前后端分离开发的优势、YAPI接口管理平台的功能，以及通过Vue CLI创建和管理前端工程化项目的方法。">
   <meta itemprop="datePublished" content="2024-03-25T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-03-25T00:00:00+08:00">
-  <meta itemprop="wordCount" content="418">
+  <meta itemprop="wordCount" content="487">
   <meta itemprop="keywords" content="前端,Vue,环境配置">
 
       <header>
@@ -289,7 +291,7 @@
             Monday, Mar 25, 2024
           
 
-          | <span>2 minute read</span>
+          | <span>3 minute read</span>
 
           
           | <span>Updated at
@@ -373,26 +375,65 @@
 </ul>
 <p>基本使用：
 安装axios：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>npm install axios
-</span></span></code></pre></div><p>导入axios</p>
-<pre tabindex="0"><code>import axios &#39;axios&#39;
-</code></pre><p>使用Axios发送请求，并获取响应结果，官方提供的api很多，此处给出2种，如下
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm install axios
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>导入axios</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import axios &#39;axios&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用Axios发送请求，并获取响应结果，官方提供的api很多，此处给出2种，如下
 发送 get 请求</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">axios</span>({
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;get&#34;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;http://localhost:8080/ajax-demo1/aJAXDemo1?username=zhangsan&#34;</span>
-</span></span><span style="display:flex;"><span>}).<span style="color:#a6e22e">then</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">resp</span>){
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">data</span>);
-</span></span><span style="display:flex;"><span>})
-</span></span></code></pre></div><p>发送 post 请求</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">axios</span>({
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;post&#34;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;http://localhost:8080/ajax-demo1/aJAXDemo1&#34;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;username=zhangsan&#34;</span>
-</span></span><span style="display:flex;"><span>}).<span style="color:#a6e22e">then</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">resp</span>){
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">data</span>);
-</span></span><span style="display:flex;"><span>});
-</span></span></code></pre></div><h2 id="前后端分离开发">前后端分离开发</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">axios</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">method</span><span class="o">:</span><span class="s2">&#34;get&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">url</span><span class="o">:</span><span class="s2">&#34;http://localhost:8080/ajax-demo1/aJAXDemo1?username=zhangsan&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">resp</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发送 post 请求</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">axios</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">method</span><span class="o">:</span><span class="s2">&#34;post&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">url</span><span class="o">:</span><span class="s2">&#34;http://localhost:8080/ajax-demo1/aJAXDemo1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">data</span><span class="o">:</span><span class="s2">&#34;username=zhangsan&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">resp</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="前后端分离开发">前后端分离开发</h2>
 <p>前后端分离开发 是一种现代 Web 开发架构，将前端（客户端）和后端（服务器）分离为两个独立的项目，通过 API 进行通信。这种方式提高了开发效率、代码可维护性和团队协作能力。</p>
 <p><figure style="text-align: center; margin: 1.5rem auto;">
   
@@ -434,10 +475,24 @@
 <h2 id="前端工程化">前端工程化</h2>
 <p>安装 <code>node.js</code>与vue官方脚手架<code>Vue-cli</code>。
 通过命令创建vue项目：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>vue create vue-project01
-</span></span></code></pre></div><p>或者通过图形化界面创建项目：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>vue ui
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vue create vue-project01
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者通过图形化界面创建项目：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">vue ui
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="https://github.com/user-attachments/assets/d2a8de03-1517-4e0d-97c6-bb2b31161966" 
        alt="Image" 
@@ -523,8 +578,15 @@
   
 </figure></p>
 <p>安装ElementUI组件库：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>npm install element-ui@2.15.3 
-</span></span></code></pre></div><p>其余使用方式，直接上Element官网查看快速入门。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm install element-ui@2.15.3 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其余使用方式，直接上Element官网查看快速入门。</p>
 <h2 id="vue路由">Vue路由</h2>
 <p>vue官方提供了路由插件Vue Router,其主要组成如下：</p>
 <ul>
@@ -534,62 +596,143 @@
 </ul>
 <p>基本用法：
 安装vue-router插件：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>npm install vue-router@3.5.1
-</span></span></code></pre></div><p>要在src/router/index.js文件中定义路由表:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vue</span>  <span style="color:#e6db74">&#39;vue&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">VueRouter</span>  <span style="color:#e6db74">&#39;vue-router&#39;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Vue</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">VueRouter</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">routes</span> <span style="color:#f92672">=</span> [
-</span></span><span style="display:flex;"><span>  {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/emp&#39;</span>,  <span style="color:#75715e">//地址hash
-</span></span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;emp&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">component</span><span style="color:#f92672">:</span>  () =&gt; <span style="color:#66d9ef">import</span>(<span style="color:#e6db74">&#39;../views/tlias/EmpView.vue&#39;</span>)  <span style="color:#75715e">//对应的vue组件
-</span></span></span><span style="display:flex;"><span>  },
-</span></span><span style="display:flex;"><span>  {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/dept&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;dept&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">component</span><span style="color:#f92672">:</span> () =&gt; <span style="color:#66d9ef">import</span>(<span style="color:#e6db74">&#39;../views/tlias/DeptView.vue&#39;</span>)
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">router</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">VueRouter</span>({
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">routes</span>
-</span></span><span style="display:flex;"><span>})
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">default</span> <span style="color:#a6e22e">router</span>
-</span></span></code></pre></div><p>xxxxxxxxxx import pickleimport jsonimport numpy as npimport os​# 指定需要查看的 frame_idtarget_frame_id = &ldquo;000015&quot;​# 所有模型的推理结果文件路径result_paths = [    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/PartA2_free/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pointpillar/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pv_rcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/second/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/second_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;]​# 处理 numpy 数据，转换为 Python 可序列化的数据结构def convert_to_serializable(obj):    if isinstance(obj, np.ndarray):        return obj.tolist()  # numpy 数组转换为列表    elif isinstance(obj, (np.float32, np.float64)):        return float(obj)  # numpy 浮点数转换为 Python float    elif isinstance(obj, (np.int32, np.int64)):        return int(obj)  # numpy 整数转换为 Python int    return obj  # 其他数据类型保持不变​# 存储所有模型推理出的 <code>frame_id</code> 结果all_model_results = {}​for result_path in result_paths:    # 修正模型名称提取方式    path_parts = result_path.split(&rsquo;/&rsquo;)    if &ldquo;kitti_models&rdquo; in path_parts:        model_index = path_parts.index(&ldquo;kitti_models&rdquo;) + 1  # 获取模型名索引        model_name = path_parts[model_index]  # 获取模型名称    else:        model_name = &ldquo;Unknown&quot;​    try:        with open(result_path, &ldquo;rb&rdquo;) as f:            result_data = pickle.load(f)​        # 确保数据是列表        if isinstance(result_data, list):            # 查找匹配的 frame_id            matched_frames = [frame for frame in result_data if frame.get(&ldquo;frame_id&rdquo;) == target_frame_id]​            if matched_frames:                print(f&quot;模型 {model_name} 找到 {len(matched_frames)} 个匹配 frame_id = {target_frame_id} 的数据&rdquo;)                all_model_results[model_name] = matched_frames  # 存储该模型的匹配数据            else:                print(f&quot;模型 {model_name} 未找到 frame_id = {target_frame_id} 的数据&rdquo;)        else:            print(f&quot;模型 {model_name} 数据格式异常: {type(result_data)}&quot;)​    except Exception as e:        print(f&quot;加载模型 {model_name} 的数据时发生错误: {e}&quot;)​# 如果找到数据，则保存为 JSON 文件if all_model_results:    output_json_path = &ldquo;output.json&rdquo;    with open(output_json_path, &ldquo;w&rdquo;, encoding=&ldquo;utf-8&rdquo;) as f:        json.dump(all_model_results, f, indent=4, ensure_ascii=False, default=convert_to_serializable)        print(f&quot;所有模型推理的 JSON 结果已保存为 {output_json_path}&quot;)else:    print(&ldquo;未找到任何匹配的 frame_id 数据&rdquo;)​python</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">el-menu-item</span> <span style="color:#a6e22e">index</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1-1&#34;</span>&gt;
-</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">router-link</span> <span style="color:#a6e22e">to</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/dept&#34;</span>&gt;部门管理&lt;/<span style="color:#f92672">router-link</span>&gt;
-</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">el-menu-item</span>&gt;
-</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">el-menu-item</span> <span style="color:#a6e22e">index</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1-2&#34;</span>&gt;
-</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">router-link</span> <span style="color:#a6e22e">to</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/emp&#34;</span>&gt;员工管理&lt;/<span style="color:#f92672">router-link</span>&gt;
-</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">el-menu-item</span>&gt;
-</span></span></code></pre></div><p>App.vue中定义route-view:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">template</span>&gt;
-</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;app&#34;</span>&gt;
-</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">router-view</span>&gt;&lt;/<span style="color:#f92672">router-view</span>&gt;
-</span></span><span style="display:flex;"><span>  &lt;/<span style="color:#f92672">div</span>&gt;
-</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">template</span>&gt;
-</span></span></code></pre></div><p>路由配置中/对应的路由组件:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">routes</span> <span style="color:#f92672">=</span> [
-</span></span><span style="display:flex;"><span>  {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/emp&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;emp&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">component</span><span style="color:#f92672">:</span>  () =&gt; <span style="color:#66d9ef">import</span>(<span style="color:#e6db74">&#39;../views/tlias/EmpView.vue&#39;</span>)
-</span></span><span style="display:flex;"><span>  },
-</span></span><span style="display:flex;"><span>  {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/dept&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;dept&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">component</span><span style="color:#f92672">:</span> () =&gt; <span style="color:#66d9ef">import</span>(<span style="color:#e6db74">&#39;../views/tlias/DeptView.vue&#39;</span>)
-</span></span><span style="display:flex;"><span>  },
-</span></span><span style="display:flex;"><span>  {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">redirect</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;/emp&#39;</span> <span style="color:#75715e">//表示重定向到/emp即可
-</span></span></span><span style="display:flex;"><span>  },
-</span></span><span style="display:flex;"><span>]
-</span></span></code></pre></div><h2 id="打包部署">打包部署</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm install vue-router@3.5.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>要在src/router/index.js文件中定义路由表:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">Vue</span>  <span class="s1">&#39;vue&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">VueRouter</span>  <span class="s1">&#39;vue-router&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">Vue</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">VueRouter</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">routes</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/emp&#39;</span><span class="p">,</span>  <span class="c1">//地址hash
+</span></span></span><span class="line"><span class="cl">    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;emp&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">component</span><span class="o">:</span>  <span class="p">()</span> <span class="p">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&#39;../views/tlias/EmpView.vue&#39;</span><span class="p">)</span>  <span class="c1">//对应的vue组件
+</span></span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/dept&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;dept&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">component</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&#39;../views/tlias/DeptView.vue&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">router</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VueRouter</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">routes</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="nx">router</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>xxxxxxxxxx import pickleimport jsonimport numpy as npimport os​# 指定需要查看的 frame_idtarget_frame_id = &ldquo;000015&quot;​# 所有模型的推理结果文件路径result_paths = [    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/PartA2_free/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pointpillar/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/pv_rcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/second/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;,    &lsquo;/home/tdhu/OpenPCDet/output/kitti_models/second_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&rsquo;]​# 处理 numpy 数据，转换为 Python 可序列化的数据结构def convert_to_serializable(obj):    if isinstance(obj, np.ndarray):        return obj.tolist()  # numpy 数组转换为列表    elif isinstance(obj, (np.float32, np.float64)):        return float(obj)  # numpy 浮点数转换为 Python float    elif isinstance(obj, (np.int32, np.int64)):        return int(obj)  # numpy 整数转换为 Python int    return obj  # 其他数据类型保持不变​# 存储所有模型推理出的 <code>frame_id</code> 结果all_model_results = {}​for result_path in result_paths:    # 修正模型名称提取方式    path_parts = result_path.split(&rsquo;/&rsquo;)    if &ldquo;kitti_models&rdquo; in path_parts:        model_index = path_parts.index(&ldquo;kitti_models&rdquo;) + 1  # 获取模型名索引        model_name = path_parts[model_index]  # 获取模型名称    else:        model_name = &ldquo;Unknown&quot;​    try:        with open(result_path, &ldquo;rb&rdquo;) as f:            result_data = pickle.load(f)​        # 确保数据是列表        if isinstance(result_data, list):            # 查找匹配的 frame_id            matched_frames = [frame for frame in result_data if frame.get(&ldquo;frame_id&rdquo;) == target_frame_id]​            if matched_frames:                print(f&quot;模型 {model_name} 找到 {len(matched_frames)} 个匹配 frame_id = {target_frame_id} 的数据&rdquo;)                all_model_results[model_name] = matched_frames  # 存储该模型的匹配数据            else:                print(f&quot;模型 {model_name} 未找到 frame_id = {target_frame_id} 的数据&rdquo;)        else:            print(f&quot;模型 {model_name} 数据格式异常: {type(result_data)}&quot;)​    except Exception as e:        print(f&quot;加载模型 {model_name} 的数据时发生错误: {e}&quot;)​# 如果找到数据，则保存为 JSON 文件if all_model_results:    output_json_path = &ldquo;output.json&rdquo;    with open(output_json_path, &ldquo;w&rdquo;, encoding=&ldquo;utf-8&rdquo;) as f:        json.dump(all_model_results, f, indent=4, ensure_ascii=False, default=convert_to_serializable)        print(f&quot;所有模型推理的 JSON 结果已保存为 {output_json_path}&quot;)else:    print(&ldquo;未找到任何匹配的 frame_id 数据&rdquo;)​python</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">el-menu-item</span> <span class="na">index</span><span class="o">=</span><span class="s">&#34;1-1&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">router-link</span> <span class="na">to</span><span class="o">=</span><span class="s">&#34;/dept&#34;</span><span class="p">&gt;</span>部门管理<span class="p">&lt;/</span><span class="nt">router-link</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">el-menu-item</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">el-menu-item</span> <span class="na">index</span><span class="o">=</span><span class="s">&#34;1-2&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">router-link</span> <span class="na">to</span><span class="o">=</span><span class="s">&#34;/emp&#34;</span><span class="p">&gt;</span>员工管理<span class="p">&lt;/</span><span class="nt">router-link</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">el-menu-item</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>App.vue中定义route-view:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;app&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">router-view</span><span class="p">&gt;&lt;/</span><span class="nt">router-view</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>路由配置中/对应的路由组件:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">routes</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/emp&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;emp&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">component</span><span class="o">:</span>  <span class="p">()</span> <span class="p">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&#39;../views/tlias/EmpView.vue&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/dept&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;dept&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">component</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&#39;../views/tlias/DeptView.vue&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">redirect</span><span class="o">:</span><span class="s1">&#39;/emp&#39;</span> <span class="c1">//表示重定向到/emp即可
+</span></span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="打包部署">打包部署</h2>
 <p>直接通过VS Code的NPM脚本中提供的<code>build</code>按钮来完成：
 <figure style="text-align: center; margin: 1.5rem auto;">
   

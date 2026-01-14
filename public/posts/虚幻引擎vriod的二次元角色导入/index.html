@@ -50,6 +50,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -282,7 +284,7 @@
   <meta itemprop="description" content="详细讲解VRoid Studio二次元角色模型导入虚幻引擎的完整流程，涵盖VRM文件导出、VRM4U插件安装配置、常见问题解决及动画重定向方法。">
   <meta itemprop="datePublished" content="2023-11-20T00:00:00+08:00">
   <meta itemprop="dateModified" content="2023-11-20T00:00:00+08:00">
-  <meta itemprop="wordCount" content="209">
+  <meta itemprop="wordCount" content="218">
   <meta itemprop="keywords" content="模型,UnrealEngine,骨骼绑定,动画映射,插件,打包">
 
       <header>
@@ -292,7 +294,7 @@
             Monday, Nov 20, 2023
           
 
-          | <span>1 minute read</span>
+          | <span>2 minute read</span>
 
           
           | <span>Updated at
@@ -542,16 +544,31 @@
 </figure></p>
 <h2 id="打包的问题">打包的问题</h2>
 <p>项目开发测试阶段,本来想打包给我的队友看一下效果,结果在打包的时候报了以下错误:</p>
-<pre tabindex="0"><code>UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/VrmAssetListObjectBPUE5.uasset is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/VRM4U_PostToon.umap is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_Unlit.uasset is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_SSSProfile.uasset is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_MToonUnLit.uasset is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/latest/VRM4U_Outline.umap is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/latest/VRM4U_SceneCapture.umap is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Util/Actor/latest/BP_SceneCapture.uasset is too new. Engine Version: 1008 Package Version: 1009
-UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh
-</code></pre><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/VrmAssetListObjectBPUE5.uasset is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/VRM4U_PostToon.umap is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_Unlit.uasset is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_SSSProfile.uasset is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/ImportDataSet/UE5/DS_VRM_UE5_MToonUnLit.uasset is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/latest/VRM4U_Outline.umap is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Maps/latest/VRM4U_SceneCapture.umap is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh 5.1/Plugins/VRM4U/Content/Util/Actor/latest/BP_SceneCapture.uasset is too new. Engine Version: 1008 Package Version: 1009
+</span></span><span class="line"><span class="cl">UATHelper: Packaging (Windows): LogInit: Display: LogAssetRegistry: Error: Package F:/UE/GoodIdea/WeiKeFh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8Evriod%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%85%83%E8%A7%92%E8%89%B2%E5%AF%BC%E5%85%A5/image-20250424233609721.png" 
        alt="image-20250424233609721" 

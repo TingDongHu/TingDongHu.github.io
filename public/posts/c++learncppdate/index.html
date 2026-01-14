@@ -46,6 +46,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -278,7 +280,7 @@
   <meta itemprop="description" content="本文是作者践行“高密度文档&#43;AI协作”学习法后的首篇 C&#43;&#43; 笔记。不仅分享了从视频学习转向深度阅读的心路历程，更深入浅出地总结了 Learn C&#43;&#43; 基础章节：涵盖从硬件逻辑到高级语言的演进、编译器与解释器的底层差异，以及 C&#43;&#43; 源码级跨平台的实现原理。">
   <meta itemprop="datePublished" content="2026-01-01T00:00:00+08:00">
   <meta itemprop="dateModified" content="2026-01-01T00:00:00+08:00">
-  <meta itemprop="wordCount" content="313">
+  <meta itemprop="wordCount" content="324">
   <meta itemprop="keywords" content="语法,C&#43;&#43;">
 
       <header>
@@ -441,22 +443,51 @@
 <p><strong>三种语言的对比展示</strong></p>
 <p><strong>C++ (高级语言)</strong></p>
 <p>这是你写的代码。它关注的是<strong>逻辑</strong>和<strong>意图</strong>。<strong>其特点是</strong>：人类完全可读，变量名 <code>a</code> 和 <code>b</code> 具有语义，符号 <code>+</code> 直观。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> b <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> result <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> b;
-</span></span></code></pre></div><p><strong>汇编语言 (Assembly - x86-64 架构)</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>汇编语言 (Assembly - x86-64 架构)</strong></p>
 <p>这是编译器为你生成的中间代码。它关注的是<strong>寄存器</strong>和<strong>指令</strong>。你需要亲自管理 CPU 内部的存储单元（寄存器），并且每一步操作都必须拆解到最细微的动作。</p>
-<pre tabindex="0"><code class="language-assembly" data-lang="assembly">mov eax, 5        ; 将数字 5 放入寄存器 EAX
-mov ebx, 10       ; 将数字 10 放入寄存器 EBX
-add eax, ebx      ; 将 EBX 的值加到 EAX 上 (结果在 EAX)
-mov [result], eax ; 将寄存器 EAX 的结果存回内存地址
-</code></pre><p><strong>机器语言 (Machine Code - 十六进制表示)</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mov eax, 5        ; 将数字 5 放入寄存器 EAX
+</span></span><span class="line"><span class="cl">mov ebx, 10       ; 将数字 10 放入寄存器 EBX
+</span></span><span class="line"><span class="cl">add eax, ebx      ; 将 EBX 的值加到 EAX 上 (结果在 EAX)
+</span></span><span class="line"><span class="cl">mov [result], eax ; 将寄存器 EAX 的结果存回内存地址
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>机器语言 (Machine Code - 十六进制表示)</strong></p>
 <p>这是计算机最终执行的内容。它关注的是<strong>电压开关信号</strong>。完全不可读。如果此时你换了一个 ARM 架构的 CPU（比如苹果 M1 芯片），这些二进制码将完全失效，电脑根本不知道你在说什么。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plaintext" data-lang="Plaintext"><span style="display:flex;"><span>B8 05 00 00 00    ; (对应 mov eax, 5)
-</span></span><span style="display:flex;"><span>BB 0A 00 00 00    ; (对应 mov ebx, 10)
-</span></span><span style="display:flex;"><span>01 D8             ; (对应 add eax, ebx)
-</span></span><span style="display:flex;"><span>89 05 ...         ; (对应结果存储)
-</span></span></code></pre></div><h4 id="c-编译器为你省去了哪些麻烦">C++ 编译器为你省去了哪些麻烦？</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Plaintext" data-lang="Plaintext"><span class="line"><span class="cl">B8 05 00 00 00    ; (对应 mov eax, 5)
+</span></span><span class="line"><span class="cl">BB 0A 00 00 00    ; (对应 mov ebx, 10)
+</span></span><span class="line"><span class="cl">01 D8             ; (对应 add eax, ebx)
+</span></span><span class="line"><span class="cl">89 05 ...         ; (对应结果存储)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="c-编译器为你省去了哪些麻烦">C++ 编译器为你省去了哪些麻烦？</h4>
 <p>编译器不仅是一个“翻译官”，它更像是一个极其专业的<strong>管家</strong>。它帮你解决了以下三大难题：</p>
 <p>A. 硬件抽象（不用记寄存器）</p>
 <p>在汇编语言中，你必须知道 CPU 有哪些寄存器（EAX, RBX, R13&hellip;），哪些是通用的，哪些是特殊的。</p>

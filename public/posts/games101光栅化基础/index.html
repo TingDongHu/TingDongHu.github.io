@@ -50,6 +50,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -282,7 +284,7 @@
   <meta itemprop="description" content="光栅化是将几何图元转换为屏幕像素的核心渲染过程，涉及视口变换，并依托于CRT、LCD、OLED等显示设备最终成像。">
   <meta itemprop="datePublished" content="2025-06-29T00:00:00+08:00">
   <meta itemprop="dateModified" content="2025-06-29T00:00:00+08:00">
-  <meta itemprop="wordCount" content="306">
+  <meta itemprop="wordCount" content="309">
   <meta itemprop="keywords" content="图形学,Shading,GAMES课程,线性代数,光栅化,滤波,卷积">
 
       <header>
@@ -616,10 +618,19 @@ $$<h2 id="现代光栅显示设备">现代光栅显示设备</h2>
 
   </blockquote>
 
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; x <span style="color:#f92672">&lt;</span> xmax; <span style="color:#f92672">++</span>x) 
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; y <span style="color:#f92672">&lt;</span> ymax; <span style="color:#f92672">++</span>y) 
-</span></span><span style="display:flex;"><span>    image[x][y] <span style="color:#f92672">=</span> inside(tri, x <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span>, y <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span>);
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">xmax</span><span class="p">;</span> <span class="o">++</span><span class="n">x</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">ymax</span><span class="p">;</span> <span class="o">++</span><span class="n">y</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">image</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">inside</span><span class="p">(</span><span class="n">tri</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/games101%E5%85%89%E6%A0%85%E5%8C%96%E5%9F%BA%E7%A1%80/image-20250629233550066.png" 
        alt="image-20250629233550066" 

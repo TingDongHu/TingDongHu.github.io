@@ -48,6 +48,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -280,7 +282,7 @@
   <meta itemprop="description" content="组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C&#43;&#43;中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。">
   <meta itemprop="datePublished" content="2025-12-15T12:00:00+08:00">
   <meta itemprop="dateModified" content="2025-12-15T12:00:00+08:00">
-  <meta itemprop="wordCount" content="385">
+  <meta itemprop="wordCount" content="475">
   <meta itemprop="keywords" content="面相对象,C&#43;&#43;,封装,内存管理">
 
       <header>
@@ -290,7 +292,7 @@
             Monday, Dec 15, 2025
           
 
-          | <span>2 minute read</span>
+          | <span>3 minute read</span>
 
           
           | <span>Updated at
@@ -408,63 +410,125 @@
 <p><strong><code>const</code></strong>：在封装中，常用于修饰不修改成员变量的函数（如 <code>getBalance() const</code>），这被称为<strong>常成员函数</strong>，能提高代码的安全性和可读性。</p>
 <h3 id="example">Example</h3>
 <p>来一个银行账户的栗子：我们不希望别人直接修改我们的余额（<code>balance</code>），而是必须通过存款或取款函数来操作。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BankAccount</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 私有成员：外部无法直接访问
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> balance;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string ownerName;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 构造函数：初始化数据
-</span></span></span><span style="display:flex;"><span>    BankAccount(std<span style="color:#f92672">::</span>string name, <span style="color:#66d9ef">double</span> initialBalance) {
-</span></span><span style="display:flex;"><span>        ownerName <span style="color:#f92672">=</span> name;
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (initialBalance <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>) {
-</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">=</span> initialBalance;
-</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 公有成员函数：提供受控的访问接口（Getter）
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> <span style="color:#a6e22e">getBalance</span>() <span style="color:#66d9ef">const</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> balance;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 公有成员函数：存款（Setter/Action）
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">deposit</span>(<span style="color:#66d9ef">double</span> amount) {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (amount <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">+=</span> amount;
-</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;存入: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> amount <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 元&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 公有成员函数：取款
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">withdraw</span>(<span style="color:#66d9ef">double</span> amount) {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (amount <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> amount <span style="color:#f92672">&lt;=</span> balance) {
-</span></span><span style="display:flex;"><span>            balance <span style="color:#f92672">-=</span> amount;
-</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;取出: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> amount <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 元&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;余额不足或金额非法！&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    BankAccount myAccount(<span style="color:#e6db74">&#34;张三&#34;</span>, <span style="color:#ae81ff">1000.0</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// myAccount.balance = 1000000; // 错误！编译会报错，因为 balance 是 private 的
-</span></span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    myAccount.deposit(<span style="color:#ae81ff">500</span>);       <span style="color:#75715e">// 正确：通过公有接口操作
-</span></span></span><span style="display:flex;"><span>    myAccount.withdraw(<span style="color:#ae81ff">200</span>);      <span style="color:#75715e">// 正确：通过公有接口操作
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;当前余额: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> myAccount.getBalance() <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 元&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="进阶部分">进阶部分</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">BankAccount</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 私有成员：外部无法直接访问
+</span></span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="n">balance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">ownerName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 构造函数：初始化数据
+</span></span></span><span class="line"><span class="cl">    <span class="n">BankAccount</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">,</span> <span class="kt">double</span> <span class="n">initialBalance</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ownerName</span> <span class="o">=</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">initialBalance</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">balance</span> <span class="o">=</span> <span class="n">initialBalance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">balance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 公有成员函数：提供受控的访问接口（Getter）
+</span></span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="nf">getBalance</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">balance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 公有成员函数：存款（Setter/Action）
+</span></span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">deposit</span><span class="p">(</span><span class="kt">double</span> <span class="n">amount</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">balance</span> <span class="o">+=</span> <span class="n">amount</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;存入: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">amount</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; 元&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 公有成员函数：取款
+</span></span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">withdraw</span><span class="p">(</span><span class="kt">double</span> <span class="n">amount</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="n">balance</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">balance</span> <span class="o">-=</span> <span class="n">amount</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;取出: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">amount</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; 元&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;余额不足或金额非法！&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">BankAccount</span> <span class="n">myAccount</span><span class="p">(</span><span class="s">&#34;张三&#34;</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// myAccount.balance = 1000000; // 错误！编译会报错，因为 balance 是 private 的
+</span></span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">myAccount</span><span class="p">.</span><span class="n">deposit</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>       <span class="c1">// 正确：通过公有接口操作
+</span></span></span><span class="line"><span class="cl">    <span class="n">myAccount</span><span class="p">.</span><span class="n">withdraw</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>      <span class="c1">// 正确：通过公有接口操作
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;当前余额: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">myAccount</span><span class="p">.</span><span class="n">getBalance</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; 元&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="进阶部分">进阶部分</h2>
 <h3 id="访问控制的边界与编译时检查">访问控制的边界与编译时检查</h3>
 <p>在 C++ 中，封装不仅仅是“隐藏变量”，它是<strong>一种编译器层面的协议</strong>。</p>
 <p><strong>编译时 vs 运行时</strong></p>
@@ -484,20 +548,39 @@
 <h3 id="pimpl-指子pointer-to-implementation">Pimpl 指子（Pointer to Implementation）</h3>
 <p>传统的封装在头文件中暴露了私有成员变量。如果你修改了一个私有变量的类型，所有引用该头文件的源文件都需要<strong>重新编译</strong>。</p>
 <p>为了实现<strong>完全的解耦</strong>，资深开发者会使用 <strong>Pimpl 模式</strong>（也叫编译防火墙）：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// MyClass.h
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;memory&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    MyClass();
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">~</span>MyClass();
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">doSomething</span>();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Impl</span>;           <span style="color:#75715e">// 前向声明
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>unique_ptr<span style="color:#f92672">&lt;</span>Impl<span style="color:#f92672">&gt;</span> pImpl; <span style="color:#75715e">// 真正的私有数据和实现都在 Impl 里
-</span></span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h3 id="对象模型与内存对齐">对象模型与内存对齐</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// MyClass.h
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">MyClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">doSomething</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">Impl</span><span class="p">;</span>           <span class="c1">// 前向声明
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">Impl</span><span class="o">&gt;</span> <span class="n">pImpl</span><span class="p">;</span> <span class="c1">// 真正的私有数据和实现都在 Impl 里
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="对象模型与内存对齐">对象模型与内存对齐</h3>
 <p>从内存布局（Memory Layout）看封装：</p>
 <p><strong>布局顺序</strong>：C++ 保证在同一个访问块（例如同一个 <code>public</code> 块）内的成员在内存中是连续的。</p>
 <p><strong>Padding（填充）</strong>：由于内存对齐，类的大小并不总是成员大小之和。</p>
@@ -510,34 +593,67 @@
 <p>这主要是为了防止由于语义歧义而引发的隐式 Bug。</p>
 <p>在大型工程中，隐式转换往往会产生令人困惑的行为。例如，一个本意是“设置缓冲区大小”的整型参数，可能会被编译器误解为“将整数隐式转换为缓冲区对象”，从而在函数传参时触发昂贵的内存分配或错误的逻辑操作。</p>
 <p>通过使用 <code>explicit</code>，C++ 强制要求开发者必须显式地表达意图，从而实现了更严谨的接口封装，确保“所写即所得”，提升了代码的安全性与可读性。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SmartPtr</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">explicit</span> <span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">bool</span>() <span style="color:#66d9ef">const</span> { <span style="color:#66d9ef">return</span> ptr <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>; }
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> ptr;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>SmartPtr p;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (p) { ... }        <span style="color:#75715e">// OK：在 if 语句中会自动尝试转换为 bool（上下文转换）
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// int x = p + 10;    // 编译报错！防止了意外的算术运算
-</span></span></span></code></pre></div><h4 id="mutable物理与逻辑的柔性窗口">mutable&ndash;物理与逻辑的“柔性窗口”</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SmartPtr</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">explicit</span> <span class="k">operator</span> <span class="kt">bool</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">ptr</span> <span class="o">!=</span> <span class="k">nullptr</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span><span class="o">*</span> <span class="n">ptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">SmartPtr</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>        <span class="c1">// OK：在 if 语句中会自动尝试转换为 bool（上下文转换）
+</span></span></span><span class="line"><span class="cl"><span class="c1">// int x = p + 10;    // 编译报错！防止了意外的算术运算
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="mutable物理与逻辑的柔性窗口">mutable&ndash;物理与逻辑的“柔性窗口”</h4>
 <p><code>mutable</code> 是 C++ 访问控制权限中的一个特殊例外，它作用于类的非静态成员变量。</p>
 <p>它的直接功能是赋予该变量“突破 <code>const</code> 约束”的权力：即在一个被声明为 <code>const</code> 的成员函数内部，依然可以合法地修改被 <code>mutable</code> 修饰的变量。即便对象本身被定义为常量对象，其内部的 <code>mutable</code> 成员也依然保持可变性</p>
 <p>源于 C++ 对“逻辑常量性”与“物理常量性”的深刻区分。</p>
 <p>在封装逻辑中，物理常量性要求内存字节绝对不动，但有时为了维持逻辑上的常量性，内部实现必须做出调整。典型的例子是“缓存机制”和“多线程互斥锁”：为了加速查询，<code>const</code> 接口可能需要修改内部的缓存计数器；为了保证并发安全，<code>const</code> 接口必须操作互斥锁来改变其锁定状态。</p>
 <p>在这些场景下，外部用户感知不到对象状态的变化，但内部却必须进行必要的读写。<code>mutable</code> 的存在，让开发者能够在不破坏对象对外承诺（<code>const</code> 契约）的前提下，灵活地处理这些底层实现细节。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SharedData</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> data;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">mutable</span> std<span style="color:#f92672">::</span>mutex mtx; <span style="color:#75715e">// 必须是 mutable
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> getData() <span style="color:#66d9ef">const</span> {
-</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>lock_guard<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>mutex<span style="color:#f92672">&gt;</span> lock(mtx); <span style="color:#75715e">// 修改了 mtx 的内部状态
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>在多线程环境下，即使是 <code>const</code> 的只读操作（如 <code>getValue()</code>），也需要加锁来保证并发安全。但 <code>std::mutex::lock()</code> 本身会修改锁的状态。如果没有 <code>mutable</code>，你无法在 <code>const</code> 函数里加锁。这里<code>mutable</code> 告诉编译器：“这个变量不参与对象的常量语义检查，请在 <code>const</code> 函数中对它网开一面。”</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SharedData</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">mutable</span> <span class="n">std</span><span class="o">::</span><span class="n">mutex</span> <span class="n">mtx</span><span class="p">;</span> <span class="c1">// 必须是 mutable
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">getData</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span> <span class="n">lock</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span> <span class="c1">// 修改了 mtx 的内部状态
+</span></span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在多线程环境下，即使是 <code>const</code> 的只读操作（如 <code>getValue()</code>），也需要加锁来保证并发安全。但 <code>std::mutex::lock()</code> 本身会修改锁的状态。如果没有 <code>mutable</code>，你无法在 <code>const</code> 函数里加锁。这里<code>mutable</code> 告诉编译器：“这个变量不参与对象的常量语义检查，请在 <code>const</code> 函数中对它网开一面。”</p>
 
 
         

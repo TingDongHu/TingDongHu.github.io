@@ -50,6 +50,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -282,7 +284,7 @@
   <meta itemprop="description" content="本文为机器学习复习资料，适合已有基础的学习者快速回顾。内容涵盖机器学习的定义，并重点梳理了有监督学习、无监督学习、半监督学习和强化学习的主要算法类型及其典型应用场景。">
   <meta itemprop="datePublished" content="2023-10-30T00:00:00+08:00">
   <meta itemprop="dateModified" content="2023-10-30T00:00:00+08:00">
-  <meta itemprop="wordCount" content="628">
+  <meta itemprop="wordCount" content="739">
   <meta itemprop="keywords" content="人工智能,机器学习,基础算法,贝叶斯,回归树,SVM">
 
       <header>
@@ -292,7 +294,7 @@
             Monday, Oct 30, 2023
           
 
-          | <span>3 minute read</span>
+          | <span>4 minute read</span>
 
           
           | <span>Updated at
@@ -483,43 +485,85 @@
 <li>最小化误差：通过最小化实际观测值与模型预测值之间的误差来确定最佳拟合直线。</li>
 </ol>
 <p><strong>代码示例</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.datasets <span style="color:#f92672">import</span> fetch_california_housing
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.linear_model <span style="color:#f92672">import</span> LinearRegression
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> mean_squared_error
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 加载加州房价数据集</span>
-</span></span><span style="display:flex;"><span>housing <span style="color:#f92672">=</span> fetch_california_housing()
-</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame(housing<span style="color:#f92672">.</span>data, columns<span style="color:#f92672">=</span>housing<span style="color:#f92672">.</span>feature_names)
-</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> housing<span style="color:#f92672">.</span>target
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 划分训练集和测试集</span>
-</span></span><span style="display:flex;"><span>X_train, X_test, y_train, y_test <span style="color:#f92672">=</span> train_test_split(X, y, test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.2</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">42</span>)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 训练线性回归模型</span>
-</span></span><span style="display:flex;"><span>lr <span style="color:#f92672">=</span> LinearRegression()
-</span></span><span style="display:flex;"><span>lr<span style="color:#f92672">.</span>fit(X_train, y_train)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在测试集上进行预测</span>
-</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> lr<span style="color:#f92672">.</span>predict(X_test)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 计算均方误差</span>
-</span></span><span style="display:flex;"><span>mse <span style="color:#f92672">=</span> mean_squared_error(y_test, y_pred)
-</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;均方误差:&#34;</span>, mse)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 绘制预测值与真实值的散点图</span>
-</span></span><span style="display:flex;"><span>matplotlib<span style="color:#f92672">.</span>rcParams[<span style="color:#e6db74">&#39;font.sans-serif&#39;</span>] <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;SimHei&#39;</span>]
-</span></span><span style="display:flex;"><span>matplotlib<span style="color:#f92672">.</span>rcParams[<span style="color:#e6db74">&#39;axes.unicode_minus&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>figure(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">6</span>))
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>scatter(y_test, y_pred, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.5</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>xlabel(<span style="color:#e6db74">&#34;真实&#34;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>ylabel(<span style="color:#e6db74">&#34;预测&#34;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#34;真实值与预测值&#34;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_california_housing</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 加载加州房价数据集</span>
+</span></span><span class="line"><span class="cl"><span class="n">housing</span> <span class="o">=</span> <span class="n">fetch_california_housing</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">housing</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">housing</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="n">housing</span><span class="o">.</span><span class="n">target</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 划分训练集和测试集</span>
+</span></span><span class="line"><span class="cl"><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 训练线性回归模型</span>
+</span></span><span class="line"><span class="cl"><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 在测试集上进行预测</span>
+</span></span><span class="line"><span class="cl"><span class="n">y_pred</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 计算均方误差</span>
+</span></span><span class="line"><span class="cl"><span class="n">mse</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;均方误差:&#34;</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 绘制预测值与真实值的散点图</span>
+</span></span><span class="line"><span class="cl"><span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.sans-serif&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SimHei&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.unicode_minus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&#34;真实&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&#34;预测&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&#34;真实值与预测值&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%80%BB%E7%BB%93/v2-c98de3fcdc89af63b295c96603ebac6a_720w.png" 
        alt="img" 
@@ -632,53 +676,105 @@
     </figcaption>
   
 </figure></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.datasets <span style="color:#f92672">import</span> load_iris
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.linear_model <span style="color:#f92672">import</span> LogisticRegression
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> accuracy_score, confusion_matrix
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> matplotlib.colors <span style="color:#f92672">import</span> ListedColormap
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 加载鸢尾花数据集</span>
-</span></span><span style="display:flex;"><span>iris <span style="color:#f92672">=</span> load_iris()
-</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> iris<span style="color:#f92672">.</span>data[:, :<span style="color:#ae81ff">2</span>]  <span style="color:#75715e"># 只选择前两个特征用于可视化</span>
-</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> iris<span style="color:#f92672">.</span>target
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 划分训练集和测试集</span>
-</span></span><span style="display:flex;"><span>X_train, X_test, y_train, y_test <span style="color:#f92672">=</span> train_test_split(X, y, test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.2</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">42</span>)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 训练逻辑回归模型</span>
-</span></span><span style="display:flex;"><span>lr <span style="color:#f92672">=</span> LogisticRegression()
-</span></span><span style="display:flex;"><span>lr<span style="color:#f92672">.</span>fit(X_train, y_train)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在测试集上进行预测</span>
-</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> lr<span style="color:#f92672">.</span>predict(X_test)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 计算准确率</span>
-</span></span><span style="display:flex;"><span>accuracy <span style="color:#f92672">=</span> accuracy_score(y_test, y_pred)
-</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Accuracy:&#34;</span>, accuracy)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 绘制决策边界</span>
-</span></span><span style="display:flex;"><span>x_min, x_max <span style="color:#f92672">=</span> X[:, <span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>min() <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>, X[:, <span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>max() <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span>
-</span></span><span style="display:flex;"><span>y_min, y_max <span style="color:#f92672">=</span> X[:, <span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>min() <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.5</span>, X[:, <span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>max() <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span>
-</span></span><span style="display:flex;"><span>xx, yy <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>meshgrid(np<span style="color:#f92672">.</span>arange(x_min, x_max, <span style="color:#ae81ff">0.01</span>),
-</span></span><span style="display:flex;"><span>                     np<span style="color:#f92672">.</span>arange(y_min, y_max, <span style="color:#ae81ff">0.01</span>))
-</span></span><span style="display:flex;"><span>Z <span style="color:#f92672">=</span> lr<span style="color:#f92672">.</span>predict(np<span style="color:#f92672">.</span>c_[xx<span style="color:#f92672">.</span>ravel(), yy<span style="color:#f92672">.</span>ravel()])
-</span></span><span style="display:flex;"><span>Z <span style="color:#f92672">=</span> Z<span style="color:#f92672">.</span>reshape(xx<span style="color:#f92672">.</span>shape)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 绘制结果</span>
-</span></span><span style="display:flex;"><span>matplotlib<span style="color:#f92672">.</span>rcParams[<span style="color:#e6db74">&#39;font.sans-serif&#39;</span>] <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;SimHei&#39;</span>]
-</span></span><span style="display:flex;"><span>matplotlib<span style="color:#f92672">.</span>rcParams[<span style="color:#e6db74">&#39;axes.unicode_minus&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>figure(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">6</span>))
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>contourf(xx, yy, Z, alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.8</span>, cmap<span style="color:#f92672">=</span>ListedColormap((<span style="color:#e6db74">&#39;red&#39;</span>, <span style="color:#e6db74">&#39;green&#39;</span>, <span style="color:#e6db74">&#39;blue&#39;</span>)))
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>scatter(X[:, <span style="color:#ae81ff">0</span>], X[:, <span style="color:#ae81ff">1</span>], c<span style="color:#f92672">=</span>y, cmap<span style="color:#f92672">=</span>ListedColormap((<span style="color:#e6db74">&#39;red&#39;</span>, <span style="color:#e6db74">&#39;green&#39;</span>, <span style="color:#e6db74">&#39;blue&#39;</span>)), edgecolors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;k&#39;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>xlabel(<span style="color:#e6db74">&#39;分隔带长度&#39;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>ylabel(<span style="color:#e6db74">&#39;分隔带宽度&#39;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;逻辑回归决策边界&#39;</span>)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 加载鸢尾花数据集</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># 只选择前两个特征用于可视化</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 划分训练集和测试集</span>
+</span></span><span class="line"><span class="cl"><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 训练逻辑回归模型</span>
+</span></span><span class="line"><span class="cl"><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 在测试集上进行预测</span>
+</span></span><span class="line"><span class="cl"><span class="n">y_pred</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 计算准确率</span>
+</span></span><span class="line"><span class="cl"><span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Accuracy:&#34;</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 绘制决策边界</span>
+</span></span><span class="line"><span class="cl"><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span>
+</span></span><span class="line"><span class="cl"><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span>
+</span></span><span class="line"><span class="cl"><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                     <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">Z</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">xx</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">yy</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span>
+</span></span><span class="line"><span class="cl"><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 绘制结果</span>
+</span></span><span class="line"><span class="cl"><span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.sans-serif&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SimHei&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.unicode_minus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">ListedColormap</span><span class="p">((</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">ListedColormap</span><span class="p">((</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">)),</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;分隔带长度&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;分隔带宽度&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;逻辑回归决策边界&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%80%BB%E7%BB%93/v2-98875d691615e53e8229525f0b9963c0_720w.png" 
        alt="img" 
@@ -708,36 +804,71 @@
     </figcaption>
   
 </figure></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.datasets <span style="color:#f92672">import</span> load_iris
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.tree <span style="color:#f92672">import</span> DecisionTreeClassifier, plot_tree
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> accuracy_score
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 加载鸢尾花数据集</span>
-</span></span><span style="display:flex;"><span>iris <span style="color:#f92672">=</span> load_iris()
-</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> iris<span style="color:#f92672">.</span>data
-</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> iris<span style="color:#f92672">.</span>target
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 划分训练集和测试集</span>
-</span></span><span style="display:flex;"><span>X_train, X_test, y_train, y_test <span style="color:#f92672">=</span> train_test_split(X, y, test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.2</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">42</span>)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 构建决策树模型</span>
-</span></span><span style="display:flex;"><span>dt <span style="color:#f92672">=</span> DecisionTreeClassifier()
-</span></span><span style="display:flex;"><span>dt<span style="color:#f92672">.</span>fit(X_train, y_train)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在测试集上进行预测</span>
-</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>predict(X_test)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 计算准确率</span>
-</span></span><span style="display:flex;"><span>accuracy <span style="color:#f92672">=</span> accuracy_score(y_test, y_pred)
-</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Accuracy:&#34;</span>, accuracy)
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 绘制决策树</span>
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>figure(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">12</span>, <span style="color:#ae81ff">8</span>))
-</span></span><span style="display:flex;"><span>plot_tree(dt, filled<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, feature_names<span style="color:#f92672">=</span>iris<span style="color:#f92672">.</span>feature_names, class_names<span style="color:#f92672">=</span>iris<span style="color:#f92672">.</span>target_names)
-</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">plot_tree</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 加载鸢尾花数据集</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 划分训练集和测试集</span>
+</span></span><span class="line"><span class="cl"><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 构建决策树模型</span>
+</span></span><span class="line"><span class="cl"><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">dt</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 在测试集上进行预测</span>
+</span></span><span class="line"><span class="cl"><span class="n">y_pred</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 计算准确率</span>
+</span></span><span class="line"><span class="cl"><span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Accuracy:&#34;</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 绘制决策树</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">plot_tree</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="n">iris</span><span class="o">.</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">iris</span><span class="o">.</span><span class="n">target_names</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%80%BB%E7%BB%93/v2-d02c61a2a757a3bb6d6399c8ae8cebc8_720w.png" 
        alt="img" 

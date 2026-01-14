@@ -46,6 +46,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -278,7 +280,7 @@
   <meta itemprop="description" content="在Ubuntu20.04与CUDA 11.3环境下改进OpenPCDet时，针对spconv模块的版本冲突、API变更及初始化错误，通过重装指定版本、修改导入语句和降级版本得以解决。">
   <meta itemprop="datePublished" content="2024-12-30T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-12-30T00:00:00+08:00">
-  <meta itemprop="wordCount" content="76">
+  <meta itemprop="wordCount" content="83">
   <meta itemprop="keywords" content="OpenPCDet,环境配置">
 
       <header>
@@ -379,13 +381,30 @@ AttributeError: module &lsquo;spconv&rsquo; has no attribute &lsquo;<strong>vers
 
   </blockquote>
 
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pip uninstall spconv<span style="color:#f92672">-</span>cu113
-</span></span><span style="display:flex;"><span>pip uninstall spconv
-</span></span><span style="display:flex;"><span>pip install spconv<span style="color:#f92672">-</span>cu113
-</span></span></code></pre></div><p>测试版本：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> spconv
-</span></span><span style="display:flex;"><span>print(spconv<span style="color:#f92672">.</span>__version__)
-</span></span></code></pre></div><p>问题2：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">spconv</span><span class="o">-</span><span class="n">cu113</span>
+</span></span><span class="line"><span class="cl"><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">spconv</span>
+</span></span><span class="line"><span class="cl"><span class="n">pip</span> <span class="n">install</span> <span class="n">spconv</span><span class="o">-</span><span class="n">cu113</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试版本：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">spconv</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">spconv</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>问题2：</p>
 
 
 
@@ -406,9 +425,17 @@ AttributeError: module &lsquo;spconv&rsquo; has no attribute &lsquo;<strong>vers
 
   </blockquote>
 
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pip uninstall spconv<span style="color:#f92672">-</span>cu113
-</span></span><span style="display:flex;"><span>pip install spconv<span style="color:#f92672">-</span>cu102
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">spconv</span><span class="o">-</span><span class="n">cu113</span>
+</span></span><span class="line"><span class="cl"><span class="n">pip</span> <span class="n">install</span> <span class="n">spconv</span><span class="o">-</span><span class="n">cu102</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
         
       </section>

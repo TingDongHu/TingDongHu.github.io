@@ -46,6 +46,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -278,7 +280,7 @@
   <meta itemprop="description" content="OpenPCDet框架通过修改KITTI数据集的ImageSet索引文件，可便捷创建不同训练子集，无需操作原始点云文件。通过脚本采样生成新索引文件，并在配置文件中指定即可启动训练。">
   <meta itemprop="datePublished" content="2024-12-20T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-12-20T00:00:00+08:00">
-  <meta itemprop="wordCount" content="166">
+  <meta itemprop="wordCount" content="202">
   <meta itemprop="keywords" content="OpenPCDet,自动驾驶">
 
       <header>
@@ -356,44 +358,93 @@
         <p>在<strong>OpenPCDet</strong>中，KITTI 数据集的 ImageSet 中已经包含了训练和测试数据的索引信息，这使得可以不必直接扫描点云数据文件来获取某个特定的数据集。通过修改 ImageSet 中的索引，就可以直接选择不同的数据帧来进行训练、测试或推理。</p>
 <h3 id="1-kitti-数据集中的-imageset">1. KITTI 数据集中的 ImageSet</h3>
 <p>imageset 文件夹包含了多个文本文件，其中每个文件列出了训练和测试数据的帧索引。这些文件通常以如下格式命名：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>data/
-</span></span><span style="display:flex;"><span>  ├── kitti/
-</span></span><span style="display:flex;"><span>  │   ├── ImageSets/
-</span></span><span style="display:flex;"><span>  │   │   ├── train.txt      <span style="color:#75715e"># 训练集的帧索引</span>
-</span></span><span style="display:flex;"><span>  │   │   ├── val.txt        <span style="color:#75715e"># 验证集的帧索引</span>
-</span></span><span style="display:flex;"><span>  │   │   └── test.txt       <span style="color:#75715e"># 测试集的帧索引</span>
-</span></span></code></pre></div><p>每个 txt 文件中列出了一系列的帧编号，例如：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ae81ff">000000</span>
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">000001</span>
-</span></span><span style="display:flex;"><span><span style="color:#ae81ff">000002</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
-</span></span></code></pre></div><p>这些帧编号对应的是 velodyne 文件夹中的 .bin 点云数据文件.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">data/
+</span></span><span class="line"><span class="cl">  ├── kitti/
+</span></span><span class="line"><span class="cl">  │   ├── ImageSets/
+</span></span><span class="line"><span class="cl">  │   │   ├── train.txt      <span class="c1"># 训练集的帧索引</span>
+</span></span><span class="line"><span class="cl">  │   │   ├── val.txt        <span class="c1"># 验证集的帧索引</span>
+</span></span><span class="line"><span class="cl">  │   │   └── test.txt       <span class="c1"># 测试集的帧索引</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>每个 txt 文件中列出了一系列的帧编号，例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="mi">000000</span>
+</span></span><span class="line"><span class="cl"><span class="mi">000001</span>
+</span></span><span class="line"><span class="cl"><span class="mi">000002</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这些帧编号对应的是 velodyne 文件夹中的 .bin 点云数据文件.</p>
 <h3 id="2-修改索引文件">2. 修改索引文件</h3>
 <p>此处我想要基于Kitti数据集进行采样，生成十个不同的用于训练的数据集
 可以直接原本的train.txt进行采样，将其保存为一个新的索引集
 在kitti文件路径下新建一个脚本文件</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> random
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 读取原始的 train.txt 文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;kitti/training/imageset/train.txt&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>) <span style="color:#66d9ef">as</span> f:
-</span></span><span style="display:flex;"><span>    lines <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>readlines()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 随机采样 10 组数据</span>
-</span></span><span style="display:flex;"><span>num_samples <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>  <span style="color:#75715e"># 每组采样的帧数量</span>
-</span></span><span style="display:flex;"><span>num_groups <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>  <span style="color:#75715e"># 需要采样的组数</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 随机生成 10 组数据集</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, num_groups <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>):
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 随机选择 1000 个帧</span>
-</span></span><span style="display:flex;"><span>    sampled_lines <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>sample(lines, num_samples)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 保存到不同的 train_sampledX.txt 文件中</span>
-</span></span><span style="display:flex;"><span>    sampled_file_path <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;kitti/training/imageset/train_sampled</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">.txt&#39;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(sampled_file_path, <span style="color:#e6db74">&#39;w&#39;</span>) <span style="color:#66d9ef">as</span> f:
-</span></span><span style="display:flex;"><span>        f<span style="color:#f92672">.</span>writelines(sampled_lines)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Group </span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74"> saved to </span><span style="color:#e6db74">{</span>sampled_file_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span></code></pre></div><p>运行以上代码即可在原本的目录下生成一系列的采样数据集
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">random</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 读取原始的 train.txt 文件</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;kitti/training/imageset/train.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 随机采样 10 组数据</span>
+</span></span><span class="line"><span class="cl"><span class="n">num_samples</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># 每组采样的帧数量</span>
+</span></span><span class="line"><span class="cl"><span class="n">num_groups</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># 需要采样的组数</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 随机生成 10 组数据集</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_groups</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 随机选择 1000 个帧</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sampled_lines</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># 保存到不同的 train_sampledX.txt 文件中</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sampled_file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;kitti/training/imageset/train_sampled</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.txt&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sampled_file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">sampled_lines</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Group </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> saved to </span><span class="si">{</span><span class="n">sampled_file_path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运行以上代码即可在原本的目录下生成一系列的采样数据集
 <figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="https://github.com/user-attachments/assets/ac52c130-cc24-4b59-b33c-db3ccc6649a5" 
@@ -421,14 +472,31 @@
 <h4 id="如何修改-kitti_datasetyaml-使用新生成的-train_sampledtxt">如何修改 kitti_dataset.yaml 使用新生成的 train_sampled.txt</h4>
 <p>在该文件内容中找到DATA_SPLIT
 默认值如下示例：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">DATA_SPLIT</span>: {
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#39;train&#39;</span>: <span style="color:#ae81ff">train,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#39;test&#39;</span>: <span style="color:#ae81ff">val</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>使用上面生成的新的索引只需修改‘train’键的值为train_sampled1/train_sampled2保存即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">DATA_SPLIT</span><span class="p">:</span><span class="w"> </span>{<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">&#39;train&#39;</span><span class="p">:</span><span class="w"> </span><span class="l">train,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">&#39;test&#39;</span><span class="p">:</span><span class="w"> </span><span class="l">val</span><span class="w">
+</span></span></span><span class="line"><span class="cl">}<span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用上面生成的新的索引只需修改‘train’键的值为train_sampled1/train_sampled2保存即可</p>
 <h3 id="3启动训练">3.启动训练</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python tools/train.py --cfg_file tools/cfgs/kitti_models/pointpillar.yaml
-</span></span></code></pre></div><p>训练中
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">python tools/train.py --cfg_file tools/cfgs/kitti_models/pointpillar.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>训练中
 <figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="https://github.com/user-attachments/assets/5387318c-bf71-464a-b56f-48ef65f28e88" 

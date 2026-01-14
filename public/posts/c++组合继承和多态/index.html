@@ -49,6 +49,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -281,7 +283,7 @@
   <meta itemprop="description" content="组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C&#43;&#43;中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。">
   <meta itemprop="datePublished" content="2026-01-05T00:00:00+08:00">
   <meta itemprop="dateModified" content="2026-01-05T00:00:00+08:00">
-  <meta itemprop="wordCount" content="1475">
+  <meta itemprop="wordCount" content="1649">
   <meta itemprop="keywords" content="面相对象,C&#43;&#43;,继承,多态,虚函数">
 
       <header>
@@ -291,7 +293,7 @@
             Monday, Jan 5, 2026
           
 
-          | <span>7 minute read</span>
+          | <span>8 minute read</span>
 
           
           | <span>Updated at
@@ -363,28 +365,56 @@
 <p>从内存布局的角度来看，组合体现为<strong>物理上的直接嵌套</strong>：成员对象的所有数据成员被完整地包含在宿主对象的内存空间内。这意味着，如果你在栈上创建一个宿主对象，其组合的所有成员也都在栈上；同理，若宿主在堆上，成员也在堆上。</p>
 <p>这种布局方式带来了极高的执行效率，因为数据在内存中是连续存放的，极大提高了 CPU 的缓存命中率。</p>
 <p>在初始化逻辑上，C++ 遵循严格的顺序：<strong>成员对象先构造，宿主对象后构造</strong>；析构时则完全相反。设计上，C++ 社区推崇“优先使用组合而非继承”，因为组合是一种“黑盒复用”，宿主类只需关心成员类的公共接口，而不需要了解其内部实现，这大大降低了代码间的耦合度。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Engine</span> { <span style="color:#75715e">/* 引擎数据 */</span> };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Car</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    Engine engine; <span style="color:#75715e">// Car 组合了 Engine
-</span></span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>如果你在栈上创建一个 <code>Car</code> 对象，那么 <code>Engine</code> 的数据会<strong>直接包含</strong>在 <code>Car</code> 的内存块内部。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Engine</span> <span class="p">{</span> <span class="cm">/* 引擎数据 */</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Car</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Engine</span> <span class="n">engine</span><span class="p">;</span> <span class="c1">// Car 组合了 Engine
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果你在栈上创建一个 <code>Car</code> 对象，那么 <code>Engine</code> 的数据会<strong>直接包含</strong>在 <code>Car</code> 的内存块内部。</p>
 <p><strong>设计原则</strong>：<strong>优先使用组合，而不是继承</strong>。组合耦合度低，灵活性高。</p>
 <p><strong>生命周期</strong>：成员对象（Engine）随宿主对象（Car）的创建而创建，随其销毁而销毁。</p>
 <h2 id="继承-inheritance结构延伸与逻辑分类">继承 (Inheritance)：结构延伸与逻辑分类</h2>
 <p><strong>继承</strong>建立的是一种“是一个 (Is-a)”的关系，允许你基于已有的类创建新类，从而复用代码。它允许子类继承父类的属性和行为。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Animal</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> age;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">eat</span>() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Eating...&#34;</span>; }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Cat</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Animal { <span style="color:#75715e">// Cat 继承自 Animal
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> meow() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Meow!&#34;</span>; }
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>派生类（Cat）的内存结构是：<strong>父类的数据成员 + 派生类特有的数据成员</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Animal</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">age</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">eat</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Eating...&#34;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Cat</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Animal</span> <span class="p">{</span> <span class="c1">// Cat 继承自 Animal
+</span></span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">meow</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Meow!&#34;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>派生类（Cat）的内存结构是：<strong>父类的数据成员 + 派生类特有的数据成员</strong>。</p>
 <p><strong>核心逻辑</strong>：</p>
 <ul>
 <li><strong>可见性</strong>：<code>public</code> 继承表示父类的公有成员在子类中依然公有。</li>
@@ -411,30 +441,59 @@
 
 <p><strong>二义性与冗余</strong></p>
 <p>如果不做特殊处理，菱形继承会导致严重的内存问题。我们来看这段会报错的代码：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string name;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Student</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Person {};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Teacher</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Person {};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TA</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Student, <span style="color:#66d9ef">public</span> Teacher {};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    TA ta;
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ta.name = &#34;小明&#34;; // 报错！编译失败：二义性 (ambiguous)
-</span></span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 你必须这样写，编译器才知道你要改哪个“分身”的名字：
-</span></span></span><span style="display:flex;"><span>    ta.Student<span style="color:#f92672">::</span>name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;学生小明&#34;</span>;
-</span></span><span style="display:flex;"><span>    ta.Teacher<span style="color:#f92672">::</span>name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;老师小明&#34;</span>;
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>在内存中，<code>TA</code> 对象内部包含了两个 <code>Person</code> 的副本：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Person</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Student</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Person</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Teacher</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Person</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">TA</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Student</span><span class="p">,</span> <span class="k">public</span> <span class="n">Teacher</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TA</span> <span class="n">ta</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ta.name = &#34;小明&#34;; // 报错！编译失败：二义性 (ambiguous)
+</span></span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 你必须这样写，编译器才知道你要改哪个“分身”的名字：
+</span></span></span><span class="line"><span class="cl">    <span class="n">ta</span><span class="p">.</span><span class="n">Student</span><span class="o">::</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#34;学生小明&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ta</span><span class="p">.</span><span class="n">Teacher</span><span class="o">::</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#34;老师小明&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在内存中，<code>TA</code> 对象内部包含了两个 <code>Person</code> 的副本：</p>
 <ol>
 <li>一个是从 <code>Student</code> 路径继承下来的 <code>Person</code>。</li>
 <li>一个是从 <code>Teacher</code> 路径继承下来的 <code>Person</code></li>
@@ -443,25 +502,49 @@
 <p><strong>资源浪费</strong>：如果 <code>Person</code> 很大（比如包含 100MB 的头像数据），那么 <code>TA</code> 对象就会无谓地占用 200MB 内存。</p>
 <h4 id="虚继承-virtual-inheritance">虚继承 (Virtual Inheritance)</h4>
 <p>为了解决这个问题，C++ 引入了 <strong>虚继承</strong>。我们只需要在中间层（Student 和 Teacher）继承时加上 <code>virtual</code> 关键字。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string name;
-</span></span><span style="display:flex;"><span>    Person() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;构造了一个 Person</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 【关键】虚继承
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Student</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">public</span> Person {};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Teacher</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">public</span> Person {};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TA</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Student, <span style="color:#66d9ef">public</span> Teacher {};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    TA ta;
-</span></span><span style="display:flex;"><span>    ta.name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;小明&#34;</span>; <span style="color:#75715e">// 现在成功了！全局唯一
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;TA 的名字是: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> ta.name <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h4 id="虚基类指针-vbptr">虚基类指针 (vbptr)</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Person</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Person</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;构造了一个 Person</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 【关键】虚继承
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Student</span> <span class="o">:</span> <span class="k">virtual</span> <span class="k">public</span> <span class="n">Person</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Teacher</span> <span class="o">:</span> <span class="k">virtual</span> <span class="k">public</span> <span class="n">Person</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">TA</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Student</span><span class="p">,</span> <span class="k">public</span> <span class="n">Teacher</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TA</span> <span class="n">ta</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ta</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#34;小明&#34;</span><span class="p">;</span> <span class="c1">// 现在成功了！全局唯一
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;TA 的名字是: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">ta</span><span class="p">.</span><span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="虚基类指针-vbptr">虚基类指针 (vbptr)</h4>
 <p>当你使用了 <code>virtual</code> 继承，内存布局发生了翻天覆地的变化：</p>
 <ol>
 <li><strong>内存合并</strong>：编译器不再把 <code>Person</code> 放在 <code>Student</code> 和 <code>Teacher</code> 的“身体里”，而是把唯一的 <code>Person</code> 放在内存的<strong>最末端</strong>（作为公共资源）。</li>
@@ -469,36 +552,71 @@
 <li><strong>查找偏移</strong>：这个指针指向一张 <strong>虚基类表 (vbtable)</strong>，表里记录了“从当前位置到公共 <code>Person</code> 数据的距离（偏移量）”。</li>
 </ol>
 <p>如下列示例代码所示：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 基类：4 字节
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Base</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> data; 
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// --- 情况 1：普通菱形继承 ---
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A1</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Base {};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B1</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Base {};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C1</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> A1, <span style="color:#66d9ef">public</span> B1 {};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// --- 情况 2：虚继承 ---
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A2</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">public</span> Base {};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B2</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">public</span> Base {};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C2</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> A2, <span style="color:#66d9ef">public</span> B2 {};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;--- 普通继承 ---&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Base 大小: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(Base) <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;A1 (普通) 大小: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(A1) <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;C1 (普通) 大小: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(C1) <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">--- 虚继承 ---&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;A2 (虚继承) 大小: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(A2) <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;C2 (虚继承) 大小: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(C2) <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>运行后会发现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 基类：4 字节
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">data</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 情况 1：普通菱形继承 ---
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">A1</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">B1</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">C1</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A1</span><span class="p">,</span> <span class="k">public</span> <span class="n">B1</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// --- 情况 2：虚继承 ---
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">A2</span> <span class="o">:</span> <span class="k">virtual</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">B2</span> <span class="o">:</span> <span class="k">virtual</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">C2</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A2</span><span class="p">,</span> <span class="k">public</span> <span class="n">B2</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;--- 普通继承 ---&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Base 大小: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">Base</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;A1 (普通) 大小: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">A1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;C1 (普通) 大小: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">C1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">--- 虚继承 ---&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;A2 (虚继承) 大小: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">A2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;C2 (虚继承) 大小: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">C2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运行后会发现：</p>
 <table>
   <thead>
       <tr>
@@ -623,21 +741,41 @@
 <p>C++ 的动态多态主要依赖于 <strong>虚函数 (Virtual Function)</strong> 机制。当一个类声明了虚函数，编译器会为该类生成一张<strong>虚函数表 (vtable)</strong>，表中存储了该类所有虚函数的实际入口地址。同时，每个该类的对象实例在内存的起始位置都会被秘密安插一个<strong>虚表指针 (vptr)</strong>，指向对应的虚函数表。</p>
 <p>每个<strong>对象</strong>（在堆上或栈上）的内存起始位置，都会多出 8 字节（64位系统）来存放指向该类 <code>vtable</code> 的指针<code>vptr</code>。</p>
 <p>当通过基类指针调用虚函数时，程序不再是简单的代码跳转，而是经历一次“间接寻址”：首先根据对象的 <code>vptr</code> 找到 <code>vtable</code>，再根据偏移量从表中提取正确的函数地址。这是实现多态的关键，但也带来了一定的运行时开销。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Shape</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> draw() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;画一个形状&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>Shape() {} <span style="color:#75715e">// 重要：虚析构函数防止内存泄漏
-</span></span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Circle</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Shape {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> draw() <span style="color:#66d9ef">override</span> { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;画一个圆&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">render</span>(Shape<span style="color:#f92672">*</span> s) {
-</span></span><span style="display:flex;"><span>    s<span style="color:#f92672">-&gt;</span>draw(); <span style="color:#75715e">// 运行时决定调用哪个 draw
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>当你调用 <code>s-&gt;draw()</code> 时，程序会：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Shape</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">draw</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;画一个形状&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">Shape</span><span class="p">()</span> <span class="p">{}</span> <span class="c1">// 重要：虚析构函数防止内存泄漏
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Circle</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Shape</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">draw</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;画一个圆&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">render</span><span class="p">(</span><span class="n">Shape</span><span class="o">*</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span><span class="o">-&gt;</span><span class="n">draw</span><span class="p">();</span> <span class="c1">// 运行时决定调用哪个 draw
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当你调用 <code>s-&gt;draw()</code> 时，程序会：</p>
 <ol>
 <li>顺着指针 <code>s</code> 找到对象。</li>
 <li>找到对象头部的 <code>vptr</code>。</li>
@@ -645,33 +783,69 @@
 <li>跳到正确的函数地址执行。</li>
 </ol>
 <h3 id="为什么多态通常要配合堆对象和指针">为什么多态通常要配合堆对象和指针？</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">slice</span>(Base b) { b.show(); }    <span style="color:#75715e">// 值传递：发生“对象切片”
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">poly</span>(Base<span style="color:#f92672">*</span> b) { b<span style="color:#f92672">-&gt;</span>show(); }   <span style="color:#75715e">// 指针传递：保留虚表指针
-</span></span></span></code></pre></div><p><strong>多态必须配合指针或引用使用</strong>，因为如果直接进行值传递（存放在栈上的普通对象赋值），会发生“对象切片 (Slicing)”现象——子类的特有数据和 <code>vptr</code> 会被丢弃，导致对象退化为基类，多态特性随之丧失。<strong>指针或引用</strong>只是一把“钥匙”，它能指向堆上更完整的子类对象，并能通过 <code>vptr</code> 找到正确的函数。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">slice</span><span class="p">(</span><span class="n">Base</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span> <span class="n">b</span><span class="p">.</span><span class="n">show</span><span class="p">();</span> <span class="p">}</span>    <span class="c1">// 值传递：发生“对象切片”
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">poly</span><span class="p">(</span><span class="n">Base</span><span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">show</span><span class="p">();</span> <span class="p">}</span>   <span class="c1">// 指针传递：保留虚表指针
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>多态必须配合指针或引用使用</strong>，因为如果直接进行值传递（存放在栈上的普通对象赋值），会发生“对象切片 (Slicing)”现象——子类的特有数据和 <code>vptr</code> 会被丢弃，导致对象退化为基类，多态特性随之丧失。<strong>指针或引用</strong>只是一把“钥匙”，它能指向堆上更完整的子类对象，并能通过 <code>vptr</code> 找到正确的函数。</p>
 <h3 id="虚析构函数的必要性">虚析构函数的必要性</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 接口（多态的基础）
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Tool</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> work() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#75715e">// 纯虚函数
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>Tool() {}
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 具体的零件（用于组合）
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Battery</span> { <span style="color:#66d9ef">public</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">int</span> power <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>; };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 具体的实现（继承自 Tool）
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Drill</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Tool {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    Battery battery; <span style="color:#75715e">// 【组合】：钻机有一个电池
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> work() <span style="color:#66d9ef">override</span> { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;钻头转动中...&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; } <span style="color:#75715e">// 【多态重写】
-</span></span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 使用
-</span></span></span><span style="display:flex;"><span>Tool<span style="color:#f92672">*</span> myTool <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Drill(); <span style="color:#75715e">// 多态调用
-</span></span></span><span style="display:flex;"><span>myTool<span style="color:#f92672">-&gt;</span>work();
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">delete</span> myTool; <span style="color:#75715e">// 安全析构
-</span></span></span></code></pre></div><p>在多态体系中，<strong>虚析构函数</strong>是防止内存泄漏的最后一道防线。当一个类可能被继承且被多态使用时，必须将其<strong>析构函数</strong>声明为 <code>virtual</code>。这是因为，当我们通过基类指针 <code>delete</code> 一个派生类对象时，如果析构函数不是虚函数，编译器将执行“静态绑定”，仅调用基类的析构函数。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 接口（多态的基础）
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Tool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">work</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 纯虚函数
+</span></span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">Tool</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体的零件（用于组合）
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Battery</span> <span class="p">{</span> <span class="k">public</span><span class="o">:</span> <span class="kt">int</span> <span class="n">power</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体的实现（继承自 Tool）
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Drill</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Tool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Battery</span> <span class="n">battery</span><span class="p">;</span> <span class="c1">// 【组合】：钻机有一个电池
+</span></span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">work</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;钻头转动中...&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span> <span class="c1">// 【多态重写】
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 使用
+</span></span></span><span class="line"><span class="cl"><span class="n">Tool</span><span class="o">*</span> <span class="n">myTool</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Drill</span><span class="p">();</span> <span class="c1">// 多态调用
+</span></span></span><span class="line"><span class="cl"><span class="n">myTool</span><span class="o">-&gt;</span><span class="n">work</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">delete</span> <span class="n">myTool</span><span class="p">;</span> <span class="c1">// 安全析构
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在多态体系中，<strong>虚析构函数</strong>是防止内存泄漏的最后一道防线。当一个类可能被继承且被多态使用时，必须将其<strong>析构函数</strong>声明为 <code>virtual</code>。这是因为，当我们通过基类指针 <code>delete</code> 一个派生类对象时，如果析构函数不是虚函数，编译器将执行“静态绑定”，仅调用基类的析构函数。</p>
 <p>在这种情况下，派生类中特有的资源（如派生类在堆上申请的内存、打开的文件句柄等）将永远不会被释放。而一旦将基类析构函数设为 <code>virtual</code>，<code>delete</code> 操作就会通过虚函数表找到派生类的析构函数。派生类析构函数执行完毕后，会自动向上调用基类的析构函数，从而确保整个对象树的所有部分都能被完整、干净地清理。</p>
 <h3 id="virtual关键字">virtual关键字</h3>
 <p>在 C++ 之父 Bjarne Stroustrup 的设计哲学中，<code>virtual</code> 代表一种**“间接层”**。</p>
@@ -820,26 +994,51 @@
 <h3 id="多重继承下的多指针">多重继承下的多指针</h3>
 <p>上面的结论提到一个继承了虚函数对象有一个 <code>vptr</code>，但实际上在<strong>多重继承</strong>中，这个结论是错的。</p>
 <p>假设你有两个独立的基类，它们都有自己的虚函数：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Base1</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> func1() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Base1::func1&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> data1;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Base2</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> func2() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Base2::func2&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> data2;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 派生类同时继承两者
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Derived</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Base1, <span style="color:#66d9ef">public</span> Base2 {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> func1() <span style="color:#66d9ef">override</span> { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Derived::func1&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">func2</span>() <span style="color:#66d9ef">override</span> { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Derived::func2&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> data3;
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>此时会出现一个矛盾点：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Base1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">func1</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Base1::func1&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">data1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Base2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">func2</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Base2::func2&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">data2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 派生类同时继承两者
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Derived</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Base1</span><span class="p">,</span> <span class="k">public</span> <span class="n">Base2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">func1</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Derived::func1&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">func2</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Derived::func2&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">data3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时会出现一个矛盾点：</p>
 <p>当你把 <code>Derived*</code> 转成 <code>Base1*</code> 时，代码期望在指针开头看到 <code>Base1</code> 的虚表。</p>
 <p>当你把 <code>Derived*</code> 转成 <code>Base2*</code> 时，代码期望在指针开头看到 <code>Base2</code> 的虚表。</p>
 <p>如果只有一个 <code>vptr</code>，它只能指向一张表。那么 <code>Base2</code> 路径的调用就会彻底乱套，因为它会在 <code>Base1</code> 的表里寻找 <code>func2</code>。</p>
@@ -887,10 +1086,19 @@
 </table>
 <p>一个 <code>Derived</code> 对象里有两个虚表指针。如果你再继承一个 <code>Base3</code>，就会有第三个。</p>
 <p>当你进行指针类型转换时，<strong>指针的数值实际上发生了改变</strong>：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Derived<span style="color:#f92672">*</span> d <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Derived();
-</span></span><span style="display:flex;"><span>Base1<span style="color:#f92672">*</span> b1 <span style="color:#f92672">=</span> d;            <span style="color:#75715e">// b1 的地址和 d 是一样的（指向对象开头）
-</span></span></span><span style="display:flex;"><span>Base2<span style="color:#f92672">*</span> b2 <span style="color:#f92672">=</span> d;            <span style="color:#75715e">// 重点：b2 的地址比 d 增加了 16 字节！
-</span></span></span></code></pre></div><p><strong>b1</strong> 指向对象的起始位置。那里刚好是 <code>vptr1</code>，符合 <code>Base1</code> 的预期。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">Derived</span><span class="o">*</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Derived</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">Base1</span><span class="o">*</span> <span class="n">b1</span> <span class="o">=</span> <span class="n">d</span><span class="p">;</span>            <span class="c1">// b1 的地址和 d 是一样的（指向对象开头）
+</span></span></span><span class="line"><span class="cl"><span class="n">Base2</span><span class="o">*</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">d</span><span class="p">;</span>            <span class="c1">// 重点：b2 的地址比 d 增加了 16 字节！
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>b1</strong> 指向对象的起始位置。那里刚好是 <code>vptr1</code>，符合 <code>Base1</code> 的预期。</p>
 <p><strong>b2</strong> 被编译器自动“挪”到了后面 16 字节处。那里刚好是 <code>vptr2</code>，符合 <code>Base2</code> 的预期。</p>
 <p>这种自动调整地址的技术，确保了无论你把对象看作哪个父类，它都能在其“视角”的起始位置找到正确的虚表。</p>
 <p>这里还有一个深层问题： 当通过 <code>Base2*</code> 调用 <code>func2</code> 时，执行的是 <code>Derived::func2</code>。但 <code>Derived::func2</code> 内部可能需要访问 <code>data1</code>（对象的开头）。 可是此时的 <code>this</code> 指针指向的是 <code>Base2</code> 的子对象（偏移了 16 字节的地方）。</p>
@@ -905,13 +1113,25 @@
 <h4 id="纯虚函数pure-virtual-function">纯虚函数(Pure Virtual Function)</h4>
 <p>纯虚函数是一种特殊的虚函数，它在基类中<strong>没有定义（没有实现）</strong>，要求派生类必须自行实现。</p>
 <p><strong>语法</strong>：在虚函数声明后面加上 <code>= 0</code>。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Shape</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 纯虚函数：我不知道怎么画一个“形状”，但我要求子类必须会画
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> draw() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>Shape() {} 
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>在虚函数表（vtable）中，纯虚函数对应的位置通常存放的是一个**空指针（nullptr）**或者指向一个名为 <code>__pure_virtual_called</code> 的错误处理函数。这保证了程序在运行时如果不小心调用了它，会直接报错而不是乱跳地址。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Shape</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 纯虚函数：我不知道怎么画一个“形状”，但我要求子类必须会画
+</span></span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">draw</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">Shape</span><span class="p">()</span> <span class="p">{}</span> 
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在虚函数表（vtable）中，纯虚函数对应的位置通常存放的是一个**空指针（nullptr）**或者指向一个名为 <code>__pure_virtual_called</code> 的错误处理函数。这保证了程序在运行时如果不小心调用了它，会直接报错而不是乱跳地址。</p>
 <h4 id="抽象类abstract-class">抽象类(Abstract Class)</h4>
 <p>只要一个类中包含<strong>至少一个</strong>纯虚函数，这个类就自动成为了<strong>抽象类</strong>。抽象类是类的“半成品”，不能独立存在（不能 new），必须被继承。</p>
 
@@ -934,29 +1154,57 @@
 <li>所有的成员函数都是<strong>纯虚函数</strong>（Pure Virtual）。</li>
 <li>有一个虚析构函数。</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 这是一个“可飞行”的接口
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IFlyable</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> takeOff() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">land</span>() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>IFlyable() {}
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 这是一个“可游泳”的接口
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ISwimmable</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> swim() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>ISwimmable() {}
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 具体的类：鸭子（既能飞又能游）
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Duck</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> IFlyable, <span style="color:#66d9ef">public</span> ISwimmable {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> takeOff() <span style="color:#66d9ef">override</span> { <span style="color:#75715e">/* ... */</span> }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">land</span>() <span style="color:#66d9ef">override</span> { <span style="color:#75715e">/* ... */</span> }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">swim</span>() <span style="color:#66d9ef">override</span> { <span style="color:#75715e">/* ... */</span> }
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>结合之前的多重继承的指针之谜，你会发现接口在 C++ 中非常强大：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 这是一个“可飞行”的接口
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">IFlyable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">takeOff</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">land</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">IFlyable</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 这是一个“可游泳”的接口
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">ISwimmable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">swim</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">ISwimmable</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 具体的类：鸭子（既能飞又能游）
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Duck</span> <span class="o">:</span> <span class="k">public</span> <span class="n">IFlyable</span><span class="p">,</span> <span class="k">public</span> <span class="n">ISwimmable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">takeOff</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">land</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">swim</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>结合之前的多重继承的指针之谜，你会发现接口在 C++ 中非常强大：</p>
 <p><strong>解耦</strong>：你的函数可以只接收 <code>IFlyable*</code>，而不需要知道这个对象到底是“飞机”还是“鸭子”。</p>
 <p><strong>安全性</strong>：通过接口，你只暴露了对象的一部分能力。比如你把 <code>Duck</code> 对象传给一个只接受 <code>ISwimmable*</code> 的函数，那个函数就只能让鸭子游泳，而不能让它起飞。</p>
 <p><strong>内存布局</strong>：当你使用多个接口时，编译器会自动为每个接口生成一个 <code>vptr</code>。这保证了当你把 <code>Duck*</code> 转换成 <code>IFlyable*</code> 时，指针会自动偏移到对应的虚表位置。</p>

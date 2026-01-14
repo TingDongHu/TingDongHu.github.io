@@ -47,6 +47,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -279,7 +281,7 @@
   <meta itemprop="description" content="本文以Complex类为例，讲解了C&#43;&#43;程序的基本结构，包括头文件与实现文件的分离、防御性声明、命名空间的使用、inline函数的定义方式以及访问级别关键字的作用。">
   <meta itemprop="datePublished" content="2025-12-02T00:00:00+08:00">
   <meta itemprop="dateModified" content="2025-12-02T00:00:00+08:00">
-  <meta itemprop="wordCount" content="786">
+  <meta itemprop="wordCount" content="1039">
   <meta itemprop="keywords" content="语法,C&#43;&#43;,面相对象">
 
       <header>
@@ -289,7 +291,7 @@
             Tuesday, Dec 2, 2025
           
 
-          | <span>4 minute read</span>
+          | <span>5 minute read</span>
 
           
           | <span>Updated at
@@ -365,65 +367,137 @@
     <p class="heading">
       <ion-icon name="warning-outline"></ion-icon>Warning</p>
     <p>在<code>.cpp</code>文件中,自己的头文件一般用引号,而引用标准库文件则用尖括号:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include&lt;iostream.h&gt;
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#inlcude&#39;complex.h&#39;
-</span></span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="cp">#include&lt;iostream.h&gt;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#inlcude&#39;complex.h&#39;
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
   </blockquote>
 
 <h4 id="头文件的防御性声明">头文件的防御性声明</h4>
 <p>在大型项目中,一个写好的类声明文件可能会被引用到程序的各个部分,而有一种规范安全的写法可以解决程序四处引用导致类重复声明的问题</p>
 <p>示例:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#ifndef _COMPLEX_
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define _COMPLEX_
-</span></span></span><span style="display:flex;"><span>...
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#endif
-</span></span></span></code></pre></div><h4 id="namespace命名空间">namespace命名空间</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#ifndef _COMPLEX_
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define _COMPLEX_
+</span></span></span><span class="line"><span class="cl"><span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="namespace命名空间">namespace命名空间</h4>
 <p>namesapce主要的用途是免去每个函数之前都加一个类名,举个栗子:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">//使用命名空间
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include&lt;iostram&gt;
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    cin<span style="color:#f92672">&lt;&lt;</span>...;
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>...;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//使用更加具体的命名空间
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include&lt;iostram&gt;
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std<span style="color:#f92672">::</span>cout;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cin<span style="color:#f92672">&lt;&lt;</span>...;
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>...;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//不使用命名空间
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include&lt;iostram&gt;
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cin<span style="color:#f92672">&lt;&lt;</span>...;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout<span style="color:#f92672">&lt;&lt;</span>...;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h4 id="inline方式书写类">inline方式书写类</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//使用命名空间
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include&lt;iostram&gt;
+</span></span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cin</span><span class="o">&lt;&lt;</span><span class="p">...;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="p">...;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//使用更加具体的命名空间
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include&lt;iostram&gt;
+</span></span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="o">&lt;&lt;</span><span class="p">...;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="p">...;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//不使用命名空间
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include&lt;iostram&gt;
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="o">&lt;&lt;</span><span class="p">...;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="p">...;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="inline方式书写类">inline方式书写类</h4>
 <p>对于某一个C++类,我们可以将其声明和定义直接写在一起(就是像C语音中一串写下来一样),示例:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">complex</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    complex(<span style="color:#66d9ef">double</span> r<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,<span style="color:#66d9ef">double</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span> re(r),im(i)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        ....
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    complex<span style="color:#f92672">&amp;</span> <span style="color:#66d9ef">operator</span> <span style="color:#f92672">+=</span>(<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> <span style="color:#a6e22e">real</span>() <span style="color:#66d9ef">const</span>{<span style="color:#66d9ef">return</span> re;}
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> <span style="color:#a6e22e">imag</span>() <span style="color:#66d9ef">const</span>{retrun im;}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> re,im;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">friend</span> complex<span style="color:#f92672">&amp;</span>_doapl(complex<span style="color:#f92672">*</span>,<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span>);
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p>像如上内容中,在类定义中直接将函数具体实现写在<code>{...}</code>中就是<code>inline</code>写法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">complex</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="kt">double</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="n">re</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="n">im</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="p">....</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="o">&amp;</span> <span class="k">operator</span> <span class="o">+=</span><span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="nf">real</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span><span class="k">return</span> <span class="n">re</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="nf">imag</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span><span class="n">retrun</span> <span class="n">im</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="n">re</span><span class="p">,</span><span class="n">im</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">friend</span> <span class="n">complex</span><span class="o">&amp;</span><span class="n">_doapl</span><span class="p">(</span><span class="n">complex</span><span class="o">*</span><span class="p">,</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>像如上内容中,在类定义中直接将函数具体实现写在<code>{...}</code>中就是<code>inline</code>写法</p>
 
 
 
@@ -434,12 +508,23 @@
   </blockquote>
 
 <p>除此之外也可以向如下写法在类外定义函数,编译器检测到<code>inline</code>关键字后会将该函数与声明编译到一块</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">double</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">imag</span>(<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> x)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> x.imag();
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="access-level访问级别关键字">access level(访问级别)关键字</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span> <span class="kt">double</span>
+</span></span><span class="line"><span class="cl"><span class="nf">imag</span><span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">imag</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="access-level访问级别关键字">access level(访问级别)关键字</h3>
 <p>在C++中，**访问级别（access level）**用于控制类成员（属性和方法）的可见性和可访问性，这是封装（encapsulation）的核心机制。C++提供了三个关键字来定义访问级别：<code>public</code>、<code>protected</code> 和 <code>private</code>。</p>
 <p><strong><code>public</code>（公有成员）</strong></p>
 <ul>
@@ -516,8 +601,15 @@
 <h3 id="构造函数与析构函数">构造函数与析构函数</h3>
 <p>在C++中，<strong>构造函数（Constructor）<strong>和</strong>析构函数（Destructor）<strong>是类的特殊成员函数，分别用于对象的</strong>初始化</strong>和<strong>清理</strong>。它们是面向对象编程中资源管理的关键机制。</p>
 <p>还是以之前的代码为例子:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>complex(<span style="color:#66d9ef">double</span> r <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">double</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">:</span> re(r), im(i) { ... }
-</span></span></code></pre></div><ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">complex</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">double</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">:</span> <span class="n">re</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">im</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
 <li>
 <p>使用<strong>初始化列表</strong>（<code>: re(r), im(i)</code>）直接初始化成员变量（比在函数体内赋值更高效）。</p>
 </li>
@@ -538,38 +630,82 @@
 <h4 id="const-member-function常量成员函数">const member function(常量成员函数)</h4>
 <p><code>const</code>是C++中一个非常重要的关键字，它用于定义常量、保护数据不被修改，并在编译时强制执行不变性规则。</p>
 <p>还是以上面的示例:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">double</span> <span style="color:#a6e22e">real</span>() <span style="color:#66d9ef">const</span>{<span style="color:#66d9ef">return</span> re;}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">double</span> <span style="color:#a6e22e">imag</span>() <span style="color:#66d9ef">const</span>{retrun im;}
-</span></span></code></pre></div><p>这样写的意义在于保证程序无论在哪种情况下都能正常使用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">double</span> <span class="nf">real</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span><span class="k">return</span> <span class="n">re</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">double</span> <span class="nf">imag</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span><span class="n">retrun</span> <span class="n">im</span><span class="p">;}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样写的意义在于保证程序无论在哪种情况下都能正常使用</p>
 <p>比如下面的两种调用方式:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">//方式一
-</span></span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    complex <span style="color:#a6e22e">c1</span>(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>c1.real();
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>c1.imag();
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//方式二
-</span></span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> complex <span style="color:#a6e22e">c1</span>(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>c1.real();
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>c1.imag();
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>如果在类的定义中我们没有将const写在函数内容之前,那么方法二就会报错.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//方式一
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span> <span class="nf">c1</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">c1</span><span class="p">.</span><span class="n">real</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">c1</span><span class="p">.</span><span class="n">imag</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//方式二
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="n">complex</span> <span class="nf">c1</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">c1</span><span class="p">.</span><span class="n">real</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">c1</span><span class="p">.</span><span class="n">imag</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果在类的定义中我们没有将const写在函数内容之前,那么方法二就会报错.</p>
 <h4 id="函数传参pass-by-value与pass-by-referenceto-const">函数传参:pass by value与pass by reference(to const)</h4>
 <p>在C++中，函数参数传递主要有两种方式：<strong>值传递</strong>和<strong>引用传递</strong>。如下示例:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">increment1</span>(<span style="color:#66d9ef">int</span> x) {
-</span></span><span style="display:flex;"><span>    x<span style="color:#f92672">++</span>;  <span style="color:#75715e">// 只修改局部副本
-</span></span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 普通引用传递（可修改原始数据）
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">increment2</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">&amp;</span> x) {
-</span></span><span style="display:flex;"><span>    x<span style="color:#f92672">++</span>;  <span style="color:#75715e">// 修改原始数据
-</span></span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// const引用传递（不可修改原始数据）
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">printLargeObject</span>(<span style="color:#66d9ef">const</span> BigObject<span style="color:#f92672">&amp;</span> obj) {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 只能读取obj，不能修改
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>值传递 (Pass by Value):将实参的<strong>副本</strong>传递给函数，函数内对参数的修改不会影响原始数据。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">increment1</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span><span class="o">++</span><span class="p">;</span>  <span class="c1">// 只修改局部副本
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 普通引用传递（可修改原始数据）
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">increment2</span><span class="p">(</span><span class="kt">int</span><span class="o">&amp;</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span><span class="o">++</span><span class="p">;</span>  <span class="c1">// 修改原始数据
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// const引用传递（不可修改原始数据）
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">printLargeObject</span><span class="p">(</span><span class="k">const</span> <span class="n">BigObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 只能读取obj，不能修改
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>值传递 (Pass by Value):将实参的<strong>副本</strong>传递给函数，函数内对参数的修改不会影响原始数据。</p>
 <ul>
 <li>优点：
 <ul>
@@ -639,28 +775,59 @@
 </table>
 <h4 id="返回值传递retrun-by-value与return-by-referenceto-const">返回值传递:retrun by value与return by reference(to const)</h4>
 <p>特征与用法与上面参数传递部分基本一样,这里就不再赘述,需要注意的点是,<strong>返回引用需要保证该值的生命周期</strong>,如果无法确保生命周期可能引起灾难性的bug</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 绝对不要这样写！
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span>string<span style="color:#f92672">&amp;</span> badIdea() {
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string local <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;temp&#34;</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> local; <span style="color:#75715e">// 灾难！
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h4 id="friend友元">friend友元</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 绝对不要这样写！
+</span></span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">badIdea</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">local</span> <span class="o">=</span> <span class="s">&#34;temp&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">local</span><span class="p">;</span> <span class="c1">// 灾难！
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="friend友元">friend友元</h4>
 <p>友元是C++中一种打破封装性的特殊机制，它允许特定的<strong>非成员函数</strong>或<strong>其他类</strong>访问当前类的私有(private)和保护(protected)成员。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Engine</span>;  <span style="color:#75715e">// 前向声明
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Car</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> speed;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">friend</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Engine</span>;  <span style="color:#75715e">// 允许Engine访问私有成员
-</span></span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Engine</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> accelerate(Car<span style="color:#f92672">&amp;</span> car) {
-</span></span><span style="display:flex;"><span>        car.speed <span style="color:#f92672">+=</span> <span style="color:#ae81ff">10</span>;  <span style="color:#75715e">// 可以访问Car的私有成员
-</span></span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Engine</span><span class="p">;</span>  <span class="c1">// 前向声明
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Car</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">speed</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">friend</span> <span class="k">class</span> <span class="nc">Engine</span><span class="p">;</span>  <span class="c1">// 允许Engine访问私有成员
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Engine</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">accelerate</span><span class="p">(</span><span class="n">Car</span><span class="o">&amp;</span> <span class="n">car</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">car</span><span class="p">.</span><span class="n">speed</span> <span class="o">+=</span> <span class="mi">10</span><span class="p">;</span>  <span class="c1">// 可以访问Car的私有成员
+</span></span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote class="dream-alert tip">
@@ -671,24 +838,47 @@
   </blockquote>
 
 <p>如下示例:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">complex</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    complex(<span style="color:#66d9ef">double</span> r<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">double</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>) <span style="color:#f92672">:</span> re(r), im(i) { }
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> <span style="color:#a6e22e">func</span>(<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> param) { 
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> param.re <span style="color:#f92672">+</span> param.im; 
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> re, im;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    complex c1(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>    complex c2;
-</span></span><span style="display:flex;"><span>    c2.func(c1);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>此处在对象<code>c2</code>中直接访问了<code>c1</code>的私有成员,这是C++访问控制机制的一个重要特性。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">complex</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="kt">double</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">:</span> <span class="n">re</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">im</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="nf">func</span><span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">param</span><span class="p">)</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">param</span><span class="p">.</span><span class="n">re</span> <span class="o">+</span> <span class="n">param</span><span class="p">.</span><span class="n">im</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="n">re</span><span class="p">,</span> <span class="n">im</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span> <span class="n">c1</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span> <span class="n">c2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">c2</span><span class="p">.</span><span class="n">func</span><span class="p">(</span><span class="n">c1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此处在对象<code>c2</code>中直接访问了<code>c1</code>的私有成员,这是C++访问控制机制的一个重要特性。</p>
 
 
 
@@ -736,17 +926,33 @@
 <h3 id="操作符重载">操作符重载</h3>
 <h4 id="操作成员函数">操作成员函数</h4>
 <p>如下代码示例:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> complex<span style="color:#f92672">&amp;</span> __doapl(complex<span style="color:#f92672">*</span> ths, <span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> r) {
-</span></span><span style="display:flex;"><span>    ths<span style="color:#f92672">-&gt;</span>re <span style="color:#f92672">+=</span> r.re;  <span style="color:#75715e">// 实部相加
-</span></span></span><span style="display:flex;"><span>    ths<span style="color:#f92672">-&gt;</span>im <span style="color:#f92672">+=</span> r.im;  <span style="color:#75715e">// 虚部相加
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span>ths;      <span style="color:#75715e">// 返回修改后的对象
-</span></span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> complex<span style="color:#f92672">&amp;</span> complex<span style="color:#f92672">::</span><span style="color:#66d9ef">operator</span><span style="color:#f92672">+=</span>(<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> r) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">__doapl</span>(<span style="color:#66d9ef">this</span>, r);  <span style="color:#75715e">// 委托给辅助函数
-</span></span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>complex <span style="color:#a6e22e">a</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>), b(<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>);
-</span></span><span style="display:flex;"><span>a <span style="color:#f92672">+=</span> b;  <span style="color:#75715e">// 比 a.add(b) 更符合数学直觉
-</span></span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">__doapl</span><span class="p">(</span><span class="n">complex</span><span class="o">*</span> <span class="n">ths</span><span class="p">,</span> <span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ths</span><span class="o">-&gt;</span><span class="n">re</span> <span class="o">+=</span> <span class="n">r</span><span class="p">.</span><span class="n">re</span><span class="p">;</span>  <span class="c1">// 实部相加
+</span></span></span><span class="line"><span class="cl">    <span class="n">ths</span><span class="o">-&gt;</span><span class="n">im</span> <span class="o">+=</span> <span class="n">r</span><span class="p">.</span><span class="n">im</span><span class="p">;</span>  <span class="c1">// 虚部相加
+</span></span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">*</span><span class="n">ths</span><span class="p">;</span>      <span class="c1">// 返回修改后的对象
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">complex</span><span class="o">::</span><span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">__doapl</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>  <span class="c1">// 委托给辅助函数
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">complex</span> <span class="nf">a</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">b</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">+=</span> <span class="n">b</span><span class="p">;</span>  <span class="c1">// 比 a.add(b) 更符合数学直觉
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote class="dream-alert caution">
@@ -756,31 +962,62 @@
   </blockquote>
 
 <p>所以其实在编辑器看来我们的运算符重载函数为:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> complex<span style="color:#f92672">&amp;</span> complex<span style="color:#f92672">::</span><span style="color:#66d9ef">operator</span><span style="color:#f92672">+=</span>(<span style="color:#66d9ef">this</span>,<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> r) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">__doapl</span>(<span style="color:#66d9ef">this</span>, r);  <span style="color:#75715e">// 委托给辅助函数
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">complex</span><span class="o">::</span><span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">__doapl</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>  <span class="c1">// 委托给辅助函数
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote class="dream-alert caution">
     <p class="heading">
       <ion-icon name="alert-circle-outline"></ion-icon>Caution</p>
     <p>C++允许重载大多数运算符（如 <code>+</code>, <code>-</code>, <code>&lt;&lt;</code>, <code>==</code>），但不能重载以下运算符：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>.  .<span style="color:#f92672">*</span>  <span style="color:#f92672">::</span>  <span style="color:#f92672">?:</span>  <span style="color:#66d9ef">sizeof</span>  <span style="color:#960050;background-color:#1e0010">#</span>  <span style="color:#960050;background-color:#1e0010">##</span>
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="p">.</span>  <span class="p">.</span><span class="o">*</span>  <span class="o">::</span>  <span class="o">?:</span>  <span class="k">sizeof</span>  <span class="err">#</span>  <span class="err">##</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
   </blockquote>
 
 <h4 id="操作非成员函数与临时对象">操作非成员函数与临时对象</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> complex <span style="color:#66d9ef">operator</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> x, <span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> y) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">complex</span>(real(x) <span style="color:#f92672">+</span> real(y), imag(x) <span style="color:#f92672">+</span> imag(y));
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> complex <span style="color:#66d9ef">operator</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> x, <span style="color:#66d9ef">double</span> y) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">complex</span>(real(x) <span style="color:#f92672">+</span> y, imag(x));
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> complex <span style="color:#66d9ef">operator</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">double</span> x, <span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span> y) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">complex</span>(x <span style="color:#f92672">+</span> real(y), imag(y));
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>如上代码可以同时处理多种复数加法运算的情况</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">complex</span> <span class="k">operator</span> <span class="o">+</span> <span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">complex</span><span class="p">(</span><span class="n">real</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">real</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">imag</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">imag</span><span class="p">(</span><span class="n">y</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">complex</span> <span class="k">operator</span> <span class="o">+</span> <span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">complex</span><span class="p">(</span><span class="n">real</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">imag</span><span class="p">(</span><span class="n">x</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">complex</span> <span class="k">operator</span> <span class="o">+</span> <span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">complex</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">real</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">imag</span><span class="p">(</span><span class="n">y</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如上代码可以同时处理多种复数加法运算的情况</p>
 
 
 
@@ -794,38 +1031,79 @@
 <h2 id="string-class">String class</h2>
 <h3 id="big-three">Big Three</h3>
 <p>相比上面的复数类,下面重写的String class需要特别注意三个特殊函数 <code>拷贝复制</code>,<code>拷贝构造</code>,<code>析构函数</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">String</span>    
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    String(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> cstr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>);
-</span></span><span style="display:flex;"><span>    String(<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> str);
-</span></span><span style="display:flex;"><span>    String<span style="color:#f92672">&amp;</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">=</span>(<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> str);
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">~</span>String();
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> <span style="color:#a6e22e">get_c_str</span>() <span style="color:#66d9ef">const</span>{<span style="color:#66d9ef">return</span> m_data;}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> m_data;
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h4 id="ctor和dtor构造函数-和-析构函数">ctor和dtor(构造函数 和 析构函数)</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">String</span>    
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">cstr</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span><span class="p">(</span><span class="k">const</span> <span class="n">String</span><span class="o">&amp;</span> <span class="n">str</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">String</span><span class="o">&amp;</span> <span class="n">str</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">String</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span><span class="o">*</span> <span class="nf">get_c_str</span><span class="p">()</span> <span class="k">const</span><span class="p">{</span><span class="k">return</span> <span class="n">m_data</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span><span class="o">*</span> <span class="n">m_data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="ctor和dtor构造函数-和-析构函数">ctor和dtor(构造函数 和 析构函数)</h4>
 <p>class中如果有指针,那么该类的变量中多半使用了动态内存分配,要再析构函数中将该内存释放掉,否则会造成<strong>内存泄漏</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span>
-</span></span><span style="display:flex;"><span>String<span style="color:#f92672">::</span>string(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> cstr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(cstr){
-</span></span><span style="display:flex;"><span>        m_data<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span>[strlen(cstr)<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>];
-</span></span><span style="display:flex;"><span>        strcpy(m_data,cstr);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>{<span style="color:#75715e">//未指定初始值的情况
-</span></span></span><span style="display:flex;"><span>        m_data<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span>[<span style="color:#ae81ff">1</span>];
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>m_data<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;\0&#39;</span>;
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span>
-</span></span><span style="display:flex;"><span>String<span style="color:#f92672">::~</span>String()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">delete</span>[] m_data;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h4 id="copy-ctor和copy-op-拷贝构造和拷贝赋值">copy ctor和copy op= (拷贝构造和拷贝赋值)</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span>
+</span></span><span class="line"><span class="cl"><span class="n">String</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">cstr</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">cstr</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">m_data</span><span class="o">=</span><span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="n">strlen</span><span class="p">(</span><span class="n">cstr</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">strcpy</span><span class="p">(</span><span class="n">m_data</span><span class="p">,</span><span class="n">cstr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">{</span><span class="c1">//未指定初始值的情况
+</span></span></span><span class="line"><span class="cl">        <span class="n">m_data</span><span class="o">=</span><span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="n">m_data</span><span class="o">=</span><span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">inline</span>
+</span></span><span class="line"><span class="cl"><span class="n">String</span><span class="o">::~</span><span class="n">String</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">delete</span><span class="p">[]</span> <span class="n">m_data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="copy-ctor和copy-op-拷贝构造和拷贝赋值">copy ctor和copy op= (拷贝构造和拷贝赋值)</h4>
 
 
 
@@ -851,34 +1129,73 @@
     </figcaption>
   
 </figure></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span>
-</span></span><span style="display:flex;"><span>String<span style="color:#f92672">::</span>String(<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> str)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    m_data <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span>[ strlen(str.m_data)<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>];<span style="color:#75715e">//同类型的对象可以直接取另一个的object的private data.
-</span></span></span><span style="display:flex;"><span>    strcpy(m_data,str.m_data);
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//下面为使用场景
-</span></span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    String <span style="color:#a6e22e">s1</span>(<span style="color:#e6db74">&#34;Hello&#34;</span>);
-</span></span><span style="display:flex;"><span>    String <span style="color:#a6e22e">s2</span>(s1);
-</span></span><span style="display:flex;"><span>    String s2<span style="color:#f92672">=</span>s1;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">inline</span>
-</span></span><span style="display:flex;"><span>String<span style="color:#f92672">&amp;</span> String<span style="color:#f92672">::</span><span style="color:#66d9ef">operator</span><span style="color:#f92672">=</span>(<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> str)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">this</span><span style="color:#f92672">==&amp;</span>str)<span style="color:#75715e">//检测自我赋值,是十分有必要的,因为后续的逻辑会清除原本self的地址空间
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">this</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">delete</span>[] m_data;
-</span></span><span style="display:flex;"><span>    m_data <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span>[ strlen(str.m_data)<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>];
-</span></span><span style="display:flex;"><span>    strcpy(m_data,str.m_data);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">this</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    String <span style="color:#a6e22e">s1</span>(<span style="color:#e6db74">&#34;Hello&#34;</span>);
-</span></span><span style="display:flex;"><span>    String <span style="color:#a6e22e">s2</span>(s1);
-</span></span><span style="display:flex;"><span>   	s2<span style="color:#f92672">=</span>s1;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="输出cout">输出cout</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span>
+</span></span><span class="line"><span class="cl"><span class="n">String</span><span class="o">::</span><span class="n">String</span><span class="p">(</span><span class="k">const</span> <span class="n">String</span><span class="o">&amp;</span> <span class="n">str</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span> <span class="n">strlen</span><span class="p">(</span><span class="n">str</span><span class="p">.</span><span class="n">m_data</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span><span class="c1">//同类型的对象可以直接取另一个的object的private data.
+</span></span></span><span class="line"><span class="cl">    <span class="n">strcpy</span><span class="p">(</span><span class="n">m_data</span><span class="p">,</span><span class="n">str</span><span class="p">.</span><span class="n">m_data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//下面为使用场景
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="nf">s1</span><span class="p">(</span><span class="s">&#34;Hello&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="nf">s2</span><span class="p">(</span><span class="n">s1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="n">s2</span><span class="o">=</span><span class="n">s1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">inline</span>
+</span></span><span class="line"><span class="cl"><span class="n">String</span><span class="o">&amp;</span> <span class="n">String</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">String</span><span class="o">&amp;</span> <span class="n">str</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="o">==&amp;</span><span class="n">str</span><span class="p">)</span><span class="c1">//检测自我赋值,是十分有必要的,因为后续的逻辑会清除原本self的地址空间
+</span></span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">delete</span><span class="p">[]</span> <span class="n">m_data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span> <span class="n">strlen</span><span class="p">(</span><span class="n">str</span><span class="p">.</span><span class="n">m_data</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="n">strcpy</span><span class="p">(</span><span class="n">m_data</span><span class="p">,</span><span class="n">str</span><span class="p">.</span><span class="n">m_data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="nf">s1</span><span class="p">(</span><span class="s">&#34;Hello&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="nf">s2</span><span class="p">(</span><span class="n">s1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">   	<span class="n">s2</span><span class="o">=</span><span class="n">s1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="输出cout">输出cout</h3>
 <p>全局函数,在<code>cout</code>的定义部分重载<code>&lt;&lt;</code>符号,如下图所示:
 <figure style="text-align: center; margin: 1.5rem auto;">
   
@@ -894,68 +1211,144 @@
     </figcaption>
   
 </figure></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#inlcude&lt;istream.h&gt;
-</span></span></span><span style="display:flex;"><span>ostream<span style="color:#f92672">&amp;</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">&lt;&lt;</span>(ostream<span style="color:#f92672">&amp;</span> os,<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> str)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">&lt;&lt;</span>str.get_c_str();
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> os;<span style="color:#75715e">//返回os类型,用于符合用户书写习惯在后面跟其他的东西.
-</span></span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    String <span style="color:#a6e22e">s1</span>(<span style="color:#e6db74">&#34;hello &#34;</span>);
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>s1;
-</span></span><span style="display:flex;"><span>    cout<span style="color:#f92672">&lt;&lt;</span>s1<span style="color:#f92672">&lt;&lt;</span>endl;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="class-template类模板">class template类模板</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">&gt;</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">complex</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    complex(T r<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;T i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span>re(r),im(i)
-</span></span><span style="display:flex;"><span>    {}
-</span></span><span style="display:flex;"><span>    complex<span style="color:#f92672">&amp;</span> <span style="color:#66d9ef">operator</span> <span style="color:#f92672">+=</span>(<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span>);
-</span></span><span style="display:flex;"><span>    T <span style="color:#a6e22e">real</span>()<span style="color:#66d9ef">const</span>{<span style="color:#66d9ef">return</span> re;}
-</span></span><span style="display:flex;"><span>    T <span style="color:#a6e22e">imag</span>()<span style="color:#66d9ef">const</span>{<span style="color:#66d9ef">return</span> im;}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    T re,im;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">friend</span> complex<span style="color:#f92672">&amp;</span> _doapl(complex<span style="color:#f92672">*</span>,<span style="color:#66d9ef">const</span> complex<span style="color:#f92672">&amp;</span>);
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">\\使用模板创建类</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    complex<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">double</span><span style="color:#f92672">&gt;</span>c1(<span style="color:#ae81ff">2.5</span>,<span style="color:#ae81ff">1.5</span>);
-</span></span><span style="display:flex;"><span>    complex<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>c2(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">6</span>);
-</span></span><span style="display:flex;"><span>    ...
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>类模板可以使<em><strong>代码膨胀</strong></em>,一次书写,多次使用.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#inlcude&lt;istream.h&gt;
+</span></span></span><span class="line"><span class="cl"><span class="n">ostream</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="n">ostream</span><span class="o">&amp;</span> <span class="n">os</span><span class="p">,</span><span class="k">const</span> <span class="n">String</span><span class="o">&amp;</span> <span class="n">str</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">os</span><span class="o">&lt;&lt;</span><span class="n">str</span><span class="p">.</span><span class="n">get_c_str</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">os</span><span class="p">;</span><span class="c1">//返回os类型,用于符合用户书写习惯在后面跟其他的东西.
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="nf">s1</span><span class="p">(</span><span class="s">&#34;hello &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">s1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">s1</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="class-template类模板">class template类模板</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">complex</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="p">(</span><span class="n">T</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">T</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span><span class="n">re</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="n">im</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="o">&amp;</span> <span class="k">operator</span> <span class="o">+=</span><span class="p">(</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="nf">real</span><span class="p">()</span><span class="k">const</span><span class="p">{</span><span class="k">return</span> <span class="n">re</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="nf">imag</span><span class="p">()</span><span class="k">const</span><span class="p">{</span><span class="k">return</span> <span class="n">im</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="n">re</span><span class="p">,</span><span class="n">im</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">friend</span> <span class="n">complex</span><span class="o">&amp;</span> <span class="n">_doapl</span><span class="p">(</span><span class="n">complex</span><span class="o">*</span><span class="p">,</span><span class="k">const</span> <span class="n">complex</span><span class="o">&amp;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="err">\\使用模板创建类</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="n">c1</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">complex</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="n">c2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>类模板可以使<em><strong>代码膨胀</strong></em>,一次书写,多次使用.</p>
 <h2 id="function-template函数模板">function template函数模板</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span><span style="color:#f92672">&gt;</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> T<span style="color:#f92672">&amp;</span> min(<span style="color:#66d9ef">const</span> T<span style="color:#f92672">&amp;</span> a,<span style="color:#66d9ef">const</span> T<span style="color:#f92672">&amp;</span> b)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> b<span style="color:#f92672">&lt;</span>a<span style="color:#f92672">?</span>b:a;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//某一个类定义
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">stone</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    stone(<span style="color:#66d9ef">int</span> w,<span style="color:#66d9ef">int</span> h,<span style="color:#66d9ef">int</span> we)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span> _w(w), _h(h), _weight(we)
-</span></span><span style="display:flex;"><span>        {}
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">bool</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">&lt;</span> (<span style="color:#66d9ef">const</span> stone<span style="color:#f92672">&amp;</span> rhs) <span style="color:#66d9ef">const</span>
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> _weight<span style="color:#f92672">&lt;</span>rhs._weight;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> _w, _h, _weight;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//具体使用
-</span></span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    stone <span style="color:#a6e22e">r1</span>(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>),r2(<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">3</span>),r3;
-</span></span><span style="display:flex;"><span>    r3<span style="color:#f92672">=</span>min(r1,r2);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>对于上面的函数模板使用,编译器首先会对function template进行参数推导（Argument Deduction）,参数推导的结果是<code>T</code>为<code>stone</code>,于是调用<code>stone::operator&lt;</code>,如果该类没有实现<code>&lt;</code>的重载则会报错.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">inline</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">min</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">b</span><span class="o">&lt;</span><span class="n">a</span><span class="o">?</span><span class="nl">b</span><span class="p">:</span><span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//某一个类定义
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">stone</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">stone</span><span class="p">(</span><span class="kt">int</span> <span class="n">w</span><span class="p">,</span><span class="kt">int</span> <span class="n">h</span><span class="p">,</span><span class="kt">int</span> <span class="n">we</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="n">_w</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">_h</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="n">_weight</span><span class="p">(</span><span class="n">we</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="k">operator</span><span class="o">&lt;</span> <span class="p">(</span><span class="k">const</span> <span class="n">stone</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">)</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">_weight</span><span class="o">&lt;</span><span class="n">rhs</span><span class="p">.</span><span class="n">_weight</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">_w</span><span class="p">,</span> <span class="n">_h</span><span class="p">,</span> <span class="n">_weight</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//具体使用
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">stone</span> <span class="nf">r1</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">r2</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">r3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">r3</span><span class="o">=</span><span class="n">min</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span><span class="n">r2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于上面的函数模板使用,编译器首先会对function template进行参数推导（Argument Deduction）,参数推导的结果是<code>T</code>为<code>stone</code>,于是调用<code>stone::operator&lt;</code>,如果该类没有实现<code>&lt;</code>的重载则会报错.</p>
 
 
         

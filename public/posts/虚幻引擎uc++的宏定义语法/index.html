@@ -47,6 +47,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -279,7 +281,7 @@
   <meta itemprop="description" content="Unreal Engine通过UCLASS、UPROPERTY和UFUNCTION等反射宏，将C&#43;&#43;代码暴露给引擎反射系统与蓝图编辑器，实现可视化编辑。GENERATED_BODY()宏必须置于类定义起始处，关键宏参数则控制属性与函数在编辑器中的可见性、可编辑性和蓝图交互能力。">
   <meta itemprop="datePublished" content="2024-04-10T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-04-10T00:00:00+08:00">
-  <meta itemprop="wordCount" content="143">
+  <meta itemprop="wordCount" content="175">
   <meta itemprop="keywords" content="UnrealEngine,语法,C&#43;&#43;">
 
       <header>
@@ -357,31 +359,61 @@
         <p>Unreal Engine通过UCLASS、UPROPERTY和UFUNCTION等反射宏，将C++类、属性和函数暴露给引擎反射系统与蓝图编辑器，实现可视化编辑和脚本交互。GENERATED_BODY()宏必须置于类定义起始处。</p>
 <h2 id="unreal-engine中宏定义语法的使用">Unreal Engine中宏定义语法的使用</h2>
 <h3 id="示例代码">示例代码：</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 类声明宏：使类被纳入Unreal反射系统
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - Blueprintable：允许在蓝图中创建该类的子类
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - meta=(DisplayName=&#34;My Object&#34;)：在编辑器中显示的自定义名称
-</span></span></span><span style="display:flex;"><span>UCLASS(Blueprintable, meta<span style="color:#f92672">=</span>(DisplayName<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;My Object&#34;</span>))
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UMyObject</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> UObject  <span style="color:#75715e">// 必须继承UObject或其子类
-</span></span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 代码生成宏：必须出现在类体内第一个位置
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// - 展开后会包含类型信息、反射数据等引擎所需的内容
-</span></span></span><span style="display:flex;"><span>    GENERATED_BODY()
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 属性声明宏：将成员变量暴露给反射系统
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// - EditAnywhere：可在编辑器的任意位置（如蓝图、细节面板）编辑此属性
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// - Category=&#34;Stats&#34;：在编辑器中归入&#34;Stats&#34;分类组
-</span></span></span><span style="display:flex;"><span>    UPROPERTY(EditAnywhere, Category<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Stats&#34;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">float</span> Health <span style="color:#f92672">=</span> <span style="color:#ae81ff">100.0f</span>;  <span style="color:#75715e">// 带默认值的公开属性
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 函数声明宏：将函数暴露给反射系统
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// - BlueprintCallable：允许蓝图调用此方法
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// - 可添加其他说明符如：
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">//   - Category=&#34;Gameplay&#34;：函数分组
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">//   - meta=(ToolTip=&#34;Heal amount&#34;)：悬停提示文本
-</span></span></span><span style="display:flex;"><span>    UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> Heal(<span style="color:#66d9ef">float</span> Amount);  <span style="color:#75715e">// 可被蓝图调用的方法
-</span></span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h3 id="关键宏参数详解">关键宏参数详解：</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 类声明宏：使类被纳入Unreal反射系统
+</span></span></span><span class="line"><span class="cl"><span class="c1">// - Blueprintable：允许在蓝图中创建该类的子类
+</span></span></span><span class="line"><span class="cl"><span class="c1">// - meta=(DisplayName=&#34;My Object&#34;)：在编辑器中显示的自定义名称
+</span></span></span><span class="line"><span class="cl"><span class="n">UCLASS</span><span class="p">(</span><span class="n">Blueprintable</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">DisplayName</span><span class="o">=</span><span class="s">&#34;My Object&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">UMyObject</span> <span class="o">:</span> <span class="k">public</span> <span class="n">UObject</span>  <span class="c1">// 必须继承UObject或其子类
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 代码生成宏：必须出现在类体内第一个位置
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// - 展开后会包含类型信息、反射数据等引擎所需的内容
+</span></span></span><span class="line"><span class="cl">    <span class="n">GENERATED_BODY</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 属性声明宏：将成员变量暴露给反射系统
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// - EditAnywhere：可在编辑器的任意位置（如蓝图、细节面板）编辑此属性
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// - Category=&#34;Stats&#34;：在编辑器中归入&#34;Stats&#34;分类组
+</span></span></span><span class="line"><span class="cl">    <span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span><span class="o">=</span><span class="s">&#34;Stats&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">Health</span> <span class="o">=</span> <span class="mf">100.0f</span><span class="p">;</span>  <span class="c1">// 带默认值的公开属性
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 函数声明宏：将函数暴露给反射系统
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// - BlueprintCallable：允许蓝图调用此方法
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// - 可添加其他说明符如：
+</span></span></span><span class="line"><span class="cl">    <span class="c1">//   - Category=&#34;Gameplay&#34;：函数分组
+</span></span></span><span class="line"><span class="cl">    <span class="c1">//   - meta=(ToolTip=&#34;Heal amount&#34;)：悬停提示文本
+</span></span></span><span class="line"><span class="cl">    <span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">Heal</span><span class="p">(</span><span class="kt">float</span> <span class="n">Amount</span><span class="p">);</span>  <span class="c1">// 可被蓝图调用的方法
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="关键宏参数详解">关键宏参数详解：</h3>
 <h4 id="uclass-常用参数">UCLASS 常用参数：</h4>
 <table>
   <thead>
@@ -490,15 +522,29 @@
 </li>
 <li>
 <p>继承规则：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 正确：继承自UObject派生类
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UMyActor</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> AActor {
-</span></span><span style="display:flex;"><span>    GENERATED_BODY()
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...
-</span></span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 错误：不能直接从非UObject继承
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UInvalidClass</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> std<span style="color:#f92672">::</span>enable_shared_from_this { <span style="color:#75715e">/*...*/</span> };
-</span></span></code></pre></div></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 正确：继承自UObject派生类
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">UMyActor</span> <span class="o">:</span> <span class="k">public</span> <span class="n">AActor</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GENERATED_BODY</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 错误：不能直接从非UObject继承
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">UInvalidClass</span> <span class="o">:</span> <span class="k">public</span> <span class="n">std</span><span class="o">::</span><span class="n">enable_shared_from_this</span> <span class="p">{</span> <span class="cm">/*...*/</span> <span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
 </ol>
 <p>这些宏共同构成了Unreal的反射系统基础，使C++类能够与蓝图编辑器、序列化系统等引擎功能无缝交互。</p>
 

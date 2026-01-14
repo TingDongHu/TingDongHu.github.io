@@ -47,6 +47,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -279,7 +281,7 @@
   <meta itemprop="description" content="OpenPCDet模型推理输出为字典，包含目标类别、位置、尺寸等关键字段，不同模型结构类似但字段可能略有差异。">
   <meta itemprop="datePublished" content="2024-03-02T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-03-02T00:00:00+08:00">
-  <meta itemprop="wordCount" content="522">
+  <meta itemprop="wordCount" content="721">
   <meta itemprop="keywords" content="OpenPCDet,自动驾驶,目标检测">
 
       <header>
@@ -289,7 +291,7 @@
             Saturday, Mar 2, 2024
           
 
-          | <span>3 minute read</span>
+          | <span>4 minute read</span>
 
           
           | <span>Updated at
@@ -371,136 +373,271 @@
 </figure>
 在 OpenPCDet  中，每个模型的推理结果通常是<strong>一个包含多个键值对的字典</strong>，其中包含与 3D 检测任务相关的信息。不同模型的输出结构可能略有不同，但一般来说，模型输出通常包含以下几个关键字段：
 以下给一段<code>output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl</code>中选取某一帧的结果示例,提取为json文件便于阅读：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&#34;pointrcnn&#34;</span>: [
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Car&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Pedestrian&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Pedestrian&#34;</span>,
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;truncated&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;occluded&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;alpha&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">-4.0102105140686035</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">-1.6028798818588257</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">-4.731999397277832</span>,
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;bbox&#34;</span>: [
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.0</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">196.87057495117188</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">410.6382141113281</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">373.0</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">688.0215454101562</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">172.8148193359375</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">709.7300415039062</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">224.52003479003906</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">667.0341186523438</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">172.51962280273438</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">687.4990844726562</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">223.23146057128906</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>              
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;dimensions&#34;</span>: [
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">4.10535192489624</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.4689395427703857</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.6220554113388062</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.9827990531921387</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.7112400531768799</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.6871805191040039</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.5967018008232117</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.6898497343063354</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.67041015625</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;location&#34;</span>: [
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-2.7540218830108643</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.6045180559158325</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">4.157565593719482</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">3.2612111568450928</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.4242191314697266</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">24.295761108398438</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">2.5298221111297607</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.3910222053527832</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">24.260332107543945</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;rotation_y&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">-4.574054718017578</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">-1.476109504699707</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">-4.6344404220581055</span>,
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;score&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.9997606873512268</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.9978153705596924</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#ae81ff">0.9920910596847534</span>,
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;boxes_lidar&#34;</span>: [
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">4.406521797180176</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">2.786322832107544</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-0.915142297744751</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">4.10535192489624</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.6220554113388062</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.4689395427703857</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">3.003258228302002</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">24.574119567871094</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-3.132066488265991</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-0.7385169863700867</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.9827990531921387</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.6871805191040039</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.7112400531768799</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-0.09468691051006317</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>                [
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">24.53524398803711</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-2.4012603759765625</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">-0.7080038189888</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.5967018008232117</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">0.67041015625</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">1.6898497343063354</span>,
-</span></span><span style="display:flex;"><span>                    <span style="color:#ae81ff">3.0636441707611084</span>
-</span></span><span style="display:flex;"><span>                ],
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    ],
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="内容解读">内容解读</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&#34;pointrcnn&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;Car&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;Pedestrian&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;Pedestrian&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;truncated&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;occluded&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;alpha&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">-4.0102105140686035</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">-1.6028798818588257</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">-4.731999397277832</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;bbox&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">196.87057495117188</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">410.6382141113281</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">373.0</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">688.0215454101562</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">172.8148193359375</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">709.7300415039062</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">224.52003479003906</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">667.0341186523438</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">172.51962280273438</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">687.4990844726562</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">223.23146057128906</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">              
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;dimensions&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">4.10535192489624</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.4689395427703857</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.6220554113388062</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.9827990531921387</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.7112400531768799</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.6871805191040039</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.5967018008232117</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.6898497343063354</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.67041015625</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;location&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-2.7540218830108643</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.6045180559158325</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">4.157565593719482</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">3.2612111568450928</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.4242191314697266</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">24.295761108398438</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">2.5298221111297607</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.3910222053527832</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">24.260332107543945</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;rotation_y&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">-4.574054718017578</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">-1.476109504699707</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">-4.6344404220581055</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;score&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.9997606873512268</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.9978153705596924</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="mf">0.9920910596847534</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;boxes_lidar&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">4.406521797180176</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">2.786322832107544</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-0.915142297744751</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">4.10535192489624</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.6220554113388062</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.4689395427703857</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">3.003258228302002</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">24.574119567871094</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-3.132066488265991</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-0.7385169863700867</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.9827990531921387</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.6871805191040039</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.7112400531768799</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-0.09468691051006317</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">24.53524398803711</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-2.4012603759765625</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">-0.7080038189888</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.5967018008232117</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">0.67041015625</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">1.6898497343063354</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mf">3.0636441707611084</span>
+</span></span><span class="line"><span class="cl">                <span class="p">],</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="内容解读">内容解读</h2>
 <h3 id="name">name</h3>
 <p>含义：检测到的物体类别。
 ​示例：<code>[&quot;Car&quot;, &quot;Pedestrian&quot;, &quot;Pedestrian&quot;, ...]</code>
@@ -590,77 +727,153 @@
 <h2 id="提取json文件的代码">提取json文件的代码</h2>
 <p>有朋友留言问我是怎么把pkl文件提取出来的，附下面的代码供参考：
 使用时记得替换路径</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pickle
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 指定需要查看的 frame_id</span>
-</span></span><span style="display:flex;"><span>target_frame_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;000015&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 所有模型的推理结果文件路径</span>
-</span></span><span style="display:flex;"><span>result_paths <span style="color:#f92672">=</span> [
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/PartA2_free/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pointpillar/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pv_rcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/second/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/home/tdhu/OpenPCDet/output/kitti_models/second_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>
-</span></span><span style="display:flex;"><span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 处理 numpy 数据，转换为 Python 可序列化的数据结构</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">convert_to_serializable</span>(obj):
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isinstance(obj, np<span style="color:#f92672">.</span>ndarray):
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> obj<span style="color:#f92672">.</span>tolist()  <span style="color:#75715e"># numpy 数组转换为列表</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> isinstance(obj, (np<span style="color:#f92672">.</span>float32, np<span style="color:#f92672">.</span>float64)):
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> float(obj)  <span style="color:#75715e"># numpy 浮点数转换为 Python float</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> isinstance(obj, (np<span style="color:#f92672">.</span>int32, np<span style="color:#f92672">.</span>int64)):
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> int(obj)  <span style="color:#75715e"># numpy 整数转换为 Python int</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> obj  <span style="color:#75715e"># 其他数据类型保持不变</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 存储所有模型推理出的 `frame_id` 结果</span>
-</span></span><span style="display:flex;"><span>all_model_results <span style="color:#f92672">=</span> {}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> result_path <span style="color:#f92672">in</span> result_paths:
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 修正模型名称提取方式</span>
-</span></span><span style="display:flex;"><span>    path_parts <span style="color:#f92672">=</span> result_path<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;kitti_models&#34;</span> <span style="color:#f92672">in</span> path_parts:
-</span></span><span style="display:flex;"><span>        model_index <span style="color:#f92672">=</span> path_parts<span style="color:#f92672">.</span>index(<span style="color:#e6db74">&#34;kitti_models&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>  <span style="color:#75715e"># 获取模型名索引</span>
-</span></span><span style="display:flex;"><span>        model_name <span style="color:#f92672">=</span> path_parts[model_index]  <span style="color:#75715e"># 获取模型名称</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>        model_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Unknown&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(result_path, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
-</span></span><span style="display:flex;"><span>            result_data <span style="color:#f92672">=</span> pickle<span style="color:#f92672">.</span>load(f)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 确保数据是列表</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> isinstance(result_data, list):
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 查找匹配的 frame_id</span>
-</span></span><span style="display:flex;"><span>            matched_frames <span style="color:#f92672">=</span> [frame <span style="color:#66d9ef">for</span> frame <span style="color:#f92672">in</span> result_data <span style="color:#66d9ef">if</span> frame<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;frame_id&#34;</span>) <span style="color:#f92672">==</span> target_frame_id]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> matched_frames:
-</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;模型 </span><span style="color:#e6db74">{</span>model_name<span style="color:#e6db74">}</span><span style="color:#e6db74"> 找到 </span><span style="color:#e6db74">{</span>len(matched_frames)<span style="color:#e6db74">}</span><span style="color:#e6db74"> 个匹配 frame_id = </span><span style="color:#e6db74">{</span>target_frame_id<span style="color:#e6db74">}</span><span style="color:#e6db74"> 的数据&#34;</span>)
-</span></span><span style="display:flex;"><span>                all_model_results[model_name] <span style="color:#f92672">=</span> matched_frames  <span style="color:#75715e"># 存储该模型的匹配数据</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;模型 </span><span style="color:#e6db74">{</span>model_name<span style="color:#e6db74">}</span><span style="color:#e6db74"> 未找到 frame_id = </span><span style="color:#e6db74">{</span>target_frame_id<span style="color:#e6db74">}</span><span style="color:#e6db74"> 的数据&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;模型 </span><span style="color:#e6db74">{</span>model_name<span style="color:#e6db74">}</span><span style="color:#e6db74"> 数据格式异常: </span><span style="color:#e6db74">{</span>type(result_data)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;加载模型 </span><span style="color:#e6db74">{</span>model_name<span style="color:#e6db74">}</span><span style="color:#e6db74"> 的数据时发生错误: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果找到数据，则保存为 JSON 文件</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> all_model_results:
-</span></span><span style="display:flex;"><span>    output_json_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;output.json&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(output_json_path, <span style="color:#e6db74">&#34;w&#34;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>) <span style="color:#66d9ef">as</span> f:
-</span></span><span style="display:flex;"><span>        json<span style="color:#f92672">.</span>dump(all_model_results, f, indent<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span>, ensure_ascii<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>, default<span style="color:#f92672">=</span>convert_to_serializable)
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;所有模型推理的 JSON 结果已保存为 </span><span style="color:#e6db74">{</span>output_json_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;未找到任何匹配的 frame_id 数据&#34;</span>)
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pickle</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 指定需要查看的 frame_id</span>
+</span></span><span class="line"><span class="cl"><span class="n">target_frame_id</span> <span class="o">=</span> <span class="s2">&#34;000015&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 所有模型的推理结果文件路径</span>
+</span></span><span class="line"><span class="cl"><span class="n">result_paths</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/PartA2_free/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pointpillar/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pointrcnn_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/pv_rcnn/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/second/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;/home/tdhu/OpenPCDet/output/kitti_models/second_iou/default/eval/eval_with_train/epoch_80/val/result.pkl&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 处理 numpy 数据，转换为 Python 可序列化的数据结构</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">convert_to_serializable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>  <span class="c1"># numpy 数组转换为列表</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>  <span class="c1"># numpy 浮点数转换为 Python float</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>  <span class="c1"># numpy 整数转换为 Python int</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">obj</span>  <span class="c1"># 其他数据类型保持不变</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 存储所有模型推理出的 `frame_id` 结果</span>
+</span></span><span class="line"><span class="cl"><span class="n">all_model_results</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">result_path</span> <span class="ow">in</span> <span class="n">result_paths</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 修正模型名称提取方式</span>
+</span></span><span class="line"><span class="cl">    <span class="n">path_parts</span> <span class="o">=</span> <span class="n">result_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;kitti_models&#34;</span> <span class="ow">in</span> <span class="n">path_parts</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">model_index</span> <span class="o">=</span> <span class="n">path_parts</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&#34;kitti_models&#34;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># 获取模型名索引</span>
+</span></span><span class="line"><span class="cl">        <span class="n">model_name</span> <span class="o">=</span> <span class="n">path_parts</span><span class="p">[</span><span class="n">model_index</span><span class="p">]</span>  <span class="c1"># 获取模型名称</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&#34;Unknown&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">result_path</span><span class="p">,</span> <span class="s2">&#34;rb&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">result_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># 确保数据是列表</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 查找匹配的 frame_id</span>
+</span></span><span class="line"><span class="cl">            <span class="n">matched_frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">result_data</span> <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;frame_id&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="n">target_frame_id</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">matched_frames</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;模型 </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> 找到 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">matched_frames</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个匹配 frame_id = </span><span class="si">{</span><span class="n">target_frame_id</span><span class="si">}</span><span class="s2"> 的数据&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">all_model_results</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">matched_frames</span>  <span class="c1"># 存储该模型的匹配数据</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;模型 </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> 未找到 frame_id = </span><span class="si">{</span><span class="n">target_frame_id</span><span class="si">}</span><span class="s2"> 的数据&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;模型 </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> 数据格式异常: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;加载模型 </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> 的数据时发生错误: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果找到数据，则保存为 JSON 文件</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">all_model_results</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output_json_path</span> <span class="o">=</span> <span class="s2">&#34;output.json&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_json_path</span><span class="p">,</span> <span class="s2">&#34;w&#34;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">all_model_results</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">convert_to_serializable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;所有模型推理的 JSON 结果已保存为 </span><span class="si">{</span><span class="n">output_json_path</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;未找到任何匹配的 frame_id 数据&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
         
       </section>

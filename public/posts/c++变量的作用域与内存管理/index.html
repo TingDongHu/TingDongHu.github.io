@@ -48,6 +48,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -280,7 +282,7 @@
   <meta itemprop="description" content="C&#43;&#43;内存管理涵盖栈、堆和全局/静态存储区。栈内存自动管理，用于局部变量；堆内存需手动分配释放，适合动态对象；全局/静态区存放全局和静态变量。对象生命周期因存储区而异，栈对象随作用域结束销毁，静态对象持续至程序结束，堆对象由程序员控制。">
   <meta itemprop="datePublished" content="2026-01-02T00:00:00+08:00">
   <meta itemprop="dateModified" content="2026-01-02T00:00:00+08:00">
-  <meta itemprop="wordCount" content="758">
+  <meta itemprop="wordCount" content="899">
   <meta itemprop="keywords" content="内存管理,C&#43;&#43;,堆,栈">
 
       <header>
@@ -290,7 +292,7 @@
             Friday, Jan 2, 2026
           
 
-          | <span>4 minute read</span>
+          | <span>5 minute read</span>
 
           
           | <span>Updated at
@@ -422,13 +424,25 @@
 <p>通常指<strong>引用类型 (Reference Types)</strong>。主要包含通过 <code>new</code> 关键字创建的类的实例（如 <code>new User()</code>, <code>new Bitmap()</code>），以及数组、长字符串等。</p>
 <p>堆对象的生命周期不受函数结束的限制。即使创建它的函数执行完了，堆上的对象依然存在，直到它被垃圾回收器 (GC) 回收，或者被手动释放（C++中）。</p>
 <p>堆对象的分配和销毁开销大。如果管理不当，容易产生<strong>内存碎片</strong>或<strong>内存泄漏</strong>（即对象不用了但没被清理，一直占着仓库位置）。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Complex</span>{...};
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    Complex<span style="color:#f92672">*</span> p<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Complex;
-</span></span><span style="display:flex;"><span>    ...
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">delete</span> p;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Complex</span><span class="p">{...};</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Complex</span><span class="o">*</span> <span class="n">p</span><span class="o">=</span><span class="k">new</span> <span class="n">Complex</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="k">delete</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote class="dream-alert caution">
@@ -439,17 +453,43 @@
 
 <h3 id="new与delete">new与delete</h3>
 <p><strong>new关键字</strong>先分配内存,在调用构造函数</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Complex<span style="color:#f92672">*</span> pc<span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Complex(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);
-</span></span></code></pre></div><p>如上new一个对象的流程,在编译器中会被转化为以下代码(不标准,但是思路类似):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Complex <span style="color:#f92672">*</span>pc;<span style="color:#75715e">//创建一个指向新对象的指针
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> mem<span style="color:#f92672">=</span><span style="color:#66d9ef">operator</span> <span style="color:#66d9ef">new</span>(<span style="color:#66d9ef">sizeof</span>(Complex));<span style="color:#75715e">//分配类大小的内存,new方法内部会调用C语言中的动态内存分配方法malloc(n);
-</span></span></span><span style="display:flex;"><span>pc<span style="color:#f92672">=</span><span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span>Complex<span style="color:#f92672">*&gt;</span>(mem); <span style="color:#75715e">//转型
-</span></span></span><span style="display:flex;"><span>pc<span style="color:#f92672">-&gt;</span>Complex<span style="color:#f92672">::</span>Complex(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);     <span style="color:#75715e">//调用构造函数
-</span></span></span></code></pre></div><p><strong>delete关键字</strong>先调用析构函数,再释放内存</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Complex<span style="color:#f92672">*</span>pc <span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Complex(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">delete</span> pc;
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">Complex</span><span class="o">*</span> <span class="n">pc</span><span class="o">=</span> <span class="k">new</span> <span class="n">Complex</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如上new一个对象的流程,在编译器中会被转化为以下代码(不标准,但是思路类似):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">Complex</span> <span class="o">*</span><span class="n">pc</span><span class="p">;</span><span class="c1">//创建一个指向新对象的指针
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="n">mem</span><span class="o">=</span><span class="k">operator</span> <span class="k">new</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Complex</span><span class="p">));</span><span class="c1">//分配类大小的内存,new方法内部会调用C语言中的动态内存分配方法malloc(n);
+</span></span></span><span class="line"><span class="cl"><span class="n">pc</span><span class="o">=</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">Complex</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">mem</span><span class="p">);</span> <span class="c1">//转型
+</span></span></span><span class="line"><span class="cl"><span class="n">pc</span><span class="o">-&gt;</span><span class="n">Complex</span><span class="o">::</span><span class="n">Complex</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>     <span class="c1">//调用构造函数
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>delete关键字</strong>先调用析构函数,再释放内存</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">Complex</span><span class="o">*</span><span class="n">pc</span> <span class="o">=</span><span class="k">new</span> <span class="n">Complex</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">delete</span> <span class="n">pc</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote class="dream-alert caution">
@@ -475,32 +515,63 @@
 </figure></p>
 <h3 id="example">Example</h3>
 <p>举一个两者对比的栗子：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Player</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string name;
-</span></span><span style="display:flex;"><span>    Player(std<span style="color:#f92672">::</span>string n) <span style="color:#f92672">:</span> name(n) { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> name <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 进入了内存</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; }
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">~</span>Player() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> name <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; 被销毁了</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">createPlayers</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 1. 栈对象 (Stack Object)
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 直接声明，不需要 new。函数结束时，它会自动触发析构函数销毁。
-</span></span></span><span style="display:flex;"><span>    Player stackPlayer(<span style="color:#e6db74">&#34;栈小王&#34;</span>); 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 2. 堆对象 (Heap Object)
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 使用 new 关键字。它会一直存在，直到你手动调用 delete。
-</span></span></span><span style="display:flex;"><span>    Player<span style="color:#f92672">*</span> heapPlayer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Player(<span style="color:#e6db74">&#34;堆大强&#34;</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>} <span style="color:#75715e">// &lt;--- 这里的右大括号是“栈对象”的终点
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    createPlayers();
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>运行该代码会发现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Player</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Player</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">n</span><span class="p">)</span> <span class="o">:</span> <span class="n">name</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; 进入了内存</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">Player</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; 被销毁了</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">createPlayers</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 1. 栈对象 (Stack Object)
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// 直接声明，不需要 new。函数结束时，它会自动触发析构函数销毁。
+</span></span></span><span class="line"><span class="cl">    <span class="n">Player</span> <span class="n">stackPlayer</span><span class="p">(</span><span class="s">&#34;栈小王&#34;</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 2. 堆对象 (Heap Object)
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// 使用 new 关键字。它会一直存在，直到你手动调用 delete。
+</span></span></span><span class="line"><span class="cl">    <span class="n">Player</span><span class="o">*</span> <span class="n">heapPlayer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Player</span><span class="p">(</span><span class="s">&#34;堆大强&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="c1">// &lt;--- 这里的右大括号是“栈对象”的终点
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">createPlayers</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运行该代码会发现：</p>
 <ol>
 <li><code>栈小王</code> 在函数结束时自动打印了“被销毁了”。</li>
 <li><code>堆大强</code> <strong>没有被销毁</strong>！如果你不手动 <code>delete heapPlayer</code>，他在程序运行期间会一直占用内存，这就是<strong>内存泄漏</strong>。</li>
@@ -517,14 +588,27 @@
 <p><strong>智能指针是一个栈对象（受作用域控制），它在自己的析构函数里去执行 <code>delete</code>。</strong></p>
 <p>这样，你就把<strong>堆对象</strong>那不受控的生命周期，强行绑定到了一个<strong>栈对象</strong>的作用域上。这种技术就叫 RAII (Resource Acquisition Is Initialization) 思想（资源获取即初始化），是现代 C++ 能够摆脱内存泄漏噩梦的法宝。</p>
 <p>现代 C++ (C++11及以后) 极力推荐使用<strong>智能指针</strong>，它能让你<strong>像用栈一样安全地使用堆</strong>：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;memory&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">modernCpp</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 这里的 unique_ptr 在栈上，但它指向的对象在堆上
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 当 smartPlayer 离开作用域，它会自动 delete 指向的堆对象
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>unique_ptr<span style="color:#f92672">&lt;</span>Player<span style="color:#f92672">&gt;</span> smartPlayer <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_unique<span style="color:#f92672">&lt;</span>Player<span style="color:#f92672">&gt;</span>(<span style="color:#e6db74">&#34;智能强&#34;</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>这行代码实际上在内存中创造了这种结构：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">modernCpp</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 这里的 unique_ptr 在栈上，但它指向的对象在堆上
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// 当 smartPlayer 离开作用域，它会自动 delete 指向的堆对象
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">Player</span><span class="o">&gt;</span> <span class="n">smartPlayer</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">Player</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&#34;智能强&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这行代码实际上在内存中创造了这种结构：</p>
 <ul>
 <li><strong>栈上</strong>：有一个名为 <code>smartPlayer</code> 的小盒子，里面装着堆内存的地址（比如 <code>0x55AA</code>）。</li>
 <li><strong>堆上</strong>：有一个真正的 <code>Player</code> 对象实例。</li>
@@ -551,72 +635,157 @@
 <h4 id="深拷贝-deep-copy">深拷贝 (Deep Copy)</h4>
 <p>在C++中，深拷贝需要程序员手动实现（写拷贝构造函数）。它不仅复印钥匙，还去盖一个一模一样的仓库，并把里面的东西全搬进去。</p>
 <p><strong>栈上：</strong> 有两个指针，存储不同的地址。<strong>堆上：</strong> 有两份完全独立的数据。<strong>后果则是：</strong> 两个对象完全独立，互不干扰，各自管理各自的生命周期。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyData</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> heapPtr; <span style="color:#75715e">// 指向堆内存的指针
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    MyData(<span style="color:#66d9ef">int</span> val) {
-</span></span><span style="display:flex;"><span>        heapPtr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>(val); <span style="color:#75715e">// 在堆上分配内存
-</span></span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 默认的拷贝构造函数（浅拷贝）长这样：
-</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// MyData(const MyData&amp; other) { heapPtr = other.heapPtr; }
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 手动实现深拷贝
-</span></span></span><span style="display:flex;"><span>    MyData(<span style="color:#66d9ef">const</span> MyData<span style="color:#f92672">&amp;</span> other) {
-</span></span><span style="display:flex;"><span>        heapPtr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>(<span style="color:#f92672">*</span>other.heapPtr); <span style="color:#75715e">// 1. 开新堆 2. 考内容
-</span></span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">~</span>MyData() { <span style="color:#66d9ef">delete</span> heapPtr; } <span style="color:#75715e">// 释放堆内存
-</span></span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h2 id="全局静态存储区"><strong>全局/静态存储区</strong></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyData</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span><span class="o">*</span> <span class="n">heapPtr</span><span class="p">;</span> <span class="c1">// 指向堆内存的指针
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">MyData</span><span class="p">(</span><span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">heapPtr</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">(</span><span class="n">val</span><span class="p">);</span> <span class="c1">// 在堆上分配内存
+</span></span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 默认的拷贝构造函数（浅拷贝）长这样：
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// MyData(const MyData&amp; other) { heapPtr = other.heapPtr; }
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 手动实现深拷贝
+</span></span></span><span class="line"><span class="cl">    <span class="n">MyData</span><span class="p">(</span><span class="k">const</span> <span class="n">MyData</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">heapPtr</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">(</span><span class="o">*</span><span class="n">other</span><span class="p">.</span><span class="n">heapPtr</span><span class="p">);</span> <span class="c1">// 1. 开新堆 2. 考内容
+</span></span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">MyData</span><span class="p">()</span> <span class="p">{</span> <span class="k">delete</span> <span class="n">heapPtr</span><span class="p">;</span> <span class="p">}</span> <span class="c1">// 释放堆内存
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="全局静态存储区"><strong>全局/静态存储区</strong></h2>
 <p>果说<strong>栈</strong>是“快餐盒”（用完即丢），<strong>堆</strong>是“租来的仓库”（需手动还钥匙），那么<strong>全局/静态存储区</strong>就是“<strong>自有房产</strong>”。</p>
 <p>这块区域专门存储那些<strong>从程序启动到程序结束一直存在</strong>的数据。一般指：全局变量：定义在所有函数外部的变量。静态变量 (<code>static</code>)：包括全局静态变量、局部静态变量以及类的静态成员。常量 (某些情况下)：比如被 <code>const</code> 修饰的全局变量（有时会被优化到只读数据区）。</p>
 <h3 id="static-object静态对象">Static object静态对象</h3>
 <p>如果想让对象的声明周期突破作用域限制,可以使用<code>static</code>修饰符,<strong>static local objects</strong>的生命在其作用域结束之后依然存在,直到整个程序结束.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Complex</span>{...};
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> Complex <span style="color:#a6e22e">c2</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p><strong>global objects</strong>全局变量 写在<code>main</code>函数的外面,可以将其视为一种特殊的static object,其作用域也是<em><strong>整个程序</strong></em></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Complex</span>{...};
-</span></span><span style="display:flex;"><span>Complex <span style="color:#a6e22e">c3</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    ...
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>在程序运行期间，静态变量只初始化一次，并且没有指针，但对于静态局部变量和静态成员变量的情况还有所不同，如下面例子所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Complex</span><span class="p">{...};</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="n">Complex</span> <span class="nf">c2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>global objects</strong>全局变量 写在<code>main</code>函数的外面,可以将其视为一种特殊的static object,其作用域也是<em><strong>整个程序</strong></em></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Complex</span><span class="p">{...};</span>
+</span></span><span class="line"><span class="cl"><span class="n">Complex</span> <span class="nf">c3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在程序运行期间，静态变量只初始化一次，并且没有指针，但对于静态局部变量和静态成员变量的情况还有所不同，如下面例子所示：</p>
 <p><strong>局部静态变量</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">counter</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;  <span style="color:#75715e">// 只初始化一次
-</span></span></span><span style="display:flex;"><span>    count<span style="color:#f92672">++</span>;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> count <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    counter();  <span style="color:#75715e">// 输出1
-</span></span></span><span style="display:flex;"><span>    counter();  <span style="color:#75715e">// 输出2
-</span></span></span><span style="display:flex;"><span>    counter();  <span style="color:#75715e">// 输出3
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>第二次调用||第N次调用时：程序会直接“跳过”初始化那一行，直接去访问已经在静态存储区里待命的那个 <code>count</code>。因为编译器会在后台设置一个“隐藏的标志位”。每次进入函数都会检查这个标志位，如果发现已经初始化过了，就直接取值，不再调用构造函数。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">counter</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// 只初始化一次
+</span></span></span><span class="line"><span class="cl">    <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">count</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">counter</span><span class="p">();</span>  <span class="c1">// 输出1
+</span></span></span><span class="line"><span class="cl">    <span class="n">counter</span><span class="p">();</span>  <span class="c1">// 输出2
+</span></span></span><span class="line"><span class="cl">    <span class="n">counter</span><span class="p">();</span>  <span class="c1">// 输出3
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>第二次调用||第N次调用时：程序会直接“跳过”初始化那一行，直接去访问已经在静态存储区里待命的那个 <code>count</code>。因为编译器会在后台设置一个“隐藏的标志位”。每次进入函数都会检查这个标志位，如果发现已经初始化过了，就直接取值，不再调用构造函数。</p>
 <p><strong>全局静态变量 / 类的静态成员</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> global_val <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>; <span style="color:#75715e">// 全局静态
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> sharedValue;  <span style="color:#75715e">// 声明
-</span></span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> MyClass<span style="color:#f92672">::</span>sharedValue <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;  <span style="color:#75715e">// 定义和初始化
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    MyClass a, b;
-</span></span><span style="display:flex;"><span>    a.sharedValue <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> b.sharedValue;  <span style="color:#75715e">// 输出10，因为所有实例共享
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>这里的全局静态变量和类的静态成员在 <code>main</code> 函数执行<strong>之前</strong>，程序加载时就会完成初始化。所有类实例共享同一个静态变量，可以通过类名或实例访问。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="n">global_val</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">// 全局静态
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">sharedValue</span><span class="p">;</span>  <span class="c1">// 声明
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">sharedValue</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>  <span class="c1">// 定义和初始化
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">a</span><span class="p">.</span><span class="n">sharedValue</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">b</span><span class="p">.</span><span class="n">sharedValue</span><span class="p">;</span>  <span class="c1">// 输出10，因为所有实例共享
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里的全局静态变量和类的静态成员在 <code>main</code> 函数执行<strong>之前</strong>，程序加载时就会完成初始化。所有类实例共享同一个静态变量，可以通过类名或实例访问。</p>
 <h3 id="static-关键字">static 关键字</h3>
 <p><strong>static</strong> 是 C++ 中一个多用途关键字，根据使用上下文有不同的含义。<code>static</code>修饰的变量的作用域可能不同,但是统一存储在全局/静态存储区（非堆非栈）.而<code>static</code>修饰的函数存储在代码段,与普通成员函数存储位置相同.</p>
 <h4 id="静态成员函数">静态成员函数</h4>
@@ -624,17 +793,33 @@
 <p>该函数没有 <code>this</code> 指针 (最本质区别)；只能访问静态成员变量和其他静态成员函数；可以通过类名直接调用；不能是虚函数（因为与实例无关）。</p>
 <p>和普通函数一样，静态函数的二进制指令存储在程序的 <strong>代码区 (Text Segment)</strong>。</p>
 <p><strong>生命周期</strong>：它在程序加载时就存在了。即使你一个该类的对象都没有创建，你依然可以调用它的静态成员函数。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> printMessage() {
-</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Static method&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 不能访问非静态成员
-</span></span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    MyClass<span style="color:#f92672">::</span>printMessage();  <span style="color:#75715e">// 不需要实例
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>**没有 <code>this</code> 指针 **</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">void</span> <span class="n">printMessage</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Static method&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 不能访问非静态成员
+</span></span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span><span class="o">::</span><span class="n">printMessage</span><span class="p">();</span>  <span class="c1">// 不需要实例
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>**没有 <code>this</code> 指针 **</p>
 <p><strong>普通成员函数</strong>：当你调用 <code>obj.func()</code> 时，编译器会隐式地传递一个 <code>this</code> 指针给函数，指向 <code>obj</code> 的地址。</p>
 <p><strong>静态成员函数</strong>：它没有 <code>this</code> 指针。因为它不属于任何对象，所以它不知道、也无法访问具体的某个对象的成员。</p>
 <p>由于没有 <code>this</code> 指针，静态成员函数在访问成员时非常“挑食”：</p>
@@ -692,13 +877,25 @@
   </tbody>
 </table>
 <h4 id="静态全局变量和函数">静态全局变量和函数</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// file1.cpp
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> hiddenVar <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;  <span style="color:#75715e">// 只在当前文件可见
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">hiddenFunc</span>() {  <span style="color:#75715e">// 只在当前文件可见
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> hiddenVar <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="静态与单例模式meyers-singleton">静态与单例模式(Meyers Singleton)</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// file1.cpp
+</span></span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="n">hiddenVar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>  <span class="c1">// 只在当前文件可见
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">hiddenFunc</span><span class="p">()</span> <span class="p">{</span>  <span class="c1">// 只在当前文件可见
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hiddenVar</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="静态与单例模式meyers-singleton">静态与单例模式(Meyers Singleton)</h3>
 <h4 id="什么是单例模式">什么是单例模式?</h4>
 <p>单例模式（Singleton Pattern）是一种创建型设计模式，它的核心目标是：<strong>保证一个类在整个程序运行期间，有且仅有一个实例，并提供一个全局访问点。</strong></p>
 
@@ -729,17 +926,33 @@
 <p>在现代 C++ (C++11及以后) 中，静态局部变量的初始化是线程安全的。这意味着即使多个线程同时调用 <code>getInstance()</code>，编译器也能确保唯一的实例只被创建一次。</p>
 <h4 id="example-1">Example</h4>
 <p><strong>迈耶斯单例：</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Singleton</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> Singleton<span style="color:#f92672">&amp;</span> getInstance() {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// static 保证了：1. 只有第一次执行这行会初始化 2. 存在静态区 3. 线程安全
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">static</span> Singleton instance; 
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> instance;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    Singleton() {} <span style="color:#75715e">// 构造私有，防止外部创建
-</span></span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p><strong>逻辑</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Singleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="n">Singleton</span><span class="o">&amp;</span> <span class="n">getInstance</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// static 保证了：1. 只有第一次执行这行会初始化 2. 存在静态区 3. 线程安全
+</span></span></span><span class="line"><span class="cl">        <span class="k">static</span> <span class="n">Singleton</span> <span class="n">instance</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">instance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Singleton</span><span class="p">()</span> <span class="p">{}</span> <span class="c1">// 构造私有，防止外部创建
+</span></span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>逻辑</strong>：</p>
 <ol>
 <li>当你第一次调用 <code>getInstance()</code> 时，编译器在<strong>全局/静态存储区</strong>划分了一块房产，把 <code>instance</code> 放了进去,然后返回一个该对象别名。</li>
 <li>因为它在静态区，所以即使函数执行完了，它也不会消失（生命周期直到程序结束）。</li>
@@ -748,21 +961,41 @@
 <p><strong>内存表现</strong>：对象直接住在<strong>静态存储区</strong>。</p>
 <p><strong>优点</strong>：最简单，代码少，系统自动回收内存，不用担心泄漏。</p>
 <p><strong>静态指针单例</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Singleton</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> Singleton<span style="color:#f92672">*</span> instance; <span style="color:#75715e">// 静态成员声明
-</span></span></span><span style="display:flex;"><span>    Singleton() {}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> Singleton<span style="color:#f92672">*</span> getInstance() {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (instance <span style="color:#f92672">==</span> <span style="color:#66d9ef">nullptr</span>) {
-</span></span><span style="display:flex;"><span>            instance <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Singleton();
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> instance;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 静态成员必须在类外定义
-</span></span></span><span style="display:flex;"><span>Singleton<span style="color:#f92672">*</span> Singleton<span style="color:#f92672">::</span>instance <span style="color:#f92672">=</span> <span style="color:#66d9ef">nullptr</span>;
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Singleton</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="n">Singleton</span><span class="o">*</span> <span class="n">instance</span><span class="p">;</span> <span class="c1">// 静态成员声明
+</span></span></span><span class="line"><span class="cl">    <span class="n">Singleton</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="n">Singleton</span><span class="o">*</span> <span class="n">getInstance</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">instance</span> <span class="o">==</span> <span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Singleton</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">instance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 静态成员必须在类外定义
+</span></span></span><span class="line"><span class="cl"><span class="n">Singleton</span><span class="o">*</span> <span class="n">Singleton</span><span class="o">::</span><span class="n">instance</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote class="dream-alert caution">

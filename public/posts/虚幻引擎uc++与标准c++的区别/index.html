@@ -47,6 +47,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -279,7 +281,7 @@
   <meta itemprop="description" content="Unreal C&#43;&#43;通过宏和反射机制支持运行时类型信息与动态访问，并采用自动垃圾回收；而标准C&#43;&#43;则依赖手动管理或智能指针，且反射功能有限。">
   <meta itemprop="datePublished" content="2024-03-19T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-03-19T00:00:00+08:00">
-  <meta itemprop="wordCount" content="307">
+  <meta itemprop="wordCount" content="396">
   <meta itemprop="keywords" content="C&#43;&#43;,语法,UnrealEngine">
 
       <header>
@@ -357,27 +359,58 @@
         <h2 id="1-类声明与反射系统">1. 类声明与反射系统</h2>
 <h3 id="11-类定义语法">1.1 类定义语法</h3>
 <h4 id="unreal-c">Unreal C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 必须继承UObject且使用反射宏
-</span></span></span><span style="display:flex;"><span>UCLASS(Blueprintable, meta<span style="color:#f92672">=</span>(DisplayName<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;My Object&#34;</span>))
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UMyObject</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> UObject {
-</span></span><span style="display:flex;"><span>    GENERATED_BODY() <span style="color:#75715e">// 必须包含
-</span></span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    UPROPERTY(EditAnywhere, Category<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Stats&#34;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">float</span> Health <span style="color:#f92672">=</span> <span style="color:#ae81ff">100.0f</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> Heal(<span style="color:#66d9ef">float</span> Amount);
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h4 id="标准-c">标准 C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyObject</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">float</span> Health <span style="color:#f92672">=</span> <span style="color:#ae81ff">100.0f</span>;
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Heal</span>(<span style="color:#66d9ef">float</span> Amount) {
-</span></span><span style="display:flex;"><span>        Health <span style="color:#f92672">+=</span> Amount;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><h3 id="12-反射机制对比">1.2 反射机制对比</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 必须继承UObject且使用反射宏
+</span></span></span><span class="line"><span class="cl"><span class="n">UCLASS</span><span class="p">(</span><span class="n">Blueprintable</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">(</span><span class="n">DisplayName</span><span class="o">=</span><span class="s">&#34;My Object&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">UMyObject</span> <span class="o">:</span> <span class="k">public</span> <span class="n">UObject</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GENERATED_BODY</span><span class="p">()</span> <span class="c1">// 必须包含
+</span></span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span><span class="o">=</span><span class="s">&#34;Stats&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">Health</span> <span class="o">=</span> <span class="mf">100.0f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">Heal</span><span class="p">(</span><span class="kt">float</span> <span class="n">Amount</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="标准-c">标准 C++</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyObject</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">Health</span> <span class="o">=</span> <span class="mf">100.0f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Heal</span><span class="p">(</span><span class="kt">float</span> <span class="n">Amount</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Health</span> <span class="o">+=</span> <span class="n">Amount</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="12-反射机制对比">1.2 反射机制对比</h3>
 <table>
   <thead>
       <tr>
@@ -407,97 +440,245 @@
 <h2 id="2-内存管理模型">2. 内存管理模型</h2>
 <h3 id="21-对象生命周期">2.1 对象生命周期</h3>
 <h4 id="unreal-c-1">Unreal C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 自动垃圾回收
-</span></span></span><span style="display:flex;"><span>UMyObject<span style="color:#f92672">*</span> Obj <span style="color:#f92672">=</span> NewObject<span style="color:#f92672">&lt;</span>UMyObject<span style="color:#f92672">&gt;</span>();
-</span></span><span style="display:flex;"><span>Obj<span style="color:#f92672">-&gt;</span>MarkPendingKill(); <span style="color:#75715e">// 标记销毁
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 手动控制引用
-</span></span></span><span style="display:flex;"><span>Obj<span style="color:#f92672">-&gt;</span>AddToRoot(); <span style="color:#75715e">// 防止被GC
-</span></span></span><span style="display:flex;"><span>Obj<span style="color:#f92672">-&gt;</span>RemoveFromRoot();
-</span></span></code></pre></div><h4 id="标准-c-1">标准 C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 手动管理
-</span></span></span><span style="display:flex;"><span>MyObject<span style="color:#f92672">*</span> obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> MyObject();
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">delete</span> obj;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 或使用智能指针
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">auto</span> ptr <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_shared<span style="color:#f92672">&lt;</span>MyObject<span style="color:#f92672">&gt;</span>();
-</span></span></code></pre></div><h3 id="22-内存分配器对比">2.2 内存分配器对比</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Unreal自定义分配器
-</span></span></span><span style="display:flex;"><span>FMemory<span style="color:#f92672">::</span>Malloc(Size);
-</span></span><span style="display:flex;"><span>FMemory<span style="color:#f92672">::</span>Free(Ptr);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 标准库分配器
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> p <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>malloc(size);
-</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>free(p);
-</span></span></code></pre></div><h2 id="3-核心数据类型差异">3. 核心数据类型差异</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 自动垃圾回收
+</span></span></span><span class="line"><span class="cl"><span class="n">UMyObject</span><span class="o">*</span> <span class="n">Obj</span> <span class="o">=</span> <span class="n">NewObject</span><span class="o">&lt;</span><span class="n">UMyObject</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">Obj</span><span class="o">-&gt;</span><span class="n">MarkPendingKill</span><span class="p">();</span> <span class="c1">// 标记销毁
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 手动控制引用
+</span></span></span><span class="line"><span class="cl"><span class="n">Obj</span><span class="o">-&gt;</span><span class="n">AddToRoot</span><span class="p">();</span> <span class="c1">// 防止被GC
+</span></span></span><span class="line"><span class="cl"><span class="n">Obj</span><span class="o">-&gt;</span><span class="n">RemoveFromRoot</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="标准-c-1">标准 C++</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 手动管理
+</span></span></span><span class="line"><span class="cl"><span class="n">MyObject</span><span class="o">*</span> <span class="n">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyObject</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">delete</span> <span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 或使用智能指针
+</span></span></span><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="22-内存分配器对比">2.2 内存分配器对比</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// Unreal自定义分配器
+</span></span></span><span class="line"><span class="cl"><span class="n">FMemory</span><span class="o">::</span><span class="n">Malloc</span><span class="p">(</span><span class="n">Size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">FMemory</span><span class="o">::</span><span class="n">Free</span><span class="p">(</span><span class="n">Ptr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 标准库分配器
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">malloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-核心数据类型差异">3. 核心数据类型差异</h2>
 <h3 id="31-字符串处理">3.1 字符串处理</h3>
 <h4 id="unreal-c-2">Unreal C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>FString Str <span style="color:#f92672">=</span> TEXT(<span style="color:#e6db74">&#34;Hello&#34;</span>); <span style="color:#75715e">// UTF-16
-</span></span></span><span style="display:flex;"><span>FText Text <span style="color:#f92672">=</span> NSLOCTEXT(<span style="color:#e6db74">&#34;NS&#34;</span>, <span style="color:#e6db74">&#34;Key&#34;</span>, <span style="color:#e6db74">&#34;Localized Text&#34;</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 格式化
-</span></span></span><span style="display:flex;"><span>FString Format <span style="color:#f92672">=</span> FString<span style="color:#f92672">::</span>Printf(TEXT(<span style="color:#e6db74">&#34;%s:%d&#34;</span>), <span style="color:#f92672">*</span>Str, <span style="color:#ae81ff">42</span>);
-</span></span></code></pre></div><h4 id="标准-c-2">标准 C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>std<span style="color:#f92672">::</span>string str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello&#34;</span>; <span style="color:#75715e">// 依赖编码
-</span></span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>string format <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>format(<span style="color:#e6db74">&#34;{}:{}&#34;</span>, str, <span style="color:#ae81ff">42</span>); <span style="color:#75715e">// C++20
-</span></span></span></code></pre></div><h3 id="32-容器类对比">3.2 容器类对比</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">FString</span> <span class="n">Str</span> <span class="o">=</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Hello&#34;</span><span class="p">);</span> <span class="c1">// UTF-16
+</span></span></span><span class="line"><span class="cl"><span class="n">FText</span> <span class="n">Text</span> <span class="o">=</span> <span class="n">NSLOCTEXT</span><span class="p">(</span><span class="s">&#34;NS&#34;</span><span class="p">,</span> <span class="s">&#34;Key&#34;</span><span class="p">,</span> <span class="s">&#34;Localized Text&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 格式化
+</span></span></span><span class="line"><span class="cl"><span class="n">FString</span> <span class="n">Format</span> <span class="o">=</span> <span class="n">FString</span><span class="o">::</span><span class="n">Printf</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;%s:%d&#34;</span><span class="p">),</span> <span class="o">*</span><span class="n">Str</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="标准-c-2">标准 C++</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&#34;Hello&#34;</span><span class="p">;</span> <span class="c1">// 依赖编码
+</span></span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">format</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">format</span><span class="p">(</span><span class="s">&#34;{}:{}&#34;</span><span class="p">,</span> <span class="n">str</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span> <span class="c1">// C++20
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="32-容器类对比">3.2 容器类对比</h3>
 <h4 id="数组操作">数组操作</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Unreal
-</span></span></span><span style="display:flex;"><span>TArray<span style="color:#f92672">&lt;</span>int32<span style="color:#f92672">&gt;</span> Arr;
-</span></span><span style="display:flex;"><span>Arr.Add(<span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>Arr.Remove(<span style="color:#ae81ff">0</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 标准库
-</span></span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> vec;
-</span></span><span style="display:flex;"><span>vec.push_back(<span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>vec.erase(vec.begin());
-</span></span></code></pre></div><h4 id="字典操作">字典操作</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Unreal
-</span></span></span><span style="display:flex;"><span>TMap<span style="color:#f92672">&lt;</span>FName, FString<span style="color:#f92672">&gt;</span> Map;
-</span></span><span style="display:flex;"><span>Map.Add(<span style="color:#e6db74">&#34;Key&#34;</span>, <span style="color:#e6db74">&#34;Value&#34;</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 标准库
-</span></span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>unordered_map<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>string, std<span style="color:#f92672">::</span>string<span style="color:#f92672">&gt;</span> map;
-</span></span><span style="display:flex;"><span>map.emplace(<span style="color:#e6db74">&#34;Key&#34;</span>, <span style="color:#e6db74">&#34;Value&#34;</span>);
-</span></span></code></pre></div><h2 id="4-多线程编程">4. 多线程编程</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// Unreal
+</span></span></span><span class="line"><span class="cl"><span class="n">TArray</span><span class="o">&lt;</span><span class="n">int32</span><span class="o">&gt;</span> <span class="n">Arr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">Arr</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Arr</span><span class="p">.</span><span class="n">Remove</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 标准库
+</span></span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">vec</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">vec</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">vec</span><span class="p">.</span><span class="n">begin</span><span class="p">());</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="字典操作">字典操作</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// Unreal
+</span></span></span><span class="line"><span class="cl"><span class="n">TMap</span><span class="o">&lt;</span><span class="n">FName</span><span class="p">,</span> <span class="n">FString</span><span class="o">&gt;</span> <span class="n">Map</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">Map</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="s">&#34;Key&#34;</span><span class="p">,</span> <span class="s">&#34;Value&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 标准库
+</span></span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">map</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">map</span><span class="p">.</span><span class="n">emplace</span><span class="p">(</span><span class="s">&#34;Key&#34;</span><span class="p">,</span> <span class="s">&#34;Value&#34;</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-多线程编程">4. 多线程编程</h2>
 <h3 id="41-任务系统">4.1 任务系统</h3>
 <h4 id="unreal-c-3">Unreal C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// GameThread执行
-</span></span></span><span style="display:flex;"><span>AsyncTask(ENamedThreads<span style="color:#f92672">::</span>GameThread, [](){
-</span></span><span style="display:flex;"><span>    UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;Main thread&#34;</span>));
-</span></span><span style="display:flex;"><span>});
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// 并行任务
-</span></span></span><span style="display:flex;"><span>ParallelFor(<span style="color:#ae81ff">10</span>, [](int32 Index){
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 并行执行
-</span></span></span><span style="display:flex;"><span>});
-</span></span></code></pre></div><h4 id="标准-c-3">标准 C++</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>std<span style="color:#f92672">::</span><span style="color:#66d9ef">thread</span> t([](){
-</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;New thread&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>});
-</span></span><span style="display:flex;"><span>t.join();
-</span></span></code></pre></div><h2 id="5-编译系统差异">5. 编译系统差异</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// GameThread执行
+</span></span></span><span class="line"><span class="cl"><span class="n">AsyncTask</span><span class="p">(</span><span class="n">ENamedThreads</span><span class="o">::</span><span class="n">GameThread</span><span class="p">,</span> <span class="p">[](){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Main thread&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 并行任务
+</span></span></span><span class="line"><span class="cl"><span class="n">ParallelFor</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[](</span><span class="n">int32</span> <span class="n">Index</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 并行执行
+</span></span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="标准-c-3">标准 C++</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t</span><span class="p">([](){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;New thread&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="n">t</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5-编译系统差异">5. 编译系统差异</h2>
 <h3 id="51-模块定义">5.1 模块定义</h3>
 <h4 id="unreal模块">Unreal模块</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// MyModule.Build.cs
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyModule</span> <span style="color:#f92672">:</span> ModuleRules {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">MyModule</span>(ReadOnlyTargetRules Target) {
-</span></span><span style="display:flex;"><span>        PublicDependencyModuleNames.AddRange(<span style="color:#66d9ef">new</span> string[] { <span style="color:#e6db74">&#34;Core&#34;</span> });
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h4 id="cmake示例">CMake示例</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmake" data-lang="cmake"><span style="display:flex;"><span>add_library(<span style="color:#e6db74">MyModule</span> <span style="color:#e6db74">STATIC</span> <span style="color:#e6db74">src.cpp</span>)<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span>target_link_libraries(<span style="color:#e6db74">MyModule</span> <span style="color:#e6db74">PUBLIC</span> <span style="color:#e6db74">Core</span>)<span style="color:#960050;background-color:#1e0010">
-</span></span></span></code></pre></div><h2 id="6-常用宏对比">6. 常用宏对比</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// MyModule.Build.cs
+</span></span></span><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">MyModule</span> <span class="o">:</span> <span class="n">ModuleRules</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="nf">MyModule</span><span class="p">(</span><span class="n">ReadOnlyTargetRules</span> <span class="n">Target</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span><span class="k">new</span> <span class="n">string</span><span class="p">[]</span> <span class="p">{</span> <span class="s">&#34;Core&#34;</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="cmake示例">CMake示例</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_library</span><span class="p">(</span><span class="s">MyModule</span> <span class="s">STATIC</span> <span class="s">src.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">MyModule</span> <span class="s">PUBLIC</span> <span class="s">Core</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="6-常用宏对比">6. 常用宏对比</h2>
 <h3 id="61-常用unreal宏">6.1 常用Unreal宏</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;Message&#34;</span>)); <span style="color:#75715e">// 日志
-</span></span></span><span style="display:flex;"><span>check(ptr <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>); <span style="color:#75715e">// 断言
-</span></span></span><span style="display:flex;"><span>ensureMsgf(bCondition, TEXT(<span style="color:#e6db74">&#34;Message&#34;</span>)); <span style="color:#75715e">// 带消息断言
-</span></span></span></code></pre></div><h3 id="62-标准c等效">6.2 标准C++等效</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Message&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; <span style="color:#75715e">// 日志
-</span></span></span><span style="display:flex;"><span>assert(ptr <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>); <span style="color:#75715e">// 断言
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span>bCondition) <span style="color:#66d9ef">throw</span> std<span style="color:#f92672">::</span>runtime_error(<span style="color:#e6db74">&#34;Message&#34;</span>); <span style="color:#75715e">// 异常
-</span></span></span></code></pre></div><h2 id="7-最佳实践建议">7. 最佳实践建议</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Message&#34;</span><span class="p">));</span> <span class="c1">// 日志
+</span></span></span><span class="line"><span class="cl"><span class="n">check</span><span class="p">(</span><span class="n">ptr</span> <span class="o">!=</span> <span class="k">nullptr</span><span class="p">);</span> <span class="c1">// 断言
+</span></span></span><span class="line"><span class="cl"><span class="n">ensureMsgf</span><span class="p">(</span><span class="n">bCondition</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Message&#34;</span><span class="p">));</span> <span class="c1">// 带消息断言
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="62-标准c等效">6.2 标准C++等效</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Message&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// 日志
+</span></span></span><span class="line"><span class="cl"><span class="n">assert</span><span class="p">(</span><span class="n">ptr</span> <span class="o">!=</span> <span class="k">nullptr</span><span class="p">);</span> <span class="c1">// 断言
+</span></span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">bCondition</span><span class="p">)</span> <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&#34;Message&#34;</span><span class="p">);</span> <span class="c1">// 异常
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="7-最佳实践建议">7. 最佳实践建议</h2>
 <ol>
 <li><strong>在Unreal项目中</strong>：
 <ul>

@@ -49,6 +49,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -281,7 +283,7 @@
   <meta itemprop="description" content="游戏角色跳跃设计需平衡物理模拟与玩家体验，通过插值平滑跳跃高度、引入跳跃缓冲和跳跃宽限期来优化操作手感，并可根据游戏类型定制重力参数。">
   <meta itemprop="datePublished" content="2024-03-15T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-03-15T00:00:00+08:00">
-  <meta itemprop="wordCount" content="309">
+  <meta itemprop="wordCount" content="348">
   <meta itemprop="keywords" content="游戏设计,跳跃,二段跳,状态机,物理模拟">
 
       <header>
@@ -449,19 +451,40 @@
 <ul>
 <li>
 <p>完整抛物线轨迹计算：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>y(t) = v0 <span style="font-style:italic">* t - 0.5 *</span> g * t²
-</span></span><span style="display:flex;"><span>vy(t) = v0 - g * t
-</span></span></code></pre></div><ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">y(t) = v0 <span class="ge">* t - 0.5 *</span> g * t²
+</span></span><span class="line"><span class="cl">vy(t) = v0 - g * t
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
 <li>
 <p>游戏中的离散化实现（每帧更新）：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Unity示例
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">FixedUpdate</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>isGrounded) {
-</span></span><span style="display:flex;"><span>        velocity.y <span style="color:#f92672">+=</span> gravity <span style="color:#f92672">*</span> Time.fixedDeltaTime;
-</span></span><span style="display:flex;"><span>        transform.position <span style="color:#f92672">+=</span> velocity <span style="color:#f92672">*</span> Time.fixedDeltaTime;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// Unity示例
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">FixedUpdate</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">isGrounded</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">velocity</span><span class="p">.</span><span class="n">y</span> <span class="o">+=</span> <span class="n">gravity</span> <span class="o">*</span> <span class="n">Time</span><span class="p">.</span><span class="n">fixedDeltaTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">transform</span><span class="p">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">velocity</span> <span class="o">*</span> <span class="n">Time</span><span class="p">.</span><span class="n">fixedDeltaTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
 </ul>
 </li>
 </ul>
@@ -500,9 +523,17 @@
 <ul>
 <li>
 <p>空气阻力模型：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 下落终端速度计算</span>
-</span></span><span style="display:flex;"><span>terminal_velocity <span style="color:#f92672">=</span> sqrt((<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> m <span style="color:#f92672">*</span> g) <span style="color:#f92672">/</span> (ρ <span style="color:#f92672">*</span> A <span style="color:#f92672">*</span> C_d))
-</span></span></code></pre></div><p>其中ρ=空气密度，A=角色截面积，C_d=阻力系数（《塞尔达传说：荒野之息》采用动态调整）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 下落终端速度计算</span>
+</span></span><span class="line"><span class="cl"><span class="n">terminal_velocity</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">m</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">ρ</span> <span class="o">*</span> <span class="n">A</span> <span class="o">*</span> <span class="n">C_d</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中ρ=空气密度，A=角色截面积，C_d=阻力系数（《塞尔达传说：荒野之息》采用动态调整）</p>
 </li>
 </ul>
 <hr>
@@ -558,15 +589,29 @@
 <hr>
 <h3 id="三进阶运动机制实现"><strong>三、进阶运动机制实现</strong></h3>
 <h4 id="1-墙体跳跃wall-jump物理模型">1. 墙体跳跃(Wall Jump)物理模型</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// UE5蓝图实现核心逻辑
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">WallJump</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (IsWallSliding()) {
-</span></span><span style="display:flex;"><span>        FVector impulse <span style="color:#f92672">=</span> wallNormal <span style="color:#f92672">*</span> horizontalForce <span style="color:#f92672">+</span> FVector<span style="color:#f92672">::</span>UpVector <span style="color:#f92672">*</span> verticalForce;
-</span></span><span style="display:flex;"><span>        character<span style="color:#f92672">-&gt;</span>AddImpulse(impulse, true);
-</span></span><span style="display:flex;"><span>        doubleJumpCount <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#75715e">// 重置二段跳计数
-</span></span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// UE5蓝图实现核心逻辑
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">WallJump</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">IsWallSliding</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FVector</span> <span class="n">impulse</span> <span class="o">=</span> <span class="n">wallNormal</span> <span class="o">*</span> <span class="n">horizontalForce</span> <span class="o">+</span> <span class="n">FVector</span><span class="o">::</span><span class="n">UpVector</span> <span class="o">*</span> <span class="n">verticalForce</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">character</span><span class="o">-&gt;</span><span class="n">AddImpulse</span><span class="p">(</span><span class="n">impulse</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">doubleJumpCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 重置二段跳计数
+</span></span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
 <li>参数设计要点：
 <ul>
 <li>墙体法线方向的反作用力（通常为200-500单位）</li>
@@ -575,12 +620,23 @@
 </li>
 </ul>
 <h4 id="2-斜坡适应算法">2. 斜坡适应算法</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">adjust_slope_jump</span>():
-</span></span><span style="display:flex;"><span>    slope_angle <span style="color:#f92672">=</span> atan2(ground_normal<span style="color:#f92672">.</span>y, ground_normal<span style="color:#f92672">.</span>x)
-</span></span><span style="display:flex;"><span>    effective_jump_force <span style="color:#f92672">=</span> jump_force <span style="color:#f92672">*</span> cos(slope_angle)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> slope_angle <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">30</span><span style="color:#960050;background-color:#1e0010">°</span>:
-</span></span><span style="display:flex;"><span>        apply_friction(<span style="color:#ae81ff">0.7</span>)  <span style="color:#75715e"># 陡坡减益</span>
-</span></span></code></pre></div><hr>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">adjust_slope_jump</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">slope_angle</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">ground_normal</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ground_normal</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">effective_jump_force</span> <span class="o">=</span> <span class="n">jump_force</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">slope_angle</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">slope_angle</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="err">°</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">apply_friction</span><span class="p">(</span><span class="mf">0.7</span><span class="p">)</span>  <span class="c1"># 陡坡减益</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
 <h3 id="四手感调优方法论"><strong>四、手感调优方法论</strong></h3>
 <h4 id="1-参数敏感度测试矩阵">1. 参数敏感度测试矩阵</h4>
 <table>
@@ -617,12 +673,23 @@
 <ul>
 <li>
 <p>Unity动画曲线应用：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> AnimationCurve jumpArcCurve; 
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UpdateJump() {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">float</span> evalTime = Mathf.Clamp01(jumpTimer / jumpDuration);
-</span></span><span style="display:flex;"><span>    velocity.y = jumpArcCurve.Evaluate(evalTime) * peakHeight;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="n">AnimationCurve</span> <span class="n">jumpArcCurve</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl"><span class="k">void</span> <span class="n">UpdateJump</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">evalTime</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="n">Clamp01</span><span class="p">(</span><span class="n">jumpTimer</span> <span class="p">/</span> <span class="n">jumpDuration</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">velocity</span><span class="p">.</span><span class="n">y</span> <span class="p">=</span> <span class="n">jumpArcCurve</span><span class="p">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">evalTime</span><span class="p">)</span> <span class="p">*</span> <span class="n">peakHeight</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
 <li>典型曲线形态：
 <a href="https://via.placeholder.com/600x400?text=Early&#43;Peak&#43;vs&#43;Late&#43;Peak" target="_blank">https://via.placeholder.com/600x400?text=Early+Peak+vs+Late+Peak</a>
 </li>
@@ -654,12 +721,23 @@
 <ul>
 <li>
 <p>使用SmoothDamp平滑参数过渡：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">float</span> smoothVelocity;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> Update() {
-</span></span><span style="display:flex;"><span>    currentGravity = Mathf.SmoothDamp(currentGravity, targetGravity, 
-</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">ref</span> smoothVelocity, <span style="color:#ae81ff">0.15f</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">smoothVelocity</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">void</span> <span class="n">Update</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">currentGravity</span> <span class="p">=</span> <span class="n">Mathf</span><span class="p">.</span><span class="n">SmoothDamp</span><span class="p">(</span><span class="n">currentGravity</span><span class="p">,</span> <span class="n">targetGravity</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">                                    <span class="k">ref</span> <span class="n">smoothVelocity</span><span class="p">,</span> <span class="m">0.15f</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
 </ul>
 </li>
 </ol>
@@ -707,12 +785,23 @@
 <ol>
 <li>
 <p><strong>可视化调试工具</strong>：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> OnDrawGizmos() {
-</span></span><span style="display:flex;"><span>    Gizmos.color = Color.cyan;
-</span></span><span style="display:flex;"><span>    Gizmos.DrawLine(transform.position, transform.position + velocity);
-</span></span><span style="display:flex;"><span>    Gizmos.DrawWireSphere(predictedLandingPos, <span style="color:#ae81ff">0.5f</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">void</span> <span class="n">OnDrawGizmos</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Gizmos</span><span class="p">.</span><span class="n">color</span> <span class="p">=</span> <span class="n">Color</span><span class="p">.</span><span class="n">cyan</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Gizmos</span><span class="p">.</span><span class="n">DrawLine</span><span class="p">(</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span><span class="p">,</span> <span class="n">transform</span><span class="p">.</span><span class="n">position</span> <span class="p">+</span> <span class="n">velocity</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Gizmos</span><span class="p">.</span><span class="n">DrawWireSphere</span><span class="p">(</span><span class="n">predictedLandingPos</span><span class="p">,</span> <span class="m">0.5f</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
 <li>
 <p><strong>性能敏感点</strong>：</p>
 <ul>

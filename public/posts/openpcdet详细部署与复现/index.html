@@ -46,6 +46,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -278,7 +280,7 @@
   <meta itemprop="description" content="本文详细介绍了在Ubuntu 20.04系统上配置OpenPCDet 3D目标检测工具箱的完整流程，涵盖创建虚拟环境、安装PyTorch与spconv等关键依赖，并最终完成编译和数据导入。">
   <meta itemprop="datePublished" content="2024-10-25T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-10-25T00:00:00+08:00">
-  <meta itemprop="wordCount" content="223">
+  <meta itemprop="wordCount" content="243">
   <meta itemprop="keywords" content="OpenPCDet,环境配置">
 
       <header>
@@ -364,13 +366,34 @@ GPU: NVIDIA GeForce RTX 3090
 cuda：11.3</p>
 <h3 id="配置步骤">配置步骤</h3>
 <h4 id="创建虚拟环境">创建虚拟环境</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>conda create -n pcdet python<span style="color:#f92672">=</span>3.8   
-</span></span></code></pre></div><h4 id="激活进入虚拟环境">激活进入虚拟环境</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>conda activate pcdet
-</span></span></code></pre></div><h4 id="安装pytorch">安装pytorch</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">conda create -n pcdet <span class="nv">python</span><span class="o">=</span>3.8   
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="激活进入虚拟环境">激活进入虚拟环境</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">conda activate pcdet
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="安装pytorch">安装pytorch</h4>
 <p>查看cuda版本</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> nvcc -V  
-</span></span></code></pre></div><p>查看运行结果
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"> nvcc -V  
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看运行结果
 <figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/4b241aa925cb4de2a1df63d6d1271ec4.png" 
@@ -389,23 +412,61 @@ cuda：11.3</p>
 <strong><a href="https://pytorch.org/get-started/previous-versions/" target="_blank">https://pytorch.org/get-started/previous-versions/</a>
 </strong>
 可以使用pip或conda 下载安装，本人选择conda</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>conda install pytorch<span style="color:#f92672">==</span>1.12.1 torchvision<span style="color:#f92672">==</span>0.13.1 torchaudio<span style="color:#f92672">==</span>0.12.1 cudatoolkit<span style="color:#f92672">=</span>11.3 -c pytorch 
-</span></span></code></pre></div><p>安装完成后验证</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python
-</span></span><span style="display:flex;"><span>import torch
-</span></span><span style="display:flex;"><span>torch.cuda.is_available<span style="color:#f92672">()</span>
-</span></span></code></pre></div><p>若返回True，则证明安装成功
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">conda install <span class="nv">pytorch</span><span class="o">==</span>1.12.1 <span class="nv">torchvision</span><span class="o">==</span>0.13.1 <span class="nv">torchaudio</span><span class="o">==</span>0.12.1 <span class="nv">cudatoolkit</span><span class="o">=</span>11.3 -c pytorch 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装完成后验证</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">python
+</span></span><span class="line"><span class="cl">import torch
+</span></span><span class="line"><span class="cl">torch.cuda.is_available<span class="o">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若返回True，则证明安装成功
 退出python</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>quit<span style="color:#f92672">()</span>
-</span></span></code></pre></div><h4 id="安装对应的spconv">安装对应的spconv</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">quit<span class="o">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="安装对应的spconv">安装对应的spconv</h4>
 <p>根据自己服务器的cuda版本查找对应的spconv版本
 <a href="https://gitcode.com/gh_mirrors/sp/spconv?utm_source=csdn_github_accelerator&amp;isLogin=1" target="_blank">https://gitcode.com/gh_mirrors/sp/spconv?utm_source=csdn_github_accelerator&isLogin=1</a>
 </p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>pip install spconv-cu113
-</span></span></code></pre></div><p>验证spconv是否安装成功</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python
-</span></span><span style="display:flex;"><span>import spconv
-</span></span></code></pre></div><p>没有报错则安装成功</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">pip install spconv-cu113
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>验证spconv是否安装成功</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">python
+</span></span><span class="line"><span class="cl">import spconv
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>没有报错则安装成功</p>
 <h4 id="下载安装openpcdet">下载安装OpenPCDet</h4>
 <p><figure style="text-align: center; margin: 1.5rem auto;">
   
@@ -422,8 +483,15 @@ cuda：11.3</p>
   
 </figure></p>
 <p>下载后进入OpenPCDet文件夹中</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>cd OpenPCDet
-</span></span></code></pre></div><p>注意此时要在自己创造的环境中打开该文件夹
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">cd</span> OpenPCDet
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意此时要在自己创造的环境中打开该文件夹
 <figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/7db24f005b9843058674aec5496ccab0.png" 
@@ -439,8 +507,15 @@ cuda：11.3</p>
   
 </figure></p>
 <p>安装OpenPCDet所需环境</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>pip install -r requirements.txt
-</span></span></code></pre></div><p>运行以上命令行可以一键安装，需要注意的是由于之前已经安装过pytorch，将该文件中pytorch相关的注释掉
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">pip install -r requirements.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运行以上命令行可以一键安装，需要注意的是由于之前已经安装过pytorch，将该文件中pytorch相关的注释掉
 <figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/a3b0285a62764898b9838bae9a75aefd.png" 
@@ -458,8 +533,15 @@ cuda：11.3</p>
 <p>由于pip安装速度太慢，我选择了conda安装
 打开该txt文件，对应相关的包conda安装。
 安装需要的包后就可以安装OpenPCDet库了</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python setup.py develop
-</span></span></code></pre></div><p>安装中报错基本是缺少相应的包或者包的版本过新了，把该包remove,选择一个更低版本的包安装基本就可以解决问题。
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">python setup.py develop
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装中报错基本是缺少相应的包或者包的版本过新了，把该包remove,选择一个更低版本的包安装基本就可以解决问题。
 运行setup文件无报错后就可以导入数据复现结果了！</p>
 <h3 id="导入数据集">导入数据集</h3>
 <p>这里我使用的是Kitti公开数据集，可以从官网下载<a href="https://link.zhihu.com/?target=https%3A//www.cvlibs.net/datasets/kitti/" target="_blank">The KITTI Vision Benchmark Suite</a>
@@ -511,8 +593,15 @@ cuda：11.3</p>
   
 </figure></p>
 <p>之后运行以下代码生成相应的数据集配置文件</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python -m pcdet.datasets.kitti.kitti_dataset create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml
-</span></span></code></pre></div><p>生成了以下配置文件
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">python -m pcdet.datasets.kitti.kitti_dataset create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>生成了以下配置文件
 <figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/50b2c6bb94e244368e534b65766cb54c.png" 
@@ -529,8 +618,15 @@ cuda：11.3</p>
 </figure></p>
 <h3 id="模型训练">模型训练</h3>
 <h4 id="进入配置文件夹">进入配置文件夹</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>cd tools
-</span></span></code></pre></div><p>model zoo 几个模型的训练示例</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">cd</span> tools
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>model zoo 几个模型的训练示例</p>
 
 
 
@@ -572,8 +668,15 @@ python train.py &ndash;cfg_file cfgs/kitti_models/second.yaml</p>
 </figure></p>
 <p>将此处的True修改为False</p>
 <p>训练中可以使用以下命令监测GPU的使用情况</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>watch -n 0.5 nvidia-smi
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">watch -n 0.5 nvidia-smi
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/08d5b66d18b44956ae5d188299dcd75d.png" 
        alt="img" 
@@ -628,8 +731,15 @@ python train.py &ndash;cfg_file cfgs/kitti_models/second.yaml</p>
 </figure></p>
 <h4 id="结果可视化">结果可视化</h4>
 <p>训练成功后可运行以下命令进行结果可视化</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python demo.py --cfg_file cfgs/kitti_models/pointrcnn.yaml --data_path ../data/kitti/testing/velodyne/000005.bin --ckpt ../output/kitti_models/pointrcnn/default/ckpt/checkpoint_epoch_80.pth
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">python demo.py --cfg_file cfgs/kitti_models/pointrcnn.yaml --data_path ../data/kitti/testing/velodyne/000005.bin --ckpt ../output/kitti_models/pointrcnn/default/ckpt/checkpoint_epoch_80.pth
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/openpcdet%E8%AF%A6%E7%BB%86%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%A4%8D%E7%8E%B0/94b75f6425a345d397eb102ac1ad02c6.png" 
        alt="img" 
@@ -644,10 +754,24 @@ python train.py &ndash;cfg_file cfgs/kitti_models/second.yaml</p>
   
 </figure></p>
 <p>如果报错提示缺少包open3d 和mayavi，则选择其中一个下载导入就行，实测open3d比mayavi好用，运行下面命令下载open3d(清华源)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>pip install open3d -i https://pypi.tuna.tsinghua.edu.cn/simple
-</span></span></code></pre></div><p>对训练过程中的损失函数等可视化可以运行下面命令</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>tensorboard --logdir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/home/OpenPCDet/output/kitti_models/pointrcnn/default/tensorboard&#34;</span>
-</span></span></code></pre></div><p>会输出以下结果</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">pip install open3d -i https://pypi.tuna.tsinghua.edu.cn/simple
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对训练过程中的损失函数等可视化可以运行下面命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">tensorboard --logdir<span class="o">=</span><span class="s2">&#34;/home/OpenPCDet/output/kitti_models/pointrcnn/default/tensorboard&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>会输出以下结果</p>
 
 
 

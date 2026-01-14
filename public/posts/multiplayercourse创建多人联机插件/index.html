@@ -48,6 +48,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -280,7 +282,7 @@
   <meta itemprop="description" content="在UE5中配置Steam在线子系统，需启用插件、修改项目依赖项并编辑配置文件，以实现多人游戏功能。">
   <meta itemprop="datePublished" content="2024-04-19T00:00:00+00:00">
   <meta itemprop="dateModified" content="2024-04-19T00:00:00+00:00">
-  <meta itemprop="wordCount" content="1236">
+  <meta itemprop="wordCount" content="1659">
   <meta itemprop="keywords" content="UnrealEngine,插件,多人联机,Steam">
 
       <header>
@@ -290,7 +292,7 @@
             Friday, Apr 19, 2024
           
 
-          | <span>6 minute read</span>
+          | <span>8 minute read</span>
 
           
           | <span>Updated at
@@ -377,8 +379,15 @@
   
 </figure></p>
 <p>二、在项目的<code>Build.cs</code>下找到一个<code>PublicDependencyModuleNames</code>,把插件的配置项<code>OnlineSubsystemSteam</code>、<code>OnlineSubsystem</code>添加到其中然后编译</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span>PublicDependencyModuleNames.AddRange(<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">string</span>[] { <span style="color:#e6db74">&#34;Core&#34;</span>, <span style="color:#e6db74">&#34;CoreUObject&#34;</span>, <span style="color:#e6db74">&#34;Engine&#34;</span>, <span style="color:#e6db74">&#34;InputCore&#34;</span>, <span style="color:#e6db74">&#34;HeadMountedDisplay&#34;</span>, <span style="color:#e6db74">&#34;EnhancedInput&#34;</span> ,<span style="color:#e6db74">&#34;OnlineSubsystemSteam&#34;</span>,<span style="color:#e6db74">&#34;OnlineSubsystem&#34;</span>});
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span><span class="k">new</span> <span class="kt">string</span><span class="p">[]</span> <span class="p">{</span> <span class="s">&#34;Core&#34;</span><span class="p">,</span> <span class="s">&#34;CoreUObject&#34;</span><span class="p">,</span> <span class="s">&#34;Engine&#34;</span><span class="p">,</span> <span class="s">&#34;InputCore&#34;</span><span class="p">,</span> <span class="s">&#34;HeadMountedDisplay&#34;</span><span class="p">,</span> <span class="s">&#34;EnhancedInput&#34;</span> <span class="p">,</span><span class="s">&#34;OnlineSubsystemSteam&#34;</span><span class="p">,</span><span class="s">&#34;OnlineSubsystem&#34;</span><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/multiplayercourse%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/image-20250419145217432.png" 
        alt="image-20250419145217432" 
@@ -393,22 +402,43 @@
   
 </figure></p>
 <p>三、在<code>项目/config/DefaultEngine.ini</code>中添加下面代码</p>
-<pre tabindex="0"><code>[/Script/Engine.GameEngine]
-	+NetDriverDefinitions=(DefName=&#34;GameNetDriver&#34;,DriverClassName=&#34;OnlineSubsystemSteam.SteamNetDriver&#34;,DriverClassNameFallback=&#34;OnlineSubsystemUtils.IpNetDriver&#34;)
- 
-	[OnlineSubsystem]
-	DefaultPlatformService=Steam
- 
-	[OnlineSubsystemSteam]
-	bEnabled=true
-	SteamDevAppId=480
- 
-	; If using Sessions
-	; bInitServerOnClient=true
- 
-	[/Script/OnlineSubsystemSteam.SteamNetDriver]
-	NetConnectionClassName=&#34;OnlineSubsystemSteam.SteamNetConnection&#34;
-</code></pre><p>注意：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[/Script/Engine.GameEngine]
+</span></span><span class="line"><span class="cl">	+NetDriverDefinitions=(DefName=&#34;GameNetDriver&#34;,DriverClassName=&#34;OnlineSubsystemSteam.SteamNetDriver&#34;,DriverClassNameFallback=&#34;OnlineSubsystemUtils.IpNetDriver&#34;)
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">	[OnlineSubsystem]
+</span></span><span class="line"><span class="cl">	DefaultPlatformService=Steam
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">	[OnlineSubsystemSteam]
+</span></span><span class="line"><span class="cl">	bEnabled=true
+</span></span><span class="line"><span class="cl">	SteamDevAppId=480
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">	; If using Sessions
+</span></span><span class="line"><span class="cl">	; bInitServerOnClient=true
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">	[/Script/OnlineSubsystemSteam.SteamNetDriver]
+</span></span><span class="line"><span class="cl">	NetConnectionClassName=&#34;OnlineSubsystemSteam.SteamNetConnection&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
 <ul>
 <li>
 <p>此处<code>SteamDevAppId=480</code>的ID是一个示范项目(星空)的ID</p>
@@ -423,9 +453,17 @@
 <h3 id="在character类中添加引用">在<code>Character</code>类中添加引用</h3>
 <p>一、修改头文件<code>Character.h</code>为其添加管理在线游戏会话的智能指针声明，在类底部写一个新的<code>public</code>关键字用于区分系统源码与我们书写的代码</p>
 <p>添加如下代码：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    TSharedPtr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IOnlineSession</span>, ESPMode<span style="color:#f92672">::</span>ThreadSafe<span style="color:#f92672">&gt;</span> OnlineSessionInterface;
-</span></span></code></pre></div><p>修改解释：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">IOnlineSession</span><span class="p">,</span> <span class="n">ESPMode</span><span class="o">::</span><span class="n">ThreadSafe</span><span class="o">&gt;</span> <span class="n">OnlineSessionInterface</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改解释：</p>
 <p><code>TSharedPtr</code>:<strong>Unreal Engine 的智能指针</strong>，类似标准库的 <code>std::shared_ptr</code>，但针对 UE 的内存管理优化。</p>
 <p><code>&lt;class IOnlineSession, ESPMode::ThreadSafe&gt;</code>:</p>
 <ul>
@@ -434,28 +472,60 @@
 </ul>
 <p>二、修改<code>Character.cpp</code>文件的头文件引用和构造函数</p>
 <p>添加头文件：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;OnlineSubsystem.h&#34;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;Interfaces/OnlineSessionInterface.h&#34;</span><span style="color:#75715e">
-</span></span></span></code></pre></div><p>找到析构函数在最后面添加：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">//获取在线子系统实例
-</span></span></span><span style="display:flex;"><span>IOnlineSubsystem<span style="color:#f92672">*</span> OnlineSubsystem <span style="color:#f92672">=</span> IOnlineSubsystem<span style="color:#f92672">::</span>Get();
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (OnlineSubsystem)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//获取会话接口
-</span></span></span><span style="display:flex;"><span>    OnlineSessionInterface <span style="color:#f92672">=</span> OnlineSubsystem<span style="color:#f92672">-&gt;</span>GetSessionInterface();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (GEngine)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//输出的到日志
-</span></span></span><span style="display:flex;"><span>        GEngine<span style="color:#f92672">-&gt;</span>AddOnScreenDebugMessage(
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>,   <span style="color:#75715e">// Key（-1 表示自动生成唯一标识）
-</span></span></span><span style="display:flex;"><span>            <span style="color:#ae81ff">15.f</span>,
-</span></span><span style="display:flex;"><span>            FColor<span style="color:#f92672">::</span>Blue,
-</span></span><span style="display:flex;"><span>            FString<span style="color:#f92672">::</span>Printf(TEXT(<span style="color:#e6db74">&#34;Found subsystem %s&#34;</span>), <span style="color:#f92672">*</span>OnlineSubsystem<span style="color:#f92672">-&gt;</span>GetSubsystemName().ToString())
-</span></span><span style="display:flex;"><span>        );
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p><code>CTRL+Shift+B</code>快捷键编译内容检查是否有错误</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;OnlineSubsystem.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Interfaces/OnlineSessionInterface.h&#34;</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>找到析构函数在最后面添加：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//获取在线子系统实例
+</span></span></span><span class="line"><span class="cl"><span class="n">IOnlineSubsystem</span><span class="o">*</span> <span class="n">OnlineSubsystem</span> <span class="o">=</span> <span class="n">IOnlineSubsystem</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">OnlineSubsystem</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取会话接口
+</span></span></span><span class="line"><span class="cl">    <span class="n">OnlineSessionInterface</span> <span class="o">=</span> <span class="n">OnlineSubsystem</span><span class="o">-&gt;</span><span class="n">GetSessionInterface</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">GEngine</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//输出的到日志
+</span></span></span><span class="line"><span class="cl">        <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">AddOnScreenDebugMessage</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>   <span class="c1">// Key（-1 表示自动生成唯一标识）
+</span></span></span><span class="line"><span class="cl">            <span class="mf">15.f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FColor</span><span class="o">::</span><span class="n">Blue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FString</span><span class="o">::</span><span class="n">Printf</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Found subsystem %s&#34;</span><span class="p">),</span> <span class="o">*</span><span class="n">OnlineSubsystem</span><span class="o">-&gt;</span><span class="n">GetSubsystemName</span><span class="p">().</span><span class="n">ToString</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>CTRL+Shift+B</code>快捷键编译内容检查是否有错误</p>
 
 
 
@@ -538,47 +608,122 @@
 </figure></p>
 <h4 id="对characterh进行修改">对<code>Character.h</code>进行修改</h4>
 <p>在导包处添加</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;Interfaces/OnlineSessionInterface.h&#34;</span><span style="color:#75715e">
-</span></span></span></code></pre></div><p>删除之前自己在<code>public</code>处写的：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>TSharedPtr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IOnlineSession</span>, ESPMode<span style="color:#f92672">::</span>ThreadSafe<span style="color:#f92672">&gt;</span> OnlineSessionInterface;
-</span></span></code></pre></div><p>修改为：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>IOnlineSessionPtr OnlineSessionInterface;
-</span></span></code></pre></div><p>在下面添加暴露给蓝图的函数以及用于同步事件的委托：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">//暴露给蓝图的创建会话
-</span></span></span><span style="display:flex;"><span>	UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">void</span> CreateGameSession();
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">//暴露给蓝图的加入会话
-</span></span></span><span style="display:flex;"><span>	UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">void</span> JoinGameSession();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// 会话创建完成回调
-</span></span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnCreateSessionComplete</span>(FName SessionName, <span style="color:#66d9ef">bool</span> bWasSuccessful);
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// 会话搜索完成回调
-</span></span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnFindSessionsComplete</span>(<span style="color:#66d9ef">bool</span> bWasSuccessful);
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">//加入会话完成回调
-</span></span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnJoinSessionComplete</span>(FName SessionName, EOnJoinSessionCompleteResult<span style="color:#f92672">::</span>Type Result); 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">//下面的委托写法为虚幻OnlineSubsystem特有的委托写法，与虚幻原生的委托并不一样
-</span></span></span><span style="display:flex;"><span>	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;  <span style="color:#75715e">// 会话创建完成的委托
-</span></span></span><span style="display:flex;"><span>	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;    <span style="color:#75715e">// 会话搜索完成的委托
-</span></span></span><span style="display:flex;"><span>	TSharedPtr<span style="color:#f92672">&lt;</span>FOnlineSessionSearch<span style="color:#f92672">&gt;</span> SessionSearch;                  <span style="color:#75715e">// 会话搜索参数
-</span></span></span><span style="display:flex;"><span>	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;		<span style="color:#75715e">// 会话加入完成委托（OnlineSubsystem专用）
-</span></span></span></code></pre></div><h4 id="对charactercpp进行修改">对<code>Character.cpp</code>进行修改</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Interfaces/OnlineSessionInterface.h&#34;</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>删除之前自己在<code>public</code>处写的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">IOnlineSession</span><span class="p">,</span> <span class="n">ESPMode</span><span class="o">::</span><span class="n">ThreadSafe</span><span class="o">&gt;</span> <span class="n">OnlineSessionInterface</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">IOnlineSessionPtr</span> <span class="n">OnlineSessionInterface</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在下面添加暴露给蓝图的函数以及用于同步事件的委托：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//暴露给蓝图的创建会话
+</span></span></span><span class="line"><span class="cl">	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="n">CreateGameSession</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//暴露给蓝图的加入会话
+</span></span></span><span class="line"><span class="cl">	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="n">JoinGameSession</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// 会话创建完成回调
+</span></span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">OnCreateSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// 会话搜索完成回调
+</span></span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">OnFindSessionsComplete</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//加入会话完成回调
+</span></span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">OnJoinSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="n">EOnJoinSessionCompleteResult</span><span class="o">::</span><span class="n">Type</span> <span class="n">Result</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//下面的委托写法为虚幻OnlineSubsystem特有的委托写法，与虚幻原生的委托并不一样
+</span></span></span><span class="line"><span class="cl">	<span class="n">FOnCreateSessionCompleteDelegate</span> <span class="n">CreateSessionCompleteDelegate</span><span class="p">;</span>  <span class="c1">// 会话创建完成的委托
+</span></span></span><span class="line"><span class="cl">	<span class="n">FOnFindSessionsCompleteDelegate</span> <span class="n">FindSessionsCompleteDelegate</span><span class="p">;</span>    <span class="c1">// 会话搜索完成的委托
+</span></span></span><span class="line"><span class="cl">	<span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FOnlineSessionSearch</span><span class="o">&gt;</span> <span class="n">SessionSearch</span><span class="p">;</span>                  <span class="c1">// 会话搜索参数
+</span></span></span><span class="line"><span class="cl">	<span class="n">FOnJoinSessionCompleteDelegate</span> <span class="n">JoinSessionCompleteDelegate</span><span class="p">;</span>		<span class="c1">// 会话加入完成委托（OnlineSubsystem专用）
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="对charactercpp进行修改">对<code>Character.cpp</code>进行修改</h4>
 <p>首先在cpp文件最上面导包的部分用</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;OnlineSessionSettings.h&#34;</span><span style="color:#75715e">
-</span></span></span></code></pre></div><p>替换原来的</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;Interfaces/OnlineSessionInterface.h&#34;</span><span style="color:#75715e">
-</span></span></span></code></pre></div><p>然后将<code>AMenuSystemCharacter类</code>头的部分修改为:</p>
-<pre tabindex="0"><code>AMenuSystemCharacter::AMenuSystemCharacter():
-	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &amp;ThisClass::OnCreateSessionComplete)),
-    FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &amp;ThisClass::OnFindSessionsComplete)),
- 	JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &amp;ThisClass::OnJoinSessionComplete))
-{
-    // 构造函数主体...
-}
-</code></pre><p>这是一种虚幻引擎中<strong>委托绑定</strong>的高级用法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;OnlineSessionSettings.h&#34;</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>替换原来的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Interfaces/OnlineSessionInterface.h&#34;</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后将<code>AMenuSystemCharacter类</code>头的部分修改为:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AMenuSystemCharacter::AMenuSystemCharacter():
+</span></span><span class="line"><span class="cl">	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &amp;ThisClass::OnCreateSessionComplete)),
+</span></span><span class="line"><span class="cl">    FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &amp;ThisClass::OnFindSessionsComplete)),
+</span></span><span class="line"><span class="cl"> 	JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &amp;ThisClass::OnJoinSessionComplete))
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">    // 构造函数主体...
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这是一种虚幻引擎中<strong>委托绑定</strong>的高级用法</p>
 <ol>
 <li><strong>成员初始化列表绑定</strong>：在对象构造阶段直接绑定委托</li>
 <li><strong><code>CreateUObject</code> 方法</strong>：虚幻提供的安全绑定工具</li>
@@ -596,187 +741,392 @@
 <p>在<code>.cpp</code>文件中实现<code>.h</code>文件中定义过的函数与回调函数：</p>
 <h5 id="实现createsession功能">实现<code>CreateSession</code>功能：</h5>
 <p><code>CreateGameSession</code>函数实现：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> AMenuSystemCharacter<span style="color:#f92672">::</span>CreateGameSession()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 当按下1键时调用此函数（创建游戏会话）
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 检查在线会话接口是否有效
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>OnlineSessionInterface.IsValid())
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 如果接口无效（可能网络未连接或在线子系统未初始化）
-</span></span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;OnlineSessionInterface is invalid!&#34;</span>));
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 检查是否已存在同名游戏会话
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">auto</span> ExistingSession <span style="color:#f92672">=</span> OnlineSessionInterface<span style="color:#f92672">-&gt;</span>GetNamedSession(NAME_GameSession);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (ExistingSession <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 销毁已有会话（避免冲突）
-</span></span></span><span style="display:flex;"><span>        OnlineSessionInterface<span style="color:#f92672">-&gt;</span>DestroySession(NAME_GameSession);
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 注意：实际项目应等待DestroySession完成回调后再创建新会话
-</span></span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Log, TEXT(<span style="color:#e6db74">&#34;Existing session destroyed&#34;</span>));
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 绑定会话创建完成委托（已在构造函数初始化）
-</span></span></span><span style="display:flex;"><span>    OnlineSessionInterface<span style="color:#f92672">-&gt;</span>AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 配置会话参数
-</span></span></span><span style="display:flex;"><span>    TSharedPtr<span style="color:#f92672">&lt;</span>FOnlineSessionSettings<span style="color:#f92672">&gt;</span> SessionSettings <span style="color:#f92672">=</span> MakeShareable(<span style="color:#66d9ef">new</span> FOnlineSessionSettings());
-</span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>bIsLANMatch <span style="color:#f92672">=</span> false;            <span style="color:#75715e">// 互联网连接
-</span></span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>NumPublicConnections <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>;       <span style="color:#75715e">// 最大4名玩家
-</span></span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>bAllowJoinInProgress <span style="color:#f92672">=</span> true;    <span style="color:#75715e">// 允许中途加入
-</span></span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>bAllowJoinViaPresence <span style="color:#f92672">=</span> true;  <span style="color:#75715e">// 允许通过好友加入
-</span></span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>bShouldAdvertise <span style="color:#f92672">=</span> true;       <span style="color:#75715e">// 公开会话
-</span></span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>bUsesPresence <span style="color:#f92672">=</span> true;          <span style="color:#75715e">// 使用平台在线状态
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 设置自定义匹配类型（用于筛选特定游戏模式）
-</span></span></span><span style="display:flex;"><span>    SessionSettings<span style="color:#f92672">-&gt;</span>Set(
-</span></span><span style="display:flex;"><span>        FName(<span style="color:#e6db74">&#34;MatchType&#34;</span>),
-</span></span><span style="display:flex;"><span>        FString(<span style="color:#e6db74">&#34;FreeForAll&#34;</span>),
-</span></span><span style="display:flex;"><span>        EOnlineDataAdvertisementType<span style="color:#f92672">::</span>ViaOnlineServiceAndPing
-</span></span><span style="display:flex;"><span>    );
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 获取本地玩家网络ID并创建会话
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">const</span> ULocalPlayer<span style="color:#f92672">*</span> LocalPlayer <span style="color:#f92672">=</span> GetWorld()<span style="color:#f92672">-&gt;</span>GetFirstLocalPlayerFromController())
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        OnlineSessionInterface<span style="color:#f92672">-&gt;</span>CreateSession(
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">*</span>LocalPlayer<span style="color:#f92672">-&gt;</span>GetPreferredUniqueNetId(),  <span style="color:#75715e">// 玩家唯一ID
-</span></span></span><span style="display:flex;"><span>            NAME_GameSession,                         <span style="color:#75715e">// 会话名称
-</span></span></span><span style="display:flex;"><span>            <span style="color:#f92672">*</span>SessionSettings                         <span style="color:#75715e">// 会话配置
-</span></span></span><span style="display:flex;"><span>        );
-</span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Log, TEXT(<span style="color:#e6db74">&#34;Session creation requested&#34;</span>));
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>回调<code>OnCreateSessionComplete</code>函数实现：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> AMenuSystemCharacter<span style="color:#f92672">::</span>OnCreateSessionComplete(FName SessionName, <span style="color:#66d9ef">bool</span> bWasSuccessful)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 会话创建完成回调
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (bWasSuccessful)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 成功时跳转至大厅地图
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (GEngine)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            GEngine<span style="color:#f92672">-&gt;</span>AddOnScreenDebugMessage(
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">15.f</span>, FColor<span style="color:#f92672">::</span>Blue,
-</span></span><span style="display:flex;"><span>                FString<span style="color:#f92672">::</span>Printf(TEXT(<span style="color:#e6db74">&#34;Session created: %s&#34;</span>), <span style="color:#f92672">*</span>SessionName.ToString())
-</span></span><span style="display:flex;"><span>            );
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 服务器端地图跳转（?listen表示作为监听服务器）
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (UWorld<span style="color:#f92672">*</span> World <span style="color:#f92672">=</span> GetWorld())
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            World<span style="color:#f92672">-&gt;</span>ServerTravel(<span style="color:#e6db74">&#34;/Game/ThirdPerson/Maps/Lobby?listen&#34;</span>);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 失败处理
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (GEngine)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            GEngine<span style="color:#f92672">-&gt;</span>AddOnScreenDebugMessage(
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">15.f</span>, FColor<span style="color:#f92672">::</span>Red,
-</span></span><span style="display:flex;"><span>                TEXT(<span style="color:#e6db74">&#34;Failed to create session!&#34;</span>)
-</span></span><span style="display:flex;"><span>            );
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h5 id="实现joinsession功能">实现<code>JoinSession</code>功能：</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AMenuSystemCharacter</span><span class="o">::</span><span class="n">CreateGameSession</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 当按下1键时调用此函数（创建游戏会话）
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 检查在线会话接口是否有效
+</span></span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">OnlineSessionInterface</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 如果接口无效（可能网络未连接或在线子系统未初始化）
+</span></span></span><span class="line"><span class="cl">        <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;OnlineSessionInterface is invalid!&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 检查是否已存在同名游戏会话
+</span></span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">ExistingSession</span> <span class="o">=</span> <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">GetNamedSession</span><span class="p">(</span><span class="n">NAME_GameSession</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">ExistingSession</span> <span class="o">!=</span> <span class="k">nullptr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 销毁已有会话（避免冲突）
+</span></span></span><span class="line"><span class="cl">        <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">DestroySession</span><span class="p">(</span><span class="n">NAME_GameSession</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 注意：实际项目应等待DestroySession完成回调后再创建新会话
+</span></span></span><span class="line"><span class="cl">        <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Log</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Existing session destroyed&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 绑定会话创建完成委托（已在构造函数初始化）
+</span></span></span><span class="line"><span class="cl">    <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">AddOnCreateSessionCompleteDelegate_Handle</span><span class="p">(</span><span class="n">CreateSessionCompleteDelegate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 配置会话参数
+</span></span></span><span class="line"><span class="cl">    <span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FOnlineSessionSettings</span><span class="o">&gt;</span> <span class="n">SessionSettings</span> <span class="o">=</span> <span class="n">MakeShareable</span><span class="p">(</span><span class="k">new</span> <span class="n">FOnlineSessionSettings</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">bIsLANMatch</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>            <span class="c1">// 互联网连接
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">NumPublicConnections</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>       <span class="c1">// 最大4名玩家
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">bAllowJoinInProgress</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>    <span class="c1">// 允许中途加入
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">bAllowJoinViaPresence</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>  <span class="c1">// 允许通过好友加入
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">bShouldAdvertise</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>       <span class="c1">// 公开会话
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">bUsesPresence</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>          <span class="c1">// 使用平台在线状态
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置自定义匹配类型（用于筛选特定游戏模式）
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FName</span><span class="p">(</span><span class="s">&#34;MatchType&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FString</span><span class="p">(</span><span class="s">&#34;FreeForAll&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">EOnlineDataAdvertisementType</span><span class="o">::</span><span class="n">ViaOnlineServiceAndPing</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取本地玩家网络ID并创建会话
+</span></span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">const</span> <span class="n">ULocalPlayer</span><span class="o">*</span> <span class="n">LocalPlayer</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstLocalPlayerFromController</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">CreateSession</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="o">*</span><span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetPreferredUniqueNetId</span><span class="p">(),</span>  <span class="c1">// 玩家唯一ID
+</span></span></span><span class="line"><span class="cl">            <span class="n">NAME_GameSession</span><span class="p">,</span>                         <span class="c1">// 会话名称
+</span></span></span><span class="line"><span class="cl">            <span class="o">*</span><span class="n">SessionSettings</span>                         <span class="c1">// 会话配置
+</span></span></span><span class="line"><span class="cl">        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Log</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Session creation requested&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回调<code>OnCreateSessionComplete</code>函数实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AMenuSystemCharacter</span><span class="o">::</span><span class="n">OnCreateSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 会话创建完成回调
+</span></span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">bWasSuccessful</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 成功时跳转至大厅地图
+</span></span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">GEngine</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">AddOnScreenDebugMessage</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">15.f</span><span class="p">,</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Blue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">FString</span><span class="o">::</span><span class="n">Printf</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Session created: %s&#34;</span><span class="p">),</span> <span class="o">*</span><span class="n">SessionName</span><span class="p">.</span><span class="n">ToString</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// 服务器端地图跳转（?listen表示作为监听服务器）
+</span></span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">UWorld</span><span class="o">*</span> <span class="n">World</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">World</span><span class="o">-&gt;</span><span class="n">ServerTravel</span><span class="p">(</span><span class="s">&#34;/Game/ThirdPerson/Maps/Lobby?listen&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 失败处理
+</span></span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">GEngine</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">AddOnScreenDebugMessage</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">15.f</span><span class="p">,</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Red</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Failed to create session!&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h5 id="实现joinsession功能">实现<code>JoinSession</code>功能：</h5>
 <p><code>JoinGameSession</code>函数：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> AMenuSystemCharacter<span style="color:#f92672">::</span>JoinGameSession()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 当玩家请求加入游戏时调用
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>OnlineSessionInterface.IsValid())
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;OnlineSessionInterface is invalid!&#34;</span>));
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 绑定会话搜索完成委托
-</span></span></span><span style="display:flex;"><span>    OnlineSessionInterface<span style="color:#f92672">-&gt;</span>AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 配置搜索条件
-</span></span></span><span style="display:flex;"><span>    SessionSearch <span style="color:#f92672">=</span> MakeShareable(<span style="color:#66d9ef">new</span> FOnlineSessionSearch());
-</span></span><span style="display:flex;"><span>    SessionSearch<span style="color:#f92672">-&gt;</span>MaxSearchResults <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;          <span style="color:#75715e">// 最大搜索结果数
-</span></span></span><span style="display:flex;"><span>    SessionSearch<span style="color:#f92672">-&gt;</span>bIsLanQuery <span style="color:#f92672">=</span> false;             <span style="color:#75715e">// 仅搜索互联网会话
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 设置必须支持Presence（确保找到的是好友/公开会话）
-</span></span></span><span style="display:flex;"><span>    SessionSearch<span style="color:#f92672">-&gt;</span>QuerySettings.Set(
-</span></span><span style="display:flex;"><span>        SEARCH_PRESENCE,
-</span></span><span style="display:flex;"><span>        true,
-</span></span><span style="display:flex;"><span>        EOnlineComparisonOp<span style="color:#f92672">::</span>Equals
-</span></span><span style="display:flex;"><span>    );
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 开始搜索会话
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">const</span> ULocalPlayer<span style="color:#f92672">*</span> LocalPlayer <span style="color:#f92672">=</span> GetWorld()<span style="color:#f92672">-&gt;</span>GetFirstLocalPlayerFromController())
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        OnlineSessionInterface<span style="color:#f92672">-&gt;</span>FindSessions(
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">*</span>LocalPlayer<span style="color:#f92672">-&gt;</span>GetPreferredUniqueNetId(),
-</span></span><span style="display:flex;"><span>            SessionSearch.ToSharedRef()
-</span></span><span style="display:flex;"><span>        );
-</span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Log, TEXT(<span style="color:#e6db74">&#34;Session search started&#34;</span>));
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>回调函数<code>OnFindSessionsComplet</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> AMenuSystemCharacter<span style="color:#f92672">::</span>OnFindSessionsComplete(<span style="color:#66d9ef">bool</span> bWasSuccessful)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 会话搜索完成回调
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>OnlineSessionInterface.IsValid() <span style="color:#f92672">||</span> <span style="color:#f92672">!</span>SessionSearch.IsValid())
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 遍历所有搜索结果
-</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> FOnlineSessionSearchResult<span style="color:#f92672">&amp;</span> Result : SessionSearch<span style="color:#f92672">-&gt;</span>SearchResults)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 提取会话信息
-</span></span></span><span style="display:flex;"><span>        FString MatchType;
-</span></span><span style="display:flex;"><span>        Result.Session.SessionSettings.Get(<span style="color:#e6db74">&#34;MatchType&#34;</span>, MatchType);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 只加入匹配类型的会话
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (MatchType <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;FreeForAll&#34;</span>)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 绑定加入会话完成委托
-</span></span></span><span style="display:flex;"><span>            OnlineSessionInterface<span style="color:#f92672">-&gt;</span>AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 发起加入请求
-</span></span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">const</span> ULocalPlayer<span style="color:#f92672">*</span> LocalPlayer <span style="color:#f92672">=</span> GetWorld()<span style="color:#f92672">-&gt;</span>GetFirstLocalPlayerFromController())
-</span></span><span style="display:flex;"><span>            {
-</span></span><span style="display:flex;"><span>                OnlineSessionInterface<span style="color:#f92672">-&gt;</span>JoinSession(
-</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">*</span>LocalPlayer<span style="color:#f92672">-&gt;</span>GetPreferredUniqueNetId(),
-</span></span><span style="display:flex;"><span>                    NAME_GameSession,
-</span></span><span style="display:flex;"><span>                    Result
-</span></span><span style="display:flex;"><span>                );
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>; <span style="color:#75715e">// 只加入第一个匹配的会话
-</span></span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>回调函数<code>OnJoinSessionComplete</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> AMenuSystemCharacter<span style="color:#f92672">::</span>OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult<span style="color:#f92672">::</span>Type Result)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 加入会话完成回调
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (Result <span style="color:#f92672">!=</span> EOnJoinSessionCompleteResult<span style="color:#f92672">::</span>Success)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;Join session failed with code: %d&#34;</span>), Result);
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 获取服务器连接地址
-</span></span></span><span style="display:flex;"><span>    FString ConnectString;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (OnlineSessionInterface<span style="color:#f92672">-&gt;</span>GetResolvedConnectString(NAME_GameSession, ConnectString))
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 客户端跳转到目标服务器
-</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (APlayerController<span style="color:#f92672">*</span> PlayerController <span style="color:#f92672">=</span> GetGameInstance()<span style="color:#f92672">-&gt;</span>GetFirstLocalPlayerController())
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            PlayerController<span style="color:#f92672">-&gt;</span>ClientTravel(ConnectString, TRAVEL_Absolute);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>几个函数的调用逻辑：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AMenuSystemCharacter</span><span class="o">::</span><span class="n">JoinGameSession</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 当玩家请求加入游戏时调用
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">OnlineSessionInterface</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;OnlineSessionInterface is invalid!&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 绑定会话搜索完成委托
+</span></span></span><span class="line"><span class="cl">    <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">AddOnFindSessionsCompleteDelegate_Handle</span><span class="p">(</span><span class="n">FindSessionsCompleteDelegate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 配置搜索条件
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSearch</span> <span class="o">=</span> <span class="n">MakeShareable</span><span class="p">(</span><span class="k">new</span> <span class="n">FOnlineSessionSearch</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SessionSearch</span><span class="o">-&gt;</span><span class="n">MaxSearchResults</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>          <span class="c1">// 最大搜索结果数
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSearch</span><span class="o">-&gt;</span><span class="n">bIsLanQuery</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>             <span class="c1">// 仅搜索互联网会话
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置必须支持Presence（确保找到的是好友/公开会话）
+</span></span></span><span class="line"><span class="cl">    <span class="n">SessionSearch</span><span class="o">-&gt;</span><span class="n">QuerySettings</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">SEARCH_PRESENCE</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">EOnlineComparisonOp</span><span class="o">::</span><span class="n">Equals</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 开始搜索会话
+</span></span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">const</span> <span class="n">ULocalPlayer</span><span class="o">*</span> <span class="n">LocalPlayer</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstLocalPlayerFromController</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">FindSessions</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="o">*</span><span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetPreferredUniqueNetId</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">SessionSearch</span><span class="p">.</span><span class="n">ToSharedRef</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Log</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Session search started&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回调函数<code>OnFindSessionsComplet</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AMenuSystemCharacter</span><span class="o">::</span><span class="n">OnFindSessionsComplete</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 会话搜索完成回调
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">OnlineSessionInterface</span><span class="p">.</span><span class="n">IsValid</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="n">SessionSearch</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 遍历所有搜索结果
+</span></span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">FOnlineSessionSearchResult</span><span class="o">&amp;</span> <span class="nl">Result</span> <span class="p">:</span> <span class="n">SessionSearch</span><span class="o">-&gt;</span><span class="n">SearchResults</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 提取会话信息
+</span></span></span><span class="line"><span class="cl">        <span class="n">FString</span> <span class="n">MatchType</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Result</span><span class="p">.</span><span class="n">Session</span><span class="p">.</span><span class="n">SessionSettings</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s">&#34;MatchType&#34;</span><span class="p">,</span> <span class="n">MatchType</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// 只加入匹配类型的会话
+</span></span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">MatchType</span> <span class="o">==</span> <span class="s">&#34;FreeForAll&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 绑定加入会话完成委托
+</span></span></span><span class="line"><span class="cl">            <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">AddOnJoinSessionCompleteDelegate_Handle</span><span class="p">(</span><span class="n">JoinSessionCompleteDelegate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// 发起加入请求
+</span></span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="k">const</span> <span class="n">ULocalPlayer</span><span class="o">*</span> <span class="n">LocalPlayer</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstLocalPlayerFromController</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">JoinSession</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                    <span class="o">*</span><span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetPreferredUniqueNetId</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">NAME_GameSession</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">Result</span>
+</span></span><span class="line"><span class="cl">                <span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span> <span class="c1">// 只加入第一个匹配的会话
+</span></span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回调函数<code>OnJoinSessionComplete</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AMenuSystemCharacter</span><span class="o">::</span><span class="n">OnJoinSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="n">EOnJoinSessionCompleteResult</span><span class="o">::</span><span class="n">Type</span> <span class="n">Result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 加入会话完成回调
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">Result</span> <span class="o">!=</span> <span class="n">EOnJoinSessionCompleteResult</span><span class="o">::</span><span class="n">Success</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Join session failed with code: %d&#34;</span><span class="p">),</span> <span class="n">Result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取服务器连接地址
+</span></span></span><span class="line"><span class="cl">    <span class="n">FString</span> <span class="n">ConnectString</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">OnlineSessionInterface</span><span class="o">-&gt;</span><span class="n">GetResolvedConnectString</span><span class="p">(</span><span class="n">NAME_GameSession</span><span class="p">,</span> <span class="n">ConnectString</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 客户端跳转到目标服务器
+</span></span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">GetGameInstance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstLocalPlayerController</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">ClientTravel</span><span class="p">(</span><span class="n">ConnectString</span><span class="p">,</span> <span class="n">TRAVEL_Absolute</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>几个函数的调用逻辑：</p>
 <pre class="mermaid">
   flowchart TD
     subgraph 构造函数初始化
@@ -859,8 +1209,15 @@
   <blockquote>
     <p><strong>注意</strong>⚠️ 如果报了<code>Fail to Find a session</code>的错误</p>
 <p>确认网络没有问题，在<code>CreateGameSession</code>函数中<code>SessionSettings</code>部分添加一句</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>SessionSettings<span style="color:#f92672">-&gt;</span>bUseLobbiesIfAvailable <span style="color:#f92672">=</span> true;
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">SessionSettings</span><span class="o">-&gt;</span><span class="n">bUseLobbiesIfAvailable</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
   </blockquote>
 
 
@@ -946,27 +1303,58 @@
 </figure></p>
 <p>编译完成后在<code>MultiplayerSession.uplugin</code>和<code>MultiplayerSessions.Build.cs</code>中添加开发插件需要的插件和模组：</p>
 <p>在<code>MultiplayerSession.uplugin</code>添加在线子系统插件，并设置为<code>Enabled</code>为<code>true</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;Plugins&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
-</span></span><span style="display:flex;"><span> 		{
-</span></span><span style="display:flex;"><span> 			<span style="color:#f92672">&#34;Name&#34;</span>: <span style="color:#e6db74">&#34;OnlineSubsystem&#34;</span>,
-</span></span><span style="display:flex;"><span> 			<span style="color:#f92672">&#34;Enabled&#34;</span>: <span style="color:#66d9ef">true</span>
-</span></span><span style="display:flex;"><span> 		},
-</span></span><span style="display:flex;"><span> 		{
-</span></span><span style="display:flex;"><span> 			<span style="color:#f92672">&#34;Name&#34;</span>: <span style="color:#e6db74">&#34;OnlineSubsystemSteam&#34;</span>,
-</span></span><span style="display:flex;"><span> 			<span style="color:#f92672">&#34;Enabled&#34;</span>: <span style="color:#66d9ef">true</span>
-</span></span><span style="display:flex;"><span> 		}
-</span></span><span style="display:flex;"><span> 	]
-</span></span></code></pre></div><p>中<code>MultiplayerSessions.Build.cs</code>中添加编译需要的ModuleName</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span>PublicDependencyModuleNames.AddRange(
-</span></span><span style="display:flex;"><span> 			<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">string</span>[]
-</span></span><span style="display:flex;"><span> 			{
-</span></span><span style="display:flex;"><span> 				<span style="color:#e6db74">&#34;Core&#34;</span>,
-</span></span><span style="display:flex;"><span> 				<span style="color:#e6db74">&#34;OnlineSubsystem&#34;</span>,
-</span></span><span style="display:flex;"><span> 				<span style="color:#e6db74">&#34;OnlineSubsystemSteam&#34;</span>,
-</span></span><span style="display:flex;"><span> 				<span style="color:#75715e">// ... add other public dependencies that you statically link with here ...</span>
-</span></span><span style="display:flex;"><span> 			}
-</span></span><span style="display:flex;"><span> 			);
-</span></span></code></pre></div><p>重新编译即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl">	<span class="s2">&#34;Plugins&#34;</span><span class="err">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl"> 		<span class="p">{</span>
+</span></span><span class="line"><span class="cl"> 			<span class="nt">&#34;Name&#34;</span><span class="p">:</span> <span class="s2">&#34;OnlineSubsystem&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> 			<span class="nt">&#34;Enabled&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"> 		<span class="p">},</span>
+</span></span><span class="line"><span class="cl"> 		<span class="p">{</span>
+</span></span><span class="line"><span class="cl"> 			<span class="nt">&#34;Name&#34;</span><span class="p">:</span> <span class="s2">&#34;OnlineSubsystemSteam&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> 			<span class="nt">&#34;Enabled&#34;</span><span class="p">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"> 		<span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 	<span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>中<code>MultiplayerSessions.Build.cs</code>中添加编译需要的ModuleName</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl"> 			<span class="k">new</span> <span class="kt">string</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl"> 			<span class="p">{</span>
+</span></span><span class="line"><span class="cl"> 				<span class="s">&#34;Core&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> 				<span class="s">&#34;OnlineSubsystem&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> 				<span class="s">&#34;OnlineSubsystemSteam&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> 				<span class="c1">// ... add other public dependencies that you statically link with here ...</span>
+</span></span><span class="line"><span class="cl"> 			<span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 			<span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>重新编译即可</p>
 <h3 id="子系统类">子系统类</h3>
 <h4 id="创建子系统类">创建子系统类</h4>
 <p>在<code>C++Classes\MenuSystem\</code>路径下创建一个继承自<code>UGameInstanceSubsystem</code>的<code>cpp</code>类，创建在<code>MutiplayerSession</code>模块中这里我将他命名为<code>MultiplayerSessionsSubsystem</code>,注意这里多加了个s,当初找了好久这个问题.</p>
@@ -986,25 +1374,54 @@
 </figure></p>
 <p>为新创建的类添加变量和实现构造函数:</p>
 <p><code>.h</code>文件中,在类定义中添加构造函数和会话接口指针声明:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span> 	UMultiplayerSessionsSubsystem();
-</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span> 	IOnlineSessionPtr SessionInterface;
-</span></span></code></pre></div><p><code>.cpp</code>文件中实现构造函数:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;OnlineSubsystem.h&#34;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>UMultiplayerSessionsSubsystem<span style="color:#f92672">::</span>UMultiplayerSessionsSubsystem()
-</span></span><span style="display:flex;"><span> {
-</span></span><span style="display:flex;"><span> 	IOnlineSubsystem<span style="color:#f92672">*</span> Subsystem <span style="color:#f92672">=</span> IOnlineSubsystem<span style="color:#f92672">::</span>Get();
-</span></span><span style="display:flex;"><span> 	<span style="color:#66d9ef">if</span> (Subsystem)
-</span></span><span style="display:flex;"><span> 	{
-</span></span><span style="display:flex;"><span> 		SessionInterface <span style="color:#f92672">=</span> Subsystem<span style="color:#f92672">-&gt;</span>GetSessionInterface();
-</span></span><span style="display:flex;"><span> 	}
-</span></span><span style="display:flex;"><span> }
-</span></span></code></pre></div><p>删除缓存文件（包括项目下的和<code>Plugin</code>中的），重新生成<code>vsproject</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">UMultiplayerSessionsSubsystem</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"> <span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">IOnlineSessionPtr</span> <span class="n">SessionInterface</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>.cpp</code>文件中实现构造函数:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;OnlineSubsystem.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">UMultiplayerSessionsSubsystem</span><span class="o">::</span><span class="n">UMultiplayerSessionsSubsystem</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">IOnlineSubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">IOnlineSubsystem</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"> 	<span class="k">if</span> <span class="p">(</span><span class="n">Subsystem</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 	<span class="p">{</span>
+</span></span><span class="line"><span class="cl"> 		<span class="n">SessionInterface</span> <span class="o">=</span> <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">GetSessionInterface</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"> 	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"> <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>删除缓存文件（包括项目下的和<code>Plugin</code>中的），重新生成<code>vsproject</code></p>
 
 
 
@@ -1017,92 +1434,203 @@
 <h4 id="委托与回调函数声明">委托与回调函数声明</h4>
 <p>先将需求的功能在类中进行声明:</p>
 <p><code>.h</code>文件中<code>public</code>部分添加功能函数:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">CreateSession</span>(int32 NumPublicConnections, FString MatchType);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">FindSessions</span>(int32 MaxSearchResults);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">JoinSession</span>(<span style="color:#66d9ef">const</span> FOnlineSessionSearchResult<span style="color:#f92672">&amp;</span> SessionResult);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">DestroySession</span>();
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">StartSession</span>();
-</span></span></code></pre></div><p><code>.h</code>文件中<code>private</code>部分添加如下委托和委托句柄:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">CreateSession</span><span class="p">(</span><span class="n">int32</span> <span class="n">NumPublicConnections</span><span class="p">,</span> <span class="n">FString</span> <span class="n">MatchType</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">FindSessions</span><span class="p">(</span><span class="n">int32</span> <span class="n">MaxSearchResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">JoinSession</span><span class="p">(</span><span class="k">const</span> <span class="n">FOnlineSessionSearchResult</span><span class="o">&amp;</span> <span class="n">SessionResult</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DestroySession</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">StartSession</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>.h</code>文件中<code>private</code>部分添加如下委托和委托句柄:</p>
 <p><strong>委托句柄的作用</strong>:通过保存句柄，确保在合适的时机（如对象销毁时）清理委托，避免内存泄漏或无效回调。</p>
 <ul>
 <li>直接保存 <code>FDelegateHandle</code> 比手动管理委托更安全，尤其是涉及异步操作时。</li>
 <li>虚幻引擎的委托系统允许动态绑定/解绑函数到事件。</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
-</span></span><span style="display:flex;"><span>FDelegateHandle CreateSessionCompleteDelegateHandle;
-</span></span><span style="display:flex;"><span>FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
-</span></span><span style="display:flex;"><span>FDelegateHandle FindSessionsCompleteDelegateHandle;
-</span></span><span style="display:flex;"><span>FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
-</span></span><span style="display:flex;"><span>FDelegateHandle JoinSessionCompleteDelegateHandle;
-</span></span><span style="display:flex;"><span>FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
-</span></span><span style="display:flex;"><span>FDelegateHandle DestroySessionCompleteDelegateHandle;
-</span></span><span style="display:flex;"><span>FOnStartSessionCompleteDelegate StartSessionCompleteDelegate;
-</span></span><span style="display:flex;"><span>FDelegateHandle StartSessionCompleteDelegateHandle;
-</span></span></code></pre></div><p><code>.h</code>文件中<code>protected</code>部分添加上面委托的的回调函数:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnCreateSessionComplete</span>(FName SessionName, <span style="color:#66d9ef">bool</span> bWasSuccessful);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnFindSessionsComplete</span>(<span style="color:#66d9ef">bool</span> bWasSuccessful);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnJoinSessionComplete</span>(FName SessionName, EOnJoinSessionCompleteResult<span style="color:#f92672">::</span>Type Result);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnDestroySessionComplete</span>(FName SessionName, <span style="color:#66d9ef">bool</span> bWasSuccessful);
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">OnStartSessionComplete</span>(FName SessionName, <span style="color:#66d9ef">bool</span> bWasSuccessful);
-</span></span></code></pre></div><p><code>.cpp</code>文件中使用之前说过的委托绑定的高级用法:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">FOnCreateSessionCompleteDelegate</span> <span class="n">CreateSessionCompleteDelegate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FDelegateHandle</span> <span class="n">CreateSessionCompleteDelegateHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FOnFindSessionsCompleteDelegate</span> <span class="n">FindSessionsCompleteDelegate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FDelegateHandle</span> <span class="n">FindSessionsCompleteDelegateHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FOnJoinSessionCompleteDelegate</span> <span class="n">JoinSessionCompleteDelegate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FDelegateHandle</span> <span class="n">JoinSessionCompleteDelegateHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FOnDestroySessionCompleteDelegate</span> <span class="n">DestroySessionCompleteDelegate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FDelegateHandle</span> <span class="n">DestroySessionCompleteDelegateHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FOnStartSessionCompleteDelegate</span> <span class="n">StartSessionCompleteDelegate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">FDelegateHandle</span> <span class="n">StartSessionCompleteDelegateHandle</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>.h</code>文件中<code>protected</code>部分添加上面委托的的回调函数:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">OnCreateSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">OnFindSessionsComplete</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">OnJoinSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="n">EOnJoinSessionCompleteResult</span><span class="o">::</span><span class="n">Type</span> <span class="n">Result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">OnDestroySessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">OnStartSessionComplete</span><span class="p">(</span><span class="n">FName</span> <span class="n">SessionName</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bWasSuccessful</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>.cpp</code>文件中使用之前说过的委托绑定的高级用法:</p>
 <p>上面定义的功能函数和回调后续再实现.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>UMultiplayerSessionsSubsystem<span style="color:#f92672">::</span>UMultiplayerSessionsSubsystem()<span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span> 	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate<span style="color:#f92672">::</span>CreateUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>OnCreateSessionComplete)),
-</span></span><span style="display:flex;"><span> 	FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate<span style="color:#f92672">::</span>CreateUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>OnFindSessionsComplete)),
-</span></span><span style="display:flex;"><span> 	JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate<span style="color:#f92672">::</span>CreateUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>OnJoinSessionComplete)),
-</span></span><span style="display:flex;"><span> 	DestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate<span style="color:#f92672">::</span>CreateUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>OnDestroySessionComplete)),
-</span></span><span style="display:flex;"><span> 	StartSessionCompleteDelegate(FOnStartSessionCompleteDelegate<span style="color:#f92672">::</span>CreateUObject(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>OnStartSessionComplete))
-</span></span><span style="display:flex;"><span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//类定义主体
-</span></span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="菜单类">菜单类</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">UMultiplayerSessionsSubsystem</span><span class="o">::</span><span class="n">UMultiplayerSessionsSubsystem</span><span class="p">()</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">CreateSessionCompleteDelegate</span><span class="p">(</span><span class="n">FOnCreateSessionCompleteDelegate</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">OnCreateSessionComplete</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">FindSessionsCompleteDelegate</span><span class="p">(</span><span class="n">FOnFindSessionsCompleteDelegate</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">OnFindSessionsComplete</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">JoinSessionCompleteDelegate</span><span class="p">(</span><span class="n">FOnJoinSessionCompleteDelegate</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">OnJoinSessionComplete</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">DestroySessionCompleteDelegate</span><span class="p">(</span><span class="n">FOnDestroySessionCompleteDelegate</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">OnDestroySessionComplete</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">StartSessionCompleteDelegate</span><span class="p">(</span><span class="n">FOnStartSessionCompleteDelegate</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">OnStartSessionComplete</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//类定义主体
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="菜单类">菜单类</h3>
 <h4 id="创建菜单">创建菜单</h4>
 <p>在<code>C++Class\Public</code>文件夹下创建一个基于<code>UUserWidget</code>的类,这里我将它命名为<code>Menu</code></p>
 <p>在<code>Build.cs</code>中添加用户控件需要的模块:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span>PublicDependencyModuleNames.AddRange(
-</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">string</span>[]
-</span></span><span style="display:flex;"><span>             {
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Core&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;OnlineSubsystem&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;OnlineSubsystemSteam&#34;</span>,
-</span></span><span style="display:flex;"><span>                 <span style="color:#e6db74">&#34;UMG&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Slate&#34;</span>,
-</span></span><span style="display:flex;"><span>                 <span style="color:#e6db74">&#34;SlateCore&#34;</span>
-</span></span><span style="display:flex;"><span>                 <span style="color:#75715e">// ... add other public dependencies that you statically link with here ...</span>
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>            );
-</span></span></code></pre></div><p>为Menu添加预设:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="n">AddRange</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">             <span class="k">new</span> <span class="kt">string</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">             <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;Core&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;OnlineSubsystem&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;OnlineSubsystemSteam&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s">&#34;UMG&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;Slate&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                 <span class="s">&#34;SlateCore&#34;</span>
+</span></span><span class="line"><span class="cl">                 <span class="c1">// ... add other public dependencies that you statically link with here ...</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>为Menu添加预设:</p>
 <p><code>Menu.h</code>文件:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MULTIPLAYERSESSIONS_API</span> UMenu : <span style="color:#66d9ef">public</span> UUserWidget
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	GENERATED_BODY()
-</span></span><span style="display:flex;"><span>	
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>	UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">void</span> MenuSetup();
-</span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p><code>Menu.cpp</code>文件,<code>Setup</code>函数用于将控件添加到视口以及设置交互形式:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UMenu<span style="color:#f92672">::</span>MenuSetup()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    AddToViewport();
-</span></span><span style="display:flex;"><span>    SetVisibility(ESlateVisibility<span style="color:#f92672">::</span>Visible);
-</span></span><span style="display:flex;"><span>    bIsFocusable <span style="color:#f92672">=</span> true;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    UWorld<span style="color:#f92672">*</span> World <span style="color:#f92672">=</span> GetWorld();
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (World)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        APlayerController<span style="color:#f92672">*</span> PlayerController <span style="color:#f92672">=</span> World<span style="color:#f92672">-&gt;</span>GetFirstPlayerController();
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (PlayerController)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            FInputModeUIOnly InputModeData;
-</span></span><span style="display:flex;"><span>            InputModeData.SetWidgetToFocus(TakeWidget());
-</span></span><span style="display:flex;"><span>            InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode<span style="color:#f92672">::</span>DoNotLock);
-</span></span><span style="display:flex;"><span>            PlayerController<span style="color:#f92672">-&gt;</span>SetInputMode(InputModeData);
-</span></span><span style="display:flex;"><span>            PlayerController<span style="color:#f92672">-&gt;</span>SetShowMouseCursor(true);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>基于<code>Menu.cpp</code>类创建用户控件,命名为<code>WBP_Menu</code>,创建两个<code>Button</code>,并设置他的父类为<code>Menu</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MULTIPLAYERSESSIONS_API</span> <span class="nl">UMenu</span> <span class="p">:</span> <span class="k">public</span> <span class="n">UUserWidget</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GENERATED_BODY</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="n">MenuSetup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Menu.cpp</code>文件,<code>Setup</code>函数用于将控件添加到视口以及设置交互形式:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UMenu</span><span class="o">::</span><span class="n">MenuSetup</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">AddToViewport</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SetVisibility</span><span class="p">(</span><span class="n">ESlateVisibility</span><span class="o">::</span><span class="n">Visible</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bIsFocusable</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">UWorld</span><span class="o">*</span> <span class="n">World</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">World</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">World</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">PlayerController</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FInputModeUIOnly</span> <span class="n">InputModeData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">InputModeData</span><span class="p">.</span><span class="n">SetWidgetToFocus</span><span class="p">(</span><span class="n">TakeWidget</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">            <span class="n">InputModeData</span><span class="p">.</span><span class="n">SetLockMouseToViewportBehavior</span><span class="p">(</span><span class="n">EMouseLockMode</span><span class="o">::</span><span class="n">DoNotLock</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">SetInputMode</span><span class="p">(</span><span class="n">InputModeData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">SetShowMouseCursor</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>基于<code>Menu.cpp</code>类创建用户控件,命名为<code>WBP_Menu</code>,创建两个<code>Button</code>,并设置他的父类为<code>Menu</code></p>
 <p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/multiplayercourse%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/image-20250420191931720.png" 
@@ -1135,9 +1663,17 @@
 <h4 id="添加基本交互">添加基本交互</h4>
 <p>为<code>Menu.h</code>添加声明</p>
 <p><code>public</code>部分添加暴露给蓝图的创建函数,参数为<code>房间人数</code>和<code>比赛类型</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> MenuSetup(int32 NumberOfPublicConnections <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>, FString TypeOfMatch <span style="color:#f92672">=</span> FString(TEXT(<span style="color:#e6db74">&#34;FreeForAll&#34;</span>)));
-</span></span></code></pre></div><p><figure style="text-align: center; margin: 1.5rem auto;">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">MenuSetup</span><span class="p">(</span><span class="n">int32</span> <span class="n">NumberOfPublicConnections</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">FString</span> <span class="n">TypeOfMatch</span> <span class="o">=</span> <span class="n">FString</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;FreeForAll&#34;</span><span class="p">)));</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><figure style="text-align: center; margin: 1.5rem auto;">
   
   <img src="http://localhost:1313/posts/multiplayercourse%E5%88%9B%E5%BB%BA%E5%A4%9A%E4%BA%BA%E8%81%94%E6%9C%BA%E6%8F%92%E4%BB%B6/image-20250421161705684.png" 
        alt="image-20250421161705684" 
@@ -1152,9 +1688,17 @@
   
 </figure></p>
 <p><code>protected</code>部分添加虚函数重载.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">Initialize</span>() <span style="color:#66d9ef">override</span>;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">NativeDestruct</span>() <span style="color:#66d9ef">override</span>;
-</span></span></code></pre></div><p><code>Initialize()</code> 是一个初始化函数，通常用于：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">virtual</span> <span class="kt">bool</span> <span class="nf">Initialize</span><span class="p">()</span> <span class="k">override</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">virtual</span> <span class="kt">void</span> <span class="nf">NativeDestruct</span><span class="p">()</span> <span class="k">override</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Initialize()</code> 是一个初始化函数，通常用于：</p>
 <ul>
 <li>
 <p>执行对象创建后的必要设置（如分配资源、加载数据、绑定委托等）。</p>
@@ -1182,27 +1726,53 @@
 </li>
 </ul>
 <p><code>private</code>部分声明<code>UButton</code>变量并将其绑定到<code>Widget</code>,声明点击事件,</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>UPROPERTY(meta <span style="color:#f92672">=</span> (BindWidget))
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UButton</span><span style="color:#f92672">*</span> HostButton;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>UPROPERTY(meta <span style="color:#f92672">=</span> (BindWidget))
-</span></span><span style="display:flex;"><span>UButton<span style="color:#f92672">*</span> JoinButton;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>UFUNCTION()
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> HostButtonClicked();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>UFUNCTION()
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> JoinButtonClicked();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//用于切换关卡时去除UI,恢复为WASD按键交互
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">MenuTearDown</span>();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// The subsystem designed to handle all online session functionality
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UMultiplayerSessionsSubsystem</span><span style="color:#f92672">*</span> MultiplayerSessionsSubsystem;
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//定义用于设置创建房间的信息,并设置默认值
-</span></span></span><span style="display:flex;"><span>int32 NumPublicConnections{<span style="color:#ae81ff">4</span>};
-</span></span><span style="display:flex;"><span>FString MatchType{ TEXT(<span style="color:#e6db74">&#34;FreeForAll&#34;</span>) };
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">meta</span> <span class="o">=</span> <span class="p">(</span><span class="n">BindWidget</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">UButton</span><span class="o">*</span> <span class="n">HostButton</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">meta</span> <span class="o">=</span> <span class="p">(</span><span class="n">BindWidget</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">UButton</span><span class="o">*</span> <span class="n">JoinButton</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">HostButtonClicked</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">JoinButtonClicked</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//用于切换关卡时去除UI,恢复为WASD按键交互
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">MenuTearDown</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// The subsystem designed to handle all online session functionality
+</span></span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">UMultiplayerSessionsSubsystem</span><span class="o">*</span> <span class="n">MultiplayerSessionsSubsystem</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//定义用于设置创建房间的信息,并设置默认值
+</span></span></span><span class="line"><span class="cl"><span class="n">int32</span> <span class="n">NumPublicConnections</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="n">FString</span> <span class="n">MatchType</span><span class="p">{</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;FreeForAll&#34;</span><span class="p">)</span> <span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
 
   <blockquote>
@@ -1212,51 +1782,106 @@
   </blockquote>
 
 <p>在<code>Menu.cpp</code>中实现初始化函数为按钮绑定事件函数,绑定事件,以及去除<code>UI</code>的逻辑:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">bool</span> UMenu<span style="color:#f92672">::</span>Initialize()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Super<span style="color:#f92672">::</span>Initialize())
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> false;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (HostButton)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        HostButton<span style="color:#f92672">-&gt;</span>OnClicked.AddDynamic(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>HostButtonClicked);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (JoinButton)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        JoinButton<span style="color:#f92672">-&gt;</span>OnClicked.AddDynamic(<span style="color:#66d9ef">this</span>, <span style="color:#f92672">&amp;</span>ThisClass<span style="color:#f92672">::</span>JoinButtonClicked);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> true;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UMenu<span style="color:#f92672">::</span>NativeDestruct()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    MenuTearDown();
-</span></span><span style="display:flex;"><span>    Super<span style="color:#f92672">::</span>NativeDestruct();
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#75715e">//用于去除用户控件,恢复操作
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UMenu<span style="color:#f92672">::</span>MenuTearDown()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    RemoveFromParent();
-</span></span><span style="display:flex;"><span>    UWorld<span style="color:#f92672">*</span> World <span style="color:#f92672">=</span> GetWorld();
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (World)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        APlayerController<span style="color:#f92672">*</span> PlayerController <span style="color:#f92672">=</span> World<span style="color:#f92672">-&gt;</span>GetFirstPlayerController();
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (PlayerController)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            FInputModeGameOnly InputModeData;
-</span></span><span style="display:flex;"><span>            PlayerController<span style="color:#f92672">-&gt;</span>SetInputMode(InputModeData);
-</span></span><span style="display:flex;"><span>            PlayerController<span style="color:#f92672">-&gt;</span>SetShowMouseCursor(false);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>添加需要的头文件:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;Menu.h&#34;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;Components/Button.h&#34;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;MultiplayerSessionsSubsystem.h&#34;</span><span style="color:#75715e">
-</span></span></span></code></pre></div><h4 id="子系统与ui交互">子系统与UI交互</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">UMenu</span><span class="o">::</span><span class="n">Initialize</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">Super</span><span class="o">::</span><span class="n">Initialize</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">HostButton</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HostButton</span><span class="o">-&gt;</span><span class="n">OnClicked</span><span class="p">.</span><span class="n">AddDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">HostButtonClicked</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">JoinButton</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">JoinButton</span><span class="o">-&gt;</span><span class="n">OnClicked</span><span class="p">.</span><span class="n">AddDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">JoinButtonClicked</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UMenu</span><span class="o">::</span><span class="n">NativeDestruct</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MenuTearDown</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Super</span><span class="o">::</span><span class="n">NativeDestruct</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//用于去除用户控件,恢复操作
+</span></span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UMenu</span><span class="o">::</span><span class="n">MenuTearDown</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">RemoveFromParent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">UWorld</span><span class="o">*</span> <span class="n">World</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">World</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">World</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">PlayerController</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FInputModeGameOnly</span> <span class="n">InputModeData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">SetInputMode</span><span class="p">(</span><span class="n">InputModeData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">SetShowMouseCursor</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>添加需要的头文件:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Menu.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Components/Button.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;MultiplayerSessionsSubsystem.h&#34;</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="子系统与ui交互">子系统与UI交互</h4>
 <p>这部分的代码量比较大,但是基本是和之前的Character部分写的类似,画几张流程图梳理一下:</p>
 <p><strong>初始化阶段</strong>:</p>
 <pre class="mermaid">
@@ -1311,11 +1936,21 @@
 
 <h3 id="销毁逻辑与按钮禁用">销毁逻辑与按钮禁用</h3>
 <p><code>UMultiplayerSessionsSubsystem</code>中添加几个变量用于存储销毁和按钮的变量:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>   <span style="color:#75715e">//添加用于销毁会话后重新创建的存储变量
-</span></span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">bool</span> bCreateSessionOnDestroy{ false };
-</span></span><span style="display:flex;"><span>   int32 LastNumPublicConnections;
-</span></span><span style="display:flex;"><span>   FString LastMatchType;
-</span></span></code></pre></div><p>在find失败/join失败的时候启用按钮,其余情况禁用.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl">   <span class="c1">//添加用于销毁会话后重新创建的存储变量
+</span></span></span><span class="line"><span class="cl">   <span class="kt">bool</span> <span class="n">bCreateSessionOnDestroy</span><span class="p">{</span> <span class="nb">false</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">   <span class="n">int32</span> <span class="n">LastNumPublicConnections</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">FString</span> <span class="n">LastMatchType</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在find失败/join失败的时候启用按钮,其余情况禁用.</p>
 <h3 id="退出菜单">退出菜单</h3>
 <p><figure style="text-align: center; margin: 1.5rem auto;">
   

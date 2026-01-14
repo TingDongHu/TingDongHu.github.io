@@ -48,6 +48,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -280,7 +282,7 @@
   <meta itemprop="description" content="虚幻引擎5.1移除了`OnLevelRemovedFromWorld`函数，导致编译错误。解决方案是重写`NativeDestruct`函数来实现资源清理逻辑，从而成功编译。">
   <meta itemprop="datePublished" content="2024-04-20T00:00:00+00:00">
   <meta itemprop="dateModified" content="2024-04-20T00:00:00+00:00">
-  <meta itemprop="wordCount" content="49">
+  <meta itemprop="wordCount" content="55">
   <meta itemprop="keywords" content="C&#43;&#43;,UnrealEngine,继承,重载">
 
       <header>
@@ -395,14 +397,32 @@
   
 </figure></p>
 <p>查阅资料后发现是虚幻5.1和5.0的版本问题: 虚幻5.1 UUserWidget不再包含OnLevelRemovedFromWorld.我们可以重载一个类似的函数用于达到相同的效果:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span> <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">NativeDestruct</span>() <span style="color:#66d9ef">override</span>;
-</span></span></code></pre></div><p><code>.cpp</code>文件中实现:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UMenu<span style="color:#f92672">::</span>NativeDestruct()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    MenuTearDown();
-</span></span><span style="display:flex;"><span>    Super<span style="color:#f92672">::</span>NativeDestruct();
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p><code>NativeDestruct()</code> 是 <code>UUserWidget</code>（用户控件）提供的一个 <strong>关键生命周期虚函数</strong>(析构函数)，用于 <strong>处理控件的销毁逻辑</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"> <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">NativeDestruct</span><span class="p">()</span> <span class="k">override</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>.cpp</code>文件中实现:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UMenu</span><span class="o">::</span><span class="n">NativeDestruct</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MenuTearDown</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Super</span><span class="o">::</span><span class="n">NativeDestruct</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>NativeDestruct()</code> 是 <code>UUserWidget</code>（用户控件）提供的一个 <strong>关键生命周期虚函数</strong>(析构函数)，用于 <strong>处理控件的销毁逻辑</strong>。</p>
 <ul>
 <li><strong>调用时机</strong>：
 当 <code>UUserWidget</code> 被 ​<strong>显式移除（<code>RemoveFromParent</code>）​</strong>​ 或 ​<strong>其所属的 <code>UWorld</code> 销毁时</strong>​（如关卡切换、游戏退出），引擎会自动调用此函数。

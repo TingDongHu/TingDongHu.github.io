@@ -50,6 +50,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -282,7 +284,7 @@
   <meta itemprop="description" content="C&#43;&#43;中四种运算符的核心区别：`::`用于访问命名空间、类或静态成员；`-&gt;`通过指针访问对象成员；`.`通过对象实例访问成员；`*`用于指针解引用。">
   <meta itemprop="datePublished" content="2024-04-05T00:00:00+08:00">
   <meta itemprop="dateModified" content="2024-04-05T00:00:00+08:00">
-  <meta itemprop="wordCount" content="560">
+  <meta itemprop="wordCount" content="680">
   <meta itemprop="keywords" content="语法,C&#43;&#43;,指针,智能指针,引用,作用域">
 
       <header>
@@ -292,7 +294,7 @@
             Friday, Apr 5, 2024
           
 
-          | <span>3 minute read</span>
+          | <span>4 minute read</span>
 
           
           | <span>Updated at
@@ -367,33 +369,65 @@
 <li>区分同名的全局变量和局部变量</li>
 </ul>
 <h3 id="示例"><strong>示例</strong></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> MyNamespace {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> value <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> staticValue;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">staticMethod</span>() {
-</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Static method called!&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> MyClass<span style="color:#f92672">::</span>staticValue <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>; <span style="color:#75715e">// 静态成员变量定义
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 访问命名空间成员
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> MyNamespace<span style="color:#f92672">::</span>value <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; <span style="color:#75715e">// 输出: 42
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 访问类的静态成员
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> MyClass<span style="color:#f92672">::</span>staticValue <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; <span style="color:#75715e">// 输出: 100
-</span></span></span><span style="display:flex;"><span>    MyClass<span style="color:#f92672">::</span>staticMethod(); <span style="color:#75715e">// 输出: Static method called!
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="关键点"><strong>关键点</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="n">MyNamespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">staticValue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">void</span> <span class="nf">staticMethod</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Static method called!&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">staticValue</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">// 静态成员变量定义
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 访问命名空间成员
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">MyNamespace</span><span class="o">::</span><span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// 输出: 42
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 访问类的静态成员
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">staticValue</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// 输出: 100
+</span></span></span><span class="line"><span class="cl">    <span class="n">MyClass</span><span class="o">::</span><span class="n">staticMethod</span><span class="p">();</span> <span class="c1">// 输出: Static method called!
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="关键点"><strong>关键点</strong></h3>
 <ul>
 <li><code>::</code> <strong>不依赖对象实例</strong>，直接通过类名或命名空间访问成员。</li>
 <li>常用于 <strong>全局变量、静态成员、嵌套类</strong> 等场景。</li>
@@ -406,27 +440,53 @@
 <li>等价于 <code>(*ptr).member</code>（先解引用，再用 <code>.</code> 访问）</li>
 </ul>
 <h3 id="示例-1"><strong>示例</strong></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> value <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">print</span>() {
-</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Value: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> value <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    MyClass obj;
-</span></span><span style="display:flex;"><span>    MyClass<span style="color:#f92672">*</span> ptr <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>obj; <span style="color:#75715e">// 指向对象的指针
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 通过指针访问成员
-</span></span></span><span style="display:flex;"><span>    ptr<span style="color:#f92672">-&gt;</span>value <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>;     <span style="color:#75715e">// 等价于 (*ptr).value = 20;
-</span></span></span><span style="display:flex;"><span>    ptr<span style="color:#f92672">-&gt;</span>print();        <span style="color:#75715e">// 输出: Value: 20
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="关键点-1"><strong>关键点</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">print</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Value: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span> <span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">obj</span><span class="p">;</span> <span class="c1">// 指向对象的指针
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 通过指针访问成员
+</span></span></span><span class="line"><span class="cl">    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>     <span class="c1">// 等价于 (*ptr).value = 20;
+</span></span></span><span class="line"><span class="cl">    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">print</span><span class="p">();</span>        <span class="c1">// 输出: Value: 20
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="关键点-1"><strong>关键点</strong></h3>
 <ul>
 <li><code>-&gt;</code> <strong>只能用于指针</strong>，不能用于普通对象。</li>
 <li>在 <strong>智能指针</strong>（如 <code>std::shared_ptr</code>）和 <strong>迭代器</strong> 中也常用。</li>
@@ -439,26 +499,51 @@
 <li>适用于 <strong>结构体、类、联合体</strong> 等</li>
 </ul>
 <h3 id="示例-2"><strong>示例</strong></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> value <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">print</span>() {
-</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Value: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> value <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    MyClass obj;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 通过对象访问成员
-</span></span></span><span style="display:flex;"><span>    obj.value <span style="color:#f92672">=</span> <span style="color:#ae81ff">40</span>;
-</span></span><span style="display:flex;"><span>    obj.print(); <span style="color:#75715e">// 输出: Value: 40
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="关键点-2"><strong>关键点</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">print</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Value: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span> <span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 通过对象访问成员
+</span></span></span><span class="line"><span class="cl">    <span class="n">obj</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">40</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">obj</span><span class="p">.</span><span class="n">print</span><span class="p">();</span> <span class="c1">// 输出: Value: 40
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="关键点-2"><strong>关键点</strong></h3>
 <ul>
 <li><code>.</code> <strong>只能用于对象实例</strong>，不能用于指针。</li>
 <li>在 <strong>结构体、类、联合体</strong> 中通用。</li>
@@ -472,31 +557,67 @@
 </ol>
 <h3 id="示例与详解"><strong>示例与详解</strong></h3>
 <h4 id="1-指针声明"><strong>(1) 指针声明</strong></h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> num <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> ptr <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>num;  <span style="color:#75715e">// ptr 是一个指向 int 的指针
-</span></span></span></code></pre></div><ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">num</span><span class="p">;</span>  <span class="c1">// ptr 是一个指向 int 的指针
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
 <li><code>int* ptr</code> 表示 <code>ptr</code> 存储的是内存地址，而非直接的值。</li>
 </ul>
 <h4 id="2-解引用获取指针指向的值"><strong>(2) 解引用（获取指针指向的值）</strong></h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> num <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> ptr <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>num;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#f92672">*</span>ptr;  <span style="color:#75715e">// 输出: 42（通过 * 获取指针指向的实际值）
-</span></span></span><span style="display:flex;"><span><span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;         <span style="color:#75715e">// 修改指针指向的值
-</span></span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> num;   <span style="color:#75715e">// 输出: 100
-</span></span></span></code></pre></div><h4 id="3-与"><strong>(3) 与 <code>-&gt;</code> 的关系</strong></h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>  <span class="c1">// 输出: 42（通过 * 获取指针指向的实际值）
+</span></span></span><span class="line"><span class="cl"><span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>         <span class="c1">// 修改指针指向的值
+</span></span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">num</span><span class="p">;</span>   <span class="c1">// 输出: 100
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-与"><strong>(3) 与 <code>-&gt;</code> 的关系</strong></h4>
 <p><code>ptr-&gt;member</code> 等价于 <code>(*ptr).member</code>：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> value;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>MyClass obj;
-</span></span><span style="display:flex;"><span>MyClass<span style="color:#f92672">*</span> ptr <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>obj;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>ptr<span style="color:#f92672">-&gt;</span>value <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;     <span style="color:#75715e">// 使用 -&gt; 访问成员
-</span></span></span><span style="display:flex;"><span>(<span style="color:#f92672">*</span>ptr).value <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;   <span style="color:#75715e">// 等价写法：先解引用，再用 . 访问
-</span></span></span></code></pre></div><hr>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">MyClass</span> <span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">MyClass</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ptr</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>     <span class="c1">// 使用 -&gt; 访问成员
+</span></span></span><span class="line"><span class="cl"><span class="p">(</span><span class="o">*</span><span class="n">ptr</span><span class="p">).</span><span class="n">value</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>   <span class="c1">// 等价写法：先解引用，再用 . 访问
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
 <h2 id="四者对比总结"><strong>四者对比总结</strong></h2>
 <table>
   <thead>
@@ -557,39 +678,77 @@
 </ol>
 <hr>
 <h2 id="综合示例"><strong>综合示例</strong></h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> MyNamespace {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> global <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyClass</span> {
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> staticVar;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> instanceVar <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> MyClass<span style="color:#f92672">::</span>staticVar <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>; <span style="color:#75715e">// 静态成员定义
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 1. 作用域解析符 ::
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> MyNamespace<span style="color:#f92672">::</span>global <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; <span style="color:#75715e">// 输出: 50
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> MyClass<span style="color:#f92672">::</span>staticVar <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;  <span style="color:#75715e">// 输出: 100
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 2. 指针与解引用 *
-</span></span></span><span style="display:flex;"><span>    MyClass obj;
-</span></span><span style="display:flex;"><span>    MyClass<span style="color:#f92672">*</span> ptr <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>obj;
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> MyClass();          <span style="color:#75715e">// 解引用并赋值新对象
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> (<span style="color:#f92672">*</span>ptr).instanceVar <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; <span style="color:#75715e">// 输出: 0
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 3. -&gt; 和 . 的对比
-</span></span></span><span style="display:flex;"><span>    ptr<span style="color:#f92672">-&gt;</span>instanceVar <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;     <span style="color:#75715e">// 指针用 -&gt;
-</span></span></span><span style="display:flex;"><span>    obj.instanceVar <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;      <span style="color:#75715e">// 对象用 .
-</span></span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> ptr<span style="color:#f92672">-&gt;</span>instanceVar <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">&lt;&lt;</span> obj.instanceVar; <span style="color:#75715e">// 输出: 42 10
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><hr>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="n">MyNamespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">global</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">int</span> <span class="n">staticVar</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">instanceVar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">staticVar</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">// 静态成员定义
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 1. 作用域解析符 ::
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">MyNamespace</span><span class="o">::</span><span class="n">global</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// 输出: 50
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">staticVar</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>  <span class="c1">// 输出: 100
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 2. 指针与解引用 *
+</span></span></span><span class="line"><span class="cl">    <span class="n">MyClass</span> <span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MyClass</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">();</span>          <span class="c1">// 解引用并赋值新对象
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="o">*</span><span class="n">ptr</span><span class="p">).</span><span class="n">instanceVar</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="c1">// 输出: 0
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 3. -&gt; 和 . 的对比
+</span></span></span><span class="line"><span class="cl">    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">instanceVar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>     <span class="c1">// 指针用 -&gt;
+</span></span></span><span class="line"><span class="cl">    <span class="n">obj</span><span class="p">.</span><span class="n">instanceVar</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>      <span class="c1">// 对象用 .
+</span></span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">instanceVar</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">obj</span><span class="p">.</span><span class="n">instanceVar</span><span class="p">;</span> <span class="c1">// 输出: 42 10
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
 <h2 id="常见问题"><strong>常见问题</strong></h2>
 <h3 id="1"><strong>1. <code>::</code> 可以访问非静态成员吗？</strong></h3>
 <p>❌ <strong>不可以</strong>。<code>::</code> 只能访问 <strong>静态成员、命名空间成员、嵌套类型</strong>。</p>
@@ -608,14 +767,31 @@
 <p>因为 <code>-&gt;</code> 的设计初衷是简化指针操作（<code>(*ptr).member</code> 的语法糖），而对象本身不需要解引用。</p>
 <h3 id="6-智能指针怎么用"><strong>6. 智能指针怎么用？</strong></h3>
 <p>智能指针（如 <code>std::shared_ptr</code>）也使用 <code>-&gt;</code>：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span>MyClass<span style="color:#f92672">&gt;</span> ptr <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_shared<span style="color:#f92672">&lt;</span>MyClass<span style="color:#f92672">&gt;</span>();
-</span></span><span style="display:flex;"><span>ptr<span style="color:#f92672">-&gt;</span>print(); <span style="color:#75715e">// 正确
-</span></span></span><span style="display:flex;"><span>ptr.print();  <span style="color:#75715e">// 错误！智能指针本身不是对象
-</span></span></span></code></pre></div><h3 id="7-智能指针的"><strong>7. 智能指针的 <code>-&gt;</code> 和普通指针有何不同？</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">ptr</span><span class="o">-&gt;</span><span class="n">print</span><span class="p">();</span> <span class="c1">// 正确
+</span></span></span><span class="line"><span class="cl"><span class="n">ptr</span><span class="p">.</span><span class="n">print</span><span class="p">();</span>  <span class="c1">// 错误！智能指针本身不是对象
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="7-智能指针的"><strong>7. 智能指针的 <code>-&gt;</code> 和普通指针有何不同？</strong></h3>
 <p>无本质区别，只是智能指针（如 <code>std::shared_ptr</code>）重载了 <code>-&gt;</code> 运算符，行为与原生指针一致：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span>MyClass<span style="color:#f92672">&gt;</span> smartPtr <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_shared<span style="color:#f92672">&lt;</span>MyClass<span style="color:#f92672">&gt;</span>();
-</span></span><span style="display:flex;"><span>smartPtr<span style="color:#f92672">-&gt;</span>instanceVar <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>; <span style="color:#75715e">// 用法相同
-</span></span></span></code></pre></div><hr>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span> <span class="n">smartPtr</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">smartPtr</span><span class="o">-&gt;</span><span class="n">instanceVar</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span> <span class="c1">// 用法相同
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
 <p>掌握这四种运算符的差异，能彻底避免 C++ 中的指针和成员访问错误！</p>
 
 

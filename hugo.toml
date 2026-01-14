@@ -60,6 +60,13 @@ theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
       [markup.goldmark.extensions.passthrough.delimiters]
         block = [['$$', '$$'], ['\\[', '\\]']]
         inline = [['$', '$'], ['\\(', '\\)']]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = true
+    lineNumbersInTable = true  # 确保这个是 true
+    noClasses = false
+    style = "monokai" # 或者 dracula, github-dark
 
 
 [module]

@@ -50,6 +50,8 @@
 
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="/css/custom.css">
+<script src="/js/code_block.js" defer></script>
 
     
 
@@ -282,7 +284,7 @@
   <meta itemprop="description" content="Shading是图形学中模拟光线与物体表面交互以计算颜色和明暗的技术，其核心包括局部着色模型，以及漫反射、镜面高光和环境光等基础光照现象的模拟。">
   <meta itemprop="datePublished" content="2025-07-01T00:00:00+08:00">
   <meta itemprop="dateModified" content="2025-07-01T00:00:00+08:00">
-  <meta itemprop="wordCount" content="287">
+  <meta itemprop="wordCount" content="298">
   <meta itemprop="keywords" content="图形学,渲染管线,光照,GAMES课程,线性代数,着色器,Shading,Shader">
 
       <header>
@@ -821,18 +823,35 @@ $$<h2 id="图形管线实时渲染管线">图形管线/实时渲染管线</h2>
 <p>Shader指定的是每一个像素/顶点如何着色，所以不能也不用去指定某一个像素如何着色</p>
 <p>如果写的是顶点操作，这个shader就叫做VertexShader（顶点着色器）</p>
 <p>如果写的是像素操作，这个shader就叫做FragmentShader（片段/片元着色器）/PixelShader（像素着色器）</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span><span style="color:#66d9ef">uniform</span> <span style="color:#66d9ef">sampler2D</span> myTexture;    <span style="color:#75715e">// 纹理采样器</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uniform</span> <span style="color:#66d9ef">vec3</span> lightDir;          <span style="color:#75715e">// 世界空间光源方向（应归一化）</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">varying</span> <span style="color:#66d9ef">vec2</span> uv;                <span style="color:#75715e">// 纹理坐标（已插值）</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">varying</span> <span style="color:#66d9ef">vec3</span> norm;             <span style="color:#75715e">// 顶点法线（应归一化）</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> diffuseShader() {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">vec3</span> kd; 
-</span></span><span style="display:flex;"><span>  kd <span style="color:#f92672">=</span> texture2D(myTexture, uv).rgb; <span style="color:#75715e">// 获取纹理颜色</span>
-</span></span><span style="display:flex;"><span>  kd <span style="color:#f92672">*=</span> clamp(dot(<span style="color:#f92672">-</span>lightDir, norm), <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>); <span style="color:#75715e">// 兰伯特余弦计算</span>
-</span></span><span style="display:flex;"><span>  gl_FragColor <span style="color:#f92672">=</span> <span style="color:#66d9ef">vec4</span>(kd, <span style="color:#ae81ff">1.0</span>);     <span style="color:#75715e">// 输出最终颜色</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-glsl" data-lang="glsl"><span class="line"><span class="cl"><span class="k">uniform</span> <span class="k">sampler2D</span> <span class="n">myTexture</span><span class="p">;</span>    <span class="c1">// 纹理采样器</span>
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="k">vec3</span> <span class="n">lightDir</span><span class="p">;</span>          <span class="c1">// 世界空间光源方向（应归一化）</span>
+</span></span><span class="line"><span class="cl"><span class="k">varying</span> <span class="k">vec2</span> <span class="n">uv</span><span class="p">;</span>                <span class="c1">// 纹理坐标（已插值）</span>
+</span></span><span class="line"><span class="cl"><span class="k">varying</span> <span class="k">vec3</span> <span class="n">norm</span><span class="p">;</span>             <span class="c1">// 顶点法线（应归一化）</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">void</span> <span class="n">diffuseShader</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">vec3</span> <span class="n">kd</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">kd</span> <span class="o">=</span> <span class="n">texture2D</span><span class="p">(</span><span class="n">myTexture</span><span class="p">,</span> <span class="n">uv</span><span class="p">).</span><span class="n">rgb</span><span class="p">;</span> <span class="c1">// 获取纹理颜色</span>
+</span></span><span class="line"><span class="cl">  <span class="n">kd</span> <span class="o">*=</span> <span class="n">clamp</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">lightDir</span><span class="p">,</span> <span class="n">norm</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span> <span class="c1">// 兰伯特余弦计算</span>
+</span></span><span class="line"><span class="cl">  <span class="n">gl_FragColor</span> <span class="o">=</span> <span class="k">vec4</span><span class="p">(</span><span class="n">kd</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>     <span class="c1">// 输出最终颜色</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
         
       </section>
