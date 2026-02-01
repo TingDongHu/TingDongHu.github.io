@@ -1,60 +1,72 @@
 import os
 import sys
+import tempfile
 from PIL import Image
 
 # --- 配置区 ---
 MAX_WIDTH = 2560      # 2K 分辨率
 QUALITY = 85          # 高保真质量
-MIN_SIZE_KB = 3000    # 阈值：小于 3MB 的图片不重复压缩 (根据你的要求设定)
+MIN_SIZE_KB = 3000    # 阈值：小于 3MB 的图片不重复压缩
 EXTENSIONS = ('.jpg', '.jpeg', '.png')
 
-def compress_image(file_path):
+def process_image(file_path):
     try:
-        # --- 1. 强制文件名小写逻辑 (解决 GitHub Pages 404) ---
+        # --- 第一阶段：命名标准化 (所有的图必须先过这一关) ---
         dir_name = os.path.dirname(file_path)
         base_name = os.path.basename(file_path)
         lower_name = base_name.lower()
-        
-        # 即使图片很小不压缩，也要先确保它是小写的
+        current_path = file_path
+
         if base_name != lower_name:
             new_path = os.path.join(dir_name, lower_name)
-            # 如果目标小写文件已存在，先删除（防止 Windows 报错）
-            if os.path.exists(new_path) and base_name.lower() == lower_name:
-                pass 
-            os.rename(file_path, new_path)
-            file_path = new_path # 后续逻辑使用新路径
+            
+            # Windows 特有逻辑：A.JPG 改 a.jpg 有时会报错
+            # 我们通过一个中转名来强制重命名
+            temp_name = os.path.join(dir_name, f"temp_{base_name}")
+            os.rename(current_path, temp_name)
+            os.rename(temp_name, new_path)
+            
+            current_path = new_path
             print(f"  [重命名] {base_name} -> {lower_name}")
 
-        # --- 2. 检查文件大小：如果已经小于阈值，直接跳过压缩 ---
-        original_size = os.path.getsize(file_path)
-        if original_size < MIN_SIZE_KB * 1024:
-            # 如果只是重命名了，我们也返回 True 以便 Git 捕获变化
-            return True
-
-        # --- 3. 读取图片并检查分辨率 ---
-        img = Image.open(file_path)
+        # --- 第二阶段：体积判定 (基于标准化后的路径) ---
+        original_size = os.path.getsize(current_path)
         
-        # 如果宽度没超标且文件不是巨大，跳过压缩
-        if img.width <= MAX_WIDTH and original_size < 1024 * 1024: 
+        # 如果体积已经很小，直接结束（此时已完成重命名）
+        if original_size < MIN_SIZE_KB * 1024:
             return True
 
-        # --- 4. 执行压缩逻辑 ---
-        ext = os.path.splitext(file_path)[1].lower()
-
-        # 调整尺寸
+        # --- 第三阶段：压缩处理 ---
+        img = Image.open(current_path)
+        needs_compression = False
+        
+        # 判定是否需要调整尺寸
         if img.width > MAX_WIDTH:
-            height = int((MAX_WIDTH / img.width) * img.height)
-            img = img.resize((MAX_WIDTH, height), Image.Resampling.LANCZOS)
+            needs_compression = True
+        
+        # 即使尺寸不超，如果体积很大且没被压缩过，也建议过一遍优化
+        if original_size > MIN_SIZE_KB * 1024:
+            needs_compression = True
 
-        # 保存文件
-        if ext in ('.jpg', '.jpeg'):
-            img.save(file_path, "JPEG", optimize=True, quality=QUALITY, subsampling=0, progressive=True)
-        elif ext == '.png':
-            img.save(file_path, "PNG", optimize=True)
+        if needs_compression:
+            ext = os.path.splitext(current_path)[1].lower()
+            
+            # 调整尺寸
+            if img.width > MAX_WIDTH:
+                height = int((MAX_WIDTH / img.width) * img.height)
+                img = img.resize((MAX_WIDTH, height), Image.Resampling.LANCZOS)
 
-        new_size = os.path.getsize(file_path)
-        print(f"  [优化] {os.path.basename(file_path)}: {original_size//1024}KB -> {new_size//1024}KB")
+            # 保存覆盖
+            if ext in ('.jpg', '.jpeg'):
+                img.save(current_path, "JPEG", optimize=True, quality=QUALITY, subsampling=0, progressive=True)
+            elif ext == '.png':
+                img.save(current_path, "PNG", optimize=True)
+
+            new_size = os.path.getsize(current_path)
+            print(f"  [优化] {lower_name}: {original_size//1024}KB -> {new_size//1024}KB")
+        
         return True
+
     except Exception as e:
         print(f"  [失败] {file_path}: {e}")
         return False
@@ -63,7 +75,7 @@ if __name__ == "__main__":
     # 获取 Git Hook 传进来的文件列表
     files = sys.argv[1:] if len(sys.argv) > 1 else []
     
-    # 如果没传参数，说明是手动全量扫描整个 content 目录
+    # 手动运行模式：扫描 content 目录
     if not files:
         for root, _, filenames in os.walk('./content/posts/'):
             for filename in filenames:
@@ -71,6 +83,5 @@ if __name__ == "__main__":
                     files.append(os.path.join(root, filename))
 
     for f in files:
-        # 过滤掉不存在的文件（有时 Git Hook 传进来的文件可能已被删）
         if os.path.exists(f):
-            compress_image(f)
+            process_image(f)
