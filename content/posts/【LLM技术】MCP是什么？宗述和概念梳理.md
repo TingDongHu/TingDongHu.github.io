@@ -7,11 +7,9 @@ description: "MCP是一种标准化协议，为大型语言模型提供安全可
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true
---- 
+---
 
 MCP（模型上下文协议）是一种标准化协议，旨在为大型语言模型提供安全、可控的接口，使其能够可靠地访问和调用外部工具、数据源及服务。其核心架构基于客户端-服务器模型，通过标准化交互提升AI系统的集成能力与可靠性。 
-
-
 
 # MCP基本概念
 
@@ -32,9 +30,7 @@ MCP（模型上下文协议）是一种标准化协议，旨在为大型语言�
 这就是 **MCP（Model Context Protocol，模型上下文协议）** 想要解决的问题。它的核心使命是：  
 👉 **为大模型和外部服务之间提供一个安全、标准化、可控的调用接口。**
 
-![What is Model Context Protocol (MCP)? How it simplifies AI integrations  compared to APIs | AI Agents That Work](【LLM技术】MCP是什么？宗述和概念梳理/5acb521b1e4dd4ef52aa689fb9d8436f.png)
-
----
+![What is Model Context Protocol (MCP)? How it simplifies AI integrations  compared to APIs | AI Agents That Work](【LLM技术】MCP是什么？宗述和概念梳理/5acb521b1e4dd4ef52aa689fb9d8436f.png
 
 ## MCP的定义
 
