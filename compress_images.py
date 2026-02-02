@@ -1,87 +1,117 @@
 import os
 import sys
-import tempfile
 from PIL import Image
 
 # --- 配置区 ---
-MAX_WIDTH = 2560      # 2K 分辨率
-QUALITY = 85          # 高保真质量
-MIN_SIZE_KB = 5000    # 阈值：小于 5MB 的图片不重复压缩
+MAX_WIDTH = 2560
+QUALITY = 85
+MIN_SIZE_KB = 4000
 EXTENSIONS = ('.jpg', '.jpeg', '.png')
 
-def process_image(file_path):
+# 统计数据
+stats = {
+    "folders_renamed": 0,
+    "files_renamed": 0,
+    "files_compressed": 0,
+    "total_saved_kb": 0
+}
+
+def safe_rename_to_lower(full_path, is_folder=False):
+    """
+    安全地将路径重命名为全小写，并记录统计数据。
+    """
+    dir_name = os.path.dirname(full_path)
+    old_name = os.path.basename(full_path)
+    lower_name = old_name.lower()
+
+    if old_name != lower_name:
+        new_path = os.path.join(dir_name, lower_name)
+        temp_path = os.path.join(dir_name, f"temp_rename_{old_name}")
+        try:
+            os.rename(full_path, temp_path)
+            os.rename(temp_path, new_path)
+            
+            label = "文件夹" if is_folder else "文件"
+            print(f"  [{label}重命名] {old_name} -> {lower_name}")
+            
+            if is_folder:
+                stats["folders_renamed"] += 1
+            else:
+                stats["files_renamed"] += 1
+                
+            return new_path, True
+        except Exception as e:
+            print(f"  [失败] 重命名 {old_name} 时出错: {e}")
+            return full_path, False
+    return full_path, False
+
+def compress_image(file_path):
+    """
+    执行图片压缩并记录节省的体积。
+    """
     try:
-        # --- 第一阶段：命名标准化 (所有的图必须先过这一关) ---
-        dir_name = os.path.dirname(file_path)
-        base_name = os.path.basename(file_path)
-        lower_name = base_name.lower()
-        current_path = file_path
-
-        if base_name != lower_name:
-            new_path = os.path.join(dir_name, lower_name)
-            
-            # Windows 特有逻辑：A.JPG 改 a.jpg 有时会报错
-            # 我们通过一个中转名来强制重命名
-            temp_name = os.path.join(dir_name, f"temp_{base_name}")
-            os.rename(current_path, temp_name)
-            os.rename(temp_name, new_path)
-            
-            current_path = new_path
-            print(f"  [重命名] {base_name} -> {lower_name}")
-
-        # --- 第二阶段：体积判定 (基于标准化后的路径) ---
-        original_size = os.path.getsize(current_path)
-        
-        # 如果体积已经很小，直接结束（此时已完成重命名）
+        original_size = os.path.getsize(file_path)
         if original_size < MIN_SIZE_KB * 1024:
-            return True
+            return
 
-        # --- 第三阶段：压缩处理 ---
-        img = Image.open(current_path)
-        needs_compression = False
-        
-        # 判定是否需要调整尺寸
-        if img.width > MAX_WIDTH:
-            needs_compression = True
-        
-        # 即使尺寸不超，如果体积很大且没被压缩过，也建议过一遍优化
-        if original_size > MIN_SIZE_KB * 1024:
-            needs_compression = True
-
-        if needs_compression:
-            ext = os.path.splitext(current_path)[1].lower()
+        img = Image.open(file_path)
+        if img.width > MAX_WIDTH or original_size > MIN_SIZE_KB * 1024:
+            ext = os.path.splitext(file_path)[1].lower()
             
-            # 调整尺寸
+            # 缩放逻辑
             if img.width > MAX_WIDTH:
                 height = int((MAX_WIDTH / img.width) * img.height)
                 img = img.resize((MAX_WIDTH, height), Image.Resampling.LANCZOS)
-
-            # 保存覆盖
+            
+            # 保存
             if ext in ('.jpg', '.jpeg'):
-                img.save(current_path, "JPEG", optimize=True, quality=QUALITY, subsampling=0, progressive=True)
+                img.save(file_path, "JPEG", optimize=True, quality=QUALITY, subsampling=0, progressive=True)
             elif ext == '.png':
-                img.save(current_path, "PNG", optimize=True)
+                img.save(file_path, "PNG", optimize=True)
 
-            new_size = os.path.getsize(current_path)
-            print(f"  [优化] {lower_name}: {original_size//1024}KB -> {new_size//1024}KB")
-        
-        return True
-
+            new_size = os.path.getsize(file_path)
+            saved_kb = (original_size - new_size) // 1024
+            
+            if saved_kb > 0:
+                print(f"  [图片压缩] {os.path.basename(file_path)}: {original_size//1024}KB -> {new_size//1024}KB (节省 {saved_kb}KB)")
+                stats["files_compressed"] += 1
+                stats["total_saved_kb"] += saved_kb
     except Exception as e:
-        print(f"  [失败] {file_path}: {e}")
-        return False
+        print(f"  [失败] 压缩 {file_path} 时出错: {e}")
+
+def print_summary():
+    """打印最终的处理汇总"""
+    print("\n" + "="*40)
+    print(" >>> 处理汇总报告 <<<")
+    print(f" - 重命名文件夹: {stats['folders_renamed']} 个")
+    print(f" - 重命名文件:   {stats['files_renamed']} 个")
+    print(f" - 压缩优化图片: {stats['files_compressed']} 张")
+    print(f" - 共计节省空间: {stats['total_saved_kb']} KB (~{stats['total_saved_kb']/1024:.2f} MB)")
+    print("="*40 + "\n")
 
 if __name__ == "__main__":
-    # 获取 Git Hook 传进来的文件列表
-    files = sys.argv[1:] if len(sys.argv) > 1 else []
-    
-    # 手动运行模式：扫描 content 目录
-    if not files:
-        for root, _, filenames in os.walk('./content/posts/'):
+    target_dir = './content/posts/'
+    git_files = sys.argv[1:] if len(sys.argv) > 1 else []
+
+    if git_files:
+        print(">>>> Git Hook 模式: 正在处理暂存区文件...")
+        for f in git_files:
+            if os.path.exists(f) and f.lower().endswith(EXTENSIONS):
+                new_f, _ = safe_rename_to_lower(f, is_folder=False)
+                compress_image(new_f)
+    else:
+        print(">>>> 手动全量模式: 正在扫描路径标准化...")
+        # 1. 文件夹处理
+        for root, dirs, _ in os.walk(target_dir, topdown=False):
+            for d in dirs:
+                safe_rename_to_lower(os.path.join(root, d), is_folder=True)
+
+        # 2. 文件处理
+        for root, _, filenames in os.walk(target_dir):
             for filename in filenames:
                 if filename.lower().endswith(EXTENSIONS):
-                    files.append(os.path.join(root, filename))
+                    full_file_path = os.path.join(root, filename)
+                    new_file_path, _ = safe_rename_to_lower(full_file_path, is_folder=False)
+                    compress_image(new_file_path)
 
-    for f in files:
-        if os.path.exists(f):
-            process_image(f)
+    print_summary()
