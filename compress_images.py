@@ -6,7 +6,7 @@ from PIL import Image
 # --- 配置区 ---
 MAX_WIDTH = 2560      # 2K 分辨率
 QUALITY = 85          # 高保真质量
-MIN_SIZE_KB = 3000    # 阈值：小于 3MB 的图片不重复压缩
+MIN_SIZE_KB = 5000    # 阈值：小于 5MB 的图片不重复压缩
 EXTENSIONS = ('.jpg', '.jpeg', '.png')
 
 def process_image(file_path):
