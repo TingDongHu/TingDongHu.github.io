@@ -128,3 +128,55 @@
     cursor: pointer;
     z-index: 10;
 }
+
+/* ==========================================================================
+    Hugo Dream Theme - Layout & Width Optimization
+    目的：增加正文显示宽度，提升 Games101/C++ 笔记的信息密度，并确保图片居中
+   ========================================================================== */
+
+/* 1. 核心正文容器：提升至 1300px 以获取超大视野 */
+.ui.container.dream-article {
+    max-width: 1300px !important; 
+    width: 92% !important;        
+}
+
+/* 2. 响应式微调：确保在大屏幕下锁定宽度 */
+@media only screen and (min-width: 1200px) {
+    .ui.container.dream-article {
+        width: 1300px !important; 
+    }
+}
+
+/* 3. 图片完美居中方案 */
+/* 核心逻辑：将图片变为块级元素并利用 margin 自动平衡 */
+.dream-article img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    
+    max-width: 100% !important;   /* 防止图片溢出容器 */
+    height: auto !important;
+    border-radius: 8px;           /* 圆角风格统一 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* 增加轻微阴影，提升质感 */
+}
+
+/* 额外处理：Markdown 渲染时图片常被包裹在 p 标签里，强制该 p 标签也居中 */
+.dream-article p {
+    text-align: center; /* 确保 p 标签内的行内元素居中 */
+}
+
+/* 恢复正文文字的左对齐（防止被上面的 p 标签全局居中干扰） */
+/* 如果你发现文字也居中了，取消下面这段注释 */
+/*
+.dream-article p {
+    text-align: justify; 
+}
+*/
+
+/* 4. 代码块自适应：确保横向铺满 */
+.highlight {
+    width: 100% !important;
+    text-align: left; /* 强制代码块内容左对齐，不受全局居中影响 */
+}
