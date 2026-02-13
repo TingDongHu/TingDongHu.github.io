@@ -5,7 +5,7 @@ from PIL import Image
 
 # --- 配置区 ---
 MAX_WIDTH = 2560      # 2K 分辨率
-QUALITY = 85          # 高保真质量
+QUALITY = 80          # 高保真质量
 MIN_SIZE_KB = 4000    # 阈值：小于 4MB 的图片不重复压缩
 EXTENSIONS = ('.jpg', '.jpeg', '.png')
 TARGET_DIR = './content/posts/'
