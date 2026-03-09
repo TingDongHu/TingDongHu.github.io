@@ -1,13 +1,13 @@
---- 
+---
 title: 【LLM应用开发原理】Agent经典开发范式
 date: 2026-03-06T00:00:00+08:00
-categories: ["LLM"]
-tags: ["LLM", "大模型", "Agent", "ReAct","Reflection",“Plan-and-Execute”]
+categories: ["Agent"]
+tags: ["LLM", "Agent", "ReAct","Reflection",“Plan-and-Execute”]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true
 description: "Datawhale开源项目HelloAgent提供Agent架构学习。ReAct范式通过“思考-行动-观察”循环处理任务，适用于短链路工具调用，但存在Token消耗大和长任务易迷失的缺点。"
---- 
+---
 
 ### 动手学Agent
 
@@ -176,3 +176,23 @@ for i in range(max_retries):
     # 将失败尝试和反馈重新喂给模型
     candidate = agent.refine(candidate, feedback, memory=past_attempts)
 ```
+
+## 如何选取合适的范式
+
+| 范式名称                      | 核心逻辑 (Motto)                     | 适用场景 (Best For)                                     | 优点                                                | 缺点 (Cons)                                                  | 开发复杂度 | 成本/延迟 |
+| ----------------------------- | ------------------------------------ | ------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------ | ---------- | --------- |
+| ReAct (Reason+Act)            | “边想边做”<br />(Thought→Act→Obs)    | 通用型 Best For 查天气、简单搜索、单次工具调用          | ✅ 最通用，生态支持最好。<br />✅开发门槛低，上手快。 | ❌长链路任务容易“迷路” <br />❌容易陷入死循环                  | ★          | 低        |
+| Plan-and-Execute (规划与执行) | “谋定而后动”<br />(Planner→Executor) | 长链路复杂任务 写长短报告、从零完成项目、多步骤数据分析 | ✅目标感强，不易跑偏。<br /> ✅逻辑清晰，步骤可控。   | ❌初始计划可能不准确 。<br />❌灵活性稍差（除非加 Re-planning） | ★★         | 中        |
+| Reflection (反思/自修正)      | “三省吾身”<br />(Do→Critique→Fix)    | 高精度任务 写代码(Code Gen)、数学解题、翻译优化         | ✅产出质量最高。<br />✅ 容错率极高，能自动修 Bug。   | ❌最慢，延迟高。<br />❌ Token 消耗翻倍（反复重试）            | ★★         | 高        |
+
+> [!tip] 
+> 现代Agent开发过程中，几种范式常常搭配起来使用。
+
+| 架构类型     | 组合方式                               | 具体实现逻辑                                                 |
+| ------------ | -------------------------------------- | ------------------------------------------------------------ |
+| 最强单体架构 | ReAct + Reflection                     | 让 Agent 以 **ReAct（边想边做：Thought→Act→Obs）** 的方式调用工具，但在输出最终答案前，增加一个 **Reflection（反思：Do→Critique→Fix）** 节点检查成果，兼顾灵活性与质量。 |
+| 最强任务架构 | Plan-and-Execute (外层) + ReAct (内层) | 1. 外层 **Planner** 负责制定整体计划：①搜索信息 ②整理数据 ③写邮件；2. 内层 **Executor** 是一个 **ReAct Agent**，专门执行具体步骤（如“搜索信息”这一环节），兼顾规划性与执行灵活性。 |
+
+组合架构的核心是**“分工协同”**：通过不同范式的优势互补，解决单一范式的短板（如 ReAct 长链路易迷路、Plan-and-Execute 灵活性差、Reflection 速度慢等问题）。
+
+开发复杂度与成本/延迟会随组合层数增加而上升，但任务完成质量与鲁棒性也会提升，需根据实际场景权衡。

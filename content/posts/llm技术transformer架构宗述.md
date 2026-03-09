@@ -1,8 +1,8 @@
 ---
-title: 【LLM技术】Transformer架构宗述
+title: 【LLM应用开发原理】Transformer架构宗述
 date: 2025-09-30T00:00:00+08:00
 categories: ["LLM"]
-tags: ["LLM", "大模型", "Transformer", "NLP"]
+tags: ["LLM", "Transformer", "NLP"]
 description: "NLP技术从传统统计方法演进至神经网络，Transformer凭借自注意力机制实现突破，成为里程碑，并催生了BERT、GPT等变革性模型。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/linpory.png"

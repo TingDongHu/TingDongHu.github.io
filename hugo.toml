@@ -13,7 +13,7 @@ theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
   # --- 1. 核心显示配置 (由 LoveIt 的 profile 迁移而来) ---
   author = "古月月仔"
   headerTitle = "古月月仔的博客"
-  motto = "计算机在校生 || 游戏程序员\n记录从基础到进阶的每一份思考。" # 对应 LoveIt 的 subtitle + description
+  motto = "计算机在校生 || 游戏程序员" # 对应 LoveIt 的 subtitle + description
   avatar = "/img/ChipDog.jpg" # 确保文件在 static/img/ChipDog.jpg
   
   # --- 2. 主题皮肤配置 ---
@@ -51,6 +51,7 @@ theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
     name = "标签"
     url = "/tags/"
     weight = 4
+  
 [markup]
   [markup.goldmark.renderer]
       unsafe = true  # 允许在 Markdown 中直接使用 HTML 标签

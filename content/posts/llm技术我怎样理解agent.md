@@ -1,8 +1,8 @@
 ---
 title: 【LLM应用开发原理】我怎样理解Agent
 date: 2026-03-05T00:00:00+08:00
-categories: ["LLM"]
-tags: ["LLM", "大模型", "Agent"]
+categories: ["Agent"]
+tags: ["LLM", "Agent"]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true
