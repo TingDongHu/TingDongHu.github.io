@@ -1,0 +1,224 @@
+/* ==========================================================================
+   Prism Prism.js Mac 风格代码块
+   基于 Prism 主题增强，添加 Mac 窗口效果和自定义复制按钮
+   ========================================================================== */
+
+/* 1. Mac 窗口风格 - 核心容器 */
+pre[class*="language-"] {
+    position: relative !important;
+    border-radius: 12px !important;
+    margin: 2em 0 !important;
+    padding: 42px 0 0 0 !important; /* 顶部留出 42px 给标题栏 */
+    overflow: hidden !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    font-family: 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    background: transparent !important;
+}
+
+/* Mac 窗口标题栏 */
+pre[class*="language-"]::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 42px !important;
+    background: #2d2d2d !important;
+    border-bottom: 1px solid #3a3a3a !important;
+    z-index: 50 !important;
+}
+
+/* Mac 三色圆点 - 确保只显示一次 */
+pre[class*="language-"]::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 15px !important;
+    left: 18px !important;
+    width: 12px !important;
+    height: 12px !important;
+    background: #ff5f56 !important;
+    border-radius: 50% !important;
+    box-shadow:
+        18px 0 0 #ffbd2e,
+        36px 0 0 #27c93f !important;
+    z-index: 100 !important;
+}
+
+/* 代码内容区域优化 */
+pre[class*="language-"] > code {
+    display: block !important;
+    padding: 15px 20px !important;
+    margin: 0 !important;
+    background: #1e1e1e !important; /* 设置代码背景色 */
+    border: none !important;
+    min-height: calc(100% - 42px) !important;
+}
+
+/* 2. 行号样式优化 - 避免重复显示圆点 */
+.line-numbers .line-numbers-rows {
+    position: absolute !important;
+    left: 0 !important;
+    top: 42px !important; /* 从标题栏下方开始 */
+    width: 50px !important;
+    padding: 0 !important; /* 去除上下内边距 */
+    border-right: 1px solid #3a3a3a !important;
+    background: #2d2d2d !important;
+    border-radius: 0 0 0 12px !important; /* 只保留左下角圆角 */
+    height: calc(100% - 42px) !important;
+}
+
+.line-numbers-rows > span {
+    padding: 0 10px 0 15px !important;
+    color: #6a6a6a !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    display: block !important;
+    height: calc(1.6 * 13px) !important;
+    box-sizing: border-box !important;
+}
+
+/* 调整有行号时的代码区域 padding */
+.line-numbers pre[class*="language-"] > code {
+    padding-left: 60px !important;
+    padding-right: 20px !important;
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+}
+
+/* 3. 工具栏样式优化 */
+div[class*="language-"] .toolbar {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    z-index: 100 !important;
+}
+
+.toolbar-item {
+    margin: 0 10px !important;
+    padding: 4px 12px !important;
+}
+
+/* 语言标签样式 */
+.toolbar-item span[style*="background"] {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #a0a0a0 !important;
+    padding: 4px 10px !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* 复制按钮样式 */
+.toolbar button {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #a0a0a0 !important;
+    padding: 5px 12px !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-weight: 500 !important;
+}
+
+.toolbar button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.toolbar button:focus {
+    outline: none !important;
+}
+
+/* 4. 深色模式适配 */
+.dark pre[class*="language-"]::before {
+    background: #1e1e1e !important;
+    border-bottom-color: #2a2a2a !important;
+}
+
+.dark pre[class*="language-"] > code {
+    background: #1e1e1e !important;
+}
+
+.dark .line-numbers .line-numbers-rows {
+    background: #1e1e1e !important;
+    border-right-color: #2a2a2a !important;
+}
+
+/* 5. 内联代码样式优化 */
+:not(pre) > code[class*="language-"] {
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-size: 0.9em !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+    color: #d63384 !important;
+}
+
+.dark :not(pre) > code[class*="language-"] {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #f8b7d9 !important;
+}
+
+/* 6. 响应式优化 */
+@media (max-width: 768px) {
+    pre[class*="language-"] {
+        font-size: 12px !important;
+        padding-top: 38px !important;
+    }
+
+    pre[class*="language-"]::before {
+        height: 38px !important;
+    }
+
+    pre[class*="language-"]::after {
+        top: 13px !important;
+        left: 15px !important;
+        width: 10px !important;
+        height: 10px !important;
+        box-shadow:
+            15px 0 0 #ffbd2e,
+            30px 0 0 #27c93f !important;
+    }
+
+    .line-numbers .line-numbers-rows {
+        top: 38px !important;
+        height: calc(100% - 38px) !important;
+    }
+}
+
+/* 7. 滚动条样式优化 */
+pre[class*="language-"]::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}
+
+/* 8. 修复行号区域的圆点重复问题 */
+.code {
+    position: relative !important;
+}

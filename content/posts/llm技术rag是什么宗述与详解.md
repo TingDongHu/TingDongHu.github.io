@@ -1,5 +1,5 @@
 ---
-title: 【LLM应用开发原理】RAG是什么？宗述与详解
+title: 【LLM应用开发原理】RAG是什么详解
 date: 2025-09-13T00:00:00+08:00
 categories: ["Agent"]
 tags: ["LLM",  "Agent", "RAG"]

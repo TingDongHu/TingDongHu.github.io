@@ -35,7 +35,6 @@
 {{ hugo.Generator }}
 
 {{ template "_internal/opengraph.html" . }}
-
 {{ template "_internal/twitter_cards.html" . }}
 
 {{ $outputCss := resources.Get "css/output.css" }}
@@ -60,6 +59,8 @@ html.dark #dream-global-bg {
 </style>
 {{ end }}
 
+<!-- Hugo Chroma Mac 风格代码块样式 -->
+<link rel="stylesheet" href="/css/chroma-mac.css" />
+
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 <link rel="stylesheet" href="/css/custom.css">
-<script src="/js/code_block.js" defer></script>

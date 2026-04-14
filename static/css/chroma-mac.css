@@ -1,0 +1,295 @@
+/* ==========================================================================
+   Hugo Chroma Mac 风格代码块
+   针对 Hugo 内置的 chroma 高表格结构优化样式
+   ========================================================================== */
+
+/* 1. 整体容器 - Mac 风格外框 */
+.highlight {
+    position: relative !important;
+    background: #282c34 !important;
+    border-radius: 12px !important;
+    margin: 2em 0 !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid #3a3a3a !important;
+}
+
+/* Mac 窗口标题栏 - 使用伪元素 */
+.highlight::before {
+    content: "" !important;
+    display: block !important;
+    height: 42px !important;
+    background: #2d2d2d !important;
+    border-bottom: 1px solid #3a3a3a !important;
+    width: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10 !important;
+}
+
+/* Mac 三色圆点容器 */
+.mac-dots {
+    position: absolute !important;
+    top: 15px !important;
+    left: 18px !important;
+    z-index: 20 !important;
+    display: flex !important;
+    gap: 8px !important;
+}
+
+.mac-dots span {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+}
+
+.dot-red { background: #ff5f56 !important; }
+.dot-yellow { background: #ffbd2e !important; }
+.dot-green { background: #27c93f !important; }
+
+/* 2. Chroma 容器调整 - 为标准表格布局留出顶部空间 */
+.highlight > .chroma {
+    margin-top: 42px !important;
+}
+
+/* 3. 标准表格结构 - 恢复浏览器默认表格布局 */
+.lntable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    /* 保持表格默认 display: table */
+}
+
+.lntable tbody {
+    /* 保持默认 display: table-row-group */
+}
+
+.lntable tr {
+    /* 保持默认 display: table-row */
+}
+
+/* 4. 表格单元格样式 */
+.lntd {
+    vertical-align: top !important;
+    padding: 15px !important;
+    border: none !important;
+    /* 保持默认 display: table-cell */
+}
+
+/* 5. 行号列样式 - 缩小宽度，外边距设为零，去除上下内边距 */
+.lntd:first-child {
+    width: auto !important;
+    min-width: auto !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    background: #2d2d2d !important;
+    border-right: 1px solid #3a3a3a !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+.lntd:first-child pre {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    color: #6a6a6a !important;
+    font-family: 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace !important;
+}
+
+.lnt {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    user-select: none !important;
+}
+
+/* 6. 代码区域样式 - 添加横向滚动条 */
+.lntd:last-child {
+    width: 99% !important; /* 占据剩余空间 */
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    background: #282c34 !important;
+    overflow-x: auto !important; /* 添加横向滚动 */
+}
+
+.lntd:last-child pre {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow-x: visible !important; /* pre 不需要滚动，由 td 处理 */
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    font-family: 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace !important;
+    white-space: pre !important; /* 保持代码不换行 */
+}
+
+/* 7. Mac 风格工具栏 */
+.mac-toolbar {
+    position: absolute !important;
+    top: 6px !important;
+    right: 15px !important;
+    display: flex !important;
+    gap: 10px !important;
+    z-index: 15 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+/* 语言标签 */
+.mac-language {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #a0a0a0 !important;
+    padding: 5px 10px !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* 复制按钮 */
+.mac-copy-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #a0a0a0 !important;
+    padding: 5px 12px !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-weight: 500 !important;
+}
+
+.mac-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.mac-copy-btn:focus {
+    outline: none !important;
+}
+
+/* 8. 移除旧的工具栏 */
+.code-toolbar {
+    display: none !important;
+}
+
+/* 9. 语法高亮颜色 (Hugo Chroma 默认配色) */
+/* 关键字 */
+.k { color: #c678dd !important; font-weight: bold; }
+/* 函数名 */
+.f, .nf { color: #61afef !important; }
+/* 字符串 */
+.s, .s2, .sb, .si { color: #98c379 !important; }
+/* 注释 */
+.c, .c1, .cm { color: #7f848e !important; font-style: italic; }
+/* 数字 */
+.m, .mi, .mf { color: #d19a66 !important; }
+/* 操作符 */
+.o, .p { color: #56b6c2 !important; }
+/* 类名 */
+.nc, .nb, .no { color: #e5c07b !important; }
+/* 变量 */
+.n, .nv { color: #e06c75 !important; }
+
+/* 10. 深色模式适配 */
+.dark .highlight {
+    background: #1e1e1e !important;
+    border-color: #2a2a2a !important;
+}
+
+.dark .highlight::before {
+    background: #1e1e1e !important;
+    border-bottom-color: #2a2a2a !important;
+}
+
+.dark .lntd:first-child {
+    background: #1e1e1e !important;
+    border-right-color: #2a2a2a !important;
+}
+
+.dark .lntd:last-child {
+    background: #1e1e1e !important;
+}
+
+/* 11. 响应式优化 */
+@media (max-width: 768px) {
+    .highlight::before {
+        height: 38px !important;
+    }
+
+    .mac-dots {
+        top: 13px !important;
+        left: 15px !important;
+    }
+
+    .mac-dots span {
+        width: 10px !important;
+        height: 10px !important;
+    }
+
+    .highlight > .chroma {
+        margin-top: 38px !important;
+    }
+
+    .lntd:first-child {
+        min-width: 40px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .lntd:first-child pre {
+        font-size: 11px !important;
+    }
+
+    .lntd:last-child pre {
+        font-size: 12px !important;
+    }
+
+    .mac-toolbar {
+        top: 4px !important;
+        right: 10px !important;
+    }
+
+    .mac-language {
+        padding: 4px 8px !important;
+        font-size: 10px !important;
+    }
+
+    .mac-copy-btn {
+        padding: 4px 10px !important;
+        font-size: 10px !important;
+    }
+}
+
+/* 12. 滚动条样式 */
+.lntd:last-child pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.lntd:last-child pre::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+.lntd:last-child pre::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+.lntd:last-child pre::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}

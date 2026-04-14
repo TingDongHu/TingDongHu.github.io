@@ -1,4 +1,4 @@
---- 
+---
 title: 【博客魔改】Butterfly 主题配置 Giscus 评论系统
 date: 2025-12-03T00:00:00+08:00
 categories: ["Hexo博客"]
@@ -7,8 +7,9 @@ description: "为Hexo的Butterfly主题配置Giscus评论系统，需先在GitHu
 cover: "/img/BlogMakeover.png"
 headerImage: "/img/Raythy.png"
 math: true
---- 
+---
 
+---
 本文介绍了为Hexo博客的Butterfly主题配置Giscus评论系统的详细步骤。Giscus是一个基于GitHub Discussions的免费评论工具，无需自建服务器。配置过程主要包括：创建公开的GitHub仓库并启用Discussions功能，安装Giscus应用，最后在配置页面生成并获取必要的代码片段。 
 
 

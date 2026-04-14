@@ -9,6 +9,8 @@ headerImage: "/img/pink.png"
 math: true
 ---
 
+---
+
 ## 基本概念
 
 ### 封装的概念

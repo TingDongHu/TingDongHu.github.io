@@ -1,4 +1,4 @@
---- 
+---
 title: 【虚幻引擎】委托(Delegates)与回调(Callbacks)
 date: 2024-04-15T00:00:00+08:00
 categories: ["虚幻引擎"]
@@ -7,6 +7,8 @@ description: "虚幻引擎委托机制是一种类型安全的事件通知系统
 cover: "/img/unrealengine.png"
 headerImage: "/img/sakura.png"
 math: true
+---
+
 --- 
 
 虚幻引擎的委托机制是一种类型安全的事件通知系统，支持动态绑定和多播功能，适用于观察者模式和回调实现。主要包括单播、多播、动态委托及事件等类型，并提供基本使用示例。 

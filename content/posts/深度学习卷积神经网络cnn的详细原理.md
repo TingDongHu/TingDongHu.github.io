@@ -1,4 +1,4 @@
---- 
+---
 title: 卷积神经网络(CNN)的原理
 date: 2024-11-10T00:00:00+08:00
 categories: ["机器学习"]
@@ -7,7 +7,9 @@ description: "卷积是CNN的核心数学运算，通过翻转和滑动叠加捕
 cover: "/img/machinelearning.png"
 headerImage: "/img/rthykless.png"
 math: true
---- 
+---
+
+---
 
 卷积神经网络（CNN）的核心运算“卷积”是一种数学操作，通过翻转和滑动叠加来捕捉数据的局部与全局特征。这种机制使CNN在图像识别等计算机视觉任务中表现出色，能够有效处理图像中的平移不变性。 
 

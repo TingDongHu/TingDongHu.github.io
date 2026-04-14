@@ -9,6 +9,7 @@ headerImage: "/img/pink.png"
 math: true
 ---
 
+---
 组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C++中面向对象编程（OOP）的三大支柱。
 
 之前只在大学课本上学到一点皮毛，在此做复习和深入挖掘。

@@ -1,3 +1,53 @@
 public/
 .venv/
 __pycache__/
+
+# Claude Code
+.claude/
+.memory/
+
+# Claude specific files
+CLAUDE.md
+CLAUDE.mdc
+*.claude.md
+*.claude.mdc
+claude-config.json
+claude-cache/
+claude-logs/
+
+# Claude session files
+.claude-session
+.claude-history
+.claude-temp/
+
+# baoyu-skills - 用户配置和 API 密钥（包含敏感信息）
+.baoyu-skills/
+
+# baoyu-skills - node 依赖
+baoyu-skills/node_modules/
+
+# 环境变量文件（包含 API 密钥）
+.env
+.env.*
+!.env.example
+
+# baoyu-skills 临时输出目录
+x-to-markdown/
+xhs-images/
+url-to-markdown/
+cover-image/
+slide-deck/
+infographic/
+illustrations/
+comic/
+translate/
+posts/
+diagram/
+youtube-transcript/
+.omx/
+
+# ClawHub 本地状态
+.clawhub/
+.clawdhub/
+.release-artifacts/
+.worktrees/

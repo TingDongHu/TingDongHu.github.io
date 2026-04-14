@@ -15,7 +15,7 @@ math: true
 
 之前玩一个yolo项目的时候碰上了数据不足训练结果很差的问题，刚好现在AI生图这么发达，而自己之前有摸索过一点使用ComfyUI生图的工作流，索性开始用ComfyUI开始造数据。ComfyUI本身是支持多批次生成功能的。设置次数后可以反复运行该工作流，但是官方提供的这个更多是面向同一提示词、不同随机种子抽卡情况的。
 
-![image-20251201204323062](%E3%80%90ComfyUI%E3%80%91I2I%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/image-20251201204323062.png)
+![image-20251201204323062](comfyuii2i批量生成自动化/image-20251201204323062.png)
 
 我造数据需要的工况则是：
 
@@ -23,7 +23,7 @@ math: true
 
 显然和官方提供的方法不太匹配，中间也找了几篇博客，有的是提供了批量加载图片节点，配合工作流的一个循环（LoopStart和LoopEnd）去实现的，个人尝试了一下发现其限制很大，每次限制加载100张，而且循环的逻辑很难用，还会出现重复加载的问题，只能算是面向非程序人员的解决方案了。
 
-![Load Images For Loop文章图片](https://uinodes.com/_next/image?url=%2Fimg%2Fplugins%2FComfyUI-Easy-Use%2Fcompressed%2FLGQn8E9iXbgQMmp3dnQx5Y.webp&w=3840&q=75)
+![Load Images For Loop文章图片](comfyuii2i批量生成自动化/imageurl=%2Fimg%2Fplugins%2FComfyUI-Easy-Use%2Fcompressed%2FLGQn8E9iXbgQMmp3dnQx5Y.webp)
 
 还有些方法就是使用第三方的平台或者插件等调用API，该方法的解决问题是很不错的。这里留一个链接方便以后查找[快速开始 - EasyAI在线文档](https://doc.51easyai.com/getting-started/quickstart)。但是感觉我就很简单一个需求，完全没必要用这么复杂的东西，索性自己配合GPT整理了一个脚本，用于本地的Image2Image的工作流批量运行.
 
@@ -31,7 +31,7 @@ math: true
 
 要注意在保存导出为API之前，工作流中的预览图片节点要尽量去除，节省算力，同时要保证该工作流是确实可用的，可以运行出图的。
 
-![image-20251201210839690](%E3%80%90ComfyUI%E3%80%91I2I%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/image-20251201210839690.png)
+![image-20251201210839690](comfyuii2i批量生成自动化/image-20251201210839690.png)
 
 导出后可以得到一个.json后缀的文件，就是可以用于python脚本中API调用的文件了。
 
@@ -233,6 +233,6 @@ if __name__ == "__main__":
 >
 > - 没有其他任务在排队
 
-![image-20251201210952597](%E3%80%90ComfyUI%E3%80%91I2I%E6%89%B9%E9%87%8F%E7%94%9F%E6%88%90%E8%87%AA%E5%8A%A8%E5%8C%96/image-20251201210952597.png)
+![image-20251201210952597](comfyuii2i批量生成自动化/image-20251201210952597.png)
 
 如此就可以交给该脚本线性的处理我配置文件夹中所有的图片且不会出现加载重复的问题了，而我本人就可以安心睡大觉去了!

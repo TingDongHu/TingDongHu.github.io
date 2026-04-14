@@ -20,6 +20,8 @@ theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
   # Dream 使用 DaisyUI 颜色体系，可选: emerald, forest, cupcake, lo-fi 等
   lightTheme = "emerald"
   darkTheme = "forest"
+  # 告诉 Dream 主题加载你的自定义样式
+  customCSS = ["css/custom.css"]
 
   # --- 3. 社交链接 (Dream 直接在 params 下定义) ---
   email = "2680957536@qq.com"
