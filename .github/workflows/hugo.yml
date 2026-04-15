@@ -17,7 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # 必须，为了拉取 Dream 主题
           fetch-depth: 0
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
