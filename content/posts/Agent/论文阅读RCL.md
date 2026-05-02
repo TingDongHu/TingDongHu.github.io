@@ -1,9 +1,8 @@
 ---
-title: 【论文阅读】Reflective Context Learning: Studying the Optimization Primitives of Context Space
+title: "【论文阅读】Reflective Context Learning: Studying the Optimization Primitives of Context Space"
 date: 2026-04-19T00:00:00+08:00
 categories: ["Agent"]
-tags: ["LLM", "Agent", "context-learning", "paper-reading"]
-", "reflective-learning"
+tags: ["LLM", "Agent", "context-learning", "paper-reading", "reflective-learning"]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true
