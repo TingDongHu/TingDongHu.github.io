@@ -5,6 +5,9 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # 强制使用Node.js 24运行时，解决Node.js 20废弃问题
+
 permissions:
   contents: read
   pages: write
@@ -15,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+        uses: peaceiris/actions-hugo@v4
         with:
           hugo-version: 'latest'
           extended: true        # 必须，Dream 主题需要 extended 版本处理 CSS
