@@ -1,0 +1,35 @@
+{
+  "jobs": 4,
+  "tasks": [
+    {
+      "id": "01-proof-nfa-to-dfa",
+      "promptFiles": ["proofs/prompts/01-proof-nfa-to-dfa.md"],
+      "image": "proofs/01-proof-nfa-to-dfa.png",
+      "ar": "16:9"
+    },
+    {
+      "id": "02-proof-dfa-to-regex",
+      "promptFiles": ["proofs/prompts/02-proof-dfa-to-regex.md"],
+      "image": "proofs/02-proof-dfa-to-regex.png",
+      "ar": "16:9"
+    },
+    {
+      "id": "03-proof-cfg-to-pda",
+      "promptFiles": ["proofs/prompts/03-proof-cfg-to-pda.md"],
+      "image": "proofs/03-proof-cfg-to-pda.png",
+      "ar": "16:9"
+    },
+    {
+      "id": "04-proof-decidability",
+      "promptFiles": ["proofs/prompts/04-proof-decidability.md"],
+      "image": "proofs/04-proof-decidability.png",
+      "ar": "16:9"
+    },
+    {
+      "id": "05-proof-savitch",
+      "promptFiles": ["proofs/prompts/05-proof-savitch.md"],
+      "image": "proofs/05-proof-savitch.png",
+      "ar": "16:9"
+    }
+  ]
+}

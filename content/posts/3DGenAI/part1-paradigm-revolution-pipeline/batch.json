@@ -1,0 +1,54 @@
+{
+  "jobs": 4,
+  "tasks": [
+    {
+      "id": "01-comparison-pipeline-hours",
+      "promptFiles": ["prompts/01-comparison-pipeline-hours.md"],
+      "image": "01-comparison-pipeline-hours.png",
+      "ar": "16:9",
+      "quality": "2k"
+    },
+    {
+      "id": "02-infographic-normal-baking",
+      "promptFiles": ["prompts/02-infographic-normal-baking.md"],
+      "image": "02-infographic-normal-baking.png",
+      "ar": "16:9",
+      "quality": "2k"
+    },
+    {
+      "id": "03-framework-paradigm-shifts",
+      "promptFiles": ["prompts/03-framework-paradigm-shifts.md"],
+      "image": "03-framework-paradigm-shifts.png",
+      "ar": "16:9",
+      "quality": "2k"
+    },
+    {
+      "id": "04-infographic-application-value",
+      "promptFiles": ["prompts/04-infographic-application-value.md"],
+      "image": "04-infographic-application-value.png",
+      "ar": "16:9",
+      "quality": "2k"
+    },
+    {
+      "id": "05-flowchart-full-pipeline",
+      "promptFiles": ["prompts/05-flowchart-full-pipeline.md"],
+      "image": "05-flowchart-full-pipeline.png",
+      "ar": "9:16",
+      "quality": "2k"
+    },
+    {
+      "id": "06-infographic-ai-positioning",
+      "promptFiles": ["prompts/06-infographic-ai-positioning.md"],
+      "image": "06-infographic-ai-positioning.png",
+      "ar": "16:9",
+      "quality": "2k"
+    },
+    {
+      "id": "07-infographic-3dgs-principle",
+      "promptFiles": ["prompts/07-infographic-3dgs-principle.md"],
+      "image": "07-infographic-3dgs-principle.png",
+      "ar": "16:9",
+      "quality": "2k"
+    }
+  ]
+}
