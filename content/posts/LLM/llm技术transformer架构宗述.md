@@ -8,6 +8,7 @@ cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/linpory.png"
 math: true
 ---
+
 NLP 技术从传统统计方法演进至神经网络，Word Embeddings、RNN/LSTM 等模型逐步发展。Transformer 凭借自注意力机制实现突破，成为里程碑，并催生了 BERT、GPT 等变革性模型。 
 
 ### 博文背景

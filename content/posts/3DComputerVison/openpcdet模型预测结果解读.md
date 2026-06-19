@@ -1,4 +1,4 @@
---- 
+---
 title: 【OpenPCDet】模型预测结果解读
 date: 2024-03-02T00:00:00+08:00
 categories: ["3DComputerVison"]
@@ -7,7 +7,7 @@ description: "OpenPCDet模型推理输出为字典，包含目标类别、位置
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
---- 
+---
 
 OpenPCDet模型的推理结果以字典形式输出，包含检测目标的类别、位置、尺寸等关键信息。不同模型输出结构类似，但具体字段可能略有差异。 
 

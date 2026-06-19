@@ -1,4 +1,4 @@
---- 
+---
 title: 【OpenPCDet】关于spconv的一些问题解决方案
 date: 2024-12-30T00:00:00+08:00
 categories: ["3DComputerVison"]
@@ -7,7 +7,7 @@ description: "在Ubuntu20.04与CUDA 11.3环境下改进OpenPCDet时，针对spco
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
---- 
+---
 
 
 最近在修改对OpenPCDet中一些算法做改进评估的时候碰到了一系列的和spconv模组相关的问题，找到了一些解决方法。
