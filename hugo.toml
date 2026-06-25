@@ -3,6 +3,9 @@ locale = 'zh-cn'
 title = '古月月仔的博客'
 theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
 
+# 排除非文章文件(图像生成prompts/系列outline/README/演讲草稿),避免被当文章渲染产生0001空归档
+ignoreFiles = ['/prompts/', 'outline\.md$', '/README\.md$', 'RCL组会报告演讲稿\.md$']
+
 [taxonomies]
   category = "categories"
   tag = "tags"
@@ -33,27 +36,19 @@ theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
   # --- 4. 站点选项 ---
   siteStartYear = 2021
   # 如果不想在首页卡片显示默认占位图，取消下面注释
-  # noDefaultSummaryCover = true 
+  # noDefaultSummaryCover = true
 
-# --- 5. 菜单配置 (注意：Dream 的图标处理方式与 LoveIt 不同) ---
-# LoveIt 用 pre 写 HTML，Dream 建议直接在 menu 结构中配置
-[menu]
-  [[menu.main]]
-    identifier = "posts"
-    name = "文章"
-    url = "/posts/"
-    weight = 1
-  [[menu.main]]
-    identifier = "categories"
-    name = "分类"
-    url = "/categories/"
-    weight = 3
-  [[menu.main]]
-    identifier = "tags"
-    name = "标签"
-    url = "/tags/"
-    weight = 4
-  
+  # --- 4b. 阅读体验开关 (子项目A: 启用主题内置功能) ---
+  showTableOfContents = true   # 长文目录,复习时快速跳转
+  imageZoomableInPost  = true  # 文章内图片点击放大(信息图/截图多)
+  showPrevNextPost     = true  # 上一篇/下一篇导航
+  stickyNav            = true  # 导航栏滚动吸顶
+  rss                  = true  # 显示导航栏 RSS 图标(feed 已自动生成)
+
+# --- 5. 菜单配置 ---
+# 注意: Dream 主题不读 Hugo 的 [menu] 块,导航由 nav.html 的默认列表
+# ["about","search","rss","posts","categories","tags"] 驱动,需重排时用 params.reorderNavItems。
+
 [markup]
   [markup.goldmark.renderer]
       unsafe = true  # 允许在 Markdown 中直接使用 HTML 标签

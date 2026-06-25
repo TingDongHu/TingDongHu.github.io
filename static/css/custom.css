@@ -130,53 +130,48 @@
 }
 
 /* ==========================================================================
-    Hugo Dream Theme - Layout & Width Optimization
-    目的：增加正文显示宽度，提升 Games101/C++ 笔记的信息密度，并确保图片居中
+   正文排版:解除 prose 65ch 限制 + 紧凑高密度(子项目F)
    ========================================================================== */
-
-/* 1. 核心正文容器：提升至 1300px 以获取超大视野 */
-.ui.container.dream-article {
-    max-width: 1300px !important; 
-    width: 92% !important;        
+#dream-single-post-main.prose {
+    max-width: 100%;   /* 宽度交给网格列控制 */
 }
+#dream-single-post-content {
+    font-size: 16px;
+    line-height: 1.6;
+}
+/* 标题:缩小 + 收紧间距 */
+#dream-single-post-content h1 { font-size: 1.7rem; margin: 1.1em 0 .5em; line-height: 1.3; }
+#dream-single-post-content h2 { font-size: 1.4rem; margin: 1.0em 0 .45em; line-height: 1.3; }
+#dream-single-post-content h3 { font-size: 1.2rem; margin: .9em 0 .4em; }
+#dream-single-post-content h4 { font-size: 1.05rem; margin: .8em 0 .35em; }
+/* 段落/列表/引用:压缩间距 */
+#dream-single-post-content p,
+#dream-single-post-content li { margin-top: .4em; margin-bottom: .4em; }
+#dream-single-post-content ul,
+#dream-single-post-content ol { margin-top: .5em; margin-bottom: .5em; }
+#dream-single-post-content blockquote { margin: .8em 0; }
+/* 图片:居中 + 适度上下间距 */
+#dream-single-post-content img { margin: 1em auto; }
 
-/* 2. 响应式微调：确保在大屏幕下锁定宽度 */
-@media only screen and (min-width: 1200px) {
-    .ui.container.dream-article {
-        width: 1300px !important; 
+/* 代码块横向铺满(保留旧补丁,避免溢出网格列) */
+.highlight { width: 100% !important; text-align: left; }
+
+/* ==========================================================================
+   文章版面:两列网格(正文 + TOC)+ TOC sticky(子项目F)
+   纯CSS实现,不依赖主题预编译Tailwind未包含的任意值类
+   ========================================================================== */
+@media (min-width: 1024px) {
+    .dream-post-layout {
+        grid-template-columns: 1fr 16rem;  /* 正文吃满主区,TOC 固定16rem */
+        gap: 2rem;
     }
-}
-
-/* 3. 图片完美居中方案 */
-/* 核心逻辑：将图片变为块级元素并利用 margin 自动平衡 */
-.dream-article img {
-    display: block !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    margin-top: 2rem !important;
-    margin-bottom: 2rem !important;
-    
-    max-width: 100% !important;   /* 防止图片溢出容器 */
-    height: auto !important;
-    border-radius: 8px;           /* 圆角风格统一 */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* 增加轻微阴影，提升质感 */
-}
-
-/* 额外处理：Markdown 渲染时图片常被包裹在 p 标签里，强制该 p 标签也居中 */
-.dream-article p {
-    text-align: center; /* 确保 p 标签内的行内元素居中 */
-}
-
-/* 恢复正文文字的左对齐（防止被上面的 p 标签全局居中干扰） */
-/* 如果你发现文字也居中了，取消下面这段注释 */
-/*
-.dream-article p {
-    text-align: justify; 
-}
-*/
-
-/* 4. 代码块自适应：确保横向铺满 */
-.highlight {
-    width: 100% !important;
-    text-align: left; /* 强制代码块内容左对齐，不受全局居中影响 */
+    /* 关键:grid项默认 min-width:auto,长标题/长内容会撑宽1fr列。
+       min-w-0 类不在主题预编译Tailwind中,故用纯CSS强制 min-width:0 让列正常收缩。 */
+    .dream-post-layout > .min-w-0 { min-width: 0; }
+    .dream-post-toc {
+        position: sticky;
+        top: 1rem;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+    }
 }
