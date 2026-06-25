@@ -165,6 +165,9 @@
         grid-template-columns: 1fr 16rem;  /* 正文吃满主区,TOC 固定16rem */
         gap: 2rem;
     }
+    /* 关键:grid项默认 min-width:auto,长标题/长内容会撑宽1fr列。
+       min-w-0 类不在主题预编译Tailwind中,故用纯CSS强制 min-width:0 让列正常收缩。 */
+    .dream-post-layout > .min-w-0 { min-width: 0; }
     .dream-post-toc {
         position: sticky;
         top: 1rem;
