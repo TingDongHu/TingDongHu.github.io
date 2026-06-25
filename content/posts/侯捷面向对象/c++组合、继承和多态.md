@@ -2,7 +2,7 @@
 title: 【C++】组合、继承和多态
 date: 2026-01-05T00:00:00+08:00
 categories: ["侯捷面向对象"]
-tags: ["面相对象", "c++", "继承", "多态", "虚函数"]
+tags: ["面向对象", "C++"]
 description: "组合（Composition）、继承（Inheritance）和多态（Polymorphism）是C++中面向对象编程（OOP）的三大支柱。本文从内存管理的角度深入挖掘了这三大支柱的细节。"
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"

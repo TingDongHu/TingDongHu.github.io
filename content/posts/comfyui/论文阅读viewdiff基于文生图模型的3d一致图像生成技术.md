@@ -2,7 +2,7 @@
 title: 【论文阅读】ViewDiff：基于文生图模型的3D一致图像生成技术
 date: 2025-11-04T00:00:00+08:00
 categories: ["ComfyUI"]
-tags: ["Diffusion", "AIGC", "AI绘画", "视觉图像生成", "视频生成", "生成式人工智能", "扩散模型", "文生图"]
+tags: ["Diffusion"]
 description: "ViewDiff利用预训练文生图扩散模型生成高质量、多视角一致的3D图像，解决了现有方法在真实感和视角一致性上的不足。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"

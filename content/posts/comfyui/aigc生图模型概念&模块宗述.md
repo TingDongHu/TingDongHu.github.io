@@ -2,7 +2,7 @@
 title: 【AIGC】生图模型概念&模块宗述
 date: 2025-10-22T00:00:00+08:00
 categories: ["ComfyUI"]
-tags: ["Diffusion", "AIGC", "AI绘画", "视觉图像生成", "视频生成", "生成式人工智能", "扩散模型", "文生图"]
+tags: ["Diffusion"]
 description: "生成式AI视觉内容技术从早期算法、VAE/GAN演进至当前主流的扩散模型，正向更高分辨率、更丰富内容与更强可控性发展。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"

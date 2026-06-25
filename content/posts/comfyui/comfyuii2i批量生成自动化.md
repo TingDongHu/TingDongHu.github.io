@@ -2,7 +2,7 @@
 title: 【ComfyUI】批量生成自动化
 date: 2025-12-01T00:00:00+08:00
 categories: ["ComfyUI"]
-tags: ["Diffusion", "AIGC", "AI绘画", "python", "ComfyUI", "AP"]
+tags: ["Diffusion", "ComfyUI"]
 description: "为解决YOLO项目数据不足问题，作者通过ComfyUI导出工作流API并编写Python脚本，实现了本地批量图片的自动化增强，高效生成了一一对应的训练图像数据。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"

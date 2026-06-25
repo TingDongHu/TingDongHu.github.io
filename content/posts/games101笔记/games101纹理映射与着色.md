@@ -3,7 +3,7 @@ title: 【Games101】纹理映射与着色
 date: 2025-07-03T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "纹理", "插值", "纹理映射", "各向异性过滤", "Shading"]
+tags: ["图形学", "GAMES课程", "纹理", "渲染"]
 description: "纹理是计算机图形学中用于增强模型表面细节的二维图像或数据贴图。通过纹理映射技术，结合UV坐标系和重心坐标插值，可将纹理贴合到三维模型表面，提供颜色、法线等丰富信息，提升视觉真实感。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

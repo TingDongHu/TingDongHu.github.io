@@ -3,7 +3,7 @@ title: "【LLM应用开发原理】从提示词工程、上下文工程到Harnes
 date: 2026-04-15T00:00:00+08:00
 categories: ["Agent"]
 cover: "/img/ArtificialIntelligence.png"
-tags: ["LLM", "智能体", "工程化", "提示词", "Harness"]
+tags: ["LLM", "Agent"]
 description: "大模型智能体工程化经历了三个阶段：提示词工程通过优化输入提升模型输出质量；上下文工程引入外部知识库解决记忆限制；最终形成部署生产级智能体的完整工程体系。"
 ---
 

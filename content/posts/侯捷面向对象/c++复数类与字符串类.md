@@ -2,7 +2,7 @@
 title: 【C++】复数类与字符串类
 date: 2025-12-02T00:00:00+08:00
 categories: ["侯捷面向对象"]
-tags: ["语法", "c++", "面相对象"]
+tags: ["语法", "C++", "面向对象"]
 description: "本文以Complex类为例，讲解了C++程序的基本结构，包括头文件与实现文件的分离、防御性声明、命名空间的使用、inline函数的定义方式以及访问级别关键字的作用。"
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"

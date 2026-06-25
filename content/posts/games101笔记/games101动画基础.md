@@ -3,7 +3,7 @@ title: 【Games101】动画基础
 date: 2025-12-19T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "动画", "数值分析", "常微分方程", "欧拉公式", "粒子仿真"]
+tags: ["图形学", "GAMES课程", "动画", "数学基础"]
 description: "动画通过连续图像产生运动感，其发展从手绘到数字时代。关键帧动画是基础技术，通过定义关键姿态并由计算机插值生成中间帧，数学本质是参数空间的插值过程。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

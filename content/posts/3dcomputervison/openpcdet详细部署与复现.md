@@ -2,7 +2,7 @@
 title: 【OpenPCDet】详细部署与复现
 date: 2024-10-25T00:00:00+08:00
 categories: ["3DComputerVison"]
-tags: ["OpenPCDet", "环境配置"]
+tags: ["OpenPCDet"]
 description: "本文详细介绍了在Ubuntu 20.04系统上配置OpenPCDet 3D目标检测工具箱的完整流程，涵盖创建虚拟环境、安装PyTorch与spconv等关键依赖，并最终完成编译和数据导入。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/linpory.png"

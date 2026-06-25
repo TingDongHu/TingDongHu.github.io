@@ -45,3 +45,39 @@
         overflow-y: auto;
     }
 }
+
+/* ==========================================================================
+   标签云(/tags/ 总览页左侧)+ 文章内 badge(子项目 H)
+   ========================================================================== */
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .5rem .75rem;
+    line-height: 1.6;
+}
+.tag-cloud__item {
+    display: inline-flex;
+    align-items: baseline;
+    padding: .15em .5em;
+    border-radius: 6px;
+    border: 1px solid rgba(127, 127, 127, .25);
+    color: inherit;
+    transition: background .15s, border-color .15s, color .15s;
+}
+.tag-cloud__item:hover {
+    background: rgba(127, 127, 127, .12);
+    border-color: rgba(127, 127, 127, .5);
+}
+.tag-cloud__count {
+    margin-left: .35em;
+    font-size: .7em;
+    opacity: .55;
+}
+
+/* 文章内标签 badge 微调(复用主题 .badge) */
+#dream-single-post-content .badge,
+.prose .badge {
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+}

@@ -2,7 +2,7 @@
 title: "【LLM应用开发实践】Agent 实战落地经验与技术思考"
 date: 2026-04-19T00:00:00+08:00
 categories: ["Agent"]
-tags: ["LLM", "大模型", "Agent", "Tool", "MCP"]
+tags: ["LLM", "Agent", "MCP"]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeGeCML.png"
 math: true

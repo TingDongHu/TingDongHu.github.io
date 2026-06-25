@@ -3,7 +3,7 @@ title: 【Games101】变换基础概念
 date: 2025-06-27T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "渲染", "GAMES课程", "线性代数"]
+tags: ["图形学", "渲染", "GAMES课程", "数学基础"]
 description: "计算机图形学通过缩放、镜像、错切和旋转等基本变换矩阵，描述物体在二维空间中的位置、大小和方向变化。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

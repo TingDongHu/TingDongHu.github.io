@@ -3,7 +3,7 @@ title: 【Games101】几何表达与绘制
 date: 2025-07-05T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "几何", "几何表示", "Geometry", "Blend"]
+tags: ["图形学", "GAMES课程", "几何", "Blend"]
 description: "几何是计算机图形学三维建模与渲染的基础，应用于物体建模、几何变换和碰撞检测。其表示方法主要分为隐式表示（如代数曲面、水平集）和显式表示（如点云），用于描述不同复杂度的形状。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

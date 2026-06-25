@@ -3,7 +3,7 @@ title: 【Games101】高级光线传播与复杂外观建模
 date: 2025-12-15T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "毛发建模", "复杂光线传播"]
+tags: ["图形学", "GAMES课程", "动画", "光线追踪"]
 description: "文章对比了无偏与有偏渲染方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种高级光线传播技术的原理、适用场景及优缺点。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
