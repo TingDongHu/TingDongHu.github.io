@@ -3,6 +3,9 @@ locale = 'zh-cn'
 title = '古月月仔的博客'
 theme = "dream-3.13.0" # 确保文件夹名字匹配，通常是 dream
 
+# 排除非文章文件(图像生成prompts/系列outline/README/演讲草稿),避免被当文章渲染产生0001空归档
+ignoreFiles = ['/prompts/', 'outline\.md$', '/README\.md$', 'RCL组会报告演讲稿\.md$']
+
 [taxonomies]
   category = "categories"
   tag = "tags"
