@@ -1,110 +1,49 @@
 /**
- * Hugo Chroma Mac 风格增强
- * 为代码块添加 Mac 三色圆点和复制功能
+ * Hugo Chroma 代码块增强 — render-hook 组件版
+ * 功能:复制 / 软折行切换 / 折叠·展开 / 自动折叠
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    // 为所有代码块添加 Mac 三色圆点
-    document.querySelectorAll('.highlight').forEach(function(block) {
-        // 检查是否已经有圆点了
-        if (block.querySelector('.mac-dots')) {
-            return;
-        }
+document.addEventListener('DOMContentLoaded', function () {
+  /* ── 事件委托:按 data-act 分发 ── */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    var block = btn.closest('.code-block');
+    if (!block) return;
+    var body = block.querySelector('.code-block__body');
+    if (!body) return;
 
-        // 创建圆点容器
-        var dotsContainer = document.createElement('div');
-        dotsContainer.className = 'mac-dots';
+    if (act === 'copy') {
+      navigator.clipboard.writeText(body.textContent).then(function () {
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = '复制'; }, 1500);
+      }).catch(function () {
+        btn.textContent = '失败';
+        setTimeout(function () { btn.textContent = '复制'; }, 1500);
+      });
+    }
 
-        // 创建三个圆点
-        var redDot = document.createElement('span');
-        redDot.className = 'dot-red';
+    if (act === 'wrap') {
+      body.classList.toggle('is-wrap');
+      btn.textContent = body.classList.contains('is-wrap') ? '取消折行' : '软折行';
+    }
 
-        var yellowDot = document.createElement('span');
-        yellowDot.className = 'dot-yellow';
+    if (act === 'fold') {
+      block.classList.toggle('is-folded');
+      btn.textContent = block.classList.contains('is-folded') ? '展开' : '折叠';
+    }
+  });
 
-        var greenDot = document.createElement('span');
-        greenDot.className = 'dot-green';
-
-        // 添加圆点到容器
-        dotsContainer.appendChild(redDot);
-        dotsContainer.appendChild(yellowDot);
-        dotsContainer.appendChild(greenDot);
-
-        // 将圆点容器添加到代码块（在 chroma div 之前）
-        var chromaDiv = block.querySelector('.chroma');
-        if (chromaDiv) {
-            block.insertBefore(dotsContainer, chromaDiv);
-        } else {
-            block.insertBefore(dotsContainer, block.firstChild);
-        }
-    });
-
-    // 为所有代码块添加复制按钮（只在代码内容td中）
-    document.querySelectorAll('.highlight td.lntd:last-child').forEach(function(tdElement) {
-        // 检查是否已经有复制按钮了
-        if (tdElement.querySelector('.mac-copy-btn')) {
-            return;
-        }
-
-        // 找到代码内容
-        var preElement = tdElement.querySelector('pre');
-        if (!preElement) return;
-
-        var codeElement = preElement.querySelector('code') || preElement;
-
-        // 创建工具栏容器
-        var toolbarContainer = document.createElement('div');
-        toolbarContainer.className = 'mac-toolbar';
-
-        // 添加语言标签
-        var languageClass = preElement.className.match(/language-(\w+)/);
-        if (languageClass) {
-            var languageLabel = document.createElement('div');
-            languageLabel.className = 'mac-language';
-            languageLabel.textContent = languageClass[1];
-            toolbarContainer.appendChild(languageLabel);
-        }
-
-        // 创建复制按钮
-        var copyButton = document.createElement('button');
-        copyButton.type = 'button';
-        copyButton.className = 'mac-copy-btn';
-        copyButton.textContent = 'Copy';
-
-        copyButton.addEventListener('click', function() {
-            var codeText = codeElement.textContent;
-
-            navigator.clipboard.writeText(codeText).then(function() {
-                var originalText = copyButton.textContent;
-                copyButton.textContent = 'Copied!';
-                copyButton.style.background = 'rgba(39, 201, 63, 0.2)';
-                copyButton.style.color = '#27c93f';
-                copyButton.style.borderColor = '#27c93f';
-
-                setTimeout(function() {
-                    copyButton.textContent = originalText;
-                    copyButton.style.background = '';
-                    copyButton.style.color = '';
-                    copyButton.style.borderColor = '';
-                }, 2000);
-            }).catch(function(err) {
-                console.error('复制失败:', err);
-                copyButton.textContent = 'Failed';
-
-                setTimeout(function() {
-                    copyButton.textContent = 'Copy';
-                }, 2000);
-            });
-        });
-
-        toolbarContainer.appendChild(copyButton);
-
-        // 将工具栏添加到 td 的最前面
-        tdElement.insertBefore(toolbarContainer, tdElement.firstChild);
-    });
-
-    // 移除重复的 code-toolbar（如果有）
-    document.querySelectorAll('.highlight .code-toolbar').forEach(function(toolbar) {
-        toolbar.remove();
-    });
+  /* ── 自动折叠:scrollHeight > 480px 的块默认折叠 ── */
+  var FOLD_THRESHOLD = 480;
+  document.querySelectorAll('.code-block').forEach(function (block) {
+    var body = block.querySelector('.code-block__body');
+    if (!body) return;
+    if (body.scrollHeight > FOLD_THRESHOLD) {
+      block.classList.add('is-folded');
+      var foldBtn = block.querySelector('[data-act="fold"]');
+      if (foldBtn) foldBtn.textContent = '展开';
+    }
+  });
 });

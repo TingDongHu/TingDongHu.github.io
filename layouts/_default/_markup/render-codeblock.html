@@ -1,0 +1,15 @@
+{{- $lang := .Type | default "text" -}}
+<div class="code-block" data-lang="{{ $lang }}">
+  <div class="code-block__bar">
+    <span class="code-block__dots"><i class="dot-red"></i><i class="dot-yellow"></i><i class="dot-green"></i></span>
+    <span class="code-block__lang">{{ $lang }}</span>
+    <span class="code-block__actions">
+      <button class="code-block__btn" data-act="wrap">软折行</button>
+      <button class="code-block__btn" data-act="copy">复制</button>
+      <button class="code-block__btn" data-act="fold">折叠</button>
+    </span>
+  </div>
+  <div class="code-block__body">
+    {{- transform.Highlight (trim .Inner "\n") $lang "lineNos=false" -}}
+  </div>
+</div>
