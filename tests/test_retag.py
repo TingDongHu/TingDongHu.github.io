@@ -61,3 +61,47 @@ def test_find_tags_line_ignores_body():
     # 正文里出现 tags: 不在首个 --- 块内,不该被当成 front matter tags
     text = '---\ntitle: x\n---\n这里写 tags: ["假"]\n'
     assert find_tags_line(text) is None
+
+
+import tempfile
+from retag import process_file
+
+
+def test_process_file_dryrun_no_write():
+    content = '---\ntitle: t\ntags: ["c++", "语法"]\ndate: 2025\n---\n正文\n'
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as f:
+        f.write(content)
+        path = f.name
+    try:
+        old, new = process_file(path, {"c++": "C++"}, [], apply=False)
+        assert old == 'tags: ["c++", "语法"]'
+        assert new == 'tags: ["C++", "语法"]'
+        assert open(path, encoding="utf-8").read() == content
+    finally:
+        os.unlink(path)
+
+
+def test_process_file_apply_writes():
+    content = '---\ntitle: t\ntags: ["c++", "语法"]\n---\n正文\n'
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as f:
+        f.write(content)
+        path = f.name
+    try:
+        process_file(path, {"c++": "C++"}, [], apply=True)
+        after = open(path, encoding="utf-8").read()
+        assert 'tags: ["C++", "语法"]' in after
+        assert "正文" in after
+        assert "title: t" in after
+    finally:
+        os.unlink(path)
+
+
+def test_process_file_no_change_returns_none():
+    content = '---\ntags: ["LLM"]\n---\n'
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as f:
+        f.write(content)
+        path = f.name
+    try:
+        assert process_file(path, {}, [], apply=False) is None
+    finally:
+        os.unlink(path)
