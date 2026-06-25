@@ -3,7 +3,7 @@ title: 【Games101】辐射度量学与全局光照
 date: 2025-12-07T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "光线追踪", "辐射度量学", "物理概念", "全局光照"]
+tags: ["图形学", "GAMES课程", "光线追踪", "渲染", "数学基础"]
 description: "辐射度量学为计算机图形学提供物理正确光照计算的基础，通过定义辐射能量、通量、立体角和辐射强度等物理量，使渲染结果从“看起来像”转变为“物理正确”，是通往路径追踪等高级渲染技术的基石。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

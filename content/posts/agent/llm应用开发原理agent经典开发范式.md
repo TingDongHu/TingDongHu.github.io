@@ -2,7 +2,7 @@
 title: 【LLM应用开发原理】Agent经典开发范式
 date: 2026-03-06T00:00:00+08:00
 categories: ["Agent"]
-tags: ["LLM", "Agent", "ReAct","Reflection", "Plan-and-Execute"]
+tags: ["LLM", "Agent"]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true

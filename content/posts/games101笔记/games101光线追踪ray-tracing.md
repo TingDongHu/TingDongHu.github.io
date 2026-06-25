@@ -3,7 +3,7 @@ title: 【Games101】光线追踪基础Ray-Tracing
 date: 2025-12-04T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "光线追踪", "光栅化"]
+tags: ["图形学", "GAMES课程", "光线追踪", "渲染"]
 description: "阴影贴图是光栅化渲染中生成阴影的主流技术。其核心思想是：一个点被照亮需同时被相机和光源可见。算法分为两步：首先从光源视角渲染生成记录最近距离的深度图；然后在相机视角渲染时，将每个点投影回光源视角，对比其实际距离与深度图记录值，以判断该点处于光照还是阴影中。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

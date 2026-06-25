@@ -2,7 +2,7 @@
 title: 【博客魔改】Butterfly 主题配置 Giscus 评论系统
 date: 2025-12-03T00:00:00+08:00
 categories: ["Hexo博客"]
-tags: ["blog", "Giscus", "hexo", "markdown", "GitHub", "Butterfly"]
+tags: ["博客搭建"]
 description: "为Hexo的Butterfly主题配置Giscus评论系统，需先在GitHub创建公开仓库并启用Discussions，安装Giscus应用，获取配置代码后填入主题配置文件即可。"
 cover: "/img/BlogMakeover.png"
 headerImage: "/img/Raythy.png"

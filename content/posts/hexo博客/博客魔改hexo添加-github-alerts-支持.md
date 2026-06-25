@@ -2,7 +2,7 @@
 title: 【博客魔改】Hexo添加 Github alerts 支持
 date: 2025-12-03T00:00:00+08:00
 categories: ["Hexo博客"]
-tags: ["blog", "css", "javascript", "markdown", "GitHub", "Alerts"]
+tags: ["博客搭建", "前端"]
 description: "在Hexo博客中，通过更换Markdown渲染器为markdown-it并添加自定义解析脚本，即可便捷地使用类似[!NOTE]的语法创建GitHub风格的Alerts提示框。"
 cover: "/img/BlogMakeover.png"
 headerImage: "/img/Raythy.png"

@@ -2,7 +2,7 @@
 title: 【LLM应用开发原理】RAG是什么详解
 date: 2025-09-13T00:00:00+08:00
 categories: ["Agent"]
-tags: ["LLM",  "Agent", "RAG"]
+tags: ["LLM", "Agent", "RAG"]
 description: "RAG技术通过构建知识库和智能检索机制，为AI模型精准提供外部信息，解决知识过时和幻觉问题。它避免了昂贵的模型重训练，克服了直接输入长文本的低效性，是实现高效、准确AI应用的关键。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"

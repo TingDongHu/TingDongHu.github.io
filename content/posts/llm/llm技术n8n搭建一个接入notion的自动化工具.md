@@ -2,7 +2,7 @@
 title: 【LLM应用开发】N8N搭建一个接入Notion的自动化工具
 date: 2025-09-30T00:00:00+08:00
 categories: ["LLM"]
-tags: ["LLM", "大模型", "工作流", "NLP", "自动化工具", "N8N"]
+tags: ["LLM", "工作流", "NLP"]
 description: "Notion API上传小文件的官方文档和视频教程链接，用于将文件附加到数据库页面。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/linpory.png"

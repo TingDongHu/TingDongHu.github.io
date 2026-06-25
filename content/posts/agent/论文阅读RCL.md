@@ -2,7 +2,7 @@
 title: "【论文阅读】Reflective Context Learning: Studying the Optimization Primitives of Context Space"
 date: 2026-04-19T00:00:00+08:00
 categories: ["Agent"]
-tags: ["LLM", "Agent", "context-learning", "paper-reading", "reflective-learning"]
+tags: ["LLM", "Agent"]
 description: "深度解读Contextual AI团队2026年预印本论文《Reflective Context Learning》，详解上下文空间优化与传统参数优化的同构性，以及RCL框架五大核心优化原语，为Agent无需参数更新即可持续自演进提供理论与实践指导。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"

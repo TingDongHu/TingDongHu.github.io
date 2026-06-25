@@ -3,7 +3,7 @@ title: 【Games101】相机与透镜
 date: 2025-12-16T00:00:00+08:00
 mathjax: true
 categories: ["Games101笔记"]
-tags: ["图形学", "GAMES课程", "透视原理", "相机成像"]
+tags: ["图形学", "GAMES课程", "相机成像"]
 description: "成像包含合成与捕捉。针孔相机清晰但进光量不足，透镜提升亮度却引入景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"

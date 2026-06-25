@@ -2,7 +2,7 @@
 title: 【OpenPCDet】Uncertainty Estimation学习笔记（一）
 date: 2024-11-30T00:00:00+08:00
 categories: ["3DComputerVison"]
-tags: ["CV", "自动驾驶", "目标检测"]
+tags: ["目标检测", "自动驾驶"]
 description: "神经网络不确定性研究旨在解决模型对错误或未知输入给出高置信度预测的问题。文章区分了数据不确定性和模型不确定性，并介绍了基于贝叶斯深度学习的建模方法，以帮助使用者做出更可靠的决策。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"

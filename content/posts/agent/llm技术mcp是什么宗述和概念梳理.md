@@ -2,7 +2,7 @@
 title: "【LLM应用开发原理】Function Calling底层原理与MCP"
 date: 2026-03-09T00:00:00+08:00
 categories: ["Agent"]
-tags: ["LLM", "大模型", "Agent", "FunctionCalling", "MCP"]
+tags: ["LLM", "Agent", "MCP"]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeGeCML.png"
 math: true
