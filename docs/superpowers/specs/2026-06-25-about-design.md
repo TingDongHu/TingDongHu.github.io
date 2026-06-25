@@ -23,7 +23,8 @@
 - **实现:独立 `/about/` 页 + 自定义模板**,弃用 flip 卡片交互。
 - **导航 + 头像**:都改为跳转 `/about/`(彻底弃 flip)。
 - **内容载体:单个 `content/about/index.md`** —— 叙述段走正文(markdown,好编辑);技术栈/now/uses/hobby/社交走 front matter 数组(模板渲染成 pill/列表)。
-- **展示分区(4 块 + 社交)**:技术栈/领域、最近在学(now)、工具装备(uses 合并去重)、兴趣爱好(hobby)、社交链接(链接用户稍后给)。
+- **展示分区(5 块 + 社交)**:技术栈/领域、最近在学(now)、工具装备(uses 合并去重,软件/网络工具)、好物橱窗(gear,实物电子设备)、兴趣爱好(hobby)、社交链接(链接用户稍后给)。
+- **好物橱窗(gear)**:商品卡片形式,每件含 名称 + 一句推荐语 + 图片 + 链接(图与链接用户后续给,先留结构 + 占位)。与 uses 区分:uses=软件/网络工具,gear=实物硬件设备。
 - **样式:纯 CSS `.about-*`**(Tailwind 预编译铁律),响应式网格卡片,技术栈用 pill,**跟随主题明暗**(不恒深)。
 - **不删主题文件**,仅在 `layouts/` 覆盖。
 
@@ -40,9 +41,9 @@
 ## 范围
 
 ### 包含
-1. 改 `content/about/index.md` —— 单页:front matter(title + 技术栈/now/uses/hobby/socials 数组)+ 正文(叙述段 markdown)。
+1. 改 `content/about/index.md` —— 单页:front matter(title + 技术栈/now/uses/hobby/gear/socials 数组)+ 正文(叙述段 markdown)。
 2. 删旧子页:`me.md`/`hobby.md`/`now.md`/`uses.md`/`uses1.md`(内容迁入单页)。
-3. 新建 `layouts/about/single.html` —— 独立 about 页模板(叙述段 `.Content` + 四区块 + 社交,由 front matter 渲染)。
+3. 新建 `layouts/about/single.html` —— 独立 about 页模板(叙述段 `.Content` + 五区块 + 社交,由 front matter 渲染)。
 4. 覆盖 `layouts/partials/renderNavItem.html` —— about 导航项从 flip 改为 `<a href="/about/">`。
 5. 覆盖 `layouts/partials/nav.html` —— 头像 `@click="flip"` 改为链接到 `/about/`(其余导航逻辑保持)。
 6. `static/css/custom.css` 增 `.about-*` 样式(纯 CSS,跟随主题明暗)。
@@ -73,6 +74,8 @@ uses:
 hobby:
   - "🚀 喜欢折腾各种好玩的应用技术"
   # …沿用 hobby.md
+gear:
+  - { name: "", desc: "", img: "", url: "" }   # 实物电子设备:名称+推荐语+图+链接,用户稍后填
 socials:
   - { name: "GitHub", url: "", icon: "" }   # 用户稍后给链接
 ---
@@ -90,6 +93,7 @@ socials:
 - 技术栈区:`range .Params.techStack` → pill(`.about-tag`)。
 - 最近在学:`range .Params.now` → 链接列表(icon + name + desc)。
 - 工具装备:`range .Params.uses` → 链接列表,可分小列。
+- 好物橱窗:`range .Params.gear` → 商品卡片(图 + 名称 + 推荐语,整卡链接到 url);空条目(name 为空)不渲染。
 - 兴趣爱好:`range .Params.hobby` → bullet。
 - 社交:`range .Params.socials` → 图标链接(URL 空则不渲染或占位)。
 - 各区块包在 `.about-section` 卡片里,响应式网格 `.about-grid`。
@@ -108,14 +112,15 @@ socials:
 - `.about-section`:区块卡片,描边/圆角/内距;标题 `.about-section__title`。
 - `.about-tag`:技术栈 pill(复用标签云观感)。
 - `.about-link`:now/uses 链接项,hover 高亮,等宽字体/小图标点缀(极客感)。
+- `.about-gear`:好物橱窗网格;`.about-gear__card` 商品卡(图 + 名 + 推荐语,hover 浮起);图用固定比例占位防抖动。
 - `.about-socials`:社交图标行。
 
 ## 验证方式
 
 1. `hugo` 构建无 ERROR、无新增 deprecation 警告(`.Site.LanguageCode` 既有除外)。
-2. 本地 `hugo server -D` 打开 `/about/`:独立页渲染叙述段 + 四区块 + 社交;非 flip。
+2. 本地 `hugo server -D` 打开 `/about/`:独立页渲染叙述段 + 五区块 + 社交;非 flip。
 3. 导航点 "about" → 跳 `/about/`(不再翻转);头像点击 → 跳 `/about/`。
-4. 技术栈 pill、now/uses 链接列表、hobby、社交 渲染正常;链接可点。
+4. 技术栈 pill、now/uses 链接列表、好物橱窗卡片、hobby、社交 渲染正常;链接可点;gear 空条目不渲染、有图条目图片正常。
 5. 明暗主题切换:about 页配色跟随(不恒深)。
 6. 窄屏(<lg):网格单列,不溢出。
 7. 旧子页删除后无 404、无残留引用(站内无指向 me/hobby/now 等的链接)。
