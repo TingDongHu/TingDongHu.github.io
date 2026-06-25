@@ -59,8 +59,9 @@ html.dark #dream-global-bg {
 </style>
 {{ end }}
 
-<!-- Hugo Chroma Mac 风格代码块样式 -->
-<link rel="stylesheet" href="/css/chroma-mac.css" />
+<!-- Hugo Chroma Mac 风格代码块样式(走 asset pipeline,带指纹防缓存) -->
+{{ $chromaCss := resources.Get "css/chroma-mac.css" }}
+{{ if hugo.IsProduction }}{{ $chromaCss = $chromaCss | minify | fingerprint }}{{ end }}
+<link rel="stylesheet" href="{{ $chromaCss.RelPermalink }}" />
 
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 <link rel="stylesheet" href="/css/custom.css">

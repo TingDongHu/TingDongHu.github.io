@@ -1,0 +1,212 @@
+/* ==========================================================================
+   代码块组件 — render-hook 版(.code-block)
+   配色:恒深色(One Dark),不随主题切换
+   ========================================================================== */
+
+/* ── 容器 ── */
+.code-block {
+  position: relative;
+  background: #282c34;
+  border-radius: 10px;
+  margin: 1.5em 0;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  border: 1px solid #3a3a3a;
+}
+
+/* ── 头栏 ── */
+.code-block__bar {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 14px;
+  background: #21252b;
+  border-bottom: 1px solid #3a3a3a;
+  gap: 10px;
+}
+
+/* 三色点 */
+.code-block__dots {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.code-block__dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+  font-style: normal;
+}
+.dot-red    { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green  { background: #27c93f; }
+
+/* 语言标签 */
+.code-block__lang {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #636d83;
+  flex: 1;
+  text-align: center;
+}
+
+/* 按钮组 */
+.code-block__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.code-block__btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #8a91a4;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  white-space: nowrap;
+}
+.code-block__btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #c8cdd8;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.code-block__btn:focus {
+  outline: none;
+}
+
+/* ── 代码体 ── */
+.code-block__body {
+  overflow-x: auto;
+  padding: 14px 16px;
+}
+.code-block__body .chroma,
+.code-block__body pre,
+.code-block__body code {
+  background: transparent !important;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.code-block__body pre {
+  white-space: pre;
+}
+.code-block__body code {
+  font-family: 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, Monaco, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #abb2bf;
+}
+
+/* ── 软折行状态 ── */
+.code-block__body.is-wrap pre,
+.code-block__body.is-wrap code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── 折叠状态 ── */
+.code-block.is-folded .code-block__body {
+  max-height: 300px;
+  overflow: hidden;
+}
+.code-block.is-folded .code-block__body::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 60px;
+  background: linear-gradient(transparent, #282c34);
+  pointer-events: none;
+}
+/* 折叠态去掉横向滚动条(被遮罩盖住不好看) */
+.code-block.is-folded .code-block__body {
+  overflow-x: hidden;
+}
+
+/* ── 滚动条(展开态) ── */
+.code-block__body::-webkit-scrollbar {
+  height: 6px;
+}
+.code-block__body::-webkit-scrollbar-track {
+  background: #21252b;
+}
+.code-block__body::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 3px;
+}
+.code-block__body::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+/* ==========================================================================
+   One Dark 调色 token (作用于 .code-block__body .chroma)
+   ========================================================================== */
+.code-block__body .chroma .k,
+.code-block__body .chroma .kd,
+.code-block__body .chroma .kr { color: #c678dd; }
+.code-block__body .chroma .s,
+.code-block__body .chroma .s1,
+.code-block__body .chroma .s2,
+.code-block__body .chroma .sa,
+.code-block__body .chroma .sb,
+.code-block__body .chroma .sc,
+.code-block__body .chroma .dl,
+.code-block__body .chroma .ds { color: #98c379; }
+.code-block__body .chroma .c,
+.code-block__body .chroma .c1,
+.code-block__body .chroma .cm,
+.code-block__body .chroma .cs,
+.code-block__body .chroma .cp,
+.code-block__body .chroma .cpf { color: #7f848e; font-style: italic; }
+.code-block__body .chroma .f,
+.code-block__body .chroma .nf,
+.code-block__body .chroma .fm,
+.code-block__body .chroma .fn { color: #61afef; }
+.code-block__body .chroma .nc,
+.code-block__body .chroma .no,
+.code-block__body .chroma .nb,
+.code-block__body .chroma .kt { color: #e5c07b; }
+.code-block__body .chroma .m,
+.code-block__body .chroma .mi,
+.code-block__body .chroma .mf,
+.code-block__body .chroma .mh,
+.code-block__body .chroma .mb,
+.code-block__body .chroma .il { color: #d19a66; }
+.code-block__body .chroma .o,
+.code-block__body .chroma .p { color: #56b6c2; }
+.code-block__body .chroma .n,
+.code-block__body .chroma .na,
+.code-block__body .chroma .nv,
+.code-block__body .chroma .nx { color: #e06c75; }
+
+/* ==========================================================================
+   响应式
+   ========================================================================== */
+@media (max-width: 768px) {
+  .code-block__bar {
+    height: 34px;
+    padding: 0 10px;
+    gap: 6px;
+  }
+  .code-block__dots i {
+    width: 10px;
+    height: 10px;
+  }
+  .code-block__lang {
+    font-size: 10px;
+  }
+  .code-block__btn {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+  .code-block__body {
+    padding: 12px;
+  }
+  .code-block__body code {
+    font-size: 13px;
+  }
+}
