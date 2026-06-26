@@ -72,3 +72,5 @@ Thumbs.db
 
 # Node 依赖（防止未来引入前端工程化）
 node_modules/
+
+.pytest_cache/
