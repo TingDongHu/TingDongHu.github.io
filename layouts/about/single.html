@@ -1,0 +1,137 @@
+{{ define "title" }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+<div class="about-page px-4 mt-6 mx-auto">
+
+  <section class="about-hero prose dark:prose-invert">
+    {{ .Content | emojify }}
+  </section>
+
+  <div class="about-grid mt-8">
+
+    {{ with .Params.techStack }}
+    <section class="about-section">
+      <h2 class="about-section__title">技术栈 / 领域</h2>
+      <div class="about-tags">
+        {{ range . }}<span class="about-tag">{{ . }}</span>{{ end }}
+      </div>
+    </section>
+    {{ end }}
+
+    {{ with .Params.now }}
+    <section class="about-section">
+      <h2 class="about-section__title">最近在学</h2>
+      <ul class="about-links">
+        {{ range . }}
+        <li><a class="about-link" href="{{ .url }}" target="_blank" rel="noopener">
+          <span class="about-link__icon">{{ .icon }}</span>
+          <span class="about-link__name">{{ .name }}</span>
+          <span class="about-link__desc">{{ .desc }}</span>
+        </a></li>
+        {{ end }}
+      </ul>
+    </section>
+    {{ end }}
+
+    {{ $gear := where .Params.gear "name" "!=" "" }}
+    {{ with $gear }}
+    <section class="about-section about-section--wide">
+      <h2 class="about-section__title">我的家伙什</h2>
+      <div class="about-gear">
+        {{ range . }}
+        {{ $name := .name }}
+        <div class="about-gear__card" tabindex="0" role="button" aria-label="{{ $name }},点击翻转查看配置">
+          <div class="about-gear__inner">
+
+            <div class="about-gear__face about-gear__face--front">
+              {{ with .img }}<img class="about-gear__img" src="{{ . }}" alt="{{ $name }}" loading="lazy" />{{ end }}
+              <div class="about-gear__name">{{ .name }}</div>
+              <div class="about-gear__desc">{{ .desc }}</div>
+              <span class="about-gear__hint">点击查看配置 ⤴</span>
+            </div>
+
+            <div class="about-gear__face about-gear__face--back">
+              {{ with .url }}
+              <a class="about-gear__link" href="{{ . }}" target="_blank" rel="noopener" title="前往详情" aria-label="前往 {{ $name }} 详情页">
+                <ion-icon name="open-outline"></ion-icon>
+              </a>
+              {{ end }}
+              <div class="about-gear__back-name">{{ .name }}</div>
+              {{ with .specs }}
+              <ul class="about-gear__specs">
+                {{ range . }}
+                {{ $parts := split . ":" }}
+                <li><span class="about-gear__spec-key">{{ index $parts 0 }}</span><span class="about-gear__spec-val">{{ index $parts 1 }}</span></li>
+                {{ end }}
+              </ul>
+              {{ end }}
+            </div>
+
+          </div>
+        </div>
+        {{ end }}
+      </div>
+    </section>
+    {{ end }}
+
+    {{ with .Params.hobby }}
+    <section class="about-section">
+      <h2 class="about-section__title">兴趣爱好</h2>
+      <ul class="about-hobby">
+        {{ range . }}<li>{{ . | emojify }}</li>{{ end }}
+      </ul>
+    </section>
+    {{ end }}
+
+    {{ $socials := where .Params.socials "url" "!=" "" }}
+    {{ with $socials }}
+    <section class="about-section">
+      <h2 class="about-section__title">找到我</h2>
+      <div class="about-socials">
+        {{ range . }}
+        <a class="about-social" href="{{ .url }}" target="_blank" rel="noopener" title="{{ .name }}">
+          {{ with .icon }}<ion-icon name="{{ . }}"></ion-icon>{{ end }}
+          <span>{{ .name }}</span>
+        </a>
+        {{ end }}
+      </div>
+    </section>
+    {{ end }}
+
+    {{ with .Params.uses }}
+    <section class="about-section about-section--wide">
+      <h2 class="about-section__title">工具网站</h2>
+      <ul class="about-links">
+        {{ range . }}
+        <li><a class="about-link" href="{{ .url }}" target="_blank" rel="noopener">
+          <span class="about-link__name">{{ .name }}</span>
+          <span class="about-link__desc">{{ .desc }}</span>
+        </a></li>
+        {{ end }}
+      </ul>
+    </section>
+    {{ end }}
+
+  </div>
+</div>
+
+<script>
+  (function () {
+    const cards = document.querySelectorAll('.about-gear__card');
+    cards.forEach(function (card) {
+      function flip(e) {
+        // 点击背面跳转链接时不翻转
+        if (e.target.closest('.about-gear__link')) return;
+        card.classList.toggle('is-flipped');
+      }
+      card.addEventListener('click', flip);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.classList.toggle('is-flipped');
+        }
+      });
+    });
+  })();
+</script>
+{{ end }}
