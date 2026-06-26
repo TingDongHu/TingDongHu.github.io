@@ -4,9 +4,9 @@ import re
 from PIL import Image
 
 # --- 配置区 ---
-MAX_WIDTH = 2560      # 2K 分辨率
-QUALITY = 80          # 高保真质量
-MIN_SIZE_KB = 4000    # 阈值：小于 4MB 的图片不重复压缩
+MAX_WIDTH = 1600      # 1600px 宽度上限，覆盖全部截图/信息图
+QUALITY = 75          # 略降质量换体积
+MIN_SIZE_KB = 500     # 阈值：500KB 以上均压缩
 EXTENSIONS = ('.jpg', '.jpeg', '.png')
 TARGET_DIR = './content/posts/'
 
@@ -60,26 +60,32 @@ def safe_rename(full_path, is_folder=False):
 
 def compress_image(file_path):
     """
-    执行图片压缩
+    执行图片压缩。用 magic bytes 判断真实格式（非扩展名），压完变大则还原。
     """
     try:
         size = os.path.getsize(file_path)
-        if size < MIN_SIZE_KB * 1024: return
+        if size < MIN_SIZE_KB * 1024:
+            return
+        with open(file_path, 'rb') as f:
+            original_bytes = f.read()
         img = Image.open(file_path)
-        if img.width > MAX_WIDTH or size > MIN_SIZE_KB * 1024:
-            if img.width > MAX_WIDTH:
-                h = int((MAX_WIDTH / img.width) * img.height)
-                img = img.resize((MAX_WIDTH, h), Image.Resampling.LANCZOS)
-            
-            ext = os.path.splitext(file_path)[1].lower()
-            if ext in ('.jpg', '.jpeg'):
-                img.save(file_path, "JPEG", optimize=True, quality=QUALITY, subsampling=0, progressive=True)
-            elif ext == '.png':
-                img.save(file_path, "PNG", optimize=True)
-            
-            new_size = os.path.getsize(file_path)
+        actual_format = img.format  # 'JPEG' or 'PNG'，来自 magic bytes
+        if img.width > MAX_WIDTH:
+            h = int((MAX_WIDTH / img.width) * img.height)
+            img = img.resize((MAX_WIDTH, h), Image.Resampling.LANCZOS)
+        if actual_format == "JPEG":
+            img.save(file_path, "JPEG", optimize=True, quality=QUALITY, subsampling=0, progressive=True)
+        elif actual_format == "PNG":
+            img.save(file_path, "PNG", optimize=True)
+        else:
+            return
+        new_size = os.path.getsize(file_path)
+        if new_size < size:
             stats["images_compressed"] += 1
             stats["total_saved_kb"] += (size - new_size) // 1024
+        else:
+            with open(file_path, 'wb') as f:
+                f.write(original_bytes)
     except Exception as e:
         print(f"  [压缩失败] {os.path.basename(file_path)}: {e}")
 
