@@ -11,6 +11,11 @@ description: 机器学习与深度学习基础知识笔记
 - [常见激活函数](activation-functions/) — 激活函数原理与对比
 - [CNN 原理](cnn-principles/) — 卷积神经网络详解
 
+## PyTorch 实践笔记
+- [Day 1：PyTorch 基础](pytorch-day01-foundation/) — Tensor、自动求导、线性层、Softmax、MNIST
+- [Day 2：CNN 架构](pytorch-day02-cnn/) — 卷积层、优化器、ResNet、BN、迁移学习
+- [Day 3：Transformer](pytorch-day03-transformer/) — 自注意力、多头注意力、位置编码、Encoder-Decoder
+
 ## AIGC 与 ComfyUI
 - [生图模型概念](comfyui-image-gen-concepts/) — 文生图模型与模块概览
 - [ComfyUI 批量生成](comfyui-batch-automation/) — 批量生成自动化流程
