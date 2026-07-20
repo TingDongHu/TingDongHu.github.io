@@ -16,38 +16,71 @@ The deploy workflow (`.github/workflows/hugo.yml`) pins Hugo to `latest` extende
 
 ## Content Authoring
 
-### Post structure
-Each post is a single Markdown file in `content/posts/<topic>/` plus a **sibling directory of the same base name** holding its images. Images are referenced with a relative path from the markdown file, e.g. `![alt](排序算法基础/image.png)`. This works because `hugo.toml`'s `[module]` block mounts `content` → `static`, so the content tree is served at the site root.
+### Directory structure (reorganized 2026-07)
+```
+content/posts/
+  llm/                  ← LLM / Agent / AI编程
+  cpp/                  ← C++ 语言与设计模式
+  computer-graphics/    ← 图形学 / 3D生成 / 3D视觉
+  game-dev/             ← 虚幻引擎 / 游戏设计
+  ml/                   ← 机器学习 / 深度学习 / ComfyUI
+  algorithms/           ← 算法刷题
+  dev-notes/            ← 博客搭建 / 杂项笔记
+  essays/               ← 随笔
+```
+
+### File naming
+- English kebab-case, e.g. `mcp-overview.md`, `unreal-gamemode-gamestate.md`
+- No Chinese, spaces, or special characters in filenames
 
 ### Front matter (YAML) — follow the existing convention
 ```yaml
 ---
-title: 【分类】文章标题        # bracketed category prefix is the house style
+title: "【分类】文章标题"        # bracketed category prefix is the house style
 date: 2025-12-06T00:00:00+08:00
-categories: ["算法刷题"]
-tags: ["排序算法", "快排"]
+categories: ["LLM"]               # must match target directory (see below)
+tags: ["LLM", "Agent", "MCP"]     # first tag = category tag, then 1-3 technical tags
 description: "首段摘要，用于 SEO 和首页卡片"   # consumed by layouts/partials/head.html
-cover: "/img/Algorithm.png"      # card image, lives in static/img/
-headerImage: "/img/Makima.png"   # banner image
-math: true                       # enable per-page MathJax
+cover: "/img/Algorithm.png"       # card image, lives in static/img/
+headerImage: "/img/Makima.png"    # banner image
+math: true                        # enable per-page MathJax
 ---
 ```
-After the closing `---`, posts typically open with a `---` horizontal rule, a summary paragraph, then a `<!--more-->` truncation marker for the homepage excerpt. Topic-themed cover/header images already exist in `static/img/` — reuse them rather than adding new ones.
+
+Categories ↔ directory mapping:
+
+| Directory | categories value |
+|-----------|-----------------|
+| `llm/` | `["LLM"]` |
+| `cpp/` | `["C++"]` |
+| `computer-graphics/` | `["计算机图形学"]` |
+| `game-dev/` | `["游戏开发"]` |
+| `ml/` | `["机器学习"]` |
+| `algorithms/` | `["算法刷题"]` |
+| `dev-notes/` | `["开发工具"]` |
+| `essays/` | `["随笔"]` |
+
+### Images
+Images are served from **Cloudflare R2** CDN, **not** stored in the repo.
+- New images: paste/screenshot in Typora → PicGo CLI auto-uploads to R2 → CDN URL inserted
+- URL format: `https://pub-500a3a9e99b44ef29efa70fd87011d69.r2.dev/2026-07-20/{md5}.png`
+- Do NOT use local relative paths for images
+- Cover/header images still live in `static/img/` (they're theme assets, not post content)
 
 ### Math
 Math is rendered by MathJax (custom override in `layouts/partials/math.html`), gated by `math: true` in front matter and `math = true` in `hugo.toml`. Goldmark passthrough is enabled for `$...$`, `$$...$$`, `\(...\)`, `\[...\]`, so write LaTeX directly in Markdown without escaping.
 
-## Content Pipeline: `compress_images.py`
-Run this after adding/editing posts and **before committing**. It performs three passes over `content/posts/`:
-1. **Rename** top-level post dirs and `.md` files via `sanitize_name()`: lowercase, spaces/underscores → `-`, strips `【】()[]（）：:！!？?`. Records a name map.
-2. **Repair links** — rewrites image paths inside every `.md` to match renamed folders, and lowercases `.JPG/.JPEG/.PNG` extensions.
-3. **Compress** images (walks all subdirs): downscales to max width 2560px and re-encodes JPEG q80 / PNG optimized, but **only for files > 4 MB** (`MIN_SIZE_KB`).
+### New post workflow
+1. `hugo new content posts/<dir>/<name>.md` — generates archetype with skeleton front matter
+2. Write in Typora — paste images via PicGo (auto-uploads to R2)
+3. Preview: `hugo server -D`
+4. Commit and push to `main` → auto-deploys via GitHub Actions
 
-Gotchas:
-- The rename pass uses `os.listdir` (top level only); only the link-repair map covers nested names. New posts with CJK/bracketed names **will be renamed**, so commit the post and run this script together to avoid stale links.
-- Editing markdown produces LF line endings — recent history shows CRLF caused Typora/YAML front-matter rendering issues, so keep files Unix-LF.
+### AI writing prompt
+When asking AI to write or edit a post, reference `BLOG-STANDARDS.md` in the project root which contains the full writing convention. The key points are: YAML front matter with bracketed title, English kebab filename, R2 CDN image URLs, MathJax for formulas.
 
-`temp_replace.py` and `batch-all.json` are one-off/ad-hoc tooling (a past link fixup script with a hardcoded Windows path, and an image-generation batch manifest); they are not part of the normal flow.
+## Deleted content pipeline
+`compress_images.py` was **deleted** (images are now on R2, no local compression needed). Don't try to run it. If adding new posts, just write and push — no preprocessing step needed.
 
 ## Theme Customization
 Do **not** edit `themes/dream-3.13.0/` directly. Override instead:
