@@ -2,6 +2,8 @@
 title: "【论文阅读】Reflective Context Learning 组会报告演讲稿"
 date: 2026-04-19T00:00:00+08:00
 categories: ["LLM"]
+cover: "/img/ArtificialIntelligence.png"
+headerImage: "/img/GeCML.png"
 tags: ["LLM", "agent", "论文阅读"]
 description: "Reflective Context Learning 组会报告演讲稿，8分钟汇报论文核心思想与五大优化原语。"
 math: true

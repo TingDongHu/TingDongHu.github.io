@@ -4,7 +4,7 @@ date: 2026-04-19T00:00:00+08:00
 categories: ["LLM"]
 tags: ["LLM", "Agent", "MCP"]
 cover: "/img/ArtificialIntelligence.png"
-headerImage: "/img/GeGeCML.png"
+headerImage: "/img/GeCML.png"
 math: true
 description: "在当前 AI Agent 技术快速发展的背景下，很多开发者都在探索如何构建高效可靠的 Agent 应用。本文整理了一场来自一线开发者的技术分享，聚焦于 Agent 实践中的真实经验、技术思考与设计哲学，希望能为正在探索 Agent 开发的同学提供参考。"
 ---

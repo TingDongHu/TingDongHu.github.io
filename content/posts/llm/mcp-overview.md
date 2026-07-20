@@ -4,7 +4,7 @@ date: 2026-03-09T00:00:00+08:00
 categories: ["LLM"]
 tags: ["LLM", "Agent", "MCP"]
 cover: "/img/ArtificialIntelligence.png"
-headerImage: "/img/GeGeCML.png"
+headerImage: "/img/GeCML.png"
 math: true
 description: "Function Calling通过有监督微调让LLM学会将用户意图映射为结构化JSON输出，再借助推理时的约束解码确保JSON语法正确，最终由外部代理执行工具调用并返回结果，形成完整的意图-动作闭环。"
 ---
