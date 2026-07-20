@@ -77,7 +77,9 @@ nerfstudio/
 **NERFRenderer**
 位于`model_components/renderers.py`。这里实现了经典的体渲染方程：
 
-$$C = \sum_{i=1}^{N} T_i (1 - \exp(-\sigma_i \delta_i)) c_i$$
+$$
+C = \sum_{i=1}^{N} T_i (1 - \exp(-\sigma_i \delta_i)) c_i
+$$
 
 其中透射率$T_i = \exp(-\sum_{j=1}^{i-1} \sigma_j \delta_j)$。nerfstudio的`RGBRenderer`使用`torch.cumsum`高效计算透射率，并通过`torch.nan_to_num`处理数值稳定性问题。源码中支持`background_color`参数，若设置为`"white"`，则在积分公式后加上透射率乘以白色背景；若设置为`"last_sample"`，则将最后一段的透射率无限延伸，模拟无限远背景。
 
@@ -689,7 +691,11 @@ python export.py -m output/trained_model --iteration 30000
 - 阅读原始NeRF论文（Mildenhall et al., ECCV 2020）的Section 3和Section 4。
 - 手推体渲染方程的离散近似：
   给定光线上的采样点$\mathbf{x}_i = \mathbf{o} + t_i \mathbf{d}$，模型输出体积密度$\sigma_i$和颜色$\mathbf{c}_i$。相邻样本间距为$\delta_i = t_{i+1} - t_i$。透射率（不透明度累积）为$T_i = \exp(-\sum_{j=1}^{i-1} \sigma_j \delta_j)$。最终颜色为：
-  $$\hat{C} = \sum_{i=1}^{N} T_i (1 - \exp(-\sigma_i \delta_i)) \mathbf{c}_i$$
+
+$$
+\hat{C} = \sum_{i=1}^{N} T_i (1 - \exp(-\sigma_i \delta_i)) \mathbf{c}_i
+$$
+
 - 理解位置编码的数学动机：原始的$xyz$坐标属于低频信号，通过$\gamma(p) = (\sin(2^0 \pi p), \cos(2^0 \pi p), \dots, \sin(2^{L-1} \pi p), \cos(2^{L-1} \pi p))$映射到高维，使得MLP能够学习高频细节。
 
 **Day 3-4：安装与首次训练**
@@ -1493,17 +1499,23 @@ event = controller.step(action="MoveAhead")
 
 1. **Deformable NeRF**：在规范NeRF的基础上引入形变场（Deformation Field）。其核心思想是将动态场景分解为静态规范空间（Canonical Space）和时间依赖的形变场：
 
-$$\mathbf{x}_{\text{cano}} = \mathbf{x} + D_\theta(\mathbf{x}, t)$$
+$$
+\mathbf{x}_{\text{cano}} = \mathbf{x} + D_\theta(\mathbf{x}, t)
+$$
 
 其中 $D_\theta$ 为形变网络，将时刻 $t$ 的观测空间坐标映射回规范空间。体密度和颜色在规范空间中查询：
 
-$$\sigma(\mathbf{x}, t) = \sigma_{\text{cano}}(\mathbf{x}_{\text{cano}}), \quad \mathbf{c}(\mathbf{x}, t) = \mathbf{c}_{\text{cano}}(\mathbf{x}_{\text{cano}}, \mathbf{d})$$
+$$
+\sigma(\mathbf{x}, t) = \sigma_{\text{cano}}(\mathbf{x}_{\text{cano}}), \quad \mathbf{c}(\mathbf{x}, t) = \mathbf{c}_{\text{cano}}(\mathbf{x}_{\text{cano}}, \mathbf{d})
+$$
 
 D-NeRF和HyperNeRF是这一路线的经典工作。形变场的优势在于规范空间只需编码静态几何，降低了表示复杂度；但其难点在于大形变和拓扑变化下的映射歧义性。
 
 2. **Dynamic 3D Gaussian Splatting**：将3DGS中的高斯参数扩展为时间依赖的函数。每个高斯的均值、协方差、不透明度均可随时间变化：
 
-$$\boldsymbol{\mu}(t), \quad \mathbf{S}(t), \quad \mathbf{R}(t), \quad \alpha(t)$$
+$$
+\boldsymbol{\mu}(t), \quad \mathbf{S}(t), \quad \mathbf{R}(t), \quad \alpha(t)
+$$
 
 其中 $\mathbf{S}(t)$ 和 $\mathbf{R}(t)$ 分别为缩放矩阵和旋转矩阵。Dynamic 3DGS可通过形变场驱动（如Deformable 3DGS），也可直接用小型MLP参数化每个高斯的时间变化。得益于3DGS的高效光栅化，动态3DGS在训练和渲染速度上相比Deformable NeRF有数量级优势。
 
@@ -1513,7 +1525,9 @@ $$\boldsymbol{\mu}(t), \quad \mathbf{S}(t), \quad \mathbf{R}(t), \quad \alpha(t)
 
 典型的4D生成管线如下：
 
-$$\text{文本/图像} \xrightarrow{\text{视频扩散}} \text{多视角视频} \xrightarrow{\text{4D SDS/重建}} \text{Deformable NeRF / Dynamic 3DGS}$$
+$$
+\text{文本/图像} \xrightarrow{\text{视频扩散}} \text{多视角视频} \xrightarrow{\text{4D SDS/重建}} \text{Deformable NeRF / Dynamic 3DGS}
+$$
 
 **代表工作**：
 
@@ -1552,7 +1566,9 @@ $$\text{文本/图像} \xrightarrow{\text{视频扩散}} \text{多视角视频} 
 
 世界模型（World Model）是近年来备受关注的概念，其核心思想是构建一个对物理世界的内部模拟器，能够：
 
-$$\underbrace{s_t}_{\text{当前状态}} \xrightarrow{\text{世界模型 } f_\theta} \underbrace{\hat{s}_{t+1}}_{\text{预测下一状态}}$$
+$$
+\underbrace{s_t}_{\text{当前状态}} \xrightarrow{\text{世界模型 } f_\theta} \underbrace{\hat{s}_{t+1}}_{\text{预测下一状态}}
+$$
 
 在3D生成语境下，世界模型意味着从"仅生成"走向"理解+预测+生成"的闭环：3D表示不仅用于渲染，还用于物理推理、场景补全和交互预测。这一范式的典型应用在自动驾驶领域：
 
@@ -1581,7 +1597,9 @@ $$\underbrace{s_t}_{\text{当前状态}} \xrightarrow{\text{世界模型 } f_\th
 
 可微物理仿真（Differentiable Physics Simulation）是将物理仿真过程实现为可微分计算图的技术，使得物理仿真的输出对输入参数（形状、材质、力）的梯度可以通过反向传播高效计算：
 
-$$\frac{\partial \mathbf{x}_{t+1}}{\partial \mathbf{x}_0}, \quad \frac{\partial \mathbf{x}_{t+1}}{\partial \boldsymbol{\theta}_{\text{phys}}}$$
+$$
+\frac{\partial \mathbf{x}_{t+1}}{\partial \mathbf{x}_0}, \quad \frac{\partial \mathbf{x}_{t+1}}{\partial \boldsymbol{\theta}_{\text{phys}}}
+$$
 
 其中 $\mathbf{x}_t$ 为时刻 $t$ 的物理状态，$\boldsymbol{\theta}_{\text{phys}}$ 为物理参数（如密度、弹性模量、摩擦系数）。代表引擎包括：
 
@@ -1593,7 +1611,9 @@ $$\frac{\partial \mathbf{x}_{t+1}}{\partial \mathbf{x}_0}, \quad \frac{\partial 
 
 将物理约束融入3D生成管线的核心思路是将物理仿真视为生成过程中的一个可微约束层：
 
-$$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{visual}} + \lambda_{\text{phys}} \mathcal{L}_{\text{phys}}$$
+$$
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{visual}} + \lambda_{\text{phys}} \mathcal{L}_{\text{phys}}
+$$
 
 典型的物理损失包括：
 
