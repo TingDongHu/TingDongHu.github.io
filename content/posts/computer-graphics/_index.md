@@ -34,3 +34,9 @@ description: Games101 课程笔记、3D 生成 AI、3D 计算机视觉等
 - [推理结果解读](openpcdet-inference/) — 模型预测结果解读
 - [SpConv 问题](openpcdet-spconv-issues/) — SpConv 问题解决方案
 - [Uncertainty Estimation](openpcdet-uncertainty-estimation/) — 不确定性估计学习笔记
+
+## 3D 模型验证
+- [从 OBJ 到验证框架](3dverify-mesh-basics/) — 3D 文件结构与验证维度
+- [空间加速与几何验证](3dverify-geometry-validation/) — BVH、射线奇偶、法线一致性
+- [BVH 穿插检测](3dverify-bvh-collision/) — 双树遍历与自碰撞检测
+- [渲染验证与闭环融合](3dverify-rendering-validation/) — 多模态验证与闭环修复
