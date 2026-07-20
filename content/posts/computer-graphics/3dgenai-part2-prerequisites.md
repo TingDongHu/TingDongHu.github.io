@@ -7,7 +7,7 @@ description: "系统梳理3D生成AI的两大先修知识支柱：3D计算机图
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
-------
+---
 
 # 第二部分：筑基篇——不可或缺的先修知识
 
@@ -1280,3 +1280,38 @@ $$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1 - \beta_1) \mathbf{g}_t, \quad \m
 > 
 > 在下一部分中，我们将进入"核心篇"，看到这些先修知识如何在具体的3D生成模型中组合、变形和突破。如果你在本章的任何推导中感到困惑，建议在此暂停，用纸笔重新推导一遍——因为在核心篇中，这些公式将以更复杂的形式重新出现。</result>
 ---
+
+---
+
+## 参考文献
+
+[1] Qi, C.R., et al. "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation." CVPR 2017.
+
+[2] Qi, C.R., et al. "PointNet++: Deep Hierarchical Feature Learning on Point Sets in a Metric Space." NeurIPS 2017.
+
+[3] Park, J.J., et al. "DeepSDF: Learning Continuous Signed Distance Functions for Shape Representation." CVPR 2019.
+
+[4] Mildenhall, B., et al. "NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis." ECCV 2020.
+
+[5] Arjovsky, M., et al. "Wasserstein GAN." ICML 2017.
+
+[6] Gulrajani, I., et al. "Improved Training of Wasserstein GANs." NeurIPS 2017.
+
+[7] Goodfellow, I., et al. "Generative Adversarial Nets." NeurIPS 2014.
+
+[8] Kingma, D.P., & Welling, M. "Auto-Encoding Variational Bayes." ICLR 2014.
+
+[9] Ho, J., et al. "Denoising Diffusion Probabilistic Models." NeurIPS 2020.
+
+[10] Vaswani, A., et al. "Attention Is All You Need." NeurIPS 2017.
+
+[11] Peng, S., et al. "ConvONet: Convolutional Occupancy Networks." ECCV 2020.
+
+[12] Loshchilov, I., & Hutter, F. "Decoupled Weight Decay Regularization." ICLR 2019.
+
+[13] Loshchilov, I., & Hutter, F. "SGDR: Stochastic Gradient Descent with Warm Restarts." ICLR 2017.
+
+## 扩展阅读
+
+- Hartley, R., & Zisserman, A. "Multiple View Geometry in Computer Vision." Cambridge University Press, 2004.
+- Schönberger, J.L., & Frahm, J.M. "Structure-from-Motion Revisited." CVPR 2016.
