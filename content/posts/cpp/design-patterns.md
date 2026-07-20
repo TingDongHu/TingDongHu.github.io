@@ -2,12 +2,12 @@
 title: 【C++】C++中的设计模式
 date: 2025-05-01T00:00:00+08:00
 categories: ["C++"]
-tags: ["语法", "C++", "设计模式", "编程内功"]
+tags: ["C++", "设计模式"]
 description: "设计模式是针对软件设计中常见问题的通用解决方案，核心在于提升代码复用性，避免重复造轮子。"
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"
 math: true
----
+------
 
 ---
 

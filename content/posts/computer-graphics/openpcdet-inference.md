@@ -2,12 +2,12 @@
 title: 【OpenPCDet】模型预测结果解读
 date: 2024-03-02T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["OpenPCDet", "自动驾驶", "目标检测"]
+tags: ["计算机图形学", "OpenPCDet", "自动驾驶", "3d检测"]
 description: "OpenPCDet模型推理输出为字典，包含目标类别、位置、尺寸等关键字段，不同模型结构类似但字段可能略有差异。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 OpenPCDet模型的推理结果以字典形式输出，包含检测目标的类别、位置、尺寸等关键信息。不同模型输出结构类似，但具体字段可能略有差异。 
 

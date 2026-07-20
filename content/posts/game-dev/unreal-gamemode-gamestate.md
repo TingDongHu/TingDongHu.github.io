@@ -2,12 +2,12 @@
 title: 【虚幻引擎】GameMode和GameSate
 date: 2024-04-21T00:00:00+08:00
 categories: ["游戏开发"]
-tags: ["UnrealEngine", "游戏模式", "面向对象"]
+tags: ["游戏开发", "unreal-engine", "游戏模式", "面向对象"]
 description: "GameMode是服务器端权威的游戏规则管理者，定义核心逻辑；GameState则负责在服务器与客户端间同步全局游戏状态，如比分和时间。"
 cover: "/img/unrealengine.png"
 headerImage: "/img/sakura.png"
 math: true
----
+------
 
 ---
 

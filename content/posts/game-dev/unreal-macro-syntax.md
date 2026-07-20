@@ -2,12 +2,12 @@
 title: 【虚幻引擎】UC++的宏定义语法
 date: 2024-04-10T00:00:00+08:00
 categories: ["游戏开发"]
-tags: ["UnrealEngine", "语法", "C++"]
+tags: ["游戏开发", "unreal-engine", "C++"]
 description: "Unreal Engine通过UCLASS、UPROPERTY和UFUNCTION等反射宏，将C++代码暴露给引擎反射系统与蓝图编辑器，实现可视化编辑。GENERATED_BODY()宏必须置于类定义起始处，关键宏参数则控制属性与函数在编辑器中的可见性、可编辑性和蓝图交互能力。"
 cover: "/img/unrealengine.png"
 headerImage: "/img/yuzu.png"
 math: true
----
+------
 
 ---
 

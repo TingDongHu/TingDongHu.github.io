@@ -3,12 +3,12 @@ title: 【Games101】变换基础概念
 date: 2025-06-27T00:00:00+08:00
 mathjax: true
 categories: ["计算机图形学"]
-tags: ["图形学", "渲染", "GAMES课程", "数学基础"]
+tags: ["计算机图形学", "图形学", "渲染", "games101", "数学基础"]
 description: "计算机图形学通过缩放、镜像、错切和旋转等基本变换矩阵，描述物体在二维空间中的位置、大小和方向变化。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
----
+------
 
 计算机图形学中的基本变换包括缩放、镜像、错切和旋转，每种变换都可通过特定的数学矩阵来描述物体在二维空间中的位置、大小和方向变化。 
 

@@ -2,12 +2,12 @@
 title: 3D生成AI学习笔记（五）：评估与验证
 date: 2025-04-27T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["3D生成", "评估指标"]
+tags: ["计算机图形学", "3D生成", "评估指标"]
 description: "从主观实验设计、客观指标体系（CD/EMD/F-Score/LPIPS/SSIM/CLIP Score）的数学本质、指标间的内在冲突，到下游任务驱动的功能性验证，建立多维、多视角、统计严谨的3D生成评估框架。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 # 第五部分：验证与评估篇——如何衡量生成结果的好坏？
 

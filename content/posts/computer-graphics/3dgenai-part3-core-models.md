@@ -2,12 +2,12 @@
 title: 3D生成AI学习笔记（三）：核心生成模型范式
 date: 2025-04-27T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["3D生成", "Diffusion"]
+tags: ["计算机图形学", "3D生成", "diffusion"]
 description: "深入3D生成模型的四大核心范式：体素与栅格生成、点云与结构生成、隐式场与神经场生成（NeRF完全推导、DreamFusion与SDS数学推导、3DGS详解）、可微表面积生成，以及原生3D扩散与大规模预训练趋势。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 # 第三部分：核心篇（上）——3D生成模型的核心范式
 

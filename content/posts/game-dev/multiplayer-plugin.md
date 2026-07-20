@@ -2,12 +2,12 @@
 title: 【MultiplayerCourse】创建多人联机插件
 date: 2024-04-19
 categories: ["游戏开发"]
-tags: ["UnrealEngine", "多人联机"]
+tags: ["游戏开发", "unreal-engine", "多人联机"]
 description: "在UE5中配置Steam在线子系统，需启用插件、修改项目依赖项并编辑配置文件，以实现多人游戏功能。"
 cover: "/img/unrealengine.png"
 headerImage: "/img/sakura.png"
 math: true
----
+------
 
 本文记录了在Unreal Engine 5中配置Steam在线子系统的具体步骤，包括启用插件、修改项目依赖项以及编辑配置文件，以实现多人游戏功能。 
 

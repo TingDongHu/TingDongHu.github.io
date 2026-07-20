@@ -2,12 +2,12 @@
 title: 【算法刷题】排序算法总结
 date: 2025-12-06T00:00:00+08:00
 categories: ["算法刷题"]
-tags: ["排序算法"]
+tags: ["算法", "排序算法"]
 description: "冒泡排序通过相邻元素交换实现排序，时间复杂度O(n²)，稳定且原地排序。选择排序通过选择最小元素放置到已排序末尾完成排序。插入排序将未排序元素插入已排序序列的合适位置。"
 cover: "/img/Algorithm.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 ---
 

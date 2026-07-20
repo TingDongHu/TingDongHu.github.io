@@ -3,12 +3,12 @@ title: 【Games101】光栅化基础
 date: 2025-06-29T00:00:00+08:00
 mathjax: true
 categories: ["计算机图形学"]
-tags: ["图形学", "渲染", "GAMES课程", "数学基础", "动画", "机器学习"]
+tags: ["计算机图形学", "图形学", "渲染", "games101", "数学基础", "动画", "机器学习"]
 description: "光栅化是将几何图元转换为屏幕像素的核心渲染过程，涉及视口变换，并依托于CRT、LCD、OLED等显示设备最终成像。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
----
+------
 
 光栅化是将几何图元（如三角形）转换为屏幕像素的核心渲染过程，涉及视口变换等步骤，并依托于CRT、LCD、OLED等显示设备最终成像。 
 

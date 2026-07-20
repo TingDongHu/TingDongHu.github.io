@@ -2,12 +2,12 @@
 title: 【年度总结】致我的2025：一些事实与感受
 date: 2026-01-26T00:00:00+08:00
 categories: ["随笔"]
-tags: ["年度总结"]
+tags: ["随笔", "年度总结"]
 description: "那时，我并不知道接下来的四季会是什么天气。但好在，我都走过来了。没有变得完全不同，但确实和去年此时的自己，不太一样了。这就够了。"
 cover: "/img/AnnualReview.png"
 headerImage: "/img/GeCML.png"
 math: false 
----
+------
 
 ---
 ## **致我的2025：一些事实与感受**

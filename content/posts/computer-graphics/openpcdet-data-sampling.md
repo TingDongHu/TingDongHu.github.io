@@ -2,12 +2,12 @@
 title: 【OpenPCDet】模型的数据采样训练
 date: 2024-12-20T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["OpenPCDet", "自动驾驶"]
+tags: ["计算机图形学", "OpenPCDet", "自动驾驶"]
 description: "OpenPCDet框架通过修改KITTI数据集的ImageSet索引文件，可便捷创建不同训练子集，无需操作原始点云文件。通过脚本采样生成新索引文件，并在配置文件中指定即可启动训练。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 
 

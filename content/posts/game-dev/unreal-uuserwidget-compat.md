@@ -2,12 +2,12 @@
 title: 【虚幻引擎】虚幻5.1UUserWidget不再包含OnLevelRemovedFromWorld的问题
 date: 2024-04-20
 categories: ["游戏开发"]
-tags: ["C++", "UnrealEngine", "面向对象", "事件系统"]
+tags: ["游戏开发", "C++", "unreal-engine", "面向对象", "事件系统"]
 description: "虚幻引擎5.1移除了`OnLevelRemovedFromWorld`函数，导致编译错误。解决方案是重写`NativeDestruct`函数来实现资源清理逻辑，从而成功编译。"
 cover: "/img/unrealengine.png"
 headerImage: "/img/sakura.png"
 math: true
----
+------
 
 ---
 

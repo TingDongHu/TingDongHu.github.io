@@ -2,12 +2,12 @@
 title: 【虚幻引擎】设置UI自适应屏幕大小
 date: 2023-11-30T00:00:00+08:00
 categories: ["游戏开发"]
-tags: ["UnrealEngine", "游戏开发"]
+tags: ["unreal-engine", "游戏开发"]
 description: "锚点是虚幻引擎UI布局的核心工具，通过将控件锚定在父物体或屏幕的特定点，确保界面在不同屏幕分辨率下能自适应缩放并保持稳定的相对位置关系。"
 cover: "/img/unrealengine.png"
 headerImage: "/img/sakura.png"
 math: true
----
+------
 
 ---
 

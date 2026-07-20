@@ -2,12 +2,12 @@
 title: 【Vibe-Coding】前后端基础知识扫盲-1
 date: 2026-04-13T00:00:00+08:00
 categories: ["LLM"]
-tags: ["AI编程", "前端", "后端", "设计模式"]
+tags: ["LLM", "AI编程", "前端", "后端", "设计模式"]
 description: "这篇博客是一份面向AI编程（Vibe-Coding）实践者的系统性Web开发入门指南。作者发现自己用AI快速生成应用时，对背后的技术原理和架构不了解，导致难以精细调整和维护代码，于是决定从零开始系统梳理Web开发知识，让自己能更好地“指挥”AI、理解并优化AI生成的代码。"
 cover: "/img/vibe_coding.png"
 headerImage: "/img/rabbit.png"
 math: false
----
+------
 
 ---
 

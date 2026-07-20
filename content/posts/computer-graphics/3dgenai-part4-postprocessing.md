@@ -2,12 +2,12 @@
 title: 3D生成AI学习笔记（四）：后处理与生产管线
 date: 2025-04-27T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["3D生成"]
+tags: ["计算机图形学", "3D生成"]
 description: "从生成到可用资产的关键后处理环节：Marching Cubes网格提取、重拓扑与Remesh、UV展开与纹理烘焙、LOD生成与轻量化，以及完整的引擎集成管线。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 # 第四部分：核心篇（下）——从生成到可用资产：后处理、优化与管线
 

@@ -2,12 +2,12 @@
 title: 【论文阅读】ViewDiff：基于文生图模型的3D一致图像生成技术
 date: 2025-11-04T00:00:00+08:00
 categories: ["机器学习"]
-tags: ["Diffusion"]
+tags: ["机器学习", "diffusion"]
 description: "ViewDiff利用预训练文生图扩散模型生成高质量、多视角一致的3D图像，解决了现有方法在真实感和视角一致性上的不足。"
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true
----
+------
 
 ---
 CVPR 2024论文ViewDiff提出了一种新方法，利用预训练的文生图扩散模型生成高质量且多视角一致的3D图像，旨在克服现有方法在真实感和视角一致性上的不足。 

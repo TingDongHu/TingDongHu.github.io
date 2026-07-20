@@ -2,12 +2,12 @@
 title: 3D生成AI学习笔记（二）：先修知识体系
 date: 2025-04-27T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["3D生成", "图形学", "深度学习", "Diffusion"]
+tags: ["计算机图形学", "3D生成", "图形学", "深度学习", "diffusion"]
 description: "系统梳理3D生成AI的两大先修知识支柱：3D计算机图形学基础（五种核心表示方法、多视图几何、渲染管线）与深度学习核心基石（GAN/VAE/扩散模型推导、神经网络架构、优化理论），并附先修知识自测清单。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 # 第二部分：筑基篇——不可或缺的先修知识
 

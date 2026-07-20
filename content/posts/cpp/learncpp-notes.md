@@ -2,12 +2,12 @@
 title: 【C++】LearnCppDate
 date: 2026-01-01T00:00:00+08:00
 categories: ["C++"]
-tags: ["语法", "C++"]
+tags: ["C++"]
 description: "本文是作者践行“高密度文档+AI协作”学习法后的首篇 C++ 笔记。不仅分享了从视频学习转向深度阅读的心路历程，更深入浅出地总结了 Learn C++ 基础章节：涵盖从硬件逻辑到高级语言的演进、编译器与解释器的底层差异，以及 C++ 源码级跨平台的实现原理。"
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"
 math: true
----
+------
 
 ## 前言
 

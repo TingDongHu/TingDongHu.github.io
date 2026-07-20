@@ -2,12 +2,12 @@
 title: 【虚幻引擎】UC++与标准C++的区别
 date: 2024-03-19T00:00:00+08:00
 categories: ["游戏开发"]
-tags: ["C++", "语法", "UnrealEngine"]
+tags: ["游戏开发", "C++", "unreal-engine"]
 description: "Unreal C++通过宏和反射机制支持运行时类型信息与动态访问，并采用自动垃圾回收；而标准C++则依赖手动管理或智能指针，且反射功能有限。"
 cover: "/img/unrealengine.png"
 headerImage: "/img/sakura.png"
 math: true
----
+------
 
 ---
 ## 1. 类声明与反射系统

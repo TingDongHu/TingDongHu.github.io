@@ -3,12 +3,12 @@ title: 【Games101】颜色与感知(Color and Perception)
 date: 2025-12-18T00:00:00+08:00
 mathjax: true
 categories: ["计算机图形学"]
-tags: ["图形学", "GAMES课程", "色彩"]
+tags: ["计算机图形学", "图形学", "games101", "色彩"]
 description: "颜色是光线与感光系统互动的结果。人眼通过三种视锥细胞将连续光谱转换为三个神经信号，这解释了为何三原色能模拟色彩，并产生了同色异谱现象。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
----
+------
 
 
 颜色是光线与感光系统互动的结果。人眼通过三种视锥细胞将连续光谱转换为三个神经信号，这解释了为何三原色能模拟色彩，并产生了同色异谱现象。 

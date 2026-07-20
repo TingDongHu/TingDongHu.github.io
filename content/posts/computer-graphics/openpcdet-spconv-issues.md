@@ -2,12 +2,12 @@
 title: 【OpenPCDet】关于spconv的一些问题解决方案
 date: 2024-12-30T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["OpenPCDet"]
+tags: ["计算机图形学", "OpenPCDet"]
 description: "在Ubuntu20.04与CUDA 11.3环境下改进OpenPCDet时，针对spconv模块的版本冲突、API变更及初始化错误，通过重装指定版本、修改导入语句和降级版本得以解决。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 
 最近在修改对OpenPCDet中一些算法做改进评估的时候碰到了一系列的和spconv模组相关的问题，找到了一些解决方法。

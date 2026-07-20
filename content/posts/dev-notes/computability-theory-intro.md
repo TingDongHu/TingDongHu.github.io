@@ -2,12 +2,12 @@
 title: "【课堂笔记】可计算理论导论：从零开始理解计算的边界"
 date: 2026-04-20T00:00:00+08:00
 categories: ["开发工具"]
-tags: ["可计算理论"]
+tags: ["开发工具", "可计算理论"]
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeGeCML.png"
 math: true
 description: "本文基于 MIT Michael Sipser 教授的经典教材《计算理论导引》，从零基础开始系统介绍可计算理论的基本概念。通过大量通俗示例，解释字母表、字符串、语言、自动机、图灵机、可判定性等核心概念，帮助你建立对计算边界的直观认识。"
----
+------
 
 # 可计算理论导论：从零开始理解计算的边界
 

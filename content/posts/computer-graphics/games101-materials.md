@@ -3,12 +3,12 @@ title: 【Games101】材质与外观
 date: 2025-12-11T00:00:00+08:00
 mathjax: true
 categories: ["计算机图形学"]
-tags: ["图形学", "GAMES课程", "渲染"]
+tags: ["计算机图形学", "图形学", "games101", "渲染"]
 description: "在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
----
+------
 
 在计算机图形学中，材料的视觉外观由其与光线的相互作用决定，这通过双向反射分布函数（BRDF）数学模型精确描述。BRDF必须遵循非负性、线性、可逆性和能量守恒等物理定律，以确保渲染的真实性。 
 

@@ -2,12 +2,12 @@
 title: 【OpenPCDet】PointPillar算法思路
 date: 2024-12-31T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["目标检测", "自动驾驶"]
+tags: ["计算机图形学", "3d检测", "自动驾驶"]
 description: "PointPillar是一种高效的激光雷达点云3D检测模型，通过将点云划分为柱体并编码为伪图像，在保持高精度的同时实现了显著的实时检测速度优势。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 
 PointPillar 是一种用于三维物体检测的深度学习模型，尤其适用于激光雷达点云数据的处理。它的设计思想相对简洁，并且在保持高效性的同时能获得较高的精度。

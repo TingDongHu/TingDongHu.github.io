@@ -2,12 +2,12 @@
 title: 3D生成AI学习笔记（一）：范式革命与管线全景图
 date: 2025-04-27T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["3D生成", "Diffusion", "图形学", "深度学习"]
+tags: ["计算机图形学", "3D生成", "diffusion", "图形学", "深度学习"]
 description: "从传统3D内容制作管线的工时金字塔出发，拆解3D生成AI带来的三重范式转移——门槛民主化、创意涌现性与表示连续化，并给出全流程管线总览与AI在管线中的阶梯式定位。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 # 第一部分：开篇明义——3D生成AI的范式革命与管线全景图
 

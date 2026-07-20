@@ -3,12 +3,12 @@ title: 【Games101】着色基础
 date: 2025-07-01T00:00:00+08:00
 mathjax: true
 categories: ["计算机图形学"]
-tags: ["图形学", "渲染", "GAMES课程", "数学基础"]
+tags: ["计算机图形学", "图形学", "渲染", "games101", "数学基础"]
 description: "Shading是图形学中模拟光线与物体表面交互以计算颜色和明暗的技术，其核心包括局部着色模型，以及漫反射、镜面高光和环境光等基础光照现象的模拟。"
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
----
+------
 
 Shading是图形学中模拟光线与物体表面交互，计算颜色和明暗的技术。其核心包括局部着色模型，以及漫反射、镜面高光和环境光等基础光照现象的模拟，以实现逼真的视觉效果。 
 

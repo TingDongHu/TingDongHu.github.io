@@ -2,12 +2,12 @@
 title: 3D生成AI学习笔记（六）：实战与前沿趋势
 date: 2025-04-27T00:00:00+08:00
 categories: ["计算机图形学"]
-tags: ["3D生成"]
+tags: ["计算机图形学", "3D生成"]
 description: "核心开源框架详解（nerfstudio/threestudio/Kaolin/PyTorch3D）、实战动手路径与学习资源推荐，以及3D生成AI的未来趋势展望——从数据规模到多模态统一表示。"
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
----
+------
 
 # 第六部分：实战与趋势篇——动手路径与未来展望
 
