@@ -7,7 +7,7 @@ description: "本文详细介绍了在Ubuntu 20.04系统上配置OpenPCDet 3D目
 cover: "/img/pointcloud.png"
 headerImage: "/img/linpory.png"
 math: true
-------
+---
 
 本文详细介绍了在Ubuntu 20.04系统上配置OpenPCDet 3D目标检测工具箱的完整流程，涵盖创建虚拟环境、安装PyTorch与spconv等关键依赖，并最终完成编译和数据导入。 
 

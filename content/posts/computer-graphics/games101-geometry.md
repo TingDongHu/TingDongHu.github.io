@@ -8,7 +8,7 @@ description: "几何是计算机图形学三维建模与渲染的基础，应用
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 
 几何是计算机图形学中三维建模与渲染的基础，应用于物体建模、几何变换和碰撞检测等领域。其表示方法主要分为隐式表示（如代数曲面、水平集和距离函数）和显式表示，用于描述不同复杂度的形状。 

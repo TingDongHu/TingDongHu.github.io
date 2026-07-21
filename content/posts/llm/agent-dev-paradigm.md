@@ -46,7 +46,11 @@ ReAct范式正是将这种人类自然的解决问题方式形式化，让LLM能
 
 传统LLM是一问一答。ReAct引入了一个**循环**（Loop）
 
-$$用户输入 \xrightarrow{思考} 行为 \xrightarrow{观察} 再次思考 \dots 直到得出答案$$
+
+$$
+用户输入 \xrightarrow{思考} 行为 \xrightarrow{观察} 再次思考 \dots 直到得出答案
+$$
+
 
 ![ReAct循环流程](https://pub-500a3a9e99b44ef29efa70fd87011d69.r2.dev/agent/llm应用开发原理agent经典开发范式/01-flowchart-react-loop.png)
 

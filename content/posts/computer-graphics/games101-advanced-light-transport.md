@@ -8,7 +8,7 @@ description: "文章对比了无偏与有偏渲染方法，并详细分析了双
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 高级光线传播技术旨在提升复杂光照下的渲染效率与质量。文章对比了无偏与有偏方法，并详细分析了双向路径追踪和梅特罗波利斯光线传播两种策略的原理、适用场景及优缺点。 
 

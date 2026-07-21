@@ -8,7 +8,7 @@ description: "光栅化是将几何图元转换为屏幕像素的核心渲染过
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 光栅化是将几何图元（如三角形）转换为屏幕像素的核心渲染过程，涉及视口变换等步骤，并依托于CRT、LCD、OLED等显示设备最终成像。 
 

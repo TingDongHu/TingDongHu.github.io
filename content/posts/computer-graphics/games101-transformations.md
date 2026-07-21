@@ -8,7 +8,7 @@ description: "计算机图形学通过缩放、镜像、错切和旋转等基本
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 计算机图形学中的基本变换包括缩放、镜像、错切和旋转，每种变换都可通过特定的数学矩阵来描述物体在二维空间中的位置、大小和方向变化。 
 

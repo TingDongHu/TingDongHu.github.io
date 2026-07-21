@@ -8,7 +8,7 @@ description: "颜色是光线与感光系统互动的结果。人眼通过三种
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 
 颜色是光线与感光系统互动的结果。人眼通过三种视锥细胞将连续光谱转换为三个神经信号，这解释了为何三原色能模拟色彩，并产生了同色异谱现象。 

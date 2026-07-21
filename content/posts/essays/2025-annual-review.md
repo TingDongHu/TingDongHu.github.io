@@ -7,7 +7,7 @@ description: "那时，我并不知道接下来的四季会是什么天气。但
 cover: "/img/AnnualReview.png"
 headerImage: "/img/GeCML.png"
 math: false 
-------
+---
 
 ---
 ## **致我的2025：一些事实与感受**

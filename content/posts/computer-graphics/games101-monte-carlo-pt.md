@@ -8,7 +8,7 @@ description: "蒙特卡洛积分利用随机采样近似计算复杂积分，其
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 蒙特卡洛积分利用随机采样近似计算复杂积分，其理论基础是概率论。文章介绍了离散与连续随机变量、概率密度函数、期望值以及随机变量函数的概念，并阐述了这些知识在图形学渲染问题中的应用。 
 

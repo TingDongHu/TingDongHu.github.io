@@ -8,7 +8,7 @@ description: "动画通过连续图像产生运动感，其发展从手绘到数
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 动画通过连续图像产生运动感，其发展从手绘到数字时代。关键帧动画是基础技术，通过定义关键姿态并由计算机插值生成中间帧，数学本质是参数空间的插值过程。 
 

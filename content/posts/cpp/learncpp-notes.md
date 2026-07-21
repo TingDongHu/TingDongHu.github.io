@@ -7,7 +7,7 @@ description: "本文是作者践行“高密度文档+AI协作”学习法后的
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"
 math: true
-------
+---
 
 ## 前言
 

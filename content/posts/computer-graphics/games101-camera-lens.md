@@ -8,7 +8,7 @@ description: "成像包含合成与捕捉。针孔相机清晰但进光量不足
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 成像包含合成与捕捉两个环节。针孔相机虽能实现清晰成像，但进光量不足；引入透镜可提升亮度，却带来了景深与视场角等物理权衡，揭示了亮度与清晰度的内在矛盾。 
 

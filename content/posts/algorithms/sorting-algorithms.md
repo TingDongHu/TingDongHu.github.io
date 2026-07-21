@@ -7,7 +7,7 @@ description: "冒泡排序通过相邻元素交换实现排序，时间复杂度
 cover: "/img/Algorithm.png"
 headerImage: "/img/Makima.png"
 math: true
-------
+---
 
 ---
 

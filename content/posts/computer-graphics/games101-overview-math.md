@@ -7,7 +7,7 @@ description: "计算机图形学是研究图形表示、生成、处理和显示
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 
 计算机图形学是研究计算机中图形表示、生成、处理和显示的交叉学科，其核心内容包括图形表示、生成、处理与显示，并与计算机视觉、图像处理等学科紧密关联。学习图形学需要掌握线性代数基础，如向量的点乘、叉乘及矩阵运算。 

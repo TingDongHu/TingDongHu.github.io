@@ -8,7 +8,7 @@ description: "纹理是计算机图形学中用于增强模型表面细节的二
 cover: "/img/ComputerGraphics.png"
 headerImage: "/img/rthykless.png"
 math: true
-------
+---
 
 
 纹理是计算机图形学中用于增强模型表面细节的二维图像或数据贴图。通过纹理映射技术，结合UV坐标系和重心坐标插值，可将纹理贴合到三维模型表面，提供颜色、法线等丰富信息，提升视觉真实感。 

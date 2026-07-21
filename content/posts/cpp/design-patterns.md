@@ -7,7 +7,7 @@ description: "设计模式是针对软件设计中常见问题的通用解决方
 cover: "/img/cpp.png"
 headerImage: "/img/pink.png"
 math: true
-------
+---
 
 ---
 

@@ -7,7 +7,7 @@ description: "生成式AI视觉内容技术从早期算法、VAE/GAN演进至当
 cover: "/img/ArtificialIntelligence.png"
 headerImage: "/img/GeCML.png"
 math: true
-------
+---
 
 ---
 

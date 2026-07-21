@@ -7,7 +7,7 @@ description: "神经网络不确定性研究旨在解决模型对错误或未知
 cover: "/img/pointcloud.png"
 headerImage: "/img/Makima.png"
 math: true
-------
+---
 
 
 ## 为什么要研究uncertainty？
