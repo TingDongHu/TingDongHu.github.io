@@ -65,6 +65,7 @@ Images are served from **Cloudflare R2** CDN, **not** stored in the repo.
 - New images: paste/screenshot in Typora → PicGo CLI auto-uploads to R2 → CDN URL inserted
 - URL format: `https://pub-500a3a9e99b44ef29efa70fd87011d69.r2.dev/2026-07-20/{md5}.png`
 - Do NOT use local relative paths for images
+- **When writing with AI**: AI should output `![描述]` with empty path (no URL, no placeholder path). The user adds real images later in Typora.
 - Cover/header images still live in `static/img/` (they're theme assets, not post content)
 
 ### Math

@@ -66,15 +66,28 @@ math: true
 
 ## 图片
 
-- 拖入 Typora 或粘贴截图，PicGo CLI 自动上传到 Cloudflare R2
-- markdown 中自动生成 `![](https://pub-500a3a9e99b44ef29efa70fd87011d69.r2.dev/日期/md5.png)` 格式
+### 手动写文章（Typora + PicGo）
+
+- 截图或拖入图片到 Typora → PicGo CLI 自动上传到 R2 → 自动生成 CDN URL
+- 你**不需要手动处理路径**，Typora 会自动插入：`![](https://pub-500a3a9e99b44ef29efa70fd87011d69.r2.dev/日期/md5.png)`
 - 不要使用本地相对路径引用图片
+
+### AI 写文章
+
+- AI 写文章时无法上传真实图片
+- AI 应写 `![描述]` 不带路径（方括号留空），你后续在 Typora 中粘贴补图
+- 不要写占位路径如 `![图](待上传/image.png)`，这会产生死链
+
+### 传错图片怎么撤销
+
+- 在本文中 @我，告诉我需要删除的 R2 URL，我帮你删
+- 或自行操作：浏览器进入 Cloudflare Dashboard → R2 → my-blog-images → 找到文件 → 删除
 
 ## 数学公式
 
 - front matter 中设置 `math: true`
 - 行内公式用 `$...$`
-- 行间公式用 `$$...$$`
+- 行间公式用 `$$...$$`占三行（两个`$$`各独立占一行） 
 
 ## 写作风格
 
